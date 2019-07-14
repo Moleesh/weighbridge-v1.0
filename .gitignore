@@ -24,4 +24,5 @@ hs_err_pid*
 
 .idea
 target
-weighbridgeold.iml
+com.babulens.WeighBridge_Old.iml
+weighdata.mv.db
