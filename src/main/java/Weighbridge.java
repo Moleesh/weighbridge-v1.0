@@ -7118,10 +7118,10 @@ class Weighbridge implements SerialPortEventListener {
                 // String inputLine = input.readLine();---------------------------
                 while (input.read() != 61)
                     ;
-                String inputLine = new StringBuilder(
-                        "" + (char) input.read() + (char) input.read() + (char) input.read() + (char) input.read()
-                                + (char) input.read() + (char) input.read() + (char) input.read() + (char) input.read())
-                        .reverse().toString();
+//                String inputLine = new StringBuilder(
+//                        "" + (char) input.read() + (char) input.read() + (char) input.read() + (char) input.read()
+//                                + (char) input.read() + (char) input.read() + (char) input.read() + (char) input.read())
+//                        .reverse().toString();
                 // int temps = input.read();
                 // while (temps != 13) {
                 // value[change++] = (char) temps;
@@ -7129,7 +7129,7 @@ class Weighbridge implements SerialPortEventListener {
                 // }
                 // change = 0;
                 // String inputLine = (new String(value)).replaceAll("[^0-9]", "");
-                // String inputLine = input.readLine().split("\\$")[0].replaceAll("[^0-9]", "");
+                String inputLine = input.readLine().split("\\$")[0].replaceAll("[^0-9]", "");
                 if ("".equals(inputLine))
                     inputLine = lblWeight.getText();
                 if ("".equals(inputLine))
