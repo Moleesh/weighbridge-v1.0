@@ -822,9 +822,7 @@ class Weighbridge implements SerialPortEventListener {
         frmBabulensWeighbridgeDesigned.setBounds(new Rectangle(100, 100, 1280, 768));
         frmBabulensWeighbridgeDesigned.setExtendedState(Frame.MAXIMIZED_BOTH);
         frmBabulensWeighbridgeDesigned.setUndecorated(true);
-
         frmBabulensWeighbridgeDesigned.setIconImage(Toolkit.getDefaultToolkit().getImage("resources/logo.bmp"));
-
         frmBabulensWeighbridgeDesigned.setTitle("BABULENS WEIGHBRIDGE designed by \"BABULENS ENTERPRISES\"");
         frmBabulensWeighbridgeDesigned.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frmBabulensWeighbridgeDesigned.getContentPane().setLayout(null);
