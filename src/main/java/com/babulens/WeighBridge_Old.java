@@ -7496,7 +7496,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 add(new IpCamDriver(new IpCamStorage("cameras.xml")));
 
             } catch (NullPointerException | WebcamException e) {
-                add(new Weighbridge.MyIpCam());
+                add(new WeighBridge_Old.MyIpCam());
             }
             add(new WebcamDefaultDriver());
         }
