@@ -66,7 +66,7 @@ class Weighbridge implements SerialPortEventListener {
     private final JCheckBox aaa = new JCheckBox("Transporter's Name");
     private final JCheckBox a2 = new JCheckBox("Vehicle No");
     private final JCheckBox a3 = new JCheckBox("Material");
-    private final JCheckBox a4 = new JCheckBox("Charges");
+    private final JCheckBox a4 = new JCheckBox("No of Bags");
     private final JCheckBox a5 = new JCheckBox("Gross Wt");
     private final JCheckBox a6 = new JCheckBox("Gross Date & Time");
     private final JCheckBox a7 = new JCheckBox("Tare Wt");
@@ -905,7 +905,7 @@ class Weighbridge implements SerialPortEventListener {
         lblMaterial.setBounds(50, 350, 175, 25);
         panelWeighing.add(lblMaterial);
 
-        JLabel lblCharges = new JLabel("Charges");
+        JLabel lblCharges = new JLabel("No of Bags");
         lblCharges.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         lblCharges.setBounds(50, 400, 85, 25);
         panelWeighing.add(lblCharges);
@@ -4085,7 +4085,7 @@ class Weighbridge implements SerialPortEventListener {
                     try {
                         tableReport.setModel(new DefaultTableModel(new Object[][]{},
                                 new String[]{"Sl.No", "Dc. No", "Dc. Date", "Customer's Name",
-                                        "Transporter's Name", "Vehicle No", "Material", "Charges", "Gross Wt",
+                                        "Transporter's Name", "Vehicle No", "Material", "No of Bags", "Gross Wt",
                                         "Gross Date & Time", "Tare Wt", "Tare Date & Time", "Net Wt",
                                         "Print Date & Time", "Remarks", "Manual"}) {
                             private static final long serialVersionUID = 1L;
@@ -4162,7 +4162,7 @@ class Weighbridge implements SerialPortEventListener {
                         if (!a3.isSelected())
                             tableReport.removeColumn(tableReport.getColumn("Material"));
                         if (!a4.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Charges"));
+                            tableReport.removeColumn(tableReport.getColumn("No of Bags"));
                         if (!a5.isSelected())
                             tableReport.removeColumn(tableReport.getColumn("Gross Wt"));
                         if (!a6.isSelected())
@@ -4283,7 +4283,7 @@ class Weighbridge implements SerialPortEventListener {
                         tableReport.removeColumn(tableReport.getColumn("Material Name"));
                 }
             }
-            textFieldTotalCharges.setText("Rs. " + charges);
+            textFieldTotalCharges.setText("" + charges);
             textFieldtotalNetWt.setText(netWt + " Kg");
         });
         btnGo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -4305,7 +4305,7 @@ class Weighbridge implements SerialPortEventListener {
         scrollPane.setViewportView(tableReport);
 
         textFieldTotalCharges = new JTextField();
-        textFieldTotalCharges.setText("Rs. 0");
+        textFieldTotalCharges.setText("0");
         textFieldTotalCharges.setEditable(false);
         textFieldTotalCharges.setHorizontalAlignment(SwingConstants.LEFT);
         textFieldTotalCharges.setFont(new Font("Times New Roman", Font.PLAIN, 20));
@@ -4314,7 +4314,7 @@ class Weighbridge implements SerialPortEventListener {
         textFieldTotalCharges.setBounds(162, 535, 175, 30);
         panelReport.add(textFieldTotalCharges);
 
-        JLabel lblTotalCharges = new JLabel("Total Charges");
+        JLabel lblTotalCharges = new JLabel("No of Bags");
         lblTotalCharges.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         lblTotalCharges.setBounds(20, 540, 120, 25);
         panelReport.add(lblTotalCharges);
@@ -4489,7 +4489,7 @@ class Weighbridge implements SerialPortEventListener {
                     try {
                         tableReport.setModel(new DefaultTableModel(new Object[][]{},
                                 new String[]{"Sl.No", "Dc. No", "Dc. Date", "Customer's Name",
-                                        "Transporter's Name", "Vehicle No", "Material", "Charges", "Gross Wt",
+                                        "Transporter's Name", "Vehicle No", "Material", "No of Bags", "Gross Wt",
                                         "Gross Date & Time", "Tare Wt", "Tare Date & Time", "Net Wt",
                                         "Print Date & Time", "Remarks", "Manual"}) {
                             /**
@@ -4568,7 +4568,7 @@ class Weighbridge implements SerialPortEventListener {
                         if (!a3.isSelected())
                             tableReport.removeColumn(tableReport.getColumn("Material"));
                         if (!a4.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Charges"));
+                            tableReport.removeColumn(tableReport.getColumn("No of Bags"));
                         if (!a5.isSelected())
                             tableReport.removeColumn(tableReport.getColumn("Gross Wt"));
                         if (!a6.isSelected())
@@ -4678,7 +4678,7 @@ class Weighbridge implements SerialPortEventListener {
                 // Name"));
                 // }
             }
-            textFieldTotalCharges.setText("Rs. " + charges);
+            textFieldTotalCharges.setText("" + charges);
             textFieldtotalNetWt.setText(netWt + " Kg");
             btnEditReport.setEnabled(false);
             btnSaveReport.setEnabled(true);
@@ -5971,7 +5971,7 @@ class Weighbridge implements SerialPortEventListener {
                 String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "),
                         textFieldTareDateTime.getText()),
                 String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "),
-                        "Charges : Rs." + textFieldCharges.getText()),
+                        "No of Bags : " + textFieldCharges.getText()),
                 chckbxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? ""
                         : String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n",
                 "-----------------------------------------------------------------\n",
@@ -6345,7 +6345,7 @@ class Weighbridge implements SerialPortEventListener {
                         + temp[1] + "\n\n" + String.format(format, "", "Vehicle No") + textFieldVehicleNo.getText()
                         + "\n\n" + String.format(format, "", "Material") + comboBoxMaterial.getEditor().getItem()
                         + "\n\n" + String.format(format, "", "Customer Name")
-                        + comboBoxCustomerName.getEditor().getItem() + "\n\n" + String.format(format, "", "Charges")
+                        + comboBoxCustomerName.getEditor().getItem() + "\n\n" + String.format(format, "", "No of Bags")
                         + textFieldCharges.getText() + "\n\n";
                 graphics.setFont(new Font("Courier New", Font.BOLD, 10));
                 coordinates = drawString(graphics, initString, 0, coordinates.y);
@@ -6585,7 +6585,7 @@ class Weighbridge implements SerialPortEventListener {
                 temp,
                 "==================================================================================================\n",
                 " ", "\n\tTotal Net Wt   " + textFieldtotalNetWt.getText(),
-                "\n\tTotal Charge   " + textFieldTotalCharges.getText(), "\n\t\t\t\t\tSignature"};
+                "\n\tNo of Bags   " + textFieldTotalCharges.getText(), "\n\t\t\t\t\tSignature"};
 
         String[] initStyles = {"1", "2", "2", "3", "3", "3", "3", "3", "5", "5", "5", "5"};
 
