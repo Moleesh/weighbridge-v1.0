@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.*;
 import java.util.concurrent.*;
 
+@SuppressWarnings("ALL")
 class WeighBridge_Old implements SerialPortEventListener {
     private static final String DB_CONNECTION = "jdbc:h2:./weighdata";
     private static final String DB_USER = "admin";
@@ -799,7 +800,7 @@ class WeighBridge_Old implements SerialPortEventListener {
     /**
      * Initialize the contents of the frame.
      */
-    @SuppressWarnings({"unlikely-arg-type", "StatementWithEmptyBody"})
+    @SuppressWarnings("unlikely-arg-type")
     private void initialize() {
         a1.setSelected(true);
         aa.setSelected(true);
@@ -823,7 +824,9 @@ class WeighBridge_Old implements SerialPortEventListener {
         frmBabulensWeighbridgeDesigned.setBounds(new Rectangle(100, 100, 1280, 768));
         frmBabulensWeighbridgeDesigned.setExtendedState(Frame.MAXIMIZED_BOTH);
         frmBabulensWeighbridgeDesigned.setUndecorated(true);
+
         frmBabulensWeighbridgeDesigned.setIconImage(Toolkit.getDefaultToolkit().getImage("resources/logo.bmp"));
+
         frmBabulensWeighbridgeDesigned.setTitle("BABULENS WEIGHBRIDGE designed by \"BABULENS ENTERPRISES\"");
         frmBabulensWeighbridgeDesigned.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frmBabulensWeighbridgeDesigned.getContentPane().setLayout(null);
@@ -1018,7 +1021,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                     } catch (SQLException | NumberFormatException ignored) {
                     }
                 }
-                comboBoxMaterial.setSelectedItem(Objects.requireNonNull(comboBoxMaterial.getSelectedItem()).toString().toUpperCase());
+                comboBoxMaterial.setSelectedItem(comboBoxMaterial.getSelectedItem().toString().toUpperCase());
 
                 textFieldCharges.requestFocus();
                 if (chckbxExcludeCharges.isSelected())
@@ -1442,7 +1445,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                     textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
                     textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
                     textFieldTareWt.setText(Integer.toString(
-                            rs.getInt(Objects.requireNonNull(comboBoxa.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
+                            rs.getInt(comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "WT")));
                     textFieldTareDateTime.setText(rs
                             .getDate(comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE")
                             + " " + rs.getTime(
@@ -1517,7 +1520,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                     textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
                     textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
                     textFieldGrossWt.setText(Integer.toString(
-                            rs.getInt(Objects.requireNonNull(comboBoxa.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
+                            rs.getInt(comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "WT")));
                     textFieldGrossDateTime.setText(rs
                             .getDate(comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE")
                             + " " + rs.getTime(
@@ -1576,8 +1579,8 @@ class WeighBridge_Old implements SerialPortEventListener {
                                         clickedImage
                                                 .getScaledInstance(
                                                         (int) (((double) 240
-                                                                / ((Dimension) Objects.requireNonNull(comboBoxResolution1
-                                                                .getSelectedItem())).height
+                                                                / ((Dimension) comboBoxResolution1
+                                                                .getSelectedItem()).height
                                                                 * ((Dimension) comboBoxResolution1
                                                                 .getSelectedItem()).width)),
                                                         240, Image.SCALE_SMOOTH)));
@@ -1607,8 +1610,8 @@ class WeighBridge_Old implements SerialPortEventListener {
                                         clickedImage
                                                 .getScaledInstance(
                                                         (int) (((double) 240
-                                                                / ((Dimension) Objects.requireNonNull(comboBoxResolution2
-                                                                .getSelectedItem())).height
+                                                                / ((Dimension) comboBoxResolution2
+                                                                .getSelectedItem()).height
                                                                 * ((Dimension) comboBoxResolution2
                                                                 .getSelectedItem()).width)),
                                                         240, Image.SCALE_SMOOTH)));
@@ -1640,8 +1643,8 @@ class WeighBridge_Old implements SerialPortEventListener {
                                         clickedImage
                                                 .getScaledInstance(
                                                         (int) (((double) 240
-                                                                / ((Dimension) Objects.requireNonNull(comboBoxResolution3
-                                                                .getSelectedItem())).height
+                                                                / ((Dimension) comboBoxResolution3
+                                                                .getSelectedItem()).height
                                                                 * ((Dimension) comboBoxResolution3
                                                                 .getSelectedItem()).width)),
                                                         240, Image.SCALE_SMOOTH)));
@@ -1673,8 +1676,8 @@ class WeighBridge_Old implements SerialPortEventListener {
                                         clickedImage
                                                 .getScaledInstance(
                                                         (int) (((double) 240
-                                                                / ((Dimension) Objects.requireNonNull(comboBoxResolution4
-                                                                .getSelectedItem())).height
+                                                                / ((Dimension) comboBoxResolution4
+                                                                .getSelectedItem()).height
                                                                 * ((Dimension) comboBoxResolution4
                                                                 .getSelectedItem()).width)),
                                                         240, Image.SCALE_SMOOTH)));
@@ -1922,7 +1925,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (response == JOptionPane.YES_OPTION)
                     for (int i = 0; i < Integer.parseInt(textFieldNoOfCopies.getText()); i++) {
-                        if (Objects.requireNonNull(comboBoxPrintOptionForWeight.getSelectedItem()).equals("Pre Print")) {
+                        if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Pre Print")) {
                             printPreWeight();
                             break;
                         } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Camera"))
@@ -2880,7 +2883,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
                 char[] temp = password.getPassword();
-                boolean isCorrect;
+                boolean isCorrect = true;
                 char[] correctPassword = {'1', '2', '3', '4', '5', '6'};
                 if (temp.length != correctPassword.length) {
                     isCorrect = false;
@@ -3532,7 +3535,7 @@ class WeighBridge_Old implements SerialPortEventListener {
         btnCalculate.addActionListener(e -> {
             String[] temp = textFieldBillDateTime.getText().split(" ");
             try {
-                if (datePicker.getDate() == null)
+                if (datePicker.getDate().equals(null))
                     ;
             } catch (NullPointerException e1) {
                 try {
@@ -3999,7 +4002,7 @@ class WeighBridge_Old implements SerialPortEventListener {
         btnGo.addActionListener(arg0 -> {
             int charges = 0, netWt = 0;
             String message = "Plz Choose The Column To Show In Report ?";
-            int n;
+            int n = 2;
             if (rdbtnWeighing.isSelected()) {
                 Object[] params = {message, a1, a1a, a1b, aa, aaa, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12};
                 n = JOptionPane.showConfirmDialog(null, params, "Choose The Columns", JOptionPane.OK_CANCEL_OPTION);
@@ -4008,13 +4011,13 @@ class WeighBridge_Old implements SerialPortEventListener {
                 n = JOptionPane.showConfirmDialog(null, params, "Choose The Columns", JOptionPane.OK_CANCEL_OPTION);
             }
             if (n == 0) {
-                String date1, date2,
-                        vehicleNo, material;
-                int serialNo;
+                String date1 = "0000-01-01", date2 = "9999-12-31",
+                        vehicleNo = "%", material = "%";
+                int serialNo = 0;
                 Date dateTemp12;
                 if (rdbtnWeighing.isSelected()) {
                     String temp = "SELECT * FROM WEIGHING";
-                    switch (Objects.requireNonNull(comboBox.getSelectedItem()).toString()) {
+                    switch (comboBox.getSelectedItem().toString()) {
                         case "Full Report":
                             temp = "SELECT * FROM WEIGHING";
                             break;
@@ -4100,8 +4103,8 @@ class WeighBridge_Old implements SerialPortEventListener {
                                 ResultSet.CONCUR_UPDATABLE);
                         ResultSet rs = stmt.executeQuery(temp + " ORDER BY SLNO");
                         while (rs.next()) {
-                            String date, time, gross,
-                                    tare, net;
+                            String date = "", time = "", gross = "",
+                                    tare = "", net = "";
                             date = "" + rs.getDate("GROSSDATE");
                             if (date.equals("null"))
                                 date = "";
@@ -4184,7 +4187,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                     }
                 } else {
                     String temp = "SELECT * FROM BILLING";
-                    switch (Objects.requireNonNull(comboBox.getSelectedItem()).toString()) {
+                    switch (comboBox.getSelectedItem().toString()) {
                         case "Full Report":
                             temp = "SELECT * FROM BILLING";
                             break;
@@ -4236,7 +4239,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                                 ResultSet.CONCUR_UPDATABLE);
                         ResultSet rs = stmt.executeQuery(temp);
                         while (rs.next()) {
-                            String date;
+                            String date = "";
                             date = "" + rs.getDate("BILLDATE");
                             if (date.equals("null"))
                                 date = "";
@@ -4473,7 +4476,7 @@ class WeighBridge_Old implements SerialPortEventListener {
 
             int charges = 0, netWt = 0;
             String message = "Plz Choose The Column To Show In Report ?";
-            int n;
+            int n = 2;
             if (rdbtnWeighing.isSelected()) {
                 Object[] params = {message, a1, a1a, a1b, aa, aaa, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12};
                 n = JOptionPane.showConfirmDialog(null, params, "Choose The Columns", JOptionPane.OK_CANCEL_OPTION);
@@ -4507,8 +4510,8 @@ class WeighBridge_Old implements SerialPortEventListener {
                                 ResultSet.CONCUR_UPDATABLE);
                         ResultSet rs = stmt.executeQuery(temp);
                         while (rs.next()) {
-                            String date, time, gross,
-                                    tare, net;
+                            String date = "", time = "", gross = "",
+                                    tare = "", net = "";
                             date = "" + rs.getDate("GROSSDATE");
                             if (date.equals("null"))
                                 date = "";
@@ -4777,7 +4780,7 @@ class WeighBridge_Old implements SerialPortEventListener {
         lblFooter.setBounds(10, 175, 75, 25);
         panelSettings.add(lblFooter);
 
-        JLabel lblWeighbridgeSettings = new JLabel("com.babulens.WeighBridge_Old Settings");
+        JLabel lblWeighbridgeSettings = new JLabel("Weighbridge Settings");
         lblWeighbridgeSettings.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
         lblWeighbridgeSettings.setBounds(336, 11, 200, 25);
         panelSettings.add(lblWeighbridgeSettings);
@@ -5022,7 +5025,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
                 char[] temp = password.getPassword();
-                boolean isCorrect;
+                boolean isCorrect = true;
                 char[] correctPassword = {'6', '5', '4', '3', '2', '1'};
                 if (temp.length != correctPassword.length) {
                     isCorrect = false;
@@ -5060,7 +5063,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
                 char[] temp = password.getPassword();
-                boolean isCorrect;
+                boolean isCorrect = true;
                 char[] correctPassword = {'m', 'o', 's', 'e', 's', 'd', 'h', 'a', 's'};
                 if (temp.length != correctPassword.length) {
                     isCorrect = false;
@@ -5146,7 +5149,7 @@ class WeighBridge_Old implements SerialPortEventListener {
             JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
             char[] temp = password.getPassword();
-            boolean isCorrect;
+            boolean isCorrect = true;
             char[] correctPassword = {'1', '2', '3', '4', '5', '6'};
             if (temp.length != correctPassword.length) {
                 isCorrect = false;
@@ -5154,7 +5157,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 isCorrect = Arrays.equals(temp, correctPassword);
             }
             if (isCorrect) {
-                String response;
+                String response = "";
                 response = JOptionPane.showInputDialog(null, "Please Enter the Starting Sl No ?", "Sl No",
                         JOptionPane.QUESTION_MESSAGE);
                 if (response == null || Integer.parseInt("0" + response.replaceAll("[^0-9]", "")) == 0)
@@ -5206,7 +5209,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
                 char[] temp = password.getPassword();
-                boolean isCorrect;
+                boolean isCorrect = true;
                 char[] correctPassword = {'1', '2', '3', '4', '5', '6'};
                 if (temp.length != correctPassword.length) {
                     isCorrect = false;
@@ -5270,7 +5273,7 @@ class WeighBridge_Old implements SerialPortEventListener {
             JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
             char[] temp = password.getPassword();
-            boolean isCorrect;
+            boolean isCorrect = true;
             char[] correctPassword = {'1', '2', '3', '4', '5', '6'};
             if (temp.length != correctPassword.length) {
                 isCorrect = false;
@@ -5278,7 +5281,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 isCorrect = Arrays.equals(temp, correctPassword);
             }
             if (isCorrect) {
-                String response;
+                String response = "";
                 response = JOptionPane.showInputDialog(null, "Please Enter the Starting Bill No ?", "Bill No",
                         JOptionPane.QUESTION_MESSAGE);
                 if (response == null || Integer.parseInt("0" + response.replaceAll("[^0-9]", "")) == 0)
@@ -5389,7 +5392,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
                 char[] temp = password.getPassword();
-                boolean isCorrect;
+                boolean isCorrect = true;
                 char[] correctPassword = {'d', 'e', 'v', 'j', 'i', 's', 'h'};
                 if (temp.length != correctPassword.length) {
                     isCorrect = false;
@@ -5455,7 +5458,7 @@ class WeighBridge_Old implements SerialPortEventListener {
             JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
             char[] temp = password.getPassword();
-            boolean isCorrect;
+            boolean isCorrect = true;
             char[] correctPassword = {'1', '2', '3', '4', '5', '6'};
             if (temp.length != correctPassword.length) {
                 isCorrect = false;
@@ -5948,7 +5951,6 @@ class WeighBridge_Old implements SerialPortEventListener {
         String format3 = "     %1$-9s: %2$s";
         String dc = "";
         String driver = "";
-        //noinspection StatementWithEmptyBody
         if (textFieldDcNo.getText().trim().equals("") || textFieldDcDate.getText().trim().equals(""))
             ;
         else {
@@ -6272,6 +6274,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 graphics.setFont(new Font("Courier New", Font.BOLD, 10));
                 yTemp = y;
                 coordinates = drawString(graphics, initString, 0, y);
+                y = coordinates.y;
 
                 initString = StringUtils.rightPad(textFieldNetWt.getText(), 7) + "Kg";
                 graphics.setFont(new Font("Courier New", Font.BOLD, 12));
@@ -6373,6 +6376,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 graphics.setFont(new Font("Courier New", Font.BOLD, 10));
                 yTemp = y;
                 coordinates = drawString(graphics, initString, 0, y);
+                y = coordinates.y;
 
                 initString = StringUtils.rightPad(textFieldNetWt.getText(), 7) + "Kg";
                 graphics.setFont(new Font("Courier New", Font.BOLD, 12));
@@ -6421,7 +6425,6 @@ class WeighBridge_Old implements SerialPortEventListener {
         pf.setPaper(paper);
         Book pBook = new Book();
         pBook.append(new Printable() {
-            @SuppressWarnings("SameParameterValue")
             private void drawString(Graphics g, String text, int y) {
                 int length = 0;
                 for (String line : text.split("\n")) {
@@ -6431,11 +6434,11 @@ class WeighBridge_Old implements SerialPortEventListener {
                 new Coordinates(length, y + g.getFontMetrics().getHeight() - 1);
             }
 
-            @SuppressWarnings("SameReturnValue")
             public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
                 String format1 = "           %-19s: %-25s   %-10s : %s\n";
                 String format2 = "           %-10s:%7s Kg   %-10s : %-12s   %-10s : %s\n";
                 String format3 = "           %-10s:%7s Kg \n";
+                String input = "23/12/2014 10:22:12 PM";
                 String[] temp1 = new String[2];
                 String[] temp2 = new String[2];
                 try {
@@ -7103,13 +7106,14 @@ class WeighBridge_Old implements SerialPortEventListener {
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public void serialEvent(SerialPortEvent evt) {
         if (evt.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
-            String temp;
+            String temp = "####$$$$$$####";
             try {
                 temp = textFieldPortName.getText().split(";")[3];
+                if (Objects.equals(temp, ""))
+                    temp = "####$$$$$$####";
             } catch (ArrayIndexOutOfBoundsException ignored) {
             }
             try {
@@ -7141,7 +7145,6 @@ class WeighBridge_Old implements SerialPortEventListener {
         }
     }
 
-    @SuppressWarnings("SameParameterValue")
     private WebcamPanel webcamStarter(WebcamPicker webcamPicker, int i, WebcamPanel panelCamera,
                                       JComboBox<DimensionTemplate> comboBoxResolution, JTextField textFieldCropX12, JTextField textFieldCropY12,
                                       JTextField textFieldCropWidth12, JTextField textFieldCropHeight12, int x, int y, int z, int l) {
@@ -7380,7 +7383,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
                 char[] temp = password.getPassword();
-                boolean isCorrect;
+                boolean isCorrect = true;
                 char[] correctPassword = {'l', 'e', 'n', 's', 'm', 'o', 's', 'e', 's', 'd', 'h', 'a', 's'};
                 if (temp.length != correctPassword.length) {
                     isCorrect = false;
@@ -7433,7 +7436,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
                 char[] temp = password.getPassword();
-                boolean isCorrect;
+                boolean isCorrect = true;
                 char[] correctPassword = {'m', 'o', 'l', 'e', 'e', 's', 'h'};
                 if (temp.length != correctPassword.length) {
                     isCorrect = false;
@@ -7493,7 +7496,7 @@ class WeighBridge_Old implements SerialPortEventListener {
                 add(new IpCamDriver(new IpCamStorage("cameras.xml")));
 
             } catch (NullPointerException | WebcamException e) {
-                add(new WeighBridge_Old.MyIpCam());
+                add(new Weighbridge.MyIpCam());
             }
             add(new WebcamDefaultDriver());
         }
@@ -7672,7 +7675,7 @@ class WeighBridge_Old implements SerialPortEventListener {
         }
 
         public void actionPerformed(ActionEvent e) {
-            double result;
+            double result = 0;
 
             for (int i = 0; i < jbButtons.length; i++) {
                 if (e.getSource() == jbButtons[i]) {
@@ -7809,7 +7812,6 @@ class WeighBridge_Old implements SerialPortEventListener {
 
         }
 
-        @SuppressWarnings("EmptyMethod")
         private void storeInMemory() {
             // needs code
         }
@@ -7908,7 +7910,7 @@ class WeighBridge_Old implements SerialPortEventListener {
         }
 
         void processEquals() {
-            double result;
+            double result = 0;
             if (displayMode != ERROR_MODE) {
                 try {
                     result = processLastOperator();
