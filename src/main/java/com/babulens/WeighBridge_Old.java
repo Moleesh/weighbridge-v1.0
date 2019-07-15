@@ -908,7 +908,7 @@ class WeighBridge_Old {
 
         JLabel lblCharges = new JLabel("No of Bags");
         lblCharges.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblCharges.setBounds(50, 400, 85, 25);
+        lblCharges.setBounds(50, 400, 90, 25);
         panelWeighing.add(lblCharges);
 
         JLabel lblGrossWt = new JLabel("Gross Wt");
