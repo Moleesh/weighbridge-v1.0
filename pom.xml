@@ -28,7 +28,6 @@
             <artifactId>poi-ooxml</artifactId>
             <version>4.1.0</version>
         </dependency>
-
         <dependency>
             <groupId>org.swinglabs</groupId>
             <artifactId>swingx</artifactId>
@@ -44,10 +43,21 @@
             <artifactId>webcam-capture-driver-ipcam</artifactId>
             <version>0.3.12</version>
         </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.rxtx</groupId>-->
+        <!--            <artifactId>rxtx</artifactId>-->
+        <!--            <version>2.1.7</version>-->
+        <!--        </dependency>-->
+
         <dependency>
-            <groupId>org.rxtx</groupId>
-            <artifactId>rxtx</artifactId>
-            <version>2.1.7</version>
+            <groupId>com.fazecast</groupId>
+            <artifactId>jSerialComm</artifactId>
+            <version>2.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.199</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -74,12 +84,6 @@
             <artifactId>istack-commons-runtime</artifactId>
             <version>3.0.8</version>
         </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.199</version>
-        </dependency>
-
     </dependencies>
     <build>
         <finalName>WeighBridge</finalName>
