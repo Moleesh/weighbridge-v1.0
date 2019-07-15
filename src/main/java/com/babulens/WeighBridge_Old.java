@@ -6867,7 +6867,7 @@ class WeighBridge_Old {
         }
         if (a4.isSelected()) {
             cell = row.createCell(j++);
-            cell.setCellValue("Charges");
+            cell.setCellValue("No Of Bags");
             cell.setCellStyle(cellStyleStringCenter);
         }
         if (a5.isSelected()) {
