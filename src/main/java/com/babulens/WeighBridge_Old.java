@@ -7318,6 +7318,10 @@ class WeighBridge_Old {
             dbConnection.close();
         } catch (SQLException ignored) {
         }
+        if (comPort != null) {
+            comPort.removeDataListener();
+            comPort.closePort();
+        }
         webcamdispose();
         System.exit(0);
     }
