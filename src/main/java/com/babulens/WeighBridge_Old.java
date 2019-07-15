@@ -4313,9 +4313,9 @@ class WeighBridge_Old {
         textFieldTotalCharges.setBounds(162, 535, 175, 30);
         panelReport.add(textFieldTotalCharges);
 
-        JLabel lblTotalCharges = new JLabel("No of Bags");
+        JLabel lblTotalCharges = new JLabel("Total No of Bags");
         lblTotalCharges.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblTotalCharges.setBounds(20, 540, 120, 25);
+        lblTotalCharges.setBounds(20, 540, 150, 25);
         panelReport.add(lblTotalCharges);
 
         textFieldtotalNetWt = new JTextField();
