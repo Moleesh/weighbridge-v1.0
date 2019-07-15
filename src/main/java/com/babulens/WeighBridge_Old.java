@@ -33,7 +33,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.print.*;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -101,8 +100,6 @@ class WeighBridge_Old {
     private boolean lock = false;
     private PrintService[] printServices;
     private String[] printers;
-    private SerialPort serialPort;
-    private BufferedReader input;
     private Calculator calc;
     private JFrame frmBabulensWeighbridgeDesigned;
     private JTextField textFieldCharges;
@@ -804,7 +801,7 @@ class WeighBridge_Old {
     /**
      * Initialize the contents of the frame.
      */
-    @SuppressWarnings({"unlikely-arg-type", "StatementWithEmptyBody"})
+    @SuppressWarnings({"unlikely-arg-type", "StatementWithEmptyBody", "UnusedReturnValue"})
     private void initialize() {
         a1.setSelected(true);
         aa.setSelected(true);
@@ -6411,6 +6408,7 @@ class WeighBridge_Old {
     }
 
     // TODO print
+    @SuppressWarnings("UnusedReturnValue")
     private void printPlainSriPathyWeight() {
         PrinterJob pj = PrinterJob.getPrinterJob();
         PageFormat pf = new PageFormat();
@@ -7263,6 +7261,7 @@ class WeighBridge_Old {
         }
     }
 
+    @SuppressWarnings("unused")
     private void sentSMS(String mobileNo) {
         String smsMessage = "Sl.No : " + textFieldSlNo.getText() + "\nDate & Time : " + textFieldNetDateTime.getText()
                 + "\nVehicle No : " + textFieldVehicleNo.getText() + "\nMaterial : "
@@ -7539,7 +7538,7 @@ class WeighBridge_Old {
         private final JLabel jlOutput;
         private final JButton[] jbButtons;
         int displayMode;
-        boolean clearOnNextDigit, percent;
+        boolean clearOnNextDigit;
         double lastNumber;
         String lastOperator;
 
