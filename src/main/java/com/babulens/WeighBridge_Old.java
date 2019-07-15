@@ -5925,7 +5925,7 @@ class WeighBridge_Old {
         Paper paper = pf.getPaper();
         double width = 8d * 72d;
         double height = 4d * 72d;
-        double widthmargin = .75d * 72d;
+        double widthmargin = .50d * 72d;
         double heightmargin = .25d * 72d;
         paper.setSize(width, height);
         paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
@@ -6317,7 +6317,7 @@ class WeighBridge_Old {
             private Coordinates drawString(Graphics g, String text, int x, int y) {
                 int length = 0;
                 for (String line : text.split("\n")) {
-                    g.drawString(line, x, y += g.getFontMetrics().getHeight() - 1);
+                    g.drawString(line, x + 10, y += g.getFontMetrics().getHeight() - 1);
                     length = g.getFontMetrics().stringWidth(line);
                 }
                 return new Coordinates(length, y + g.getFontMetrics().getHeight() - 1);
