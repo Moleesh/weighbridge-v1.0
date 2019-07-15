@@ -72,7 +72,7 @@ class WeighBridge_Old {
     private final JCheckBox aaa = new JCheckBox("Transporter's Name");
     private final JCheckBox a2 = new JCheckBox("Vehicle No");
     private final JCheckBox a3 = new JCheckBox("Material");
-    private final JCheckBox a4 = new JCheckBox("Charges");
+    private final JCheckBox a4 = new JCheckBox("No of Bags");
     private final JCheckBox a5 = new JCheckBox("Gross Wt");
     private final JCheckBox a6 = new JCheckBox("Gross Date & Time");
     private final JCheckBox a7 = new JCheckBox("Tare Wt");
@@ -906,7 +906,7 @@ class WeighBridge_Old {
         lblMaterial.setBounds(50, 350, 175, 25);
         panelWeighing.add(lblMaterial);
 
-        JLabel lblCharges = new JLabel("Charges");
+        JLabel lblCharges = new JLabel("No of Bags");
         lblCharges.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         lblCharges.setBounds(50, 400, 90, 25);
         panelWeighing.add(lblCharges);
@@ -4084,7 +4084,7 @@ class WeighBridge_Old {
                     try {
                         tableReport.setModel(new DefaultTableModel(new Object[][]{},
                                 new String[]{"Sl.No", "Dc. No", "Dc. Date", "Customer's Name",
-                                        "Transporter's Name", "Vehicle No", "Material", "Charges", "Gross Wt",
+                                        "Transporter's Name", "Vehicle No", "Material", "No of Bags", "Gross Wt",
                                         "Gross Date & Time", "Tare Wt", "Tare Date & Time", "Net Wt",
                                         "Print Date & Time", "Remarks", "Manual"}) {
                             private static final long serialVersionUID = 1L;
@@ -4161,7 +4161,7 @@ class WeighBridge_Old {
                         if (!a3.isSelected())
                             tableReport.removeColumn(tableReport.getColumn("Material"));
                         if (!a4.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Charges"));
+                            tableReport.removeColumn(tableReport.getColumn("No of Bags"));
                         if (!a5.isSelected())
                             tableReport.removeColumn(tableReport.getColumn("Gross Wt"));
                         if (!a6.isSelected())
@@ -4282,7 +4282,7 @@ class WeighBridge_Old {
                         tableReport.removeColumn(tableReport.getColumn("Material Name"));
                 }
             }
-            textFieldTotalCharges.setText("Rs. " + charges);
+            textFieldTotalCharges.setText("" + charges);
             textFieldtotalNetWt.setText(netWt + " Kg");
         });
         btnGo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -4304,7 +4304,7 @@ class WeighBridge_Old {
         scrollPane.setViewportView(tableReport);
 
         textFieldTotalCharges = new JTextField();
-        textFieldTotalCharges.setText("Rs. 0");
+        textFieldTotalCharges.setText("0");
         textFieldTotalCharges.setEditable(false);
         textFieldTotalCharges.setHorizontalAlignment(SwingConstants.LEFT);
         textFieldTotalCharges.setFont(new Font("Times New Roman", Font.PLAIN, 20));
@@ -4313,7 +4313,7 @@ class WeighBridge_Old {
         textFieldTotalCharges.setBounds(162, 535, 175, 30);
         panelReport.add(textFieldTotalCharges);
 
-        JLabel lblTotalCharges = new JLabel("Total Charges");
+        JLabel lblTotalCharges = new JLabel("Total No of Bags");
         lblTotalCharges.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         lblTotalCharges.setBounds(20, 540, 150, 25);
         panelReport.add(lblTotalCharges);
@@ -4488,7 +4488,7 @@ class WeighBridge_Old {
                     try {
                         tableReport.setModel(new DefaultTableModel(new Object[][]{},
                                 new String[]{"Sl.No", "Dc. No", "Dc. Date", "Customer's Name",
-                                        "Transporter's Name", "Vehicle No", "Material", "Charges", "Gross Wt",
+                                        "Transporter's Name", "Vehicle No", "Material", "No of Bags", "Gross Wt",
                                         "Gross Date & Time", "Tare Wt", "Tare Date & Time", "Net Wt",
                                         "Print Date & Time", "Remarks", "Manual"}) {
                             /**
@@ -4567,7 +4567,7 @@ class WeighBridge_Old {
                         if (!a3.isSelected())
                             tableReport.removeColumn(tableReport.getColumn("Material"));
                         if (!a4.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Charges"));
+                            tableReport.removeColumn(tableReport.getColumn("No of Bags"));
                         if (!a5.isSelected())
                             tableReport.removeColumn(tableReport.getColumn("Gross Wt"));
                         if (!a6.isSelected())
@@ -4677,7 +4677,7 @@ class WeighBridge_Old {
                 // Name"));
                 // }
             }
-            textFieldTotalCharges.setText("Rs. " + charges);
+            textFieldTotalCharges.setText("" + charges);
             textFieldtotalNetWt.setText(netWt + " Kg");
             btnEditReport.setEnabled(false);
             btnSaveReport.setEnabled(true);
@@ -5926,7 +5926,7 @@ class WeighBridge_Old {
         Paper paper = pf.getPaper();
         double width = 8d * 72d;
         double height = 4d * 72d;
-        double widthmargin = .50d * 72d;
+        double widthmargin = .75d * 72d;
         double heightmargin = .25d * 72d;
         paper.setSize(width, height);
         paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
@@ -5972,7 +5972,7 @@ class WeighBridge_Old {
                 String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "),
                         textFieldTareDateTime.getText()),
                 String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "),
-                        "Charges : Rs. " + textFieldCharges.getText()),
+                        "No of Bags : " + textFieldCharges.getText()),
                 chckbxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? ""
                         : String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n",
                 "-----------------------------------------------------------------\n",
@@ -6318,7 +6318,7 @@ class WeighBridge_Old {
             private Coordinates drawString(Graphics g, String text, int x, int y) {
                 int length = 0;
                 for (String line : text.split("\n")) {
-                    g.drawString(line, x + 10, y += g.getFontMetrics().getHeight() - 1);
+                    g.drawString(line, x, y += g.getFontMetrics().getHeight() - 1);
                     length = g.getFontMetrics().stringWidth(line);
                 }
                 return new Coordinates(length, y + g.getFontMetrics().getHeight() - 1);
@@ -6345,8 +6345,8 @@ class WeighBridge_Old {
                         + temp[1] + "\n\n" + String.format(format, "", "Vehicle No") + textFieldVehicleNo.getText()
                         + "\n\n" + String.format(format, "", "Material") + comboBoxMaterial.getEditor().getItem()
                         + "\n\n" + String.format(format, "", "Customer Name")
-                        + comboBoxCustomerName.getEditor().getItem() + "\n\n" + String.format(format, "", "Charges")
-                        + "Rs. " + textFieldCharges.getText() + "\n\n";
+                        + comboBoxCustomerName.getEditor().getItem() + "\n\n" + String.format(format, "", "No of Bags")
+                        + textFieldCharges.getText() + "\n\n";
                 graphics.setFont(new Font("Courier New", Font.BOLD, 10));
                 coordinates = drawString(graphics, initString, 0, coordinates.y);
 
@@ -6585,7 +6585,7 @@ class WeighBridge_Old {
                 temp,
                 "==================================================================================================\n",
                 " ", "\n\tTotal Net Wt   " + textFieldtotalNetWt.getText(),
-                "\n\tCharges   " + textFieldTotalCharges.getText(), "\n\t\t\t\t\tSignature"};
+                "\n\tNo of Bags   " + textFieldTotalCharges.getText(), "\n\t\t\t\t\tSignature"};
 
         String[] initStyles = {"1", "2", "2", "3", "3", "3", "3", "3", "5", "5", "5", "5"};
 
@@ -6867,7 +6867,7 @@ class WeighBridge_Old {
         }
         if (a4.isSelected()) {
             cell = row.createCell(j++);
-            cell.setCellValue("Charges");
+            cell.setCellValue("No Of Bags");
             cell.setCellStyle(cellStyleStringCenter);
         }
         if (a5.isSelected()) {
