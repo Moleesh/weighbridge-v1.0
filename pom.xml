@@ -12,6 +12,10 @@
     <name>weighbridge</name>
     <description>Weighbridge Software</description>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>commons-lang</groupId>

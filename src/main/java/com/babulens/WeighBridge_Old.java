@@ -277,6 +277,10 @@ class WeighBridge_Old {
     private JTextField textFieldLine4;
     private JCheckBox chckbxenableSettings2;
     private JCheckBox chckbxTareNoSlno;
+    private JTextField textFieldNoOfBags;
+    private JTextField textFieldBagDeduction;
+    private JTextField textField;
+    private JCheckBox chckbxExcludeNoOfBags;
 
     /**
      * Create the application.
@@ -290,8 +294,7 @@ class WeighBridge_Old {
                 printers[i++] = printer.getName();
             try {
                 dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
-            } catch (SQLException | NullPointerException e) {
-                e.printStackTrace();
+            } catch (SQLException | NullPointerException ex) {
                 JOptionPane.showMessageDialog(null,
                         "DATABASE ALREADY OPEN\nPLZ CLOSE ALL OPEN SOFTWARE FILES\nLINE :328", "DATABASE ERROR",
                         JOptionPane.ERROR_MESSAGE);
@@ -316,15 +319,14 @@ class WeighBridge_Old {
             // printPlainSriPathyWeight();
             // close();
 
-        } catch (Error | Exception e) {
-            e.printStackTrace();
+        } catch (Error | Exception ignored) {
         }
     }
 
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "UI NOT SUPPORTED\nLINE :306", "UI ERROR", JOptionPane.ERROR_MESSAGE);
         }
         EventQueue.invokeLater(() -> {
@@ -439,7 +441,7 @@ class WeighBridge_Old {
                 default:
                     close();
             }
-        } catch (SQLException e) {
+        } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :540", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -586,7 +588,7 @@ class WeighBridge_Old {
             rs.absolute(4);
             checkBoxCamera4.setSelected(rs.getBoolean("ENABLE"));
 
-        } catch (SQLException e) {
+        } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :414", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -705,8 +707,7 @@ class WeighBridge_Old {
             cameraEvent();
             billEvent();
             lock1 = false;
-        } catch (SQLException | ParseException e) {
-            e.printStackTrace();
+        } catch (SQLException | ParseException ex) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :806", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -792,7 +793,7 @@ class WeighBridge_Old {
                 rs.insertRow();
             }
             settings();
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException ex) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :477", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -840,7 +841,7 @@ class WeighBridge_Old {
         close.setFocusable(false);
         close.setBounds(646, 11, 100, 30);
         close.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        close.addActionListener(arg0 -> close());
+        close.addActionListener(e -> close());
         close.setFont(new Font("Times New Roman", Font.BOLD, 20));
         frmBabulensWeighbridgeDesigned.getContentPane().add(close);
 
@@ -893,27 +894,27 @@ class WeighBridge_Old {
 
         JLabel lblDateTime = new JLabel("Date & Time");
         lblDateTime.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblDateTime.setBounds(50, 250, 175, 25);
+        lblDateTime.setBounds(50, 230, 175, 25);
         panelWeighing.add(lblDateTime);
 
         JLabel lblVehicleNo = new JLabel("Vehicle No");
         lblVehicleNo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblVehicleNo.setBounds(50, 300, 175, 25);
+        lblVehicleNo.setBounds(50, 270, 175, 25);
         panelWeighing.add(lblVehicleNo);
 
         JLabel lblMaterial = new JLabel("Material");
         lblMaterial.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblMaterial.setBounds(50, 350, 175, 25);
+        lblMaterial.setBounds(50, 310, 175, 25);
         panelWeighing.add(lblMaterial);
 
         JLabel lblCharges = new JLabel("Charges");
         lblCharges.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblCharges.setBounds(50, 400, 90, 25);
+        lblCharges.setBounds(50, 390, 90, 25);
         panelWeighing.add(lblCharges);
 
         JLabel lblGrossWt = new JLabel("Gross Wt");
         lblGrossWt.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblGrossWt.setBounds(490, 300, 75, 25);
+        lblGrossWt.setBounds(490, 310, 90, 25);
         panelWeighing.add(lblGrossWt);
 
         JLabel lblTareWt = new JLabel("Tare Wt");
@@ -923,12 +924,12 @@ class WeighBridge_Old {
 
         JLabel lblNetWt = new JLabel("Nett Wt");
         lblNetWt.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblNetWt.setBounds(490, 400, 75, 25);
+        lblNetWt.setBounds(490, 430, 75, 25);
         panelWeighing.add(lblNetWt);
 
         rdbtnGross = new JRadioButton("Gross");
         rdbtnGross.setBackground(new Color(0, 255, 127));
-        rdbtnGross.addActionListener(arg0 -> {
+        rdbtnGross.addActionListener(e -> {
             comboBoxMaterial.setEnabled(true);
             comboBoxMaterial.setSelectedIndex(-1);
             if (chckbxExcludeCustomer.isSelected())
@@ -948,7 +949,7 @@ class WeighBridge_Old {
 
         rdbtnTare = new JRadioButton("Tare");
         rdbtnTare.setBackground(new Color(0, 255, 127));
-        rdbtnTare.addActionListener(arg0 -> {
+        rdbtnTare.addActionListener(e -> {
             // comboBoxMaterial.setEnabled(false);
             comboBoxMaterial.getModel().setSelectedItem("EMPTY");
             if (chckbxExcludeCustomer.isSelected())
@@ -975,13 +976,13 @@ class WeighBridge_Old {
         textFieldCharges.setDisabledTextColor(Color.BLACK);
         textFieldCharges.setHorizontalAlignment(SwingConstants.CENTER);
         textFieldCharges.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldCharges.setBounds(240, 400, 175, 25);
+        textFieldCharges.setBounds(240, 390, 175, 25);
         panelWeighing.add(textFieldCharges);
         textFieldCharges.setColumns(10);
 
         textFieldCustomerName = new JComboBox<>();
         textFieldCustomerName.setEditable(true);
-        textFieldCustomerName.addActionListener(arg0 -> {
+        textFieldCustomerName.addActionListener(e -> {
             comboBoxCustomerName.setSelectedItem(textFieldCustomerName.getSelectedItem());
             try {
                 Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -992,7 +993,7 @@ class WeighBridge_Old {
                     textFieldCustomerAddress.setText(rs.getString("CUSTOMERADDRESS"));
                     textFieldCustomerAddress1.setText(rs.getString("CUSTOMERADDRESS1"));
                 }
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1406", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -1003,7 +1004,7 @@ class WeighBridge_Old {
 
         });
         textFieldCustomerName.setFont(new Font("Times New Roman", Font.PLAIN, 18));
-        textFieldCustomerName.setBounds(240, 200, 175, 25);
+        textFieldCustomerName.setBounds(240, 190, 175, 25);
         panelWeighing.add(textFieldCustomerName);
 
         comboBoxMaterial = new JComboBox<>();
@@ -1032,11 +1033,11 @@ class WeighBridge_Old {
         });
         comboBoxMaterial.setEditable(true);
         comboBoxMaterial.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        comboBoxMaterial.setBounds(240, 347, 175, 30);
+        comboBoxMaterial.setBounds(240, 310, 175, 30);
         panelWeighing.add(comboBoxMaterial);
 
         textFieldVehicleNo = new JTextField();
-        textFieldVehicleNo.addActionListener(arg0 -> {
+        textFieldVehicleNo.addActionListener(e -> {
             textFieldVehicleNo.setText(textFieldVehicleNo.getText().toUpperCase().replaceAll(" ", ""));
             if (!chckbxTareNoSlno.isSelected()) {
                 if (rdbtnGross.isSelected()) {
@@ -1061,7 +1062,7 @@ class WeighBridge_Old {
                                 textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
                             }
                         }
-                    } catch (SQLException | ParseException e) {
+                    } catch (SQLException | ParseException ex) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -1090,7 +1091,7 @@ class WeighBridge_Old {
                                     comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
                                 }
                             }
-                    } catch (SQLException | ParseException e) {
+                    } catch (SQLException | ParseException ex) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -1122,7 +1123,7 @@ class WeighBridge_Old {
                                     comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
                                 }
                             }
-                    } catch (SQLException | ParseException e) {
+                    } catch (SQLException | ParseException ex) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -1153,7 +1154,7 @@ class WeighBridge_Old {
 
                                 }
                             }
-                    } catch (SQLException | ParseException e) {
+                    } catch (SQLException | ParseException ex) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -1175,7 +1176,7 @@ class WeighBridge_Old {
         textFieldVehicleNo.setHorizontalAlignment(SwingConstants.CENTER);
         textFieldVehicleNo.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldVehicleNo.setColumns(10);
-        textFieldVehicleNo.setBounds(240, 297, 175, 30);
+        textFieldVehicleNo.setBounds(240, 270, 175, 25);
         panelWeighing.add(textFieldVehicleNo);
 
         textFieldDateTime = new JTextField();
@@ -1184,7 +1185,7 @@ class WeighBridge_Old {
         textFieldDateTime.setHorizontalAlignment(SwingConstants.CENTER);
         textFieldDateTime.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         textFieldDateTime.setColumns(10);
-        textFieldDateTime.setBounds(240, 250, 175, 25);
+        textFieldDateTime.setBounds(240, 230, 175, 25);
         panelWeighing.add(textFieldDateTime);
 
         textFieldSlNo = new JTextField();
@@ -1193,7 +1194,7 @@ class WeighBridge_Old {
         textFieldSlNo.setHorizontalAlignment(SwingConstants.CENTER);
         textFieldSlNo.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldSlNo.setColumns(10);
-        textFieldSlNo.setBounds(237, 141, 175, 25);
+        textFieldSlNo.setBounds(240, 150, 175, 25);
         panelWeighing.add(textFieldSlNo);
 
         textFieldGrossWt = new JTextField();
@@ -1203,7 +1204,7 @@ class WeighBridge_Old {
         textFieldGrossWt.setHorizontalAlignment(SwingConstants.RIGHT);
         textFieldGrossWt.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldGrossWt.setColumns(10);
-        textFieldGrossWt.setBounds(619, 300, 100, 25);
+        textFieldGrossWt.setBounds(619, 310, 100, 25);
         panelWeighing.add(textFieldGrossWt);
 
         textFieldTareWt = new JTextField();
@@ -1223,7 +1224,7 @@ class WeighBridge_Old {
         textFieldNetWt.setHorizontalAlignment(SwingConstants.RIGHT);
         textFieldNetWt.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldNetWt.setColumns(10);
-        textFieldNetWt.setBounds(619, 400, 100, 25);
+        textFieldNetWt.setBounds(619, 430, 100, 25);
         panelWeighing.add(textFieldNetWt);
 
         textFieldGrossDateTime = new JTextField();
@@ -1232,7 +1233,7 @@ class WeighBridge_Old {
         textFieldGrossDateTime.setHorizontalAlignment(SwingConstants.CENTER);
         textFieldGrossDateTime.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         textFieldGrossDateTime.setColumns(10);
-        textFieldGrossDateTime.setBounds(775, 300, 175, 25);
+        textFieldGrossDateTime.setBounds(775, 310, 175, 25);
         panelWeighing.add(textFieldGrossDateTime);
 
         textFieldTareDateTime = new JTextField();
@@ -1250,7 +1251,7 @@ class WeighBridge_Old {
         textFieldNetDateTime.setHorizontalAlignment(SwingConstants.CENTER);
         textFieldNetDateTime.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         textFieldNetDateTime.setColumns(10);
-        textFieldNetDateTime.setBounds(775, 400, 175, 25);
+        textFieldNetDateTime.setBounds(775, 430, 175, 25);
         panelWeighing.add(textFieldNetDateTime);
 
         btnGetGross = new JButton("Get Gross Details");
@@ -1299,7 +1300,7 @@ class WeighBridge_Old {
 
         });
         btnGetGross.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnGetGross.setBounds(990, 300, 225, 25);
+        btnGetGross.setBounds(990, 310, 225, 25);
         panelWeighing.add(btnGetGross);
 
         btnGetTare = new JButton("Get Tare Details");
@@ -1402,12 +1403,12 @@ class WeighBridge_Old {
         });
         btnTotal.setEnabled(false);
         btnTotal.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnTotal.setBounds(990, 400, 225, 25);
+        btnTotal.setBounds(990, 430, 225, 25);
         panelWeighing.add(btnTotal);
 
         btnGetTareSl = new JButton("Get Tare Wt");
         btnGetTareSl.setFocusable(false);
-        btnGetTareSl.addActionListener(arg0 -> {
+        btnGetTareSl.addActionListener(e -> {
             rdbtnGross.setSelected(true);
             JComboBox<String> comboBoxa = new JComboBox<>();
             comboBoxa.setModel(
@@ -1423,7 +1424,7 @@ class WeighBridge_Old {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 serialNo = rs.getInt("SLNO");
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1550", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -1454,7 +1455,7 @@ class WeighBridge_Old {
                     else
                         textFieldTareDateTime.setText(dateAndTimeFormat.format(
                                 new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
-                } catch (SQLException | ParseException e) {
+                } catch (SQLException | ParseException ex) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :820",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1477,12 +1478,12 @@ class WeighBridge_Old {
 
         });
         btnGetTareSl.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnGetTareSl.setBounds(216, 25, 141, 25);
+        btnGetTareSl.setBounds(207, 25, 150, 25);
         panelWeighing.add(btnGetTareSl);
 
         btnGetGrossSl = new JButton("Get Gross Wt");
         btnGetGrossSl.setFocusable(false);
-        btnGetGrossSl.addActionListener(arg0 -> {
+        btnGetGrossSl.addActionListener(e -> {
 
             rdbtnTare.setSelected(true);
             JComboBox<String> comboBoxa = new JComboBox<>();
@@ -1499,7 +1500,7 @@ class WeighBridge_Old {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 serialNo = rs.getInt("SLNO");
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :847", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -1529,7 +1530,7 @@ class WeighBridge_Old {
                     else
                         textFieldGrossDateTime.setText(dateAndTimeFormat.format(
                                 new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
-                } catch (SQLException | ParseException e) {
+                } catch (SQLException | ParseException ex) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :861",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1551,7 +1552,7 @@ class WeighBridge_Old {
             }
         });
         btnGetGrossSl.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnGetGrossSl.setBounds(216, 75, 141, 25);
+        btnGetGrossSl.setBounds(207, 75, 150, 25);
         panelWeighing.add(btnGetGrossSl);
 
         btnGetWeight = new JButton("Get Weight");
@@ -1741,17 +1742,17 @@ class WeighBridge_Old {
             btnSave.requestFocus();
         });
         btnGetWeight.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnGetWeight.setBounds(40, 500, 162, 25);
+        btnGetWeight.setBounds(33, 515, 162, 25);
         panelWeighing.add(btnGetWeight);
 
         btnSave = new JButton("Save");
-        btnSave.addActionListener(arg0 -> {
+        btnSave.addActionListener(e -> {
             if (chckbxCamera.isSelected()) {
                 if (checkBoxCamera1.isSelected()) {
                     File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg");
                     try {
                         ImageIO.write(webcam[1].getImage(), "jpg", outputfile);
-                    } catch (IOException | IllegalArgumentException e) {
+                    } catch (IOException | IllegalArgumentException ex) {
                         JOptionPane.showMessageDialog(null,
                                 "CAMERA ERROR\nCHECK THE CAMERA IN SETTINGS\nLINE :1370", "CAMERA ERROR",
                                 JOptionPane.ERROR_MESSAGE);
@@ -1761,7 +1762,7 @@ class WeighBridge_Old {
                     File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_2.jpg");
                     try {
                         ImageIO.write(webcam[2].getImage(), "jpg", outputfile);
-                    } catch (IOException | IllegalArgumentException e) {
+                    } catch (IOException | IllegalArgumentException ex) {
                         JOptionPane.showMessageDialog(null,
                                 "CAMERA ERROR\nCHECK THE CAMERA IN SETTINGS\nLINE :1370", "CAMERA ERROR",
                                 JOptionPane.ERROR_MESSAGE);
@@ -1771,7 +1772,7 @@ class WeighBridge_Old {
                     File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_3.jpg");
                     try {
                         ImageIO.write(webcam[3].getImage(), "jpg", outputfile);
-                    } catch (IOException | IllegalArgumentException e) {
+                    } catch (IOException | IllegalArgumentException ex) {
                         JOptionPane.showMessageDialog(null,
                                 "CAMERA ERROR\nCHECK THE CAMERA IN SETTINGS\nLINE :1370", "CAMERA ERROR",
                                 JOptionPane.ERROR_MESSAGE);
@@ -1781,7 +1782,7 @@ class WeighBridge_Old {
                     File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_4.jpg");
                     try {
                         ImageIO.write(webcam[4].getImage(), "jpg", outputfile);
-                    } catch (IOException | IllegalArgumentException e) {
+                    } catch (IOException | IllegalArgumentException ex) {
                         JOptionPane.showMessageDialog(null,
                                 "CAMERA ERROR\nCHECK THE CAMERA IN SETTINGS\nLINE :1370", "CAMERA ERROR",
                                 JOptionPane.ERROR_MESSAGE);
@@ -1891,7 +1892,7 @@ class WeighBridge_Old {
                         rs.insertRow();
                     }
                 }
-            } catch (SQLException | ParseException e) {
+            } catch (SQLException | ParseException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :990", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
                 return;
@@ -1914,11 +1915,11 @@ class WeighBridge_Old {
         });
         btnSave.setEnabled(false);
         btnSave.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnSave.setBounds(252, 500, 150, 25);
+        btnSave.setBounds(245, 515, 150, 25);
         panelWeighing.add(btnSave);
 
         btnPrint = new JButton("Print");
-        btnPrint.addActionListener(arg0 -> {
+        btnPrint.addActionListener(e -> {
             try {
                 int response = JOptionPane.showConfirmDialog(null, "Do you want to Print ?", "Print",
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -1953,19 +1954,19 @@ class WeighBridge_Old {
                 // tabbedPane.setSelectedComponent(panelBilling);
                 // else
                 clear();
-            } catch (NullPointerException e) {
+            } catch (NullPointerException ex) {
                 JOptionPane.showMessageDialog(null, "Print ERROR\nPlease Use another Printer Option", "Print ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
         btnPrint.setEnabled(false);
         btnPrint.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnPrint.setBounds(452, 500, 150, 25);
+        btnPrint.setBounds(445, 515, 150, 25);
         panelWeighing.add(btnPrint);
 
         JButton btnReprint = new JButton("RePrint");
         btnReprint.setFocusable(false);
-        btnReprint.addActionListener(arg0 -> {
+        btnReprint.addActionListener(e -> {
             String response = JOptionPane.showInputDialog(null, "Please Enter the Sl.no to Reprint ?", "Reprint",
                     JOptionPane.QUESTION_MESSAGE);
             if (response != null)
@@ -1977,7 +1978,7 @@ class WeighBridge_Old {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 serialNo = rs.getInt("SLNO");
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1039", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -1989,14 +1990,14 @@ class WeighBridge_Old {
             }
         });
         btnReprint.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnReprint.setBounds(252, 550, 150, 25);
+        btnReprint.setBounds(245, 565, 150, 25);
         panelWeighing.add(btnReprint);
 
         JButton btnClear = new JButton("Clear");
         btnClear.setFocusable(false);
         btnClear.addActionListener(e -> clear());
         btnClear.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnClear.setBounds(452, 550, 150, 25);
+        btnClear.setBounds(445, 565, 150, 25);
         panelWeighing.add(btnClear);
         JLabel contact = new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().getImage("resources/contact.bmp")));
         contact.setBounds(945, 505, 300, 100);
@@ -2004,7 +2005,7 @@ class WeighBridge_Old {
 
         JLabel lblKg = new JLabel("Kg");
         lblKg.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblKg.setBounds(726, 300, 25, 25);
+        lblKg.setBounds(726, 310, 25, 25);
         panelWeighing.add(lblKg);
 
         JLabel label = new JLabel("Kg");
@@ -2014,31 +2015,31 @@ class WeighBridge_Old {
 
         JLabel label_1 = new JLabel("Kg");
         label_1.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        label_1.setBounds(729, 400, 25, 25);
+        label_1.setBounds(729, 430, 25, 25);
         panelWeighing.add(label_1);
 
         JLabel lblCustmerName = new JLabel("Custmer's Name");
         lblCustmerName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblCustmerName.setBounds(50, 200, 175, 25);
+        lblCustmerName.setBounds(50, 190, 175, 25);
         panelWeighing.add(lblCustmerName);
 
         textFieldDriverName = new JComboBox<>();
         // AutoCompleteDecorator.decorate(textFieldDriverName);// For Auto
         // completion
-        textFieldDriverName.addActionListener(arg0 -> textFieldVehicleNo.requestFocus());
+        textFieldDriverName.addActionListener(e -> textFieldVehicleNo.requestFocus());
         textFieldDriverName.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         textFieldDriverName.setEditable(true);
-        textFieldDriverName.setBounds(775, 200, 175, 25);
+        textFieldDriverName.setBounds(775, 190, 175, 25);
         panelWeighing.add(textFieldDriverName);
 
         JLabel lblDriversName = new JLabel("Transporter's Name");
         lblDriversName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblDriversName.setBounds(490, 200, 175, 25);
+        lblDriversName.setBounds(490, 190, 175, 25);
         panelWeighing.add(lblDriversName);
 
         JLabel lblDcNo = new JLabel("Dc. No");
         lblDcNo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblDcNo.setBounds(490, 250, 75, 25);
+        lblDcNo.setBounds(490, 230, 75, 25);
         panelWeighing.add(lblDcNo);
 
         textFieldDcNo = new JTextField();
@@ -2047,7 +2048,7 @@ class WeighBridge_Old {
         textFieldDcNo.setEnabled(false);
         textFieldDcNo.setDisabledTextColor(Color.BLACK);
         textFieldDcNo.setColumns(10);
-        textFieldDcNo.setBounds(619, 250, 100, 25);
+        textFieldDcNo.setBounds(619, 230, 100, 25);
         panelWeighing.add(textFieldDcNo);
 
         textFieldDcDate = new JTextField();
@@ -2056,12 +2057,12 @@ class WeighBridge_Old {
         textFieldDcDate.setEnabled(false);
         textFieldDcDate.setDisabledTextColor(Color.BLACK);
         textFieldDcDate.setColumns(10);
-        textFieldDcDate.setBounds(775, 250, 175, 25);
+        textFieldDcDate.setBounds(775, 230, 175, 25);
         panelWeighing.add(textFieldDcDate);
 
         btnGetDcDetails = new JButton("Get Dc. Details");
         btnGetDcDetails.setFocusable(false);
-        btnGetDcDetails.addActionListener(arg0 -> {
+        btnGetDcDetails.addActionListener(e -> {
             String[] ConnectOptionNames = {"Set Dc. No", "Clear", "Cancel"};
             JTextField userid = new JTextField(10);
             JXDatePicker datePicker = new JXDatePicker();
@@ -2090,7 +2091,7 @@ class WeighBridge_Old {
             }
         });
         btnGetDcDetails.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnGetDcDetails.setBounds(990, 250, 225, 25);
+        btnGetDcDetails.setBounds(990, 230, 225, 25);
         panelWeighing.add(btnGetDcDetails);
 
         btnClick = new JButton("Click");
@@ -2160,7 +2161,7 @@ class WeighBridge_Old {
         });
         btnClick.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnClick.setFocusable(false);
-        btnClick.setBounds(127, 550, 75, 25);
+        btnClick.setBounds(120, 565, 75, 25);
         panelWeighing.add(btnClick);
 
         JButton btnCalc = new JButton("Calc");
@@ -2180,7 +2181,7 @@ class WeighBridge_Old {
         });
         btnCalc.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnCalc.setFocusable(false);
-        btnCalc.setBounds(40, 550, 75, 25);
+        btnCalc.setBounds(33, 565, 75, 25);
         panelWeighing.add(btnCalc);
 
         btnMinusGross = new JButton("-");
@@ -2202,7 +2203,7 @@ class WeighBridge_Old {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 serialNo = rs.getInt("SLNO");
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :806", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -2236,7 +2237,7 @@ class WeighBridge_Old {
                     else
                         textFieldGrossDateTime.setText(dateAndTimeFormat.format(
                                 new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
-                } catch (SQLException | ParseException e) {
+                } catch (SQLException | ParseException ex) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :820",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                 }
@@ -2283,7 +2284,7 @@ class WeighBridge_Old {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 serialNo = rs.getInt("SLNO");
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :847", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -2315,7 +2316,7 @@ class WeighBridge_Old {
                     else
                         textFieldTareDateTime.setText(dateAndTimeFormat.format(
                                 new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
-                } catch (SQLException | ParseException e) {
+                } catch (SQLException | ParseException ex) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :861",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                 }
@@ -2343,38 +2344,8 @@ class WeighBridge_Old {
 
         JLabel lblRemarks_1 = new JLabel("Remarks");
         lblRemarks_1.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblRemarks_1.setBounds(50, 450, 175, 25);
+        lblRemarks_1.setBounds(50, 430, 175, 25);
         panelWeighing.add(lblRemarks_1);
-
-        JScrollPane scrollPane_4 = new JScrollPane();
-        scrollPane_4.setBounds(240, 438, 175, 50);
-        panelWeighing.add(scrollPane_4);
-
-        textPaneRemarks = new JTextPane(new DefaultStyledDocument() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
-                if ((getLength() + str.length()) <= 100) {
-                    super.insertString(offs, str, a);
-                } else {
-                    JOptionPane.showMessageDialog(null,
-                            "LIMIT REACHED\nLimit is 100 character\nPlease cutshot your Remarks\nLINE :2606",
-                            "LIMIT REACHED", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-        textPaneRemarks.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent arg0) {
-                if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
-                    btnGetWeight.requestFocus();
-                }
-            }
-        });
-        scrollPane_4.setViewportView(textPaneRemarks);
-        textPaneRemarks.setFont(new Font("Times New Roman", Font.PLAIN, 15));
-        textPaneRemarks.setDisabledTextColor(Color.BLACK);
 
         btnAuto = new JButton("Auto");
         btnAuto.addActionListener(e -> {
@@ -2392,7 +2363,7 @@ class WeighBridge_Old {
         });
         btnAuto.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnAuto.setFocusable(false);
-        btnAuto.setBounds(153, 400, 75, 25);
+        btnAuto.setBounds(153, 390, 75, 25);
         panelWeighing.add(btnAuto);
 
         chckbxChargecheck = new JCheckBox("Chargecheck");
@@ -2400,8 +2371,68 @@ class WeighBridge_Old {
         chckbxChargecheck.setFocusable(false);
         chckbxChargecheck.setEnabled(false);
         chckbxChargecheck.setBackground(new Color(0, 255, 127));
-        chckbxChargecheck.setBounds(417, 402, 25, 25);
+        chckbxChargecheck.setBounds(417, 390, 25, 25);
         panelWeighing.add(chckbxChargecheck);
+
+        JLabel lblNoOfNags = new JLabel("No Of Bags");
+        lblNoOfNags.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblNoOfNags.setBounds(50, 350, 175, 25);
+        panelWeighing.add(lblNoOfNags);
+
+        textFieldNoOfBags = new JTextField();
+        textFieldNoOfBags.setHorizontalAlignment(SwingConstants.CENTER);
+        textFieldNoOfBags.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldNoOfBags.setDisabledTextColor(Color.BLACK);
+        textFieldNoOfBags.setColumns(10);
+        textFieldNoOfBags.setBounds(240, 350, 175, 25);
+        panelWeighing.add(textFieldNoOfBags);
+
+        textPaneRemarks = new JTextPane(new DefaultStyledDocument() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+                if ((getLength() + str.length()) <= 100) {
+                    super.insertString(offs, str, a);
+                } else {
+                    JOptionPane.showMessageDialog(null,
+                            "LIMIT REACHED\nLimit is 100 character\nPlease cutshot your Remarks\nLINE :2606",
+                            "LIMIT REACHED", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        textPaneRemarks.setBounds(242, 427, 173, 48);
+        panelWeighing.add(textPaneRemarks);
+        textPaneRemarks.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    btnGetWeight.requestFocus();
+                }
+            }
+        });
+        textPaneRemarks.setFont(new Font("Times New Roman", Font.PLAIN, 15));
+        textPaneRemarks.setDisabledTextColor(Color.BLACK);
+
+        JLabel lblBagDeduction = new JLabel("Bag Deduction");
+        lblBagDeduction.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblBagDeduction.setBounds(490, 390, 141, 25);
+        panelWeighing.add(lblBagDeduction);
+
+        textFieldBagDeduction = new JTextField();
+        textFieldBagDeduction.setText("0");
+        textFieldBagDeduction.setHorizontalAlignment(SwingConstants.RIGHT);
+        textFieldBagDeduction.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldBagDeduction.setEnabled(false);
+        textFieldBagDeduction.setDisabledTextColor(Color.BLACK);
+        textFieldBagDeduction.setColumns(10);
+        textFieldBagDeduction.setBounds(619, 390, 100, 25);
+        panelWeighing.add(textFieldBagDeduction);
+
+        JLabel label_5 = new JLabel("Kg");
+        label_5.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        label_5.setBounds(729, 390, 25, 25);
+        panelWeighing.add(label_5);
 
         panelCameras = new JPanel();
         panelCameras.setBackground(new Color(0, 255, 127));
@@ -3299,7 +3330,7 @@ class WeighBridge_Old {
         panelBilling.add(btnEdit);
 
         JButton btnUpdateBill = new JButton("Update");
-        btnUpdateBill.addActionListener(arg0 -> {
+        btnUpdateBill.addActionListener(e -> {
             try {
                 Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                         ResultSet.CONCUR_UPDATABLE);
@@ -3319,7 +3350,7 @@ class WeighBridge_Old {
                     rs.updateString("D" + i, (String) model.getValueAt(i - 1, 0));
                 rs.updateString("TITLE", labelBillTitle.getText());
                 rs.updateRow();
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1334", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -3357,7 +3388,7 @@ class WeighBridge_Old {
         panelBilling.add(textFieldBillNo);
 
         textFieldReferenceSlNo = new JTextField();
-        textFieldReferenceSlNo.addActionListener(arg0 -> {
+        textFieldReferenceSlNo.addActionListener(e -> {
             if (rdbtnGross.isSelected()) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -3367,7 +3398,7 @@ class WeighBridge_Old {
                     if (rs.next())
                         textFieldNoOfUnits.setText(Integer.toString(rs.getInt("NETWT")));
                     comboBoxMaterialName.setSelectedItem(rs.getString("MATERIAL"));
-                } catch (SQLException e) {
+                } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1381",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                 }
@@ -3382,7 +3413,7 @@ class WeighBridge_Old {
         panelBilling.add(textFieldReferenceSlNo);
 
         comboBoxCustomerName = new JComboBox<>();
-        comboBoxCustomerName.addActionListener(arg0 -> {
+        comboBoxCustomerName.addActionListener(e -> {
             try {
                 Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                         ResultSet.CONCUR_UPDATABLE);
@@ -3392,7 +3423,7 @@ class WeighBridge_Old {
                     textFieldCustomerAddress.setText(rs.getString("CUSTOMERADDRESS"));
                     textFieldCustomerAddress1.setText(rs.getString("CUSTOMERADDRESS1"));
                 }
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1406", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -3404,7 +3435,7 @@ class WeighBridge_Old {
 
         comboBoxMaterialName = new JComboBox<>();
         comboBoxMaterialName.setEnabled(false);
-        comboBoxMaterialName.addActionListener(arg0 -> {
+        comboBoxMaterialName.addActionListener(e -> {
             try {
                 Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                         ResultSet.CONCUR_UPDATABLE);
@@ -3412,7 +3443,7 @@ class WeighBridge_Old {
                         + comboBoxMaterialName.getSelectedItem() + "'");
                 if (rs.next())
                     textFieldCostPerunit.setText(rs.getString("COST"));
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1425", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -3581,7 +3612,7 @@ class WeighBridge_Old {
         panelBilling.add(btnCalculate);
 
         btnSaveBill = new JButton("Save");
-        btnSaveBill.addActionListener(arg0 -> {
+        btnSaveBill.addActionListener(e -> {
             try {
                 Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                         ResultSet.CONCUR_UPDATABLE);
@@ -3606,7 +3637,7 @@ class WeighBridge_Old {
                 rs.absolute(1);
                 rs.updateInt("BILLNO", Integer.parseInt(textFieldBillNo.getText()) + 1);
                 rs.updateRow();
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1613", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -3644,7 +3675,7 @@ class WeighBridge_Old {
         panelBilling.add(btnPrintBill);
 
         JButton btnRePrintBill = new JButton("RePrint");
-        btnRePrintBill.addActionListener(arg0 -> {
+        btnRePrintBill.addActionListener(e -> {
             String response = JOptionPane.showInputDialog(null, "Please Enter the Bill.no to Reprint ?", "Reprint",
                     JOptionPane.QUESTION_MESSAGE);
             if (response != null)
@@ -3656,7 +3687,7 @@ class WeighBridge_Old {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 billNo = rs.getInt("BILLNO");
-            } catch (SQLException e) {
+            } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1662", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -3682,7 +3713,7 @@ class WeighBridge_Old {
                     textFieldAmountToBePaid.setText(Integer.toString(rs.getInt("TOTAL")));
                     datePicker.setDate(rs.getDate("BILLDATE"));
                     textFieldRemarks.setText(rs.getString("REMARK"));
-                } catch (SQLException e) {
+                } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1684",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                 }
@@ -3998,7 +4029,7 @@ class WeighBridge_Old {
         panelReport.add(lblMaterialReport);
 
         btnGo = new JButton("Go");
-        btnGo.addActionListener(arg0 -> {
+        btnGo.addActionListener(e -> {
             int charges = 0, netWt = 0;
             String message = "Plz Choose The Column To Show In Report ?";
             int n;
@@ -4178,7 +4209,7 @@ class WeighBridge_Old {
                             tableReport.removeColumn(tableReport.getColumn("Remarks"));
                         if (!a12.isSelected())
                             tableReport.removeColumn(tableReport.getColumn("Manual"));
-                    } catch (SQLException e) {
+                    } catch (SQLException ex) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2174",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -4250,7 +4281,7 @@ class WeighBridge_Old {
                             charges += rs.getInt("TOTAL");
                             netWt += rs.getInt("NOOFUNITS");
                         }
-                    } catch (SQLException e) {
+                    } catch (SQLException ex) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2259",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -4704,7 +4735,7 @@ class WeighBridge_Old {
         panelReport.add(btnSaveReport);
 
         btnExportToExcel = new JButton("Export to Excel");
-        btnExportToExcel.addActionListener(arg0 -> {
+        btnExportToExcel.addActionListener(e -> {
             JFrame parentFrame = new JFrame();
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Specify a file to save");
@@ -4714,7 +4745,7 @@ class WeighBridge_Old {
                 String fname = fileToSave.getAbsolutePath();
                 try {
                     toExcel(fname);
-                } catch (IOException e) {
+                } catch (IOException ex) {
                     JOptionPane.showMessageDialog(null, "Plz Close the Excel file\nLINE :3027", "FILE ERROR",
                             JOptionPane.ERROR_MESSAGE);
                 }
@@ -4764,20 +4795,20 @@ class WeighBridge_Old {
 
         JLabel lblTitle1 = new JLabel("Title 1");
         lblTitle1.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblTitle1.setBounds(10, 75, 75, 25);
+        lblTitle1.setBounds(10, 47, 75, 25);
         panelSettings.add(lblTitle1);
 
         JLabel lblTitle2 = new JLabel("Title 2");
         lblTitle2.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblTitle2.setBounds(10, 125, 75, 25);
+        lblTitle2.setBounds(10, 97, 75, 25);
         panelSettings.add(lblTitle2);
 
         JLabel lblFooter = new JLabel("Footer");
         lblFooter.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblFooter.setBounds(10, 175, 75, 25);
+        lblFooter.setBounds(10, 147, 75, 25);
         panelSettings.add(lblFooter);
 
-        JLabel lblWeighbridgeSettings = new JLabel("com.babulens.WeighBridge_Old Settings");
+        JLabel lblWeighbridgeSettings = new JLabel("Weighbridge Settings");
         lblWeighbridgeSettings.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
         lblWeighbridgeSettings.setBounds(336, 11, 200, 25);
         panelSettings.add(lblWeighbridgeSettings);
@@ -4851,7 +4882,7 @@ class WeighBridge_Old {
         scrollPane_1.setViewportView(tableMaterial);
 
         JButton btnAddMaterialRow = new JButton("+");
-        btnAddMaterialRow.addActionListener(arg0 -> {
+        btnAddMaterialRow.addActionListener(e -> {
             DefaultTableModel model = (DefaultTableModel) tableMaterial.getModel();
             model.addRow(new Object[]{model.getRowCount() + 1});
         });
@@ -4924,7 +4955,7 @@ class WeighBridge_Old {
         scrollPane_3.setViewportView(tableCustomer);
 
         JButton btnAddCustomer = new JButton("+");
-        btnAddCustomer.addActionListener(arg0 -> {
+        btnAddCustomer.addActionListener(e -> {
             DefaultTableModel model = (DefaultTableModel) tableCustomer.getModel();
             model.addRow(new Object[]{});
         });
@@ -4954,7 +4985,7 @@ class WeighBridge_Old {
         textFieldTitle1.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldTitle1.setDisabledTextColor(Color.BLACK);
         textFieldTitle1.setColumns(10);
-        textFieldTitle1.setBounds(101, 75, 200, 30);
+        textFieldTitle1.setBounds(101, 47, 200, 30);
         panelSettings.add(textFieldTitle1);
 
         textFieldTitle2 = new JTextField();
@@ -4968,7 +4999,7 @@ class WeighBridge_Old {
         textFieldTitle2.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldTitle2.setDisabledTextColor(Color.BLACK);
         textFieldTitle2.setColumns(10);
-        textFieldTitle2.setBounds(101, 125, 200, 30);
+        textFieldTitle2.setBounds(101, 97, 200, 30);
         panelSettings.add(textFieldTitle2);
 
         textFieldFooter = new JTextField();
@@ -4976,19 +5007,19 @@ class WeighBridge_Old {
         textFieldFooter.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldFooter.setDisabledTextColor(Color.BLACK);
         textFieldFooter.setColumns(10);
-        textFieldFooter.setBounds(101, 175, 200, 30);
+        textFieldFooter.setBounds(101, 147, 200, 30);
         panelSettings.add(textFieldFooter);
 
         chckbxExcludeCharges = new JCheckBox("Exclude Charges");
         chckbxExcludeCharges.setEnabled(false);
         chckbxExcludeCharges.setFocusable(false);
         chckbxExcludeCharges.setBackground(new Color(0, 255, 127));
-        chckbxExcludeCharges.addChangeListener(arg0 -> {
+        chckbxExcludeCharges.addChangeListener(e -> {
             textFieldCharges.setEnabled(!chckbxExcludeCharges.isSelected());
             textFieldCharges.setText("");
         });
         chckbxExcludeCharges.setFont(new Font("Times New Roman", Font.ITALIC, 15));
-        chckbxExcludeCharges.setBounds(25, 251, 145, 25);
+        chckbxExcludeCharges.setBounds(25, 210, 145, 25);
         panelSettings.add(chckbxExcludeCharges);
 
         textFieldBaudRate = new JTextField();
@@ -5130,14 +5161,14 @@ class WeighBridge_Old {
 
         JButton btnUpdate = new JButton("Update");
         btnUpdate.setFocusable(false);
-        btnUpdate.addActionListener(arg0 -> updateSettings());
+        btnUpdate.addActionListener(e -> updateSettings());
         btnUpdate.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnUpdate.setBounds(664, 228, 150, 25);
         panelSettings.add(btnUpdate);
 
         JButton btnResetWeights = new JButton("Reset Weights");
         btnResetWeights.setFocusable(false);
-        btnResetWeights.addActionListener(arg0 -> {
+        btnResetWeights.addActionListener(e -> {
             JPasswordField password = new JPasswordField(10);
             JPanel panel = new JPanel();
             String[] ConnectOptionNames = {"Enter", "Cancel"};
@@ -5170,7 +5201,7 @@ class WeighBridge_Old {
                         rs.absolute(1);
                         rs.updateInt("SLNO", Integer.parseInt(response.replaceAll("[^0-9]", "")));
                         rs.updateRow();
-                    } catch (SQLException e) {
+                    } catch (SQLException ex) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2836",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -5230,6 +5261,7 @@ class WeighBridge_Old {
                     textFieldPortName.setEnabled(true);
                     textFieldSMSBaudRate.setEnabled(true);
                     textFieldSMSPortName.setEnabled(true);
+                    chckbxExcludeNoOfBags.setEnabled(true);
                     chckbxenableSettings2.setEnabled(true);
                     btnPassword.setText("Lock");
                 }
@@ -5250,8 +5282,9 @@ class WeighBridge_Old {
                 textFieldPortName.setEnabled(false);
                 textFieldSMSBaudRate.setEnabled(false);
                 textFieldSMSPortName.setEnabled(false);
+                chckbxExcludeNoOfBags.setEnabled(false);
                 chckbxenableSettings2.setSelected(false);
-                chckbxenableSettings2.setEnabled(false);
+                chckbxenableSettings2.setEnabled(false);                
                 btnPassword.setText("Unlock");
             }
         });
@@ -5261,7 +5294,7 @@ class WeighBridge_Old {
 
         btnResetBills = new JButton("Reset Bills");
         btnResetBills.setFocusable(false);
-        btnResetBills.addActionListener(arg0 -> {
+        btnResetBills.addActionListener(e -> {
             JPasswordField password = new JPasswordField(10);
             JPanel panel = new JPanel();
             String[] ConnectOptionNames = {"Enter", "Cancel"};
@@ -5294,7 +5327,7 @@ class WeighBridge_Old {
                         rs.absolute(1);
                         rs.updateInt("BILLNO", Integer.parseInt(response.replaceAll("[^0-9]", "")));
                         rs.updateRow();
-                    } catch (SQLException e) {
+                    } catch (SQLException ex) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2836",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -5326,7 +5359,7 @@ class WeighBridge_Old {
         });
         chckbxExcludeCustomer.setFont(new Font("Times New Roman", Font.ITALIC, 15));
         chckbxExcludeCustomer.setBackground(new Color(0, 255, 127));
-        chckbxExcludeCustomer.setBounds(25, 223, 145, 25);
+        chckbxExcludeCustomer.setBounds(25, 190, 145, 25);
         panelSettings.add(chckbxExcludeCustomer);
 
         chckbxRemoveBillinTab = new JCheckBox("Remove Billing");
@@ -5349,7 +5382,7 @@ class WeighBridge_Old {
         });
         chckbxExcludeDrivers.setFont(new Font("Times New Roman", Font.ITALIC, 15));
         chckbxExcludeDrivers.setBackground(new Color(0, 255, 127));
-        chckbxExcludeDrivers.setBounds(25, 279, 145, 23);
+        chckbxExcludeDrivers.setBounds(25, 230, 145, 23);
         panelSettings.add(chckbxExcludeDrivers);
 
         chckbxCamera = new JCheckBox("Camera");
@@ -5473,8 +5506,7 @@ class WeighBridge_Old {
                         textFieldDriverName.addItem(rs.getString("TRANSPORTER"));
                         textFieldDriverName.setSelectedIndex(-1);
                     }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
+                } catch (SQLException ignored) {
                 }
             }
         });
@@ -5494,7 +5526,7 @@ class WeighBridge_Old {
         chckbxExcludeRemarks.setFont(new Font("Times New Roman", Font.ITALIC, 15));
         chckbxExcludeRemarks.setFocusable(false);
         chckbxExcludeRemarks.setBackground(new Color(0, 255, 127));
-        chckbxExcludeRemarks.setBounds(175, 223, 145, 25);
+        chckbxExcludeRemarks.setBounds(175, 190, 145, 25);
         panelSettings.add(chckbxExcludeRemarks);
 
         chckbxAutoCharges = new JCheckBox("Auto Charges");
@@ -5504,9 +5536,12 @@ class WeighBridge_Old {
                 chckbxExcludeCharges.setEnabled(false);
                 chckbxExcludeCharges.setSelected(true);
             } else {
-                if (chckbxCharges != null && !chckbxCharges.isSelected())
+                if (chckbxCharges != null && !chckbxCharges.isSelected()) {
                     btnAuto.setEnabled(false);
-                chckbxExcludeCharges.setEnabled(true);
+                }
+                if (Objects.equals(btnPassword.getText(), "Lock")) {
+                    chckbxExcludeCharges.setEnabled(true);
+                }
             }
         });
 
@@ -5514,7 +5549,7 @@ class WeighBridge_Old {
         chckbxAutoCharges.setFocusable(false);
         chckbxAutoCharges.setEnabled(false);
         chckbxAutoCharges.setBackground(new Color(0, 255, 127));
-        chckbxAutoCharges.setBounds(174, 251, 115, 25);
+        chckbxAutoCharges.setBounds(175, 210, 115, 25);
         panelSettings.add(chckbxAutoCharges);
 
         chckbxMaterialSl = new JCheckBox("Material Sl");
@@ -5522,7 +5557,7 @@ class WeighBridge_Old {
         chckbxMaterialSl.setFocusable(false);
         chckbxMaterialSl.setEnabled(false);
         chckbxMaterialSl.setBackground(new Color(0, 255, 127));
-        chckbxMaterialSl.setBounds(174, 276, 139, 25);
+        chckbxMaterialSl.setBounds(175, 230, 139, 25);
         panelSettings.add(chckbxMaterialSl);
 
         chckbxCharges = new JCheckBox("Charges2");
@@ -5536,17 +5571,20 @@ class WeighBridge_Old {
             } else {
                 if (!chckbxAutoCharges.isSelected())
                     btnAuto.setEnabled(false);
-                chckbxChargecheck.setEnabled(false);
+                if (Objects.equals(btnPassword.getText(), "Lock")) {
+                    chckbxChargecheck.setEnabled(false);
+                }
             }
         });
         chckbxCharges.setFont(new Font("Times New Roman", Font.ITALIC, 15));
         chckbxCharges.setFocusable(false);
         chckbxCharges.setEnabled(false);
         chckbxCharges.setBackground(new Color(0, 255, 127));
-        chckbxCharges.setBounds(286, 251, 25, 25);
+        chckbxCharges.setBounds(286, 210, 25, 25);
         panelSettings.add(chckbxCharges);
 
-        chckbxenableSettings2 = new JCheckBox("");
+        chckbxenableSettings2 = new JCheckBox("Enable Settings Page 2");
+        chckbxenableSettings2.setFont(new Font("Times New Roman", Font.ITALIC, 15));
         chckbxenableSettings2.setEnabled(false);
         chckbxenableSettings2.addChangeListener(e -> {
             if (chckbxenableSettings2.isSelected()) {
@@ -5558,8 +5596,22 @@ class WeighBridge_Old {
             }
         });
         chckbxenableSettings2.setBackground(new Color(0, 255, 127));
-        chckbxenableSettings2.setBounds(917, 195, 25, 25);
+        chckbxenableSettings2.setBounds(76, 288, 179, 25);
         panelSettings.add(chckbxenableSettings2);
+
+        chckbxExcludeNoOfBags = new JCheckBox("Exclude Bags");
+        chckbxExcludeNoOfBags.addChangeListener(e -> {
+            if (chckbxExcludeNoOfBags.isSelected())
+                textFieldNoOfBags.setEnabled(false);
+            else
+                textFieldNoOfBags.setEnabled(true);
+        });
+        chckbxExcludeNoOfBags.setFont(new Font("Times New Roman", Font.ITALIC, 15));
+        chckbxExcludeNoOfBags.setFocusable(false);
+        chckbxExcludeNoOfBags.setEnabled(false);
+        chckbxExcludeNoOfBags.setBackground(new Color(0, 255, 127));
+        chckbxExcludeNoOfBags.setBounds(25, 250, 145, 25);
+        panelSettings.add(chckbxExcludeNoOfBags);
 
         JPanel panel = new JPanel();
         panel.setBackground(new Color(0, 255, 127));
@@ -5579,7 +5631,7 @@ class WeighBridge_Old {
         textFieldLine1.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldLine1.setDisabledTextColor(Color.BLACK);
         textFieldLine1.setColumns(10);
-        textFieldLine1.setBounds(131, 52, 200, 30);
+        textFieldLine1.setBounds(141, 52, 200, 30);
         panel.add(textFieldLine1);
 
         JLabel lblLine2 = new JLabel("Line 2");
@@ -5594,7 +5646,7 @@ class WeighBridge_Old {
         textFieldLine2.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldLine2.setDisabledTextColor(Color.BLACK);
         textFieldLine2.setColumns(10);
-        textFieldLine2.setBounds(131, 102, 200, 30);
+        textFieldLine2.setBounds(141, 102, 200, 30);
         panel.add(textFieldLine2);
 
         JLabel lblLine3 = new JLabel("Line 3");
@@ -5608,7 +5660,7 @@ class WeighBridge_Old {
         textFieldLine3.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldLine3.setDisabledTextColor(Color.BLACK);
         textFieldLine3.setColumns(10);
-        textFieldLine3.setBounds(131, 152, 200, 30);
+        textFieldLine3.setBounds(141, 152, 200, 30);
         panel.add(textFieldLine3);
 
         textFieldSiteAt = new JTextField();
@@ -5661,7 +5713,7 @@ class WeighBridge_Old {
         textFieldLine4.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldLine4.setDisabledTextColor(Color.BLACK);
         textFieldLine4.setColumns(10);
-        textFieldLine4.setBounds(131, 205, 200, 30);
+        textFieldLine4.setBounds(141, 205, 200, 30);
         panel.add(textFieldLine4);
 
         JLabel lblLine = new JLabel("Line 4");
@@ -5680,6 +5732,30 @@ class WeighBridge_Old {
         chckbxTareNoSlno.setBackground(new Color(0, 255, 127));
         chckbxTareNoSlno.setBounds(462, 208, 200, 25);
         panel.add(chckbxTareNoSlno);
+
+        JLabel lblBagsSetting = new JLabel("Bags Setting");
+        lblBagsSetting.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
+        lblBagsSetting.setBounds(40, 258, 150, 25);
+        panel.add(lblBagsSetting);
+
+        JLabel lblBagWeight = new JLabel("Bag Weight");
+        lblBagWeight.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblBagWeight.setBounds(40, 304, 95, 25);
+        panel.add(lblBagWeight);
+
+        textField = new JTextField();
+        textField.setText(null);
+        textField.setHorizontalAlignment(SwingConstants.CENTER);
+        textField.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textField.setDisabledTextColor(Color.BLACK);
+        textField.setColumns(10);
+        textField.setBounds(141, 301, 168, 30);
+        panel.add(textField);
+
+        JLabel label_4 = new JLabel("Kg");
+        label_4.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        label_4.setBounds(316, 304, 25, 25);
+        panel.add(label_4);
 
         JButton button = new JButton("Minimize");
         button.addActionListener(e -> frmBabulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
@@ -5732,7 +5808,7 @@ class WeighBridge_Old {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nRECORD NOT FOUND\nLINE :1085", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
-        } catch (SQLException | ParseException e) {
+        } catch (SQLException | ParseException ex) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1085", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -5794,7 +5870,7 @@ class WeighBridge_Old {
             textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
             textFieldReferenceSlNo.setText(Integer.toString(rs.getInt("SLNO")));
             textFieldBillNo.setText(Integer.toString(rs.getInt("BILLNO")));
-        } catch (SQLException e) {
+        } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2862", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -5807,7 +5883,7 @@ class WeighBridge_Old {
                 textFieldDriverName.addItem(rs.getString("TRANSPORTER"));
                 textFieldDriverName.setSelectedIndex(-1);
             }
-        } catch (SQLException e) {
+        } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2862", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -7309,7 +7385,7 @@ class WeighBridge_Old {
             rs.absolute(1);
             rs.updateTimestamp("LASTLOGIN", new java.sql.Timestamp(new Date().getTime()));
             rs.updateRow();
-        } catch (SQLException e) {
+        } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :7720", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -7467,7 +7543,7 @@ class WeighBridge_Old {
             try {
                 add(new IpCamDriver(new IpCamStorage("cameras.xml")));
 
-            } catch (NullPointerException | WebcamException e) {
+            } catch (NullPointerException | WebcamException ex) {
                 add(new WeighBridge_Old.MyIpCam());
             }
             add(new WebcamDefaultDriver());
@@ -7874,7 +7950,7 @@ class WeighBridge_Old {
                         double result = processLastOperator();
                         displayResult(result);
                         lastNumber = result;
-                    } catch (DivideByZeroException e) {
+                    } catch (DivideByZeroException ex) {
                         displayError("Cannot divide by sero.");
                     }
                 } else {
@@ -7891,7 +7967,7 @@ class WeighBridge_Old {
                 try {
                     result = processLastOperator();
                     displayResult(result);
-                } catch (DivideByZeroException e) {
+                } catch (DivideByZeroException ex) {
                     displayError("Cannot divide by sero.");
                 }
                 lastOperator = "0";
