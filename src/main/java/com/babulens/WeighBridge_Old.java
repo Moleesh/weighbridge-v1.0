@@ -640,7 +640,7 @@ class WeighBridge_Old {
             textFieldSiteAt.setText(rs.getString("SITEAT"));
             chckbxTareNoSlno.setSelected(rs.getBoolean("TARENOSLNO"));
             chckbxExcludeNoOfBags.setSelected(rs.getBoolean("EXCLUDEBAGS"));
-            textFieldBagWeight.setText(Integer.toString(rs.getInt("BAGWEIGHT")));
+            textFieldBagWeight.setText(Double.toString(rs.getDouble("BAGWEIGHT")));
 
             if (((DefaultComboBoxModel<?>) comboBoxPrinter1.getModel()).getIndexOf(rs.getString("PRINTER1")) == -1)
                 JOptionPane.showMessageDialog(null, "Please Check the Printer 1 Settings");
@@ -760,7 +760,7 @@ class WeighBridge_Old {
             rs.updateString("SITEAT", textFieldSiteAt.getText());
             rs.updateBoolean("TARENOSLNO", chckbxTareNoSlno.isSelected());
             rs.updateBoolean("EXCLUDEBAGS", chckbxExcludeNoOfBags.isSelected());
-            rs.updateInt("BAGWEIGHT", Integer.parseInt(0 + textFieldBagWeight.getText().replaceAll("[^0-9]", "")));
+            rs.updateDouble("BAGWEIGHT", Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.0-9]", "")));
             rs.updateRow();
             PreparedStatement pstmt = dbConnection.prepareStatement("DELETE FROM CUSTOMER");
             pstmt.executeUpdate();
@@ -1373,7 +1373,7 @@ class WeighBridge_Old {
             } else {
                 textFieldNetDateTime.setText(textFieldTareDateTime.getText());
             }
-            textFieldBagDeduction.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", "")) * Integer.parseInt(0 + textFieldBagWeight.getText().replaceAll("[^0-9]", ""))));
+            textFieldBagDeduction.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.0-9]", "")))));
 
             if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText()) > 0
                     && !textFieldTareWt.getText().equals("0")) {
@@ -1718,7 +1718,7 @@ class WeighBridge_Old {
                 textFieldTareWt.setText(lblWeight.getText());
                 textFieldTareDateTime.setText(textFieldDateTime.getText());
             }
-            textFieldBagDeduction.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", "")) * Integer.parseInt(0 + textFieldBagWeight.getText().replaceAll("[^0-9]", ""))));
+            textFieldBagDeduction.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.0-9]", "")))));
 
             if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText()) > 0
                     && !textFieldTareWt.getText().equals("0")) {
