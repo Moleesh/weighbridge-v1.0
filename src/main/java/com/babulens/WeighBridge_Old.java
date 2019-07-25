@@ -1090,6 +1090,8 @@ class WeighBridge_Old {
                                         "Gross Weight Available", JOptionPane.YES_NO_OPTION,
                                         JOptionPane.QUESTION_MESSAGE);
                                 if (response == JOptionPane.YES_OPTION) {
+                                    textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
+                                    textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
                                     textFieldGrossDateTime
                                             .setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
                                     if (textFieldGrossDateTime.getText().equals("null null"))
@@ -1121,6 +1123,8 @@ class WeighBridge_Old {
                                         "Gross Weight Available", JOptionPane.YES_NO_OPTION,
                                         JOptionPane.QUESTION_MESSAGE);
                                 if (response == JOptionPane.YES_OPTION) {
+                                    textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
+                                    textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
                                     textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
                                     textFieldGrossDateTime
                                             .setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
@@ -6710,10 +6714,10 @@ class WeighBridge_Old {
                 "-----------------------------------------------------------------\n",
                 String.format(format1, "Gross Wt", StringUtils.leftPad(textFieldGrossWt.getText(), 7, " "),
                         textFieldGrossDateTime.getText()),
-                String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "),
+                String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, ""),
                         textFieldTareDateTime.getText()),
                 String.format(format1, "Bag Deduction", StringUtils.leftPad(textFieldBagDeduction.getText(), 7, " "),
-                        textFieldTareDateTime.getText()),
+                        ""),
                 String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "),
                         "Charges : Rs. " + textFieldCharges.getText()),
                 chckbxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? ""
