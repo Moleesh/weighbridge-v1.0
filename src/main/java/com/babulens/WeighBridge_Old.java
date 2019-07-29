@@ -6455,7 +6455,8 @@ class WeighBridge_Old {
             public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
                 String format = "%1$-5s%2$-20s: ";
 
-                String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
+
+                String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
                 String initString = "\n\n" + StringUtils.center(title1.getText(), 62);
                 graphics.setFont(new Font("Courier New", Font.BOLD, 15));
 
@@ -6470,7 +6471,7 @@ class WeighBridge_Old {
 
                 initString = String.format(format, "", "Sl.No") + textFieldSlNo.getText() + "\n\n"
                         + String.format(format, "", "Date") + temp[0] + "\n\n" + String.format(format, "", "Time")
-                        + temp[1] + "\n\n" + String.format(format, "", "Vehicle No") + textFieldVehicleNo.getText()
+                        + temp[1] + " " + temp[2] + "\n\n" + String.format(format, "", "Vehicle No") + textFieldVehicleNo.getText()
                         + "\n\n" + String.format(format, "", "Material") + comboBoxMaterial.getEditor().getItem()
                         + "\n\n" + String.format(format, "", "Customer Name")
                         + comboBoxCustomerName.getEditor().getItem() + "\n\n" + String.format(format, "", "Charges")
