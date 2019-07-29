@@ -1591,7 +1591,7 @@ class WeighBridge_Old {
                         Future<?> future = executor.submit(stuffToDo);
                         executor.shutdown();
                         try {
-                            future.get(5, TimeUnit.SECONDS);
+                            future.get(1, TimeUnit.SECONDS);
                         } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
                         }
                         if (!executor.isTerminated()) {
@@ -1622,7 +1622,7 @@ class WeighBridge_Old {
                         Future<?> future = executor.submit(stuffToDo);
                         executor.shutdown();
                         try {
-                            future.get(5, TimeUnit.SECONDS);
+                            future.get(1, TimeUnit.SECONDS);
                         } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
                         }
                         if (!executor.isTerminated()) {
@@ -1655,7 +1655,7 @@ class WeighBridge_Old {
                         Future<?> future = executor.submit(stuffToDo);
                         executor.shutdown();
                         try {
-                            future.get(5, TimeUnit.SECONDS);
+                            future.get(1, TimeUnit.SECONDS);
                         } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
                         }
                         if (!executor.isTerminated()) {
@@ -1688,7 +1688,7 @@ class WeighBridge_Old {
                         Future<?> future = executor.submit(stuffToDo);
                         executor.shutdown();
                         try {
-                            future.get(5, TimeUnit.SECONDS);
+                            future.get(1, TimeUnit.SECONDS);
                         } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
                         }
                         if (!executor.isTerminated()) {
@@ -2181,7 +2181,7 @@ class WeighBridge_Old {
                     Future<?> future = executor.submit(stuffToDo);
                     executor.shutdown();
                     try {
-                        future.get(5, TimeUnit.SECONDS);
+                        future.get(1, TimeUnit.SECONDS);
                     } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
                     }
                     if (!executor.isTerminated()) {
