@@ -1958,6 +1958,9 @@ class WeighBridge_Old {
                         if (Objects.requireNonNull(comboBoxPrintOptionForWeight.getSelectedItem()).equals("Pre Print")) {
                             printPreWeight();
                             break;
+                        } else if (Objects.requireNonNull(comboBoxPrintOptionForWeight.getSelectedItem()).equals("Pre Print 2")) {
+                            printPreWeight2();
+                            break;
                         } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Camera"))
                             printCameraWeight();
                         else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Plain Camera"))
@@ -5445,7 +5448,7 @@ class WeighBridge_Old {
         panelSettings.add(chckbxCamera);
 
         comboBoxPrintOptionForWeight = new JComboBox<>();
-        comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{"Pre Print", "Plain Paper", "Camera", "Plain Camera", "Sri Pathy", "No Of Bags"}));
+        comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{"Pre Print", "Pre Print 2", "Plain Paper", "Camera", "Plain Camera", "Sri Pathy", "No Of Bags"}));
         comboBoxPrintOptionForWeight.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         comboBoxPrintOptionForWeight.setFocusable(false);
         comboBoxPrintOptionForWeight.setBounds(988, 170, 105, 30);
@@ -5950,7 +5953,7 @@ class WeighBridge_Old {
         textFieldVehicleNo.setText("");
         comboBoxMaterial.setEnabled(true);
         comboBoxMaterial.setSelectedIndex(-1);
-        textFieldNoOfBags.setEnabled(true);
+        textFieldNoOfBags.setEnabled(!chckbxExcludeNoOfBags.isSelected());
         textFieldNoOfBags.setText("");
         textFieldCharges.setEnabled(!chckbxExcludeCharges.isSelected());
         textFieldCharges.setText("");
@@ -6221,6 +6224,89 @@ class WeighBridge_Old {
 
         s = doc.addStyle("3", regular);
         StyleConstants.setFontSize(s, 14);
+    }
+
+    private void printPreWeight2() {
+        JTextPane textPane = createTextPane7();
+        textPane.setBackground(Color.white);
+        PrinterJob pj = PrinterJob.getPrinterJob();
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 8d * 72d;
+        double height = 6d * 72d;
+        double widthmargin = 0d * 72d;
+        double heightmargin = 1.25d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+        pBook.append(textPane.getPrintable(null, null), pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter1.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+
+    }
+
+    private JTextPane createTextPane7() {
+        String format = "%1$-6s%2$-30s%3$-30s%4$-12s";
+        String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
+        String[] initString = {String.format(format, "", textFieldSlNo.getText(), textFieldSlNo.getText(), textFieldSlNo.getText()),
+                "\n\n",
+                String.format(format, "", textFieldVehicleNo.getText(), textFieldVehicleNo.getText(),
+                        textFieldVehicleNo.getText()),
+                "\n\n",
+                String.format(format, "", temp[0], temp[0], temp[0]), "\n\n",
+                String.format(format, "", temp[1] + " " + temp[2], temp[1] + " " + temp[2], temp[1] + " " + temp[2]),
+                "\n\n",
+                String.format(format, "", comboBoxMaterial.getEditor().getItem(),
+                        comboBoxMaterial.getEditor().getItem(), comboBoxMaterial.getEditor().getItem()),
+                "\n\n",
+                String.format(
+                        format, "", textFieldCharges.getText(), textFieldCharges.getText(), textFieldCharges.getText()),
+                "\n\n",
+                String.format(format, "", textFieldGrossWt.getText() + " Kg", textFieldGrossWt.getText() + " Kg",
+                        textFieldGrossWt.getText() + " Kg"),
+                "\n\n",
+                String.format(format, "", textFieldTareWt.getText() + " Kg", textFieldTareWt.getText() + " Kg",
+                        textFieldTareWt.getText() + " Kg"),
+                "\n\n", String.format(format, "", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg",
+                textFieldNetWt.getText() + " Kg")};
+
+        String[] initStyles = {"1", "2", "1", "2", "1", "2", "1", "2", "1", "2", "1", "2", "1", "3", "1", "3", "1",
+
+        };
+        JTextPane textPane = new JTextPane();
+        StyledDocument doc = textPane.getStyledDocument();
+        addStylesToDocument7(doc);
+
+        try {
+            for (int i = 0; i < initString.length; i++) {
+                doc.insertString(doc.getLength(), initString[i], doc.getStyle(initStyles[i]));
+            }
+        } catch (BadLocationException ignored) {
+        }
+        return textPane;
+    }
+
+    private void addStylesToDocument7(StyledDocument doc) {
+        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+
+        Style regular = doc.addStyle("regular", def);
+        StyleConstants.setFontFamily(def, "Courier New");
+
+        Style s = doc.addStyle("1", regular);
+        StyleConstants.setBold(s, true);
+        StyleConstants.setFontSize(s, 12);
+
+        s = doc.addStyle("2", regular);
+        StyleConstants.setFontSize(s, 8);
+
+        s = doc.addStyle("3", regular);
+        StyleConstants.setBold(s, true);
+        StyleConstants.setFontSize(s, 8);
     }
 
     private void printPlainBill() {
