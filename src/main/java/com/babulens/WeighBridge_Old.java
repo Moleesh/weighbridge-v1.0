@@ -4870,7 +4870,7 @@ class WeighBridge_Old {
         panelSettings.add(lblBaudRate);
 
         JLabel lblPortName = new JLabel("Port Details");
-        lblPortName.setToolTipText("<Port Name>;<Data Bit>;<Parity>;<Pattern>\r\n");
+        lblPortName.setToolTipText("<Port Name>;<Data Bit>;<Parity>;<Pattern>;<split>\r\n");
         lblPortName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         lblPortName.setBounds(336, 81, 100, 25);
         panelSettings.add(lblPortName);
@@ -6671,7 +6671,7 @@ class WeighBridge_Old {
                     temp2[1] = "";
                 }
 
-                String initString = "\n\n\n\n\n\n\n\n\n\n" + "         "
+                String initString = "\n\n\n\n\n\n\n\n\n\n\n\n" + "         "
                         + String.format("%72s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n" + "         "
                         + StringUtils.center(textFieldLine1.getText(), 82) + "\n" + "          "
                         + StringUtils.center(textFieldLine2.getText(), 82) + "\n" + "         "
@@ -6689,7 +6689,7 @@ class WeighBridge_Old {
                         + String.format(format2, "Tare Wt.", textFieldTareWt.getText(), "Date", temp2[0], "Time",
                         temp2[1])
                         + "\n" + String.format(format3, "Nett Wt.", textFieldNetWt.getText()) + "\n\n\n" + "         "
-                        + textFieldLine4.getText() + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + "         "
+                        + textFieldLine4.getText() + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + "         "
                         + String.format("%72s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n" + "         "
                         + StringUtils.center(textFieldLine1.getText(), 82) + "\n" + "          "
                         + StringUtils.center(textFieldLine2.getText(), 82) + "\n" + "         "
@@ -7399,7 +7399,7 @@ class WeighBridge_Old {
                 break;
             }
         }
-        String[] temp = {"8", "0", "10"};
+        String[] temp = {"8", "0", "10", "~~~~"};
         try {
             temp[0] = textFieldPortName.getText().split(";")[1];
             if (Objects.equals(temp[0], ""))
@@ -7414,6 +7414,10 @@ class WeighBridge_Old {
         }
         try {
             temp[2] = textFieldPortName.getText().split(";")[3];
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+        try {
+            temp[3] = textFieldPortName.getText().split(";")[4];
         } catch (ArrayIndexOutOfBoundsException ignored) {
         }
 
@@ -7439,7 +7443,8 @@ class WeighBridge_Old {
 
                 @Override
                 public void serialEvent(SerialPortEvent event) {
-                    lblWeight.setText("" + Integer.parseInt(0 + new String(event.getReceivedData()).replaceAll("[^-0-9]", "")));
+                    lblWeight.setText("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^" +
+                            "0-9" + temp[3] + "]", "").split(temp[3])[0]));
                 }
             });
         }
