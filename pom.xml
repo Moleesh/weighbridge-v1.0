@@ -151,11 +151,11 @@
                 <version>1.8</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>install</phase>
                         <configuration>
                             <target>
                                 <mkdir dir="WeighBridge"/>
-                                <copy file="target/*jar-with-dependencies.jar"
+                                <copy file="target/WeighBridge-jar-with-dependencies.jar"
                                       tofile="WeighBridge/weighbridge.jar"/>
                                 <copy file="cameras.xml" tofile="WeighBridge"/>
                                 <copy file="weighdata.mv.db" tofile="WeighBridge"/>
