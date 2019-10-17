@@ -47,7 +47,7 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.*;
 
-class WeighBridge_Old {
+class WeighBridge {
     private static final String DB_CONNECTION = "jdbc:h2:./weighdata";
     private static final String DB_USER = "admin";
     private static final String DB_PASSWORD = "root";
@@ -286,10 +286,8 @@ class WeighBridge_Old {
 
     /**
      * Create the application.
-     *
-     * @wbp.parser.entryPoint
      */
-    private WeighBridge_Old() {
+    private WeighBridge() {
         try {
             int i = 0;
             printServices = PrintServiceLookup.lookupPrintServices(null, null);
@@ -334,7 +332,7 @@ class WeighBridge_Old {
             JOptionPane.showMessageDialog(null, "UI NOT SUPPORTED\nLINE :306", "UI ERROR", JOptionPane.ERROR_MESSAGE);
         }
         EventQueue.invokeLater(() -> {
-            WeighBridge_Old window = new WeighBridge_Old();
+            WeighBridge window = new WeighBridge();
             window.frmBabulensWeighbridgeDesigned.setVisible(true);
         });
     }
@@ -7809,7 +7807,7 @@ class WeighBridge_Old {
                 add(new IpCamDriver(new IpCamStorage("cameras.xml")));
 
             } catch (NullPointerException | WebcamException ex) {
-                add(new WeighBridge_Old.MyIpCam());
+                add(new WeighBridge.MyIpCam());
             }
             add(new WebcamDefaultDriver());
         }
@@ -7870,7 +7868,19 @@ class WeighBridge_Old {
         }
     }
 
-    class Calculator extends JFrame implements ActionListener {
+    static class DivideByZeroException extends Exception {
+        private static final long serialVersionUID = 1L;
+
+        DivideByZeroException() {
+            super();
+        }
+
+        public DivideByZeroException(String s) {
+            super(s);
+        }
+    }
+
+    static class Calculator extends JFrame implements ActionListener {
         private static final long serialVersionUID = 1L;
         final int MAX_INPUT_LENGTH = 20;
         final int INPUT_MODE = 0;
@@ -8272,18 +8282,6 @@ class WeighBridge_Old {
             lastNumber = 0;
             displayMode = ERROR_MODE;
             clearOnNextDigit = true;
-        }
-    }
-
-    static class DivideByZeroException extends Exception {
-        private static final long serialVersionUID = 1L;
-
-        DivideByZeroException() {
-            super();
-        }
-
-        public DivideByZeroException(String s) {
-            super(s);
         }
     }
 }

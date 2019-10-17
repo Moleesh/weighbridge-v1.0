@@ -1,3 +1,3 @@
 # WeighBridgeOld
 ## to create jar
-mvn clean package
+mvn clean package deploy

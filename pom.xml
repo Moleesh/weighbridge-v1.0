@@ -121,7 +121,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.babulens.WeighBridge_Old</mainClass>
+                            <mainClass>com.babulens.WeighBridge</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -131,6 +131,38 @@
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>WeighBridge</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <mkdir dir="WeighBridge"/>
+                                <copy file="target/weighbridge-jar-with-dependencies.jar"
+                                      tofile="WeighBridge/weighbridge.jar"/>
+                                <copy file="cameras.xml" tofile="WeighBridge"/>
+                                <copy file="weighdata.mv.db" tofile="WeighBridge"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
                         </goals>
                     </execution>
                 </executions>
