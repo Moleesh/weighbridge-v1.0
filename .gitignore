@@ -26,7 +26,6 @@ hs_err_pid*
 .idea
 target
 *.iml
-weighdata.mv.db
 weighdata.trace.db
 .project
 .classpath
