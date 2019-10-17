@@ -451,7 +451,7 @@ class WeighBridge {
     }
 
     private String getUUID() {
-        String tempDetail = null;
+        String tempDetail = "";
         Process process;
         try {
             process = Runtime.getRuntime().exec(new String[]{"wmic", "csproduct", "get", "UUID"});
