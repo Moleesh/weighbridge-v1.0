@@ -155,7 +155,7 @@
                         <configuration>
                             <target>
                                 <mkdir dir="WeighBridge"/>
-                                <copy file="target/weighbridge-jar-with-dependencies.jar"
+                                <copy file="target/*jar-with-dependencies.jar"
                                       tofile="WeighBridge/weighbridge.jar"/>
                                 <copy file="cameras.xml" tofile="WeighBridge"/>
                                 <copy file="weighdata.mv.db" tofile="WeighBridge"/>
