@@ -88,6 +88,12 @@
             <artifactId>istack-commons-runtime</artifactId>
             <version>3.0.8</version>
         </dependency>
+        <dependency>
+            <groupId>com.ibatis</groupId>
+            <artifactId>ibatis2-common</artifactId>
+            <version>2.1.7.597</version>
+        </dependency>
+
     </dependencies>
     <build>
         <finalName>WeighBridge</finalName>
@@ -156,9 +162,9 @@
                             <target>
                                 <mkdir dir="WeighBridge"/>
                                 <copy file="cameras.xml" tofile="WeighBridge/cameras.xml"/>
-                                <copy file="weighdata.mv.db" tofile="WeighBridge/weighdata.mv.db"/>
                                 <copy file="target/WeighBridge-jar-with-dependencies.jar"
                                       tofile="WeighBridge/weighbridge.jar"/>
+                                <mkdir dir="WeighBridge/CameraOutput"/>
                             </target>
                         </configuration>
                         <goals>
@@ -169,5 +175,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

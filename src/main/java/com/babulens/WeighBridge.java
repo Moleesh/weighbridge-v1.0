@@ -9,6 +9,7 @@ import com.github.sarxos.webcam.ds.ipcam.IpCamDevice;
 import com.github.sarxos.webcam.ds.ipcam.IpCamDriver;
 import com.github.sarxos.webcam.ds.ipcam.IpCamMode;
 import com.github.sarxos.webcam.ds.ipcam.IpCamStorage;
+import com.ibatis.common.jdbc.ScriptRunner;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -35,6 +36,7 @@ import java.awt.image.BufferedImage;
 import java.awt.print.*;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.*;
@@ -292,11 +294,20 @@ class WeighBridge {
             int i = 0;
             printServices = PrintServiceLookup.lookupPrintServices(null, null);
             printers = new String[printServices.length];
+            boolean ExecuteQuery = false;
             for (PrintService printer : printServices)
                 printers[i++] = printer.getName();
+            if (!new File("weighdata.mv.db").exists()) {
+                ExecuteQuery = true;
+            }
             try {
                 dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
-            } catch (SQLException | NullPointerException ex) {
+                if (ExecuteQuery) {
+                    ScriptRunner scriptExecutor = new ScriptRunner(dbConnection, true, false);
+                    scriptExecutor.runScript(new FileReader(new File(getClass().getClassLoader().getResource("data.sql").getFile())));
+                }
+            } catch (SQLException | NullPointerException | IOException ex) {
+                ex.printStackTrace();
                 JOptionPane.showMessageDialog(null,
                         "DATABASE ALREADY OPEN\nPLZ CLOSE ALL OPEN SOFTWARE FILES\nLINE :328", "DATABASE ERROR",
                         JOptionPane.ERROR_MESSAGE);
@@ -343,15 +354,15 @@ class WeighBridge {
             ResultSet rs = stmt.executeQuery("SELECT * FROM setup");
             rs.absolute(1);
             String id = rs.getString("ID");
-            Date endDate = new Date(rs.getTimestamp("ENDDATE").getTime());
-            Date lastLogin = new Date(rs.getTimestamp("LASTLOGIN").getTime());
-            String tempDetail = rs.getString("TEMP");
-
+            Date endDate, lastLogin;
+            String UID;
             switch (id) {
                 case "0":
+                    endDate = new Date(rs.getTimestamp("ENDDATE").getTime());
+                    lastLogin = new Date(rs.getTimestamp("LASTLOGIN").getTime());
                     String[] buttons = {"License The Software", "Trial Period(" + endDate + ")", "Close"};
                     switch (JOptionPane.showOptionDialog(null, "Please Select a Option ?",
-                            "Welcome to the \"BABULENS WEIGHBRIDGE\" Softwere", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null,
+                            "Welcome to the \"BABULENS WEIGHBRIDGE\" Software", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null,
                             buttons, buttons[2])) {
                         case 0:
                             JPasswordField password = new JPasswordField(10);
@@ -377,9 +388,8 @@ class WeighBridge {
                                 isCorrect2 = Arrays.equals(temp, correctPassword2);
                             }
                             if (isCorrect) {
-                                tempDetail = getUUID();
                                 rs.updateString("ID", "1");
-                                rs.updateString("TEMP", tempDetail);
+                                rs.updateString("UID", getUUID());
                                 rs.updateRow();
                                 JOptionPane.showMessageDialog(null, "Welcome to the \"BABULENS WEIGHBRIDGE\" Softwere",
                                         "Welcome", JOptionPane.INFORMATION_MESSAGE);
@@ -429,7 +439,8 @@ class WeighBridge {
                     }
                     break;
                 case "1":
-                    if (tempDetail.equals(getUUID())) {
+                    UID = rs.getString("UID");
+                    if (UID.equals(getUUID())) {
                         JOptionPane.showMessageDialog(null, "Welcome to the \"BABULENS WEIGHBRIDGE\" Softwere", "Welcome",
                                 JOptionPane.INFORMATION_MESSAGE);
                     } else {
@@ -439,6 +450,14 @@ class WeighBridge {
                                 "ERROR", JOptionPane.ERROR_MESSAGE);
                         close();
                     }
+                    break;
+                case "2":
+                    rs.updateString("ID", "1");
+                    rs.updateString("UID", getUUID());
+                    rs.updateTimestamp("ENDDATE",
+                            new java.sql.Timestamp(new Date().getTime() + 10 * (long) 8.64e+7));
+                    rs.updateTimestamp("ENDDATE", new java.sql.Timestamp(new Date().getTime()));
+                    rs.updateRow();
                     break;
                 default:
                     close();
