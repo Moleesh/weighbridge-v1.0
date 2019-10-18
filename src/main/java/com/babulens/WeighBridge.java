@@ -365,54 +365,13 @@ class WeighBridge {
                             "Welcome to the \"BABULENS WEIGHBRIDGE\" Software", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null,
                             buttons, buttons[2])) {
                         case 0:
-                            JPasswordField password = new JPasswordField(10);
-                            JPanel panel = new JPanel();
-                            String[] ConnectOptionNames = {"Enter", "Cancel"};
-                            panel.add(new JLabel("Please the Password ? "));
-                            panel.add(password);
-                            JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
-                                    JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
-                            char[] temp = password.getPassword();
-                            boolean isCorrect;
-                            boolean isCorrect2;
-                            char[] correctPassword = {'0', '5', '0', '1', '1', '1'};
-                            char[] correctPassword2 = {'5', '5', '5', '1', '1', '1'};
-                            if (temp.length != correctPassword.length) {
-                                isCorrect = false;
-                            } else {
-                                isCorrect = Arrays.equals(temp, correctPassword);
-                            }
-                            if (temp.length != correctPassword2.length) {
-                                isCorrect2 = false;
-                            } else {
-                                isCorrect2 = Arrays.equals(temp, correctPassword2);
-                            }
-                            if (isCorrect) {
-                                rs.updateString("ID", "1");
-                                rs.updateString("UID", getUUID());
-                                rs.updateRow();
-                                JOptionPane.showMessageDialog(null, "Welcome to the \"BABULENS WEIGHBRIDGE\" Softwere",
-                                        "Welcome", JOptionPane.INFORMATION_MESSAGE);
-                            } else if (isCorrect2) {
-                                rs.updateTimestamp("ENDDATE",
-                                        new java.sql.Timestamp(new Date().getTime() + 10 * (long) 8.64e+7));
-                                rs.updateRow();
-                                //endDate = rs.getDate("ENDDATE");
-                                JOptionPane.showMessageDialog(null,
-                                        "Trial Reset Successfull\n you got 10 days\n Plz Open again", "Reset",
-                                        JOptionPane.INFORMATION_MESSAGE);
-                                close();
-                            } else {
-                                JOptionPane.showMessageDialog(null, "Your Lisense is not Valid\nPlease get a Valid Lisense",
-                                        "ERROR", JOptionPane.ERROR_MESSAGE);
-                                close();
-                            }
+                            startup(rs);
                             break;
                         case 1:
                             if (new Date().getTime() - lastLogin.getTime() > 0) {
                                 if (endDate.getTime() - new Date().getTime() > 0) {
                                     JOptionPane.showMessageDialog(null,
-                                            "Welcome to the \"BABULENS WEIGHBRIDGE\" Trial Softwere", "Welcome",
+                                            "Welcome to the \"BABULENS WEIGHBRIDGE\" Trial Software", "Welcome",
                                             JOptionPane.INFORMATION_MESSAGE);
                                     Timer countDown = new Timer((int) (endDate.getTime() - new Date().getTime()),
                                             e -> {
@@ -441,7 +400,7 @@ class WeighBridge {
                 case "1":
                     UID = rs.getString("UID");
                     if (UID.equals(getUUID())) {
-                        JOptionPane.showMessageDialog(null, "Welcome to the \"BABULENS WEIGHBRIDGE\" Softwere", "Welcome",
+                        JOptionPane.showMessageDialog(null, "Welcome to the \"BABULENS WEIGHBRIDGE\" Software", "Welcome",
                                 JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         rs.updateString("ID", "0");
@@ -458,6 +417,7 @@ class WeighBridge {
                             new java.sql.Timestamp(new Date().getTime() + 10 * (long) 8.64e+7));
                     rs.updateTimestamp("ENDDATE", new java.sql.Timestamp(new Date().getTime()));
                     rs.updateRow();
+                    startup(rs);
                     break;
                 default:
                     close();
@@ -467,6 +427,51 @@ class WeighBridge {
                     JOptionPane.ERROR_MESSAGE);
         }
 
+    }
+
+    private void startup(ResultSet rs) throws SQLException {
+        JPasswordField password = new JPasswordField(10);
+        JPanel panel = new JPanel();
+        String[] ConnectOptionNames = {"Enter", "Cancel"};
+        panel.add(new JLabel("Please the Password to Continue ? "));
+        panel.add(password);
+        JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
+        char[] temp = password.getPassword();
+        boolean isCorrect;
+        boolean isCorrect2;
+        char[] correctPassword = {'0', '5', '0', '1', '1', '1'};
+        char[] correctPassword2 = {'5', '5', '5', '1', '1', '1'};
+        if (temp.length != correctPassword.length) {
+            isCorrect = false;
+        } else {
+            isCorrect = Arrays.equals(temp, correctPassword);
+        }
+        if (temp.length != correctPassword2.length) {
+            isCorrect2 = false;
+        } else {
+            isCorrect2 = Arrays.equals(temp, correctPassword2);
+        }
+        if (isCorrect) {
+            rs.updateString("ID", "1");
+            rs.updateString("UID", getUUID());
+            rs.updateRow();
+            JOptionPane.showMessageDialog(null, "Welcome to the \"BABULENS WEIGHBRIDGE\" Software",
+                    "Welcome", JOptionPane.INFORMATION_MESSAGE);
+        } else if (isCorrect2) {
+            rs.updateTimestamp("ENDDATE",
+                    new Timestamp(new Date().getTime() + 10 * (long) 8.64e+7));
+            rs.updateRow();
+            //endDate = rs.getDate("ENDDATE");
+            JOptionPane.showMessageDialog(null,
+                    "Trial Reset Successfull\n you got 10 days\n Plz Open again", "Reset",
+                    JOptionPane.INFORMATION_MESSAGE);
+            close();
+        } else {
+            JOptionPane.showMessageDialog(null, "Your Lisense is not Valid\nPlease get a Valid Lisense",
+                    "ERROR", JOptionPane.ERROR_MESSAGE);
+            close();
+        }
     }
 
     private String getUUID() {

@@ -116,7 +116,7 @@ create TABLE IF NOT EXISTS SETTINGS (
 	BAGWEIGHT	DOUBLE,
 	PRIMARY KEY(key)
 );
-insert into SETTINGS values(1, 1, 1, 0, '', 'BABULENS', 'NAGERCOIL', 'FOOTER', 0.0, '', '', TRUE, FALSE, 0, 0, 'Pre Print', 'Pre Print', TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, 0, '', '', '', '', '', '', '', '', FALSE, TRUE, 0.0);
+insert into SETTINGS values(1, 1, 1, 1200, 'COM0', 'BABULENS', 'NAGERCOIL', 'FOOTER', 0.0, '', '', TRUE, FALSE, 0, 0, 'Pre Print', 'Pre Print', TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, 0, '', '', '', '', '', '', '', '', FALSE, TRUE, 0.0);
 drop table IF EXISTS MATERIALS;
 create TABLE IF NOT EXISTS MATERIALS (
 	KEY	INTEGER NOT NULL,
