@@ -34,10 +34,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.print.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.sql.*;
 import java.text.DateFormat;
@@ -304,7 +301,7 @@ class WeighBridge {
                 dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
                 if (ExecuteQuery) {
                     ScriptRunner scriptExecutor = new ScriptRunner(dbConnection, true, false);
-                    scriptExecutor.runScript(new FileReader(new File(getClass().getClassLoader().getResource("data.sql").getFile())));
+                    scriptExecutor.runScript(new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResource("data.sql").openStream())));
                 }
             } catch (SQLException | NullPointerException | IOException ex) {
                 ex.printStackTrace();
