@@ -4567,7 +4567,9 @@ class WeighBridge {
                 btnExportToExcel.setEnabled(true);
                 tabbedPane.setEnabledAt(0, true);
                 tabbedPane.setEnabledAt(1, true);
-                tabbedPane.setEnabledAt(3, true);
+                tabbedPane.setEnabledAt(2, true);
+                tabbedPane.setEnabledAt(4, true);
+                tabbedPane.setEnabledAt(5, true);
                 rdbtnWeighing.setEnabled(true);
                 rdbtnBilling.setEnabled(true);
             } catch (Exception ex) {
@@ -4799,7 +4801,9 @@ class WeighBridge {
             btnExportToExcel.setEnabled(false);
             tabbedPane.setEnabledAt(0, false);
             tabbedPane.setEnabledAt(1, false);
-            tabbedPane.setEnabledAt(3, false);
+            tabbedPane.setEnabledAt(2, false);
+            tabbedPane.setEnabledAt(4, false);
+            tabbedPane.setEnabledAt(5, false);
         });
         btnEditReport.setEnabled(false);
         btnEditReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
