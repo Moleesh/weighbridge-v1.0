@@ -282,9 +282,12 @@ class WeighBridge {
     private JTextField textFieldBagDeduction;
     private JTextField textFieldBagWeight;
     private JCheckBox chckbxExcludeNoOfBags;
+    private JCheckBox chckbxManualStatus;
 
     /**
      * Create the application.
+     *
+     * @wbp.parser.entryPoint
      */
     private WeighBridge() {
         try {
@@ -829,7 +832,6 @@ class WeighBridge {
     /**
      * Initialize the contents of the frame.
      */
-    @SuppressWarnings({"StatementWithEmptyBody", "UnusedReturnValue"})
     private void initialize() {
         a1.setSelected(true);
         aa.setSelected(true);
@@ -4100,7 +4102,12 @@ class WeighBridge {
             String message = "Plz Choose The Column To Show In Report ?";
             int n;
             if (rdbtnWeighing.isSelected()) {
-                Object[] params = {message, a1, a1a, a1b, aa, aaa, a2, a3, a3a, a4, a5, a6, a7, a8, a8a, a9, a10, a11, a12};
+                Object[] params;
+                if (chckbxManualStatus.isSelected()) {
+                    params = new Object[]{message, a1, a1a, a1b, aa, aaa, a2, a3, a3a, a4, a5, a6, a7, a8, a8a, a9, a10, a11, a12};
+                } else {
+                    params = new Object[]{message, a1, a1a, a1b, aa, aaa, a2, a3, a3a, a4, a5, a6, a7, a8, a8a, a9, a10, a11};
+                }
                 n = JOptionPane.showConfirmDialog(null, params, "Choose The Columns", JOptionPane.OK_CANCEL_OPTION);
             } else {
                 Object[] params = {message, b1, b2, b3, b4, b41, b12, b5, b6, b7, b8, b9, b10, b11};
@@ -4277,7 +4284,7 @@ class WeighBridge {
                             tableReport.removeColumn(tableReport.getColumn("Print Date & Time"));
                         if (!a11.isSelected())
                             tableReport.removeColumn(tableReport.getColumn("Remarks"));
-                        if (!a12.isSelected())
+                        if (!(a12.isSelected() && chckbxManualStatus.isSelected()))
                             tableReport.removeColumn(tableReport.getColumn("Manual"));
                     } catch (SQLException ex) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2174",
@@ -4576,7 +4583,7 @@ class WeighBridge {
             String message = "Plz Choose The Column To Show In Report ?";
             int n;
             if (rdbtnWeighing.isSelected()) {
-                Object[] params = {message, a1, a1a, a1b, aa, aaa, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12};
+                Object[] params = {message, a1, a1a, a1b, aa, aaa, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11};
                 n = JOptionPane.showConfirmDialog(null, params, "Choose The Columns", JOptionPane.OK_CANCEL_OPTION);
             } else {
                 Object[] params = {message, b1, b2, b3, b4, b41, b12, b5, b6, b7, b8, b9, b10, b11};
@@ -4683,7 +4690,7 @@ class WeighBridge {
                             tableReport.removeColumn(tableReport.getColumn("Print Date & Time"));
                         if (!a11.isSelected())
                             tableReport.removeColumn(tableReport.getColumn("Remarks"));
-                        if (!a12.isSelected())
+                        if (!(a12.isSelected() && chckbxManualStatus.isSelected()))
                             tableReport.removeColumn(tableReport.getColumn("Manual"));
                         tableReport.setEnabled(true);
                     } catch (SQLException ex) {
@@ -5826,6 +5833,13 @@ class WeighBridge {
         label_4.setBounds(316, 304, 25, 25);
         panel.add(label_4);
 
+        chckbxManualStatus = new JCheckBox("Manual Status");
+        chckbxManualStatus.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        chckbxManualStatus.setFocusable(false);
+        chckbxManualStatus.setBackground(new Color(0, 255, 127));
+        chckbxManualStatus.setBounds(462, 235, 200, 25);
+        panel.add(chckbxManualStatus);
+
         JButton button = new JButton("Minimize");
         button.addActionListener(e -> frmBabulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
         button.setFont(new Font("Times New Roman", Font.BOLD, 20));
@@ -6122,7 +6136,7 @@ class WeighBridge {
                 String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "),
                         textFieldTareDateTime.getText()),
                 String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "),
-                        "Charges : Rs. " + textFieldCharges.getText()),
+                        "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
                 chckbxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? ""
                         : String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n",
                 "-----------------------------------------------------------------\n",
@@ -6202,7 +6216,7 @@ class WeighBridge {
                         textFieldVehicleNo.getText()),
                 "\n\n",
                 String.format(
-                        format, "", textFieldCharges.getText(), textFieldCharges.getText(), textFieldCharges.getText()),
+                        format, "", (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
                 "\n\n",
                 String.format(format, "", textFieldGrossWt.getText() + " Kg", textFieldGrossWt.getText() + " Kg",
                         textFieldGrossWt.getText() + " Kg"),
@@ -6284,7 +6298,7 @@ class WeighBridge {
                         comboBoxMaterial.getEditor().getItem(), comboBoxMaterial.getEditor().getItem()),
                 "\n\n",
                 String.format(
-                        format, "", textFieldCharges.getText(), textFieldCharges.getText(), textFieldCharges.getText()),
+                        format, "", (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
                 "\n\n",
                 String.format(format, "", textFieldGrossWt.getText() + " Kg", textFieldGrossWt.getText() + " Kg",
                         textFieldGrossWt.getText() + " Kg"),
@@ -6478,7 +6492,7 @@ class WeighBridge {
                         + "\n\n" + String.format(format, "", "") + textFieldVehicleNo.getText() + "\n\n"
                         + String.format(format, "", "") + comboBoxMaterial.getEditor().getItem() + "\n\n"
                         + String.format(format, "", "") + comboBoxCustomerName.getEditor().getItem() + "\n\n"
-                        + String.format(format, "", "") + textFieldCharges.getText() + "\n\n";
+                        + String.format(format, "", "") + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()) + "\n\n";
                 graphics.setFont(new Font("Courier New", Font.BOLD, 10));
                 coordinates = drawString(graphics, initString, 0, coordinates.y);
 
@@ -6580,7 +6594,7 @@ class WeighBridge {
                         + "\n\n" + String.format(format, "", "Material") + comboBoxMaterial.getEditor().getItem()
                         + "\n\n" + String.format(format, "", "Customer Name")
                         + comboBoxCustomerName.getEditor().getItem() + "\n\n" + String.format(format, "", "Charges")
-                        + "Rs. " + textFieldCharges.getText() + "\n\n";
+                        + "Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()) + "\n\n";
                 graphics.setFont(new Font("Courier New", Font.BOLD, 10));
                 coordinates = drawString(graphics, initString, 0, coordinates.y);
 
@@ -6642,7 +6656,6 @@ class WeighBridge {
         }
     }
 
-    @SuppressWarnings("UnusedReturnValue")
     private void printPlainSriPathyWeight() {
         PrinterJob pj = PrinterJob.getPrinterJob();
         PageFormat pf = new PageFormat();
@@ -6656,7 +6669,6 @@ class WeighBridge {
         pf.setPaper(paper);
         Book pBook = new Book();
         pBook.append(new Printable() {
-            @SuppressWarnings("SameParameterValue")
             private void drawString(Graphics g, String text, int y) {
                 int length = 0;
                 for (String line : text.split("\n")) {
@@ -6666,7 +6678,6 @@ class WeighBridge {
                 new Coordinates(length, y + g.getFontMetrics().getHeight() - 1);
             }
 
-            @SuppressWarnings("SameReturnValue")
             public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
                 String format1 = "           %-19s: %-25s   %-10s : %s\n";
                 String format2 = "           %-10s:%7s Kg   %-10s : %-12s   %-10s : %s\n";
@@ -6825,7 +6836,7 @@ class WeighBridge {
                 String.format(format1, "Bag Deduction", StringUtils.leftPad(textFieldBagDeduction.getText(), 7, " "),
                         ""),
                 String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "),
-                        "Charges : Rs. " + textFieldCharges.getText()),
+                        "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
                 chckbxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? ""
                         : String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n",
                 "-----------------------------------------------------------------\n",
@@ -7469,7 +7480,6 @@ class WeighBridge {
         }
     }
 
-    @SuppressWarnings("SameParameterValue")
     private WebcamPanel webcamStarter(WebcamPicker webcamPicker, int i, WebcamPanel panelCamera,
                                       JComboBox<DimensionTemplate> comboBoxResolution, JTextField textFieldCropX12, JTextField textFieldCropY12,
                                       JTextField textFieldCropWidth12, JTextField textFieldCropHeight12, int x, int y, int z, int l) {
@@ -8151,23 +8161,19 @@ class WeighBridge {
             }
         }
 
-        @SuppressWarnings("EmptyMethod")
         private void addToMemory() {
             // needs code
 
         }
 
-        @SuppressWarnings("EmptyMethod")
         private void storeInMemory() {
             // needs code
         }
 
-        @SuppressWarnings("EmptyMethod")
         private void recallMemory() {
             // needs code
         }
 
-        @SuppressWarnings("EmptyMethod")
         private void clearMemory() {
             // needs code
         }

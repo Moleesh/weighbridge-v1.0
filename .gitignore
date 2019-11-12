@@ -33,3 +33,4 @@ weighdata.trace.db
 .classpath
 .settings
 /src/main/java/com/babulens/test.java
+/bin/
