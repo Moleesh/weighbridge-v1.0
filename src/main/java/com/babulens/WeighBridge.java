@@ -6601,7 +6601,6 @@ class WeighBridge {
                 } else {
                     label = "Save";
                     ((TableReport) tableReport.getModel()).addEditableRow(row);
-                    JOptionPane.showMessageDialog(button, "Column with Value: " + table.getValueAt(row, 1) + " -  Clicked!");
                 }
             }
             clicked = false;
