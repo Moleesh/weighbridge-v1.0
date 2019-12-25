@@ -22,10 +22,10 @@ import javax.imageio.ImageIO;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.text.*;
 import java.awt.Color;
@@ -40,10 +40,8 @@ import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.*;
 
 class WeighBridge {
@@ -53,7 +51,7 @@ class WeighBridge {
     static private SerialPort comPort;
 
     static {
-        Webcam.setDriver(new MyCompositeDriver());
+        Webcam.setDriver(new CompositeDriver());
     }
 
     private final ButtonGroup buttonGroup = new ButtonGroup();
@@ -82,19 +80,6 @@ class WeighBridge {
     private final JCheckBox a10 = new JCheckBox("Print Date & Time");
     private final JCheckBox a11 = new JCheckBox("Remarks");
     private final JCheckBox a12 = new JCheckBox("Manual");
-    private final JCheckBox b1 = new JCheckBox("Bill.No");
-    private final JCheckBox b2 = new JCheckBox("Reference SlNo");
-    private final JCheckBox b3 = new JCheckBox("Customer Name");
-    private final JCheckBox b4 = new JCheckBox("Customer Address");
-    private final JCheckBox b41 = new JCheckBox("Customer Address1");
-    private final JCheckBox b5 = new JCheckBox("Billing Date");
-    private final JCheckBox b6 = new JCheckBox("Cost Per Unit");
-    private final JCheckBox b7 = new JCheckBox("No of Units");
-    private final JCheckBox b8 = new JCheckBox("VAT");
-    private final JCheckBox b9 = new JCheckBox("Discount");
-    private final JCheckBox b10 = new JCheckBox("Total");
-    private final JCheckBox b11 = new JCheckBox("Remarks");
-    private final JCheckBox b12 = new JCheckBox("Material Name");
     private final Webcam[] webcam = new Webcam[5];
     private Connection dbConnection = null;
     private BufferedImage clickedImage;
@@ -102,7 +87,7 @@ class WeighBridge {
     private PrintService[] printServices;
     private String[] printers;
     private Calculator calc;
-    private JFrame frmBabulensWeighbridgeDesigned;
+    private JFrame babulensWeighbridgeDesigned;
     private JTextField textFieldCharges;
     private JComboBox<String> comboBoxMaterial;
     private JTextField textFieldVehicleNo;
@@ -130,7 +115,6 @@ class WeighBridge {
     private JButton btnPrint;
     private JRadioButton rdbtnWeighing;
     private JComboBox<String> comboBox;
-    private JRadioButton rdbtnBilling;
     private JTextField textFieldDetail;
     private JTable tableReport;
     private JTextField textFieldTotalCharges;
@@ -139,11 +123,6 @@ class WeighBridge {
     private JXDatePicker datePicker2;
     private JLabel detail;
     private JComboBox<String> comboBoxMaterialReport;
-    private JButton btnGo;
-    private JButton btnSaveReport;
-    private JButton btnEditReport;
-    private JButton btnExportToExcel;
-    private JButton btnPrintReport;
     private JTable tableMaterial;
     private JTable tableVehicleTare;
     private JTextField textFieldTitle1;
@@ -151,53 +130,14 @@ class WeighBridge {
     private JTextField textFieldFooter;
     private JTextField textFieldBaudRate;
     private JTextField textFieldPortName;
-    private JComboBox<String> comboBoxPrinter2;
     private JTable tableCustomer;
-    private JTextField textFieldTax;
-    private JButton btnResetBills;
     private JButton btnPassword;
     private JCheckBox chckbxEditEnable;
     private JCheckBox chckbxManualEntry;
     private JCheckBox chckbxExcludeCharges;
-    private JTable table1;
-    private JTable table2;
-    private JTable table3;
-    private JTable table4;
-    private JTextField textFieldReferenceSlNo;
-    private JTextField textFieldBillNo;
-    private JTextField textFieldCostPerunit;
-    private JTextField textFieldNoOfUnits;
-    private JTextField textFieldVat;
-    private JTextField textFieldDiscount;
-    private JTextField textFieldTotalVat;
-    private JTextField textFieldTotal;
-    private JTextField textFieldAmountToBePaid;
-    private JLabel lblAmount;
-    private JLabel lblVat;
-    private JTextField labelBillTitle;
-    private JComboBox<String> comboBoxCustomerName;
-    private JComboBox<String> comboBoxMaterialName;
-    private JButton btnSaveBill;
-    private JButton btnPrintBill;
-    private JComboBox<String> comboBoxPrinter1;
-    private JTextField textFieldBillDateTime;
+    private JComboBox<String> comboBoxPrinter;
     private JTextField textFieldNoOfCopies;
-    private JTextField textFieldCustomerAddress;
-    private JButton button6;
-    private JButton button7;
-    private JXDatePicker datePicker;
-    private JButton button5;
-    private JButton button4;
-    private JButton button3;
-    private JButton button2;
-    private JButton button1;
-    private JTextField textFieldRemarks;
-    private JButton btnCalculate;
-    private JTextField textFieldCustomerAddress1;
-    private JButton button8;
-    private JTextField textFieldNoOfCopies1;
-    private JComboBox<String> textFieldCustomerName;
-    private JCheckBox chckbxRemoveBillinTab;
+    private JComboBox<String> comboBoxCustomerName;
     private JCheckBox chckbxExcludeCustomer;
     private JCheckBox chckbxExcludeDrivers;
     private JComboBox<String> textFieldDriverName;
@@ -210,7 +150,6 @@ class WeighBridge {
     private JLabel labelCamera4;
     private JCheckBox chckbxCamera;
     private JCheckBox chckbxSms;
-    private JComboBox<String> comboBoxPrintOptionForBill;
     private JComboBox<String> comboBoxPrintOptionForWeight;
     private JTextField textFieldSMSPortName;
     private JTextField textFieldSMSBaudRate;
@@ -283,6 +222,7 @@ class WeighBridge {
     private JTextField textFieldBagWeight;
     private JCheckBox chckbxExcludeNoOfBags;
     private JCheckBox chckbxManualStatus;
+    private boolean reportOpened = false;
 
     /**
      * Create the application.
@@ -304,10 +244,9 @@ class WeighBridge {
                 dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
                 if (ExecuteQuery) {
                     ScriptRunner scriptExecutor = new ScriptRunner(dbConnection, true, false);
-                    scriptExecutor.runScript(new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResource("data.sql").openStream())));
+                    scriptExecutor.runScript(new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResource("data.sql")).openStream())));
                 }
             } catch (SQLException | NullPointerException | IOException ex) {
-                ex.printStackTrace();
                 JOptionPane.showMessageDialog(null,
                         "DATABASE ALREADY OPEN\nPLZ CLOSE ALL OPEN SOFTWARE FILES\nLINE :328", "DATABASE ERROR",
                         JOptionPane.ERROR_MESSAGE);
@@ -315,7 +254,7 @@ class WeighBridge {
             if (dbConnection == null) {
                 System.exit(0);
             }
-            // TODO start
+            // TODO: start
             initialize();
             setup();
             cameraSetting();
@@ -324,13 +263,12 @@ class WeighBridge {
             Timer t1 = new Timer(1000, e -> {
                 Date date = new Date();
                 textFieldDateTime.setText(dateAndTimeFormat.format(date));
-                textFieldBillDateTime.setText(dateAndTimeFormat.format(date));
             });
             t1.start();
-            //
-            // rePrint("3");
-            // printPlainSriPathyWeight();
-            // close();
+
+//             rePrint("1");
+//             printPlainSriPathyWeight();
+//             close();
 
         } catch (Error | Exception ignored) {
         }
@@ -344,7 +282,7 @@ class WeighBridge {
         }
         EventQueue.invokeLater(() -> {
             WeighBridge window = new WeighBridge();
-            window.frmBabulensWeighbridgeDesigned.setVisible(true);
+            window.babulensWeighbridgeDesigned.setVisible(true);
         });
     }
 
@@ -599,12 +537,6 @@ class WeighBridge {
             textFieldCropWidth4.setText(Integer.toString(rs.getInt("CROPWIDTH")));
             textFieldCropHeight4.setText(Integer.toString(rs.getInt("CROPHEIGHT")));
 
-            rs.absolute(5);
-            textFieldCropX11.setText(Integer.toString(rs.getInt("CROPX")));
-            textFieldCropY11.setText(Integer.toString(rs.getInt("CROPY")));
-            textFieldCropWidth11.setText(Integer.toString(rs.getInt("CROPWIDTH")));
-            textFieldCropHeight11.setText(Integer.toString(rs.getInt("CROPHEIGHT")));
-
             rs.absolute(1);
             checkBoxCamera1.setSelected(rs.getBoolean("ENABLE"));
             rs.absolute(2);
@@ -626,8 +558,6 @@ class WeighBridge {
             ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
             rs.absolute(1);
             textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
-            textFieldReferenceSlNo.setText(Integer.toString(rs.getInt("SLNO")));
-            textFieldBillNo.setText(Integer.toString(rs.getInt("BILLNO")));
             textFieldTitle1.setText(rs.getString("TITLE1"));
             title1.setText(rs.getString("TITLE1"));
             textFieldTitle2.setText(rs.getString("TITLE2"));
@@ -635,17 +565,12 @@ class WeighBridge {
             textFieldFooter.setText(rs.getString("FOOTER"));
             textFieldBaudRate.setText(Integer.toString(rs.getInt("BAUDRATE")));
             textFieldPortName.setText(rs.getString("PORTNAME"));
-            textFieldTax.setText(Double.toString(rs.getDouble("TAX")));
-            lblVat.setText("Tax " + rs.getDouble("TAX") + " %");
             textFieldNoOfCopies.setText(Integer.toString(rs.getInt("COPIES")));
-            textFieldNoOfCopies1.setText(Integer.toString(rs.getInt("COPIES1")));
             comboBoxPrintOptionForWeight.getModel().setSelectedItem(rs.getString("PRINTOPTIONFORWEIGHT"));
-            comboBoxPrintOptionForBill.getModel().setSelectedItem(rs.getString("PRINTOPTIONFORBILL"));
             chckbxExcludeCharges.setSelected(rs.getBoolean("EXCLUDECHARGES"));
             chckbxExcludeDrivers.setSelected(rs.getBoolean("EXCLUDEDRIVER"));
             chckbxExcludeCustomer.setSelected(rs.getBoolean("EXCLUDECUSTOMERS"));
             chckbxExcludeRemarks.setSelected(rs.getBoolean("EXCLUDEREMARKS"));
-            chckbxRemoveBillinTab.setSelected(rs.getBoolean("REMOVEBILLING"));
             chckbxAutoCharges.setSelected(rs.getBoolean("AUTOCHARGES"));
             chckbxCharges.setSelected(rs.getBoolean("AUTOCHARGES1"));
             chckbxMaterialSl.setSelected(rs.getBoolean("MATERIALSL"));
@@ -664,28 +589,19 @@ class WeighBridge {
             chckbxExcludeNoOfBags.setSelected(rs.getBoolean("EXCLUDEBAGS"));
             textFieldBagWeight.setText(Double.toString(rs.getDouble("BAGWEIGHT")));
 
-            if (((DefaultComboBoxModel<?>) comboBoxPrinter1.getModel()).getIndexOf(rs.getString("PRINTER1")) == -1)
-                JOptionPane.showMessageDialog(null, "Please Check the Printer 1 Settings");
+            if (((DefaultComboBoxModel<?>) comboBoxPrinter.getModel()).getIndexOf(rs.getString("PRINTER")) == -1)
+                JOptionPane.showMessageDialog(null, "Please Check the Printer Settings");
             else
-                comboBoxPrinter1.getModel().setSelectedItem(rs.getString("PRINTER1"));
-            if (((DefaultComboBoxModel<?>) comboBoxPrinter2.getModel()).getIndexOf(rs.getString("PRINTER2")) == -1)
-                JOptionPane.showMessageDialog(null, "Please Check the Printer 2 Settings");
-            else
-                comboBoxPrinter2.getModel().setSelectedItem(rs.getString("PRINTER2"));
+                comboBoxPrinter.getModel().setSelectedItem(rs.getString("PRINTER"));
             rs = stmt.executeQuery("SELECT * FROM CUSTOMER");
             DefaultTableModel model = (DefaultTableModel) tableCustomer.getModel();
             model.setRowCount(0);
             comboBoxCustomerName.removeAllItems();
-            textFieldCustomerName.removeAllItems();
             while (rs.next()) {
                 model.addRow(new Object[]{rs.getString("CUSTOMER"), rs.getString("CUSTOMERADDRESS"),
                         rs.getString("CUSTOMERADDRESS1")});
                 comboBoxCustomerName.addItem(rs.getString("CUSTOMER"));
-                textFieldCustomerName.addItem(rs.getString("CUSTOMER"));
                 comboBoxCustomerName.setSelectedIndex(-1);
-                textFieldCustomerName.setSelectedIndex(-1);
-                textFieldCustomerAddress.setText("");
-                textFieldCustomerAddress1.setText("");
             }
             rs = stmt.executeQuery("SELECT * FROM TRANSPORTER");
             textFieldDriverName.removeAllItems();
@@ -704,36 +620,16 @@ class WeighBridge {
             model = (DefaultTableModel) tableMaterial.getModel();
             model.setRowCount(0);
             comboBoxMaterial.removeAllItems();
-            comboBoxMaterialName.removeAllItems();
             comboBoxMaterialReport.removeAllItems();
             while (rs.next()) {
                 model.addRow(new Object[]{rs.getInt("KEY"), rs.getString("MATERIALS"), rs.getDouble("COST")});
                 comboBoxMaterial.addItem(rs.getString("MATERIALS"));
                 comboBoxMaterial.setSelectedIndex(-1);
-                comboBoxMaterialName.addItem(rs.getString("MATERIALS"));
-                comboBoxMaterialName.setSelectedIndex(-1);
                 comboBoxMaterialReport.addItem(rs.getString("MATERIALS"));
                 comboBoxMaterialReport.setSelectedIndex(-1);
-                textFieldCostPerunit.setText("0");
             }
-            rs = stmt.executeQuery("SELECT * FROM BILLPRITER");
-            rs.absolute(1);
-            model = (DefaultTableModel) table1.getModel();
-            for (int i = 1; i <= 5; i++)
-                model.setValueAt(rs.getString("A" + i), i - 1, 0);
-            model = (DefaultTableModel) table2.getModel();
-            for (int i = 1; i <= 5; i++)
-                model.setValueAt(rs.getString("B" + i), i - 1, 0);
-            model = (DefaultTableModel) table3.getModel();
-            for (int i = 1; i <= 6; i++)
-                model.setValueAt(rs.getString("C" + i), i - 1, 0);
-            model = (DefaultTableModel) table4.getModel();
-            for (int i = 1; i <= 6; i++)
-                model.setValueAt(rs.getString("D" + i), i - 1, 0);
-            labelBillTitle.setText(rs.getString("TITLE"));
             lock1 = true;
             cameraEvent();
-            billEvent();
             lock1 = false;
         } catch (SQLException | ParseException ex) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :806", "SQL ERROR",
@@ -750,18 +646,12 @@ class WeighBridge {
             rs.updateString("TITLE2", textFieldTitle2.getText());
             rs.updateString("FOOTER", textFieldFooter.getText());
             rs.updateBoolean("PRINTOPTIONFORWEIGHT", chckbxExcludeCharges.isSelected());
-            rs.updateBoolean("PRINTOPTIONFORBILL", chckbxExcludeDrivers.isSelected());
             rs.updateBoolean("EXCLUDECUSTOMERS", chckbxExcludeCustomer.isSelected());
             rs.updateString("PRINTOPTIONFORWEIGHT", (String) comboBoxPrintOptionForWeight.getSelectedItem());
-            rs.updateString("PRINTOPTIONFORBILL", (String) comboBoxPrintOptionForBill.getSelectedItem());
-            rs.updateBoolean("REMOVEBILLING", chckbxRemoveBillinTab.isSelected());
             rs.updateInt("BAUDRATE", Integer.parseInt(0 + textFieldBaudRate.getText().replaceAll("[^0-9]", "")));
             rs.updateString("PORTNAME", textFieldPortName.getText());
-            rs.updateDouble("TAX", Double.parseDouble("0" + textFieldTax.getText().replaceAll("[^.0-9]", "")));
-            rs.updateString("PRINTER1", (String) comboBoxPrinter1.getSelectedItem());
-            rs.updateString("PRINTER2", (String) comboBoxPrinter2.getSelectedItem());
+            rs.updateString("PRINTER", (String) comboBoxPrinter.getSelectedItem());
             rs.updateInt("COPIES", Integer.parseInt(0 + textFieldNoOfCopies.getText().replaceAll("[^0-9]", "")));
-            rs.updateInt("COPIES1", Integer.parseInt(0 + textFieldNoOfCopies1.getText().replaceAll("[^0-9]", "")));
             rs.updateBoolean("EXCLUDECHARGES", chckbxExcludeCharges.isSelected());
             rs.updateBoolean("EXCLUDEDRIVER", chckbxExcludeDrivers.isSelected());
             rs.updateBoolean("EXCLUDEREMARKS", chckbxExcludeRemarks.isSelected());
@@ -842,29 +732,22 @@ class WeighBridge {
         a7.setSelected(true);
         a9.setSelected(true);
         a10.setSelected(true);
-        b1.setSelected(true);
-        b2.setSelected(true);
-        b3.setSelected(true);
-        b5.setSelected(true);
-        b6.setSelected(true);
-        b7.setSelected(true);
-        b10.setSelected(true);
-        b12.setSelected(true);
-        frmBabulensWeighbridgeDesigned = new JFrame();
-        frmBabulensWeighbridgeDesigned.getContentPane().setBackground(new Color(0, 255, 127));
-        frmBabulensWeighbridgeDesigned.setBounds(new Rectangle(100, 100, 1280, 768));
-        frmBabulensWeighbridgeDesigned.setExtendedState(Frame.MAXIMIZED_BOTH);
-        frmBabulensWeighbridgeDesigned.setUndecorated(true);
-        frmBabulensWeighbridgeDesigned.setIconImage(Toolkit.getDefaultToolkit().getImage("resources/logo.bmp"));
-        frmBabulensWeighbridgeDesigned.setTitle("BABULENS WEIGHBRIDGE designed by \"BABULENS ENTERPRISES\"");
-        frmBabulensWeighbridgeDesigned.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frmBabulensWeighbridgeDesigned.getContentPane().setLayout(null);
+
+        babulensWeighbridgeDesigned = new JFrame();
+        babulensWeighbridgeDesigned.getContentPane().setBackground(new Color(0, 255, 127));
+        babulensWeighbridgeDesigned.setBounds(new Rectangle(100, 100, 1280, 768));
+        babulensWeighbridgeDesigned.setExtendedState(Frame.MAXIMIZED_BOTH);
+        babulensWeighbridgeDesigned.setUndecorated(true);
+        babulensWeighbridgeDesigned.setIconImage(Toolkit.getDefaultToolkit().getImage("resources/logo.bmp"));
+        babulensWeighbridgeDesigned.setTitle("BABULENS WEIGHBRIDGE designed by \"BABULENS ENTERPRISES\"");
+        babulensWeighbridgeDesigned.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        babulensWeighbridgeDesigned.getContentPane().setLayout(null);
 
         JLabel title = new JLabel("BABULENS WEIGHBRIDGE");
         title.setForeground(new Color(0, 0, 255));
         title.setBounds(10, 11, 300, 30);
         title.setFont(new Font("Algerian", Font.ITALIC, 25));
-        frmBabulensWeighbridgeDesigned.getContentPane().add(title);
+        babulensWeighbridgeDesigned.getContentPane().add(title);
 
         JButton close = new JButton("Close");
         close.setFocusable(false);
@@ -872,7 +755,7 @@ class WeighBridge {
         close.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         close.addActionListener(e -> close());
         close.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        frmBabulensWeighbridgeDesigned.getContentPane().add(close);
+        babulensWeighbridgeDesigned.getContentPane().add(close);
 
         title1 = new JLabel("title1");
         title1.setForeground(new Color(0, 0, 255));
@@ -880,7 +763,7 @@ class WeighBridge {
         title1.setBounds(10, 52, 1260, 25);
         title1.setHorizontalAlignment(SwingConstants.CENTER);
         title1.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 25));
-        frmBabulensWeighbridgeDesigned.getContentPane().add(title1);
+        babulensWeighbridgeDesigned.getContentPane().add(title1);
 
         title2 = new JLabel("title2");
         title2.setForeground(new Color(0, 0, 255));
@@ -888,14 +771,14 @@ class WeighBridge {
         title2.setBounds(10, 78, 1260, 25);
         title2.setHorizontalAlignment(SwingConstants.CENTER);
         title2.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 18));
-        frmBabulensWeighbridgeDesigned.getContentPane().add(title2);
+        babulensWeighbridgeDesigned.getContentPane().add(title2);
 
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane.setBackground(new Color(0, 255, 127));
         tabbedPane.setFocusable(false);
         tabbedPane.setFont(new Font("Trebuchet MS", Font.ITALIC, 20));
         tabbedPane.setBounds(10, 103, 1260, 654);
-        frmBabulensWeighbridgeDesigned.getContentPane().add(tabbedPane);
+        babulensWeighbridgeDesigned.getContentPane().add(tabbedPane);
 
         JPanel panelWeighing = new JPanel();
         panelWeighing.setBackground(new Color(0, 255, 127));
@@ -967,7 +850,7 @@ class WeighBridge {
                 else
                     textFieldDriverName.requestFocus();
             else
-                textFieldCustomerName.requestFocus();
+                comboBoxCustomerName.requestFocus();
         });
         rdbtnGross.setSelected(true);
         buttonGroup.add(rdbtnGross);
@@ -987,7 +870,7 @@ class WeighBridge {
                 else
                     textFieldDriverName.requestFocus();
             else
-                textFieldCustomerName.requestFocus();
+                comboBoxCustomerName.requestFocus();
         });
         buttonGroup.add(rdbtnTare);
         rdbtnTare.setFocusable(false);
@@ -1009,32 +892,18 @@ class WeighBridge {
         panelWeighing.add(textFieldCharges);
         textFieldCharges.setColumns(10);
 
-        textFieldCustomerName = new JComboBox<>();
-        textFieldCustomerName.setEditable(true);
-        textFieldCustomerName.addActionListener(e -> {
-            comboBoxCustomerName.setSelectedItem(textFieldCustomerName.getSelectedItem());
-            try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery("SELECT * FROM CUSTOMER WHERE CUSTOMER LIKE '"
-                        + comboBoxCustomerName.getSelectedItem() + "'");
-                if (rs.next()) {
-                    textFieldCustomerAddress.setText(rs.getString("CUSTOMERADDRESS"));
-                    textFieldCustomerAddress1.setText(rs.getString("CUSTOMERADDRESS1"));
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1406", "SQL ERROR",
-                        JOptionPane.ERROR_MESSAGE);
-            }
+        comboBoxCustomerName = new JComboBox<>();
+        comboBoxCustomerName.setEditable(true);
+        comboBoxCustomerName.addActionListener(e -> {
             if (chckbxExcludeDrivers.isSelected())
                 textFieldVehicleNo.requestFocus();
             else
                 textFieldDriverName.requestFocus();
 
         });
-        textFieldCustomerName.setFont(new Font("Times New Roman", Font.PLAIN, 18));
-        textFieldCustomerName.setBounds(240, 190, 175, 25);
-        panelWeighing.add(textFieldCustomerName);
+        comboBoxCustomerName.setFont(new Font("Times New Roman", Font.PLAIN, 18));
+        comboBoxCustomerName.setBounds(240, 190, 175, 25);
+        panelWeighing.add(comboBoxCustomerName);
 
         comboBoxMaterial = new JComboBox<>();
         comboBoxMaterial.addActionListener(e -> {
@@ -1044,7 +913,7 @@ class WeighBridge {
                         Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                                 ResultSet.CONCUR_UPDATABLE);
                         ResultSet rs = stmt.executeQuery("SELECT MATERIALS FROM MATERIALS where KEY ="
-                                + comboBoxMaterial.getEditor().getItem());
+                                + Integer.parseInt(comboBoxMaterial.getEditor().getItem().toString()));
                         if (rs.next())
                             comboBoxMaterial.setSelectedItem(rs.getString("MATERIALS"));
                     } catch (SQLException | NumberFormatException ignored) {
@@ -1318,9 +1187,7 @@ class WeighBridge {
             panel.add(new JLabel("Gross Time "));
             panel.add(timeSpinner);
             if (JOptionPane.showOptionDialog(null, panel, "Enter Gross Wt ", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, "") != 0)
-                ;
-            else {
+                    JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, "") == 0) {
                 try {
                     textFieldGrossWt.setText(Integer.toString(Integer.parseInt(userid.getText())));
                     Date dateTemp = datePicker.getDate();
@@ -1366,9 +1233,8 @@ class WeighBridge {
             panel.add(new JLabel("Tare Time "));
             panel.add(timeSpinner);
             if (JOptionPane.showOptionDialog(null, panel, "Enter Tare Wt ", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null) != 0)
-                ;
-            else {
+                    JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null) == 0
+            ) {
                 try {
                     textFieldTareWt.setText(Integer.toString(Integer.parseInt(userid.getText())));
                     Date dateTemp = datePicker.getDate();
@@ -1404,8 +1270,6 @@ class WeighBridge {
                     && !textFieldTareWt.getText().equals("0")) {
                 textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText())
                         - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText())));
-                textFieldNoOfUnits.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText())
-                        - Integer.parseInt(textFieldTareWt.getText())));
             }
             if (chckbxAutoCharges.isSelected() || chckbxChargecheck.isSelected()) {
                 try {
@@ -1423,10 +1287,9 @@ class WeighBridge {
             btnGetGross.setEnabled(false);
             btnGetTare.setEnabled(false);
             btnGetDcDetails.setEnabled(false);
-            textFieldCustomerName.setEnabled(false);
+            comboBoxCustomerName.setEnabled(false);
             textFieldDriverName.setEnabled(false);
             rdbtnGross.setEnabled(false);
-            button6.setEnabled(false);
             btnGetTareSl.setEnabled(false);
             rdbtnTare.setEnabled(false);
             btnGetGrossSl.setEnabled(false);
@@ -1469,11 +1332,10 @@ class WeighBridge {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1550", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
-            if (response == null || ("".equals(response))
+            if (!(response == null || ("".equals(response))
                     || Integer.parseInt(response.replaceAll("[^0-9]", "")) >= serialNo
                     || Integer.parseInt(response.replaceAll("[^0-9]", "")) <= 0)
-                ;
-            else {
+            ) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                             ResultSet.CONCUR_UPDATABLE);
@@ -1482,7 +1344,7 @@ class WeighBridge {
                     textFieldDcNo.setText(rs.getString("DCNO"));
                     textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? ""
                             : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
-                    textFieldCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
+                    comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                     textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
                     textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
@@ -1511,7 +1373,7 @@ class WeighBridge {
                 btnPlusTare.setEnabled(false);
                 textFieldDcNo.setEnabled(false);
                 textFieldDcDate.setEnabled(false);
-                textFieldCustomerName.setEnabled(false);
+                comboBoxCustomerName.setEnabled(false);
                 textFieldDriverName.setEnabled(false);
                 btnGetDcDetails.setEnabled(false);
                 comboBoxMaterial.setEnabled(true);
@@ -1547,10 +1409,9 @@ class WeighBridge {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :847", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
-            if (response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo
+            if (!(response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo
                     || Integer.parseInt(response) <= 0)
-                ;
-            else {
+            ) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                             ResultSet.CONCUR_UPDATABLE);
@@ -1559,7 +1420,7 @@ class WeighBridge {
                     textFieldDcNo.setText(rs.getString("DCNO"));
                     textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? ""
                             : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
-                    textFieldCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
+                    comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                     textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
                     textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
@@ -1588,7 +1449,7 @@ class WeighBridge {
                 btnPlusTare.setEnabled(false);
                 textFieldDcNo.setEnabled(false);
                 textFieldDcDate.setEnabled(false);
-                textFieldCustomerName.setEnabled(false);
+                comboBoxCustomerName.setEnabled(false);
                 textFieldDriverName.setEnabled(false);
                 btnGetDcDetails.setEnabled(false);
                 comboBoxMaterial.setEnabled(true);
@@ -1749,8 +1610,6 @@ class WeighBridge {
                     && !textFieldTareWt.getText().equals("0")) {
                 textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText())
                         - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText())));
-                textFieldNoOfUnits.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText())
-                        - Integer.parseInt(textFieldTareWt.getText())));
             }
             if (chckbxAutoCharges.isSelected() || chckbxChargecheck.isSelected()) {
                 try {
@@ -1765,10 +1624,9 @@ class WeighBridge {
                 }
             }
             textFieldNetDateTime.setText(textFieldDateTime.getText());
-            textFieldCustomerName.setEnabled(false);
+            comboBoxCustomerName.setEnabled(false);
             textFieldDriverName.setEnabled(false);
             rdbtnGross.setEnabled(false);
-            button6.setEnabled(false);
             btnGetTareSl.setEnabled(false);
             rdbtnTare.setEnabled(false);
             btnGetGrossSl.setEnabled(false);
@@ -1858,13 +1716,11 @@ class WeighBridge {
                 }
                 rs.updateInt("SLNO", Integer.parseInt(textFieldSlNo.getText()));
                 rs.updateString("DCNO", textFieldDcNo.getText());
-                if (textFieldDcDate.getText().equals(""))
-                    ;
-                else {
+                if (!textFieldDcDate.getText().equals("")) {
                     Date date = dateAndTimeFormatdate.parse(textFieldDcDate.getText());
                     rs.updateDate("DCNODATE", new java.sql.Date(date.getTime()));
                 }
-                String tempp = ("" + textFieldCustomerName.getSelectedItem()).toUpperCase();
+                String tempp = ("" + comboBoxCustomerName.getSelectedItem()).toUpperCase();
                 if (tempp.equals("NULL"))
                     tempp = "";
                 rs.updateString("CUSTOMERNAME", tempp);
@@ -1881,40 +1737,32 @@ class WeighBridge {
                 rs.updateInt("GROSSWT", Integer.parseInt(0 + textFieldGrossWt.getText()));
                 rs.updateString("REMARKS", textPaneRemarks.getText());
 
-                if (textFieldGrossDateTime.getText().equals(""))
-                    ;
-                else {
+                if (!textFieldGrossDateTime.getText().equals("")) {
                     Date date = dateAndTimeFormat.parse(textFieldGrossDateTime.getText());
                     rs.updateDate("GROSSDATE", new java.sql.Date(date.getTime()));
                     rs.updateTime("GROSSTIME", new Time(date.getTime()));
                 }
                 rs.updateInt("TAREWT", Integer.parseInt(0 + textFieldTareWt.getText()));
-                if (textFieldTareDateTime.getText().equals(""))
-                    ;
-                else {
+                if (!textFieldTareDateTime.getText().equals("")) {
                     Date date = dateAndTimeFormat.parse(textFieldTareDateTime.getText());
                     rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                     rs.updateTime("TARETIME", new Time(date.getTime()));
                 }
                 rs.updateInt("BAGDEDUCTION", Integer.parseInt(0 + textFieldBagDeduction.getText()));
                 rs.updateInt("NETWT", Integer.parseInt(0 + textFieldNetWt.getText()));
-                if (textFieldNetDateTime.getText().equals(""))
-                    ;
-                else {
+                if (!textFieldNetDateTime.getText().equals("")) {
                     Date date = dateAndTimeFormat.parse(textFieldNetDateTime.getText());
                     rs.updateDate("NETDATE", new java.sql.Date(date.getTime()));
                     rs.updateTime("NETTIME", new Time(date.getTime()));
                 }
                 rs.updateBoolean("MANUAL", chckbxManualEntry.isSelected());
-                if (update) {
-                    rs.updateRow();
-                } else {
+                if (!update) {
                     rs.insertRow();
                     rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                     rs.absolute(1);
                     rs.updateInt("SLNO", Integer.parseInt(textFieldSlNo.getText()) + 1);
-                    rs.updateRow();
                 }
+                rs.updateRow();
                 if (rdbtnTare.isSelected()) {
                     stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                             ResultSet.CONCUR_UPDATABLE);
@@ -2002,13 +1850,6 @@ class WeighBridge {
                     else
                         break;
                 }
-                // int response = JOptionPane.showConfirmDialog(null, "Do
-                // you want to Continue to Billing ?",
-                // "Continue",JOptionPane.YES_NO_OPTION,
-                // JOptionPane.QUESTION_MESSAGE);
-                // if (response == JOptionPane.YES_OPTION)
-                // tabbedPane.setSelectedComponent(panelBilling);
-                // else
                 clear();
             } catch (NullPointerException ex) {
                 JOptionPane.showMessageDialog(null, "Print ERROR\nPlease Use another Printer Option", "Print ERROR",
@@ -2026,24 +1867,7 @@ class WeighBridge {
             String response = JOptionPane.showInputDialog(null, "Please Enter the Sl.no to Reprint ?", "Reprint",
                     JOptionPane.QUESTION_MESSAGE);
             if (response != null)
-                response = response.replaceAll("[^0-9]", "");
-            int serialNo = 0;
-            try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
-                rs.absolute(1);
-                serialNo = rs.getInt("SLNO");
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1039", "SQL ERROR",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-            if (response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo
-                    || Integer.parseInt(response) <= 0)
-                ;
-            else {
                 rePrint(response);
-            }
         });
         btnReprint.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnReprint.setBounds(245, 565, 150, 25);
@@ -2265,11 +2089,9 @@ class WeighBridge {
             }
             if (result == 0)
                 rdbtnGross.setSelected(true);
-            else if (response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo
+            else if (!(response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo
                     || Integer.parseInt(response) <= 0 || result != 1)
-                ;
-
-            else {
+            ) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                             ResultSet.CONCUR_UPDATABLE);
@@ -2278,7 +2100,7 @@ class WeighBridge {
                     textFieldDcNo.setText(rs.getString("DCNO"));
                     textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? ""
                             : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
-                    textFieldCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
+                    comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                     textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
                     textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
@@ -2308,7 +2130,7 @@ class WeighBridge {
                 btnPlusTare.setEnabled(false);
                 textFieldDcNo.setEnabled(false);
                 textFieldDcDate.setEnabled(false);
-                textFieldCustomerName.setEnabled(false);
+                comboBoxCustomerName.setEnabled(false);
                 textFieldDriverName.setEnabled(false);
                 btnGetDcDetails.setEnabled(false);
                 comboBoxMaterial.setEnabled(true);
@@ -2348,10 +2170,9 @@ class WeighBridge {
             }
             if (result == 0)
                 rdbtnTare.setSelected(true);
-            else if (response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo
+            else if (!(response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo
                     || Integer.parseInt(response) <= 0 || result != 1)
-                ;
-            else {
+            ) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                             ResultSet.CONCUR_UPDATABLE);
@@ -2360,7 +2181,7 @@ class WeighBridge {
                     textFieldDcNo.setText(rs.getString("DCNO"));
                     textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? ""
                             : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
-                    textFieldCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
+                    comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                     textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
                     textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
@@ -2389,7 +2210,7 @@ class WeighBridge {
                 btnPlusTare.setEnabled(false);
                 textFieldDcNo.setEnabled(false);
                 textFieldDcDate.setEnabled(false);
-                textFieldCustomerName.setEnabled(false);
+                comboBoxCustomerName.setEnabled(false);
                 textFieldDriverName.setEnabled(false);
                 btnGetDcDetails.setEnabled(false);
                 comboBoxMaterial.setEnabled(true);
@@ -3224,661 +3045,6 @@ class WeighBridge {
         textFieldCropHeight11.setColumns(10);
         textFieldCropHeight11.setBounds(469, 281, 50, 25);
         panelCameras.add(textFieldCropHeight11);
-        JPanel panelBilling = new JPanel();
-        panelBilling.setBackground(new Color(0, 255, 127));
-        tabbedPane.addTab("           Billing          ", null, panelBilling, null);
-        panelBilling.setLayout(null);
-
-        lblAmount = new JLabel("0");
-        lblAmount.setForeground(new Color(0, 0, 255));
-        lblAmount.setHorizontalAlignment(SwingConstants.CENTER);
-        lblAmount.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 85));
-        lblAmount.setBounds(420, 95, 415, 100);
-        panelBilling.add(lblAmount);
-
-        lblVat = new JLabel("");
-        lblVat.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblVat.setBounds(452, 475, 150, 25);
-        panelBilling.add(lblVat);
-
-        JLabel lblBillNo = new JLabel("Bill No");
-        lblBillNo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblBillNo.setBounds(20, 275, 175, 25);
-        panelBilling.add(lblBillNo);
-
-        JLabel lblReferenceSlno = new JLabel("Reference Sl.No");
-        lblReferenceSlno.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblReferenceSlno.setBounds(20, 325, 175, 25);
-        panelBilling.add(lblReferenceSlno);
-
-        JLabel lblCustomerName = new JLabel("Customer Name");
-        lblCustomerName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblCustomerName.setBounds(20, 375, 175, 25);
-        panelBilling.add(lblCustomerName);
-
-        JLabel lblDateTime1 = new JLabel("Date & Time");
-        lblDateTime1.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblDateTime1.setBounds(452, 275, 150, 25);
-        panelBilling.add(lblDateTime1);
-
-        JLabel lblBillingDate = new JLabel("Billing Date");
-        lblBillingDate.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblBillingDate.setBounds(840, 275, 175, 25);
-        panelBilling.add(lblBillingDate);
-
-        JLabel lblCustiomerAddress = new JLabel("Custiomer Address");
-        lblCustiomerAddress.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblCustiomerAddress.setBounds(20, 420, 175, 25);
-        panelBilling.add(lblCustiomerAddress);
-
-        JLabel lblCustiomerAddress_1 = new JLabel("Custiomer Address1");
-        lblCustiomerAddress_1.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblCustiomerAddress_1.setBounds(19, 470, 175, 25);
-        panelBilling.add(lblCustiomerAddress_1);
-
-        JLabel lblMaterialName = new JLabel("Material Name");
-        lblMaterialName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblMaterialName.setBounds(452, 325, 150, 25);
-        panelBilling.add(lblMaterialName);
-
-        JLabel lblCostPerUnit = new JLabel("Cost Per Unit");
-        lblCostPerUnit.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblCostPerUnit.setBounds(452, 375, 150, 25);
-        panelBilling.add(lblCostPerUnit);
-
-        JLabel lblTaxNoOfUnits = new JLabel("Weight");
-        lblTaxNoOfUnits.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblTaxNoOfUnits.setBounds(452, 425, 150, 25);
-        panelBilling.add(lblTaxNoOfUnits);
-
-        JLabel lblTotal = new JLabel("Total");
-        lblTotal.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblTotal.setBounds(840, 330, 175, 25);
-        panelBilling.add(lblTotal);
-
-        JLabel lblTotalVat = new JLabel("Total + VAT");
-        lblTotalVat.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblTotalVat.setBounds(840, 380, 175, 25);
-        panelBilling.add(lblTotalVat);
-
-        JLabel lblDiscount = new JLabel("Discount");
-        lblDiscount.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblDiscount.setBounds(840, 430, 175, 25);
-        panelBilling.add(lblDiscount);
-
-        JLabel lblAmountToBe = new JLabel("Amount to be Paid");
-        lblAmountToBe.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblAmountToBe.setBounds(840, 480, 175, 25);
-        panelBilling.add(lblAmountToBe);
-
-        JLabel lblRemarks = new JLabel("Remarks");
-        lblRemarks.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblRemarks.setBounds(840, 556, 175, 25);
-        panelBilling.add(lblRemarks);
-
-        table1 = new JTable(5, 1);
-        table1.setToolTipText("Only 35 letters");
-        table1.setRowSelectionAllowed(false);
-        for (int i = 0; i < table1.getColumnCount(); i++) {
-            TableColumn col = table1.getColumnModel().getColumn(i);
-            col.setCellEditor(new MyTableCellEditor());
-        }
-        table1.setBackground(new Color(0, 255, 127));
-        table1.setEnabled(false);
-        table1.setShowVerticalLines(false);
-        table1.setShowHorizontalLines(false);
-        table1.setShowGrid(false);
-        table1.setRowHeight(table1.getRowHeight() + 3);
-        table1.setFont(new Font("Monospaced", Font.PLAIN, 15));
-        table1.setBounds(10, 11, 400, 115);
-        panelBilling.add(table1);
-
-        table2 = new JTable(5, 1);
-        table2.setToolTipText("Only 35 letters");
-        table2.setRowSelectionAllowed(false);
-        for (int i = 0; i < table2.getColumnCount(); i++) {
-            TableColumn col = table2.getColumnModel().getColumn(i);
-            col.setCellEditor(new MyTableCellEditor());
-        }
-        table2.setBackground(new Color(0, 255, 127));
-        table2.setEnabled(false);
-        table2.setShowVerticalLines(false);
-        table2.setShowHorizontalLines(false);
-        table2.setShowGrid(false);
-        table2.setRowHeight(table1.getRowHeight() + 3);
-        table2.setFont(new Font("Monospaced", Font.PLAIN, 15));
-        table2.setBounds(845, 10, 400, 115);
-        panelBilling.add(table2);
-
-        table3 = new JTable(6, 1);
-        table3.setToolTipText("Only 35 letters");
-        table3.setRowSelectionAllowed(false);
-        for (int i = 0; i < table3.getColumnCount(); i++) {
-            TableColumn col = table3.getColumnModel().getColumn(i);
-            col.setCellEditor(new MyTableCellEditor());
-        }
-        table3.setBackground(new Color(0, 255, 127));
-        table3.setEnabled(false);
-        table3.setShowVerticalLines(false);
-        table3.setShowHorizontalLines(false);
-        table3.setShowGrid(false);
-        table3.setRowHeight(19);
-        table3.setFont(new Font("Monospaced", Font.PLAIN, 15));
-        table3.setBounds(10, 128, 400, 143);
-        panelBilling.add(table3);
-
-        table4 = new JTable(6, 1);
-        table4.setToolTipText("Only 35 letters");
-        table4.setRowSelectionAllowed(false);
-        for (int i = 0; i < table4.getColumnCount(); i++) {
-            TableColumn col = table4.getColumnModel().getColumn(i);
-            col.setCellEditor(new MyTableCellEditor());
-        }
-        table4.setBackground(new Color(0, 255, 127));
-        table4.setEnabled(false);
-        table4.setShowVerticalLines(false);
-        table4.setShowHorizontalLines(false);
-        table4.setShowGrid(false);
-        table4.setRowHeight(22);
-        table4.setFont(new Font("Monospaced", Font.PLAIN, 15));
-        table4.setBounds(845, 127, 400, 143);
-        panelBilling.add(table4);
-
-        JButton btnEdit = new JButton("Edit");
-        btnEdit.addActionListener(e -> {
-            table1.setEnabled(true);
-            table2.setEnabled(true);
-            table3.setEnabled(true);
-            table4.setEnabled(true);
-            labelBillTitle.setEnabled(true);
-        });
-        btnEdit.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnEdit.setFocusable(false);
-        btnEdit.setBounds(452, 11, 150, 25);
-        panelBilling.add(btnEdit);
-
-        JButton btnUpdateBill = new JButton("Update");
-        btnUpdateBill.addActionListener(e -> {
-            try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery("SELECT * FROM BILLPRITER");
-                rs.absolute(1);
-                DefaultTableModel model = (DefaultTableModel) table1.getModel();
-                for (int i = 1; i <= 5; i++)
-                    rs.updateString("A" + i, (String) model.getValueAt(i - 1, 0));
-                model = (DefaultTableModel) table2.getModel();
-                for (int i = 1; i <= 5; i++)
-                    rs.updateString("B" + i, (String) model.getValueAt(i - 1, 0));
-                model = (DefaultTableModel) table3.getModel();
-                for (int i = 1; i <= 6; i++)
-                    rs.updateString("C" + i, (String) model.getValueAt(i - 1, 0));
-                model = (DefaultTableModel) table4.getModel();
-                for (int i = 1; i <= 6; i++)
-                    rs.updateString("D" + i, (String) model.getValueAt(i - 1, 0));
-                rs.updateString("TITLE", labelBillTitle.getText());
-                rs.updateRow();
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1334", "SQL ERROR",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-            table1.setEnabled(false);
-            table2.setEnabled(false);
-            table3.setEnabled(false);
-            table4.setEnabled(false);
-            labelBillTitle.setEnabled(false);
-        });
-        btnUpdateBill.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnUpdateBill.setFocusable(false);
-        btnUpdateBill.setBounds(669, 11, 150, 25);
-        panelBilling.add(btnUpdateBill);
-
-        labelBillTitle = new JTextField("title1");
-        labelBillTitle.setBorder(null);
-        labelBillTitle.setInheritsPopupMenu(true);
-        labelBillTitle.setOpaque(false);
-        labelBillTitle.setAutoscrolls(false);
-        labelBillTitle.setEnabled(false);
-        labelBillTitle.setDisabledTextColor(new Color(0, 0, 255));
-        labelBillTitle.setBackground(new Color(0, 255, 127));
-        labelBillTitle.setHorizontalAlignment(SwingConstants.CENTER);
-        labelBillTitle.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 25));
-        labelBillTitle.setBounds(420, 59, 415, 25);
-        panelBilling.add(labelBillTitle);
-
-        textFieldBillNo = new JTextField();
-        textFieldBillNo.setEnabled(false);
-        textFieldBillNo.setHorizontalAlignment(SwingConstants.CENTER);
-        textFieldBillNo.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldBillNo.setDisabledTextColor(Color.BLACK);
-        textFieldBillNo.setColumns(10);
-        textFieldBillNo.setBounds(210, 275, 175, 30);
-        panelBilling.add(textFieldBillNo);
-
-        textFieldReferenceSlNo = new JTextField();
-        textFieldReferenceSlNo.addActionListener(e -> {
-            if (rdbtnGross.isSelected()) {
-                try {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                            ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery(
-                            "SELECT * FROM WEIGHING WHERE SLNO = " + textFieldReferenceSlNo.getText());
-                    if (rs.next())
-                        textFieldNoOfUnits.setText(Integer.toString(rs.getInt("NETWT")));
-                    comboBoxMaterialName.setSelectedItem(rs.getString("MATERIAL"));
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1381",
-                            "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-        textFieldReferenceSlNo.setEnabled(false);
-        textFieldReferenceSlNo.setHorizontalAlignment(SwingConstants.CENTER);
-        textFieldReferenceSlNo.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldReferenceSlNo.setDisabledTextColor(Color.BLACK);
-        textFieldReferenceSlNo.setColumns(10);
-        textFieldReferenceSlNo.setBounds(210, 325, 175, 30);
-        panelBilling.add(textFieldReferenceSlNo);
-
-        comboBoxCustomerName = new JComboBox<>();
-        comboBoxCustomerName.addActionListener(e -> {
-            try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery("SELECT * FROM CUSTOMER WHERE CUSTOMER LIKE '"
-                        + comboBoxCustomerName.getSelectedItem() + "'");
-                if (rs.next()) {
-                    textFieldCustomerAddress.setText(rs.getString("CUSTOMERADDRESS"));
-                    textFieldCustomerAddress1.setText(rs.getString("CUSTOMERADDRESS1"));
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1406", "SQL ERROR",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        comboBoxCustomerName.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        comboBoxCustomerName.setEditable(true);
-        comboBoxCustomerName.setBounds(210, 375, 175, 30);
-        panelBilling.add(comboBoxCustomerName);
-
-        comboBoxMaterialName = new JComboBox<>();
-        comboBoxMaterialName.setEnabled(false);
-        comboBoxMaterialName.addActionListener(e -> {
-            try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery("SELECT * FROM MATERIALS WHERE MATERIALS LIKE '"
-                        + comboBoxMaterialName.getSelectedItem() + "'");
-                if (rs.next())
-                    textFieldCostPerunit.setText(rs.getString("COST"));
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1425", "SQL ERROR",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        textFieldCustomerAddress = new JTextField();
-        textFieldCustomerAddress.setEnabled(false);
-        textFieldCustomerAddress.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldCustomerAddress.setBounds(210, 420, 175, 30);
-        panelBilling.add(textFieldCustomerAddress);
-
-        textFieldCustomerAddress1 = new JTextField();
-        textFieldCustomerAddress1.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldCustomerAddress1.setEnabled(false);
-        textFieldCustomerAddress1.setBounds(209, 470, 175, 30);
-        panelBilling.add(textFieldCustomerAddress1);
-        comboBoxMaterialName.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        comboBoxMaterialName.setEditable(true);
-        comboBoxMaterialName.setBounds(606, 325, 175, 30);
-        panelBilling.add(comboBoxMaterialName);
-
-        textFieldBillDateTime = new JTextField();
-        textFieldBillDateTime.setEditable(false);
-        textFieldBillDateTime.setHorizontalAlignment(SwingConstants.CENTER);
-        textFieldBillDateTime.setFont(new Font("Times New Roman", Font.PLAIN, 18));
-        textFieldBillDateTime.setDisabledTextColor(Color.BLACK);
-        textFieldBillDateTime.setColumns(10);
-        textFieldBillDateTime.setBounds(606, 275, 175, 30);
-        panelBilling.add(textFieldBillDateTime);
-
-        textFieldCostPerunit = new JTextField();
-        textFieldCostPerunit.setText("0");
-        textFieldCostPerunit.setEnabled(false);
-        textFieldCostPerunit.setHorizontalAlignment(SwingConstants.RIGHT);
-        textFieldCostPerunit.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldCostPerunit.setDisabledTextColor(Color.BLACK);
-        textFieldCostPerunit.setColumns(10);
-        textFieldCostPerunit.setBounds(606, 375, 175, 30);
-        panelBilling.add(textFieldCostPerunit);
-
-        textFieldNoOfUnits = new JTextField();
-        textFieldNoOfUnits.setText("0");
-        textFieldNoOfUnits.setEnabled(false);
-        textFieldNoOfUnits.setHorizontalAlignment(SwingConstants.RIGHT);
-        textFieldNoOfUnits.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldNoOfUnits.setDisabledTextColor(Color.BLACK);
-        textFieldNoOfUnits.setColumns(10);
-        textFieldNoOfUnits.setBounds(606, 425, 175, 30);
-        panelBilling.add(textFieldNoOfUnits);
-
-        textFieldVat = new JTextField();
-        textFieldVat.setText("0");
-        textFieldVat.setEnabled(false);
-        textFieldVat.setHorizontalAlignment(SwingConstants.RIGHT);
-        textFieldVat.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldVat.setDisabledTextColor(Color.BLACK);
-        textFieldVat.setColumns(10);
-        textFieldVat.setBounds(606, 475, 175, 30);
-        panelBilling.add(textFieldVat);
-
-        datePicker = new JXDatePicker();
-        datePicker.setEnabled(false);
-        datePicker.setFormats("dd-MM-yyyy");
-        datePicker.getEditor().setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        datePicker.getEditor().setEditable(false);
-        datePicker.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        datePicker.setBounds(1030, 275, 175, 30);
-        panelBilling.add(datePicker);
-
-        textFieldTotal = new JTextField();
-        textFieldTotal.setText("0");
-        textFieldTotal.setEnabled(false);
-        textFieldTotal.setHorizontalAlignment(SwingConstants.RIGHT);
-        textFieldTotal.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldTotal.setDisabledTextColor(Color.BLACK);
-        textFieldTotal.setColumns(10);
-        textFieldTotal.setBounds(1030, 330, 175, 30);
-        panelBilling.add(textFieldTotal);
-
-        textFieldTotalVat = new JTextField();
-        textFieldTotalVat.setText("0");
-        textFieldTotalVat.setEnabled(false);
-        textFieldTotalVat.setHorizontalAlignment(SwingConstants.RIGHT);
-        textFieldTotalVat.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldTotalVat.setDisabledTextColor(Color.BLACK);
-        textFieldTotalVat.setColumns(10);
-        textFieldTotalVat.setBounds(1030, 380, 175, 30);
-        panelBilling.add(textFieldTotalVat);
-
-        textFieldDiscount = new JTextField();
-        textFieldDiscount.setEnabled(false);
-        textFieldDiscount.setText("0");
-        textFieldDiscount.setHorizontalAlignment(SwingConstants.RIGHT);
-        textFieldDiscount.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldDiscount.setDisabledTextColor(Color.BLACK);
-        textFieldDiscount.setColumns(10);
-        textFieldDiscount.setBounds(1030, 430, 175, 30);
-        panelBilling.add(textFieldDiscount);
-
-        textFieldAmountToBePaid = new JTextField();
-        textFieldAmountToBePaid.setText("0");
-        textFieldAmountToBePaid.setHorizontalAlignment(SwingConstants.RIGHT);
-        textFieldAmountToBePaid.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldAmountToBePaid.setEnabled(false);
-        textFieldAmountToBePaid.setDisabledTextColor(Color.BLACK);
-        textFieldAmountToBePaid.setColumns(10);
-        textFieldAmountToBePaid.setBounds(1030, 480, 175, 30);
-        panelBilling.add(textFieldAmountToBePaid);
-
-        textFieldRemarks = new JTextField();
-        textFieldRemarks.setHorizontalAlignment(SwingConstants.LEFT);
-        textFieldRemarks.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldRemarks.setDisabledTextColor(Color.BLACK);
-        textFieldRemarks.setColumns(10);
-        textFieldRemarks.setBounds(1030, 553, 175, 30);
-        panelBilling.add(textFieldRemarks);
-
-        btnCalculate = new JButton("Calculate");
-        btnCalculate.addActionListener(e -> {
-            String[] temp = textFieldBillDateTime.getText().split(" ");
-            try {
-                if (datePicker.getDate() == null)
-                    ;
-            } catch (NullPointerException e1) {
-                try {
-                    datePicker.setDate(dateAndTimeFormatdate.parse(temp[0]));
-                } catch (ParseException ignored) {
-                }
-            }
-            textFieldCostPerunit.setText(textFieldCostPerunit.getText().replaceAll("[^.0-9]", ""));
-            textFieldNoOfUnits.setText(textFieldNoOfUnits.getText().replaceAll("[^0-9]", ""));
-            textFieldDiscount.setText(textFieldDiscount.getText().replaceAll("[^0-9]", ""));
-            textFieldTotal.setText(Integer.toString((int) (Double.parseDouble(textFieldCostPerunit.getText())
-                    * Double.parseDouble(textFieldNoOfUnits.getText()))));
-            textFieldVat.setText(Integer.toString((int) (Double.parseDouble(textFieldTotal.getText())
-                    * Double.parseDouble(textFieldTax.getText()) / 100)));
-            textFieldTotalVat.setText(Integer.toString((int) (Double.parseDouble(textFieldVat.getText())
-                    + Double.parseDouble(textFieldTotal.getText()))));
-            textFieldAmountToBePaid.setText(Integer.toString((int) Double.parseDouble(textFieldTotalVat.getText())
-                    - (int) Double.parseDouble(textFieldDiscount.getText())));
-            lblAmount.setText(textFieldAmountToBePaid.getText());
-            textFieldReferenceSlNo.setEnabled(false);
-            button1.setEnabled(false);
-            comboBoxCustomerName.setEnabled(false);
-            textFieldCustomerAddress.setEnabled(false);
-            button2.setEnabled(false);
-            comboBoxMaterialName.setEnabled(false);
-            button3.setEnabled(false);
-            textFieldCostPerunit.setEnabled(false);
-            button4.setEnabled(false);
-            textFieldNoOfUnits.setEnabled(false);
-            button5.setEnabled(false);
-            datePicker.setEnabled(false);
-            button6.setEnabled(false);
-            textFieldDiscount.setEnabled(false);
-            button7.setEnabled(false);
-            textFieldRemarks.setEnabled(false);
-            button8.setEnabled(false);
-            textFieldCustomerAddress1.setEnabled(false);
-            btnCalculate.setEnabled(false);
-            btnSaveBill.setEnabled(true);
-        });
-        btnCalculate.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnCalculate.setFocusable(false);
-        btnCalculate.setBounds(77, 530, 150, 25);
-        panelBilling.add(btnCalculate);
-
-        btnSaveBill = new JButton("Save");
-        btnSaveBill.addActionListener(e -> {
-            try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery("SELECT * FROM BILLING");
-                rs.moveToInsertRow();
-                rs.updateInt("BILLNO", Integer.parseInt(textFieldBillNo.getText()));
-                rs.updateInt("REFERENCESLNO", Integer.parseInt(textFieldReferenceSlNo.getText()));
-                rs.updateString("CUSTOMERNAME", (String) comboBoxCustomerName.getSelectedItem());
-                rs.updateString("CUSTOMERADDRESS", textFieldCustomerAddress.getText());
-                rs.updateString("CUSTOMERADDRESS1", textFieldCustomerAddress1.getText());
-                rs.updateString("MATERIALNAME", (String) comboBoxMaterialName.getSelectedItem());
-                rs.updateDouble("COSTPERUNIT", Double.parseDouble("0" + textFieldCostPerunit.getText()));
-                rs.updateInt("NOOFUNITS", (int) Double.parseDouble("0" + textFieldNoOfUnits.getText()));
-                rs.updateInt("VAT", Integer.parseInt(0 + textFieldVat.getText()));
-                rs.updateInt("DISCOUNT", (int) Double.parseDouble("0" + textFieldDiscount.getText()));
-                rs.updateInt("TOTAL", Integer.parseInt(0 + textFieldAmountToBePaid.getText()));
-                Date date = datePicker.getDate();
-                rs.updateDate("BILLDATE", new java.sql.Date(date.getTime()));
-                rs.updateString("REMARK", textFieldRemarks.getText());
-                rs.insertRow();
-                rs = stmt.executeQuery("SELECT * FROM SETTINGS");
-                rs.absolute(1);
-                rs.updateInt("BILLNO", Integer.parseInt(textFieldBillNo.getText()) + 1);
-                rs.updateRow();
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1613", "SQL ERROR",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-            btnSaveBill.setEnabled(false);
-            btnPrintBill.setEnabled(true);
-        });
-        btnSaveBill.setEnabled(false);
-        btnSaveBill.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnSaveBill.setFocusable(false);
-        btnSaveBill.setBounds(277, 530, 150, 25);
-        panelBilling.add(btnSaveBill);
-
-        btnPrintBill = new JButton("Print");
-        btnPrintBill.addActionListener(e -> {
-            for (int i = 0; i < Integer.parseInt(textFieldNoOfCopies1.getText()); i++) {
-                int response = JOptionPane.showConfirmDialog(null, "Do you want to Print ?", "Print",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if (response == JOptionPane.YES_OPTION)
-                    printPlainBill();
-                else
-                    break;
-            }
-            // int response = JOptionPane.showConfirmDialog(null, "Do you
-            // want to Continue to Weighing ?",
-            // "Continue",JOptionPane.YES_NO_OPTION,
-            // JOptionPane.QUESTION_MESSAGE);
-            // if (response == JOptionPane.YES_OPTION)
-            // tabbedPane.setSelectedComponent(panelWeighing);
-            clear();
-        });
-        btnPrintBill.setEnabled(false);
-        btnPrintBill.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnPrintBill.setFocusable(false);
-        btnPrintBill.setBounds(477, 530, 150, 25);
-        panelBilling.add(btnPrintBill);
-
-        JButton btnRePrintBill = new JButton("RePrint");
-        btnRePrintBill.addActionListener(e -> {
-            String response = JOptionPane.showInputDialog(null, "Please Enter the Bill.no to Reprint ?", "Reprint",
-                    JOptionPane.QUESTION_MESSAGE);
-            if (response != null)
-                response = response.replaceAll("[^0-9]", "");
-            int billNo = 0;
-            try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
-                rs.absolute(1);
-                billNo = rs.getInt("BILLNO");
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1662", "SQL ERROR",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-            if (response == null || ("".equals(response)) || Integer.parseInt(response) >= billNo
-                    || Integer.parseInt(response) <= 0)
-                ;
-            else {
-                try {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                            ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM billing");
-                    rs.absolute(Integer.parseInt(response));
-                    textFieldBillNo.setText(Integer.toString(rs.getInt("BILLNO")));
-                    textFieldReferenceSlNo.setText(Integer.toString(rs.getInt("REFERENCESLNO")));
-                    comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                    textFieldCustomerAddress.setText(rs.getString("CUSTOMERADDRESS"));
-                    textFieldCustomerAddress1.setText(rs.getString("CUSTOMERADDRESS1"));
-                    comboBoxMaterialName.setSelectedItem(rs.getString("MATERIALNAME"));
-                    textFieldCostPerunit.setText(String.format("%.2f", rs.getDouble("COSTPERUNIT")));
-                    textFieldNoOfUnits.setText(Integer.toString(rs.getInt("NOOFUNITS")));
-                    textFieldVat.setText(Integer.toString(rs.getInt("VAT")));
-                    textFieldDiscount.setText(Integer.toString(rs.getInt("DISCOUNT")));
-                    textFieldAmountToBePaid.setText(Integer.toString(rs.getInt("TOTAL")));
-                    datePicker.setDate(rs.getDate("BILLDATE"));
-                    textFieldRemarks.setText(rs.getString("REMARK"));
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1684",
-                            "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-                textFieldTotal.setText(Integer.toString((int) (Double.parseDouble(textFieldCostPerunit.getText())
-                        * Double.parseDouble(textFieldNoOfUnits.getText()))));
-                textFieldTotalVat.setText(Integer.toString((int) (Double.parseDouble(textFieldVat.getText())
-                        + Double.parseDouble(textFieldTotal.getText()))));
-                textFieldReferenceSlNo.setEnabled(false);
-                button1.setEnabled(false);
-                comboBoxCustomerName.setEnabled(false);
-                textFieldCustomerAddress.setEnabled(false);
-                button2.setEnabled(false);
-                textFieldCustomerAddress1.setEnabled(false);
-                button8.setEnabled(false);
-                comboBoxMaterialName.setEnabled(false);
-                button3.setEnabled(false);
-                textFieldCostPerunit.setEnabled(false);
-                button4.setEnabled(false);
-                textFieldNoOfUnits.setEnabled(false);
-                button5.setEnabled(false);
-                datePicker.setEnabled(false);
-                button6.setEnabled(false);
-                textFieldDiscount.setEnabled(false);
-                button7.setEnabled(false);
-                textFieldRemarks.setEnabled(false);
-                btnCalculate.setEnabled(false);
-                btnSaveBill.setEnabled(false);
-                btnPrintBill.setEnabled(true);
-            }
-        });
-        btnRePrintBill.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnRePrintBill.setFocusable(false);
-        btnRePrintBill.setBounds(277, 580, 150, 25);
-        panelBilling.add(btnRePrintBill);
-
-        JButton btnClearBill = new JButton("Clear");
-        btnClearBill.addActionListener(e -> clear());
-        btnClearBill.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnClearBill.setFocusable(false);
-        btnClearBill.setBounds(477, 580, 150, 25);
-        panelBilling.add(btnClearBill);
-
-        button1 = new JButton("");
-        button1.addActionListener(e -> textFieldReferenceSlNo.setEnabled(true));
-        button1.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        button1.setFocusable(false);
-        button1.setBounds(385, 325, 26, 30);
-        panelBilling.add(button1);
-
-        button2 = new JButton("");
-        button2.addActionListener(e -> textFieldCustomerAddress.setEnabled(true));
-        button2.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        button2.setFocusable(false);
-        button2.setBounds(385, 420, 26, 30);
-        panelBilling.add(button2);
-
-        button3 = new JButton("");
-        button3.addActionListener(e -> comboBoxMaterialName.setEnabled(true));
-        button3.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        button3.setFocusable(false);
-        button3.setBounds(781, 325, 26, 30);
-        panelBilling.add(button3);
-
-        button4 = new JButton("");
-        button4.addActionListener(e -> textFieldCostPerunit.setEnabled(true));
-        button4.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        button4.setFocusable(false);
-        button4.setBounds(781, 375, 26, 30);
-        panelBilling.add(button4);
-
-        button6 = new JButton("");
-        button6.addActionListener(e -> datePicker.setEnabled(true));
-
-        button5 = new JButton("");
-        button5.addActionListener(e -> textFieldNoOfUnits.setEnabled(true));
-        button5.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        button5.setFocusable(false);
-        button5.setBounds(781, 425, 26, 30);
-        panelBilling.add(button5);
-        button6.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        button6.setFocusable(false);
-        button6.setBounds(1206, 275, 26, 30);
-        panelBilling.add(button6);
-
-        button7 = new JButton("");
-        button7.addActionListener(e -> textFieldDiscount.setEnabled(true));
-        button7.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        button7.setFocusable(false);
-        button7.setBounds(1206, 429, 26, 30);
-        panelBilling.add(button7);
-
-        button8 = new JButton("");
-        button8.addActionListener(e -> textFieldCustomerAddress1.setEnabled(true));
-        button8.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        button8.setFocusable(false);
-        button8.setBounds(384, 470, 26, 30);
-        panelBilling.add(button8);
 
         JPanel panelReport = new JPanel();
         panelReport.setBackground(new Color(0, 255, 127));
@@ -3905,33 +3071,14 @@ class WeighBridge {
         rdbtnWeighing.setBounds(75, 25, 200, 25);
         panelReport.add(rdbtnWeighing);
 
-        rdbtnBilling = new JRadioButton("Billing Report");
-        rdbtnBilling.setBackground(new Color(0, 255, 127));
-        rdbtnBilling.addActionListener(e -> {
-            comboBox.removeAllItems();
-            comboBox.addItem("Full Report");
-            comboBox.addItem("Daily Report");
-            comboBox.addItem("Datewise Report");
-            comboBox.addItem("BillNowise Report");
-            comboBox.addItem("Customerwise Report");
-            comboBox.addItem("Materialwise Report");
-        });
-        buttonGroup_1.add(rdbtnBilling);
-        rdbtnBilling.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        rdbtnBilling.setFocusable(false);
-        rdbtnBilling.setBounds(75, 75, 200, 25);
-        panelReport.add(rdbtnBilling);
-
         JLabel lblPleaseSelectThe = new JLabel("Please Select the Type of Report");
         lblPleaseSelectThe.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblPleaseSelectThe.setBounds(520, 51, 300, 25);
+        lblPleaseSelectThe.setBounds(398, 51, 300, 25);
         panelReport.add(lblPleaseSelectThe);
 
         comboBox = new JComboBox<>();
         comboBox.addItemListener(e -> {
-            if (comboBox.getSelectedItem() == null)
-                ;
-            else {
+            if (comboBox.getSelectedItem() != null) {
                 if (rdbtnWeighing.isSelected()) {
                     switch (comboBox.getSelectedItem().toString()) {
                         case "Full Report":
@@ -4036,7 +3183,7 @@ class WeighBridge {
                 "Datewise Report", "Serialwise Report", "Vehiclewise Report", "Materialwise Report",
                 "Customerwise Report", "Transporterwise Report"}));
         comboBox.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        comboBox.setBounds(840, 51, 350, 25);
+        comboBox.setBounds(721, 51, 350, 25);
         panelReport.add(comboBox);
 
         Date dateTemp = new Date();
@@ -4096,11 +3243,10 @@ class WeighBridge {
         lblMaterialReport.setBounds(838, 87, 163, 25);
         panelReport.add(lblMaterialReport);
 
-        btnGo = new JButton("Go");
+        JButton btnGo = new JButton("Go");
         btnGo.addActionListener(e -> {
-            int charges = 0, netWt = 0;
             String message = "Plz Choose The Column To Show In Report ?";
-            int n;
+            int n = -1;
             if (rdbtnWeighing.isSelected()) {
                 Object[] params;
                 if (chckbxManualStatus.isSelected()) {
@@ -4109,289 +3255,10 @@ class WeighBridge {
                     params = new Object[]{message, a1, a1a, a1b, aa, aaa, a2, a3, a3a, a4, a5, a6, a7, a8, a8a, a9, a10, a11};
                 }
                 n = JOptionPane.showConfirmDialog(null, params, "Choose The Columns", JOptionPane.OK_CANCEL_OPTION);
-            } else {
-                Object[] params = {message, b1, b2, b3, b4, b41, b12, b5, b6, b7, b8, b9, b10, b11};
-                n = JOptionPane.showConfirmDialog(null, params, "Choose The Columns", JOptionPane.OK_CANCEL_OPTION);
             }
             if (n == 0) {
-                String date1, date2,
-                        vehicleNo, material;
-                int serialNo;
-                Date dateTemp12;
-                if (rdbtnWeighing.isSelected()) {
-                    String temp = "SELECT * FROM WEIGHING";
-                    switch (Objects.requireNonNull(comboBox.getSelectedItem()).toString()) {
-                        case "Full Report":
-                            temp = "SELECT * FROM WEIGHING";
-                            break;
-                        case "Daily Report":
-                            dateTemp12 = datePicker1.getDate();
-                            date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            temp = "SELECT * FROM WEIGHING WHERE NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                            break;
-                        case "Datewise Report":
-                            dateTemp12 = datePicker1.getDate();
-                            date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            dateTemp12 = datePicker2.getDate();
-                            date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            temp = "SELECT * FROM WEIGHING WHERE NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                            break;
-                        case "Serialwise Report":
-                            serialNo = Integer.parseInt(0 + textFieldDetail.getText().replaceAll("[^0-9]", ""));
-                            temp = "SELECT * FROM WEIGHING WHERE SLNO >= " + serialNo;
-                            break;
-                        case "Vehiclewise Report":
-                            vehicleNo = textFieldDetail.getText();
-                            dateTemp12 = datePicker1.getDate();
-                            date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            dateTemp12 = datePicker2.getDate();
-                            date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            temp = "SELECT * FROM WEIGHING WHERE upper(VEHICLENO) LIKE UPPER('%" + vehicleNo
-                                    + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                            break;
-                        case "Materialwise Report":
-                            dateTemp12 = datePicker1.getDate();
-                            date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            dateTemp12 = datePicker2.getDate();
-                            date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            material = (String) comboBoxMaterialReport.getSelectedItem();
-                            if (material == null)
-                                material = "";
-                            temp = "SELECT * FROM WEIGHING WHERE upper(MATERIAL) LIKE UPPER('%" + material
-                                    + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                            break;
-                        case "Customerwise Report":
-                            dateTemp12 = datePicker1.getDate();
-                            date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            dateTemp12 = datePicker2.getDate();
-                            date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            vehicleNo = textFieldDetail.getText();
-                            material = "" + comboBoxMaterialReport.getSelectedItem();
-                            if ("null".contains(material.trim()) || "".contains(material.trim()))
-                                material = "";
-                            else
-                                material = "AND MATERIAL LIKE '" + material + "'";
-                            temp = "SELECT * FROM WEIGHING WHERE upper(CUSTOMERNAME) LIKE UPPER('%" + vehicleNo
-                                    + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'" + material;
-                            break;
-                        case "Transporterwise Report":
-                            dateTemp12 = datePicker1.getDate();
-                            date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            dateTemp12 = datePicker2.getDate();
-                            date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            vehicleNo = textFieldDetail.getText();
-                            temp = "SELECT * FROM WEIGHING WHERE upper(DRIVERNAME) LIKE UPPER('%" + vehicleNo
-                                    + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                            break;
-                    }
-                    try {
-                        tableReport.setModel(new DefaultTableModel(new Object[][]{},
-                                new String[]{"Sl.No", "Dc. No", "Dc. Date", "Customer's Name",
-                                        "Transporter's Name", "Vehicle No", "Material", "No Of Bags", "Charges", "Gross Wt",
-                                        "Gross Date & Time", "Tare Wt", "Tare Date & Time", "Bag Deduction", "Net Wt",
-                                        "Print Date & Time", "Remarks", "Manual"}) {
-                            private static final long serialVersionUID = 1L;
-                            final boolean[] columnEditables = new boolean[]{false, false, false, false, false, false, false, false,
-                                    false, false, false, false, false, false, false, false, false, false};
-
-                            public boolean isCellEditable(int row, int column) {
-                                return columnEditables[column];
-                            }
-                        });
-                        DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
-                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                                ResultSet.CONCUR_UPDATABLE);
-                        ResultSet rs = stmt.executeQuery(temp + " ORDER BY SLNO");
-                        while (rs.next()) {
-                            String date, time, gross,
-                                    tare, net;
-                            date = "" + rs.getDate("GROSSDATE");
-                            if (date.equals("null"))
-                                date = "";
-                            else
-                                date = dateAndTimeFormatdate.format(rs.getDate("GROSSDATE"));
-                            time = "" + rs.getTime("GROSSTIME");
-                            if (time.equals("null"))
-                                time = "";
-                            else
-                                time = timeFormat.format(rs.getTime("GROSSTIME"));
-                            gross = date + " " + time;
-                            date = "" + rs.getDate("TAREDATE");
-                            if (date.equals("null"))
-                                date = "";
-                            else
-                                date = dateAndTimeFormatdate.format(rs.getDate("TAREDATE"));
-                            time = "" + rs.getTime("TARETIME");
-                            if (time.equals("null"))
-                                time = "";
-                            else
-                                time = timeFormat.format(rs.getTime("TARETIME"));
-                            tare = date + " " + time;
-                            date = "" + rs.getDate("NETDATE");
-                            if (date.equals("null"))
-                                date = "";
-                            else
-                                date = dateAndTimeFormatdate.format(rs.getDate("NETDATE"));
-                            time = "" + rs.getTime("NETTIME");
-                            if (time.equals("null"))
-                                time = "";
-                            else
-                                time = timeFormat.format(rs.getTime("NETTIME"));
-                            net = date + " " + time;
-
-                            model.addRow(new Object[]{rs.getInt("SLNO"), rs.getString("DCNO"),
-                                    ("" + rs.getDate("DCNODATE")).equals("null") ? ""
-                                            : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")),
-                                    rs.getString("CUSTOMERNAME"), rs.getString("DRIVERNAME"),
-                                    rs.getString("VEHICLENO"), rs.getString("MATERIAL"), rs.getInt("NOOFBAGS"), rs.getInt("CHARGES"),
-                                    rs.getInt("GROSSWT"), gross, rs.getInt("TAREWT"), tare, rs.getInt("BAGDEDUCTION"), rs.getInt("NETWT"), net,
-                                    rs.getString("REMARKS"), rs.getBoolean("MANUAL")});
-                            charges += rs.getInt("CHARGES");
-                            netWt += rs.getInt("NETWT");
-                        }
-                        if (!a1.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Sl.No"));
-                        if (!a1a.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Dc. No"));
-                        if (!a1b.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Dc. Date"));
-                        if (!aa.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Customer's Name"));
-                        if (!aaa.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Transporter's Name"));
-                        if (!a2.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Vehicle No"));
-                        if (!a3.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Material"));
-                        if (!a3a.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("No Of Bags"));
-                        if (!a4.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Charges"));
-                        if (!a5.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Gross Wt"));
-                        if (!a6.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Gross Date & Time"));
-                        if (!a7.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Tare Wt"));
-                        if (!a8.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Tare Date & Time"));
-                        if (!a8a.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Bag Deduction"));
-                        if (!a9.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Net Wt"));
-                        if (!a10.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Print Date & Time"));
-                        if (!a11.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Remarks"));
-                        if (!(a12.isSelected() && chckbxManualStatus.isSelected()))
-                            tableReport.removeColumn(tableReport.getColumn("Manual"));
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2174",
-                                "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                    }
-                } else {
-                    String temp = "SELECT * FROM BILLING";
-                    switch (Objects.requireNonNull(comboBox.getSelectedItem()).toString()) {
-                        case "Full Report":
-                            temp = "SELECT * FROM BILLING";
-                            break;
-                        case "Daily Report":
-                            dateTemp12 = datePicker1.getDate();
-                            date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            temp = "SELECT * FROM BILLING WHERE BILLDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                            break;
-                        case "Datewise Report":
-                            dateTemp12 = datePicker1.getDate();
-                            date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            dateTemp12 = datePicker2.getDate();
-                            date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                            temp = "SELECT * FROM BILLING WHERE BILLDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                            break;
-                        case "BillNowise Report":
-                            serialNo = Integer.parseInt(0 + textFieldDetail.getText());
-                            temp = "SELECT * FROM BILLING WHERE BILLNO >= " + serialNo;
-                            break;
-                        case "Customerwise Report":
-                            vehicleNo = textFieldDetail.getText();
-                            temp = "SELECT * FROM BILLING WHERE CUSTOMERNAME LIKE '" + vehicleNo + "'";
-                            break;
-                        case "Materialwise Report":
-                            material = (String) comboBoxMaterialReport.getSelectedItem();
-                            temp = "SELECT * FROM BILLING WHERE MATERIALNAME LIKE '" + material + "'";
-                            break;
-                    }
-
-                    try {
-                        tableReport.setModel(new DefaultTableModel(new Object[][]{},
-                                new String[]{"Bill.No", "Reference SlNo", "Customer Name", "Customer Address",
-                                        "Customer Address1", "Material Name", "Billing Date", "Cost Per Unit",
-                                        "No of Units", "VAT", "Discount", "Total", "Remarks"}) {
-                            /**
-                             *
-                             */
-                            private static final long serialVersionUID = 1L;
-                            final boolean[] columnEditables = new boolean[]{false, false, false, false, false, false,
-                                    false, false, false, false, false, false, false};
-
-                            public boolean isCellEditable(int row, int column) {
-                                return columnEditables[column];
-                            }
-                        });
-                        DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
-                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                                ResultSet.CONCUR_UPDATABLE);
-                        ResultSet rs = stmt.executeQuery(temp);
-                        while (rs.next()) {
-                            String date;
-                            date = "" + rs.getDate("BILLDATE");
-                            if (date.equals("null"))
-                                date = "";
-                            else
-                                date = dateAndTimeFormatdate.format(rs.getDate("BILLDATE"));
-                            model.addRow(new Object[]{rs.getInt("BILLNO"), rs.getInt("REFERENCESLNO"),
-                                    rs.getString("CUSTOMERNAME"), rs.getString("CUSTOMERADDRESS"),
-                                    rs.getString("CUSTOMERADDRESS"), rs.getString("MATERIALNAME"), date,
-                                    rs.getDouble("COSTPERUNIT"), rs.getInt("NOOFUNITS"), rs.getInt("VAT"),
-                                    rs.getInt("DISCOUNT"), rs.getInt("TOTAL"), rs.getString("REMARK")});
-                            charges += rs.getInt("TOTAL");
-                            netWt += rs.getInt("NOOFUNITS");
-                        }
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2259",
-                                "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                    }
-                    if (!b1.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("Bill.No"));
-                    if (!b2.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("Reference SlNo"));
-                    if (!b3.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("Customer Name"));
-                    if (!b4.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("Customer Address"));
-                    if (!b41.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("Customer Address1"));
-                    if (!b5.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("Billing Date"));
-                    if (!b6.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("Cost Per Unit"));
-                    if (!b7.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("No of Units"));
-                    if (!b8.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("VAT"));
-                    if (!b9.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("Discount"));
-                    if (!b10.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("Total"));
-                    if (!b11.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("Remarks"));
-                    if (!b12.isSelected())
-                        tableReport.removeColumn(tableReport.getColumn("Material Name"));
-                }
+                getReport();
             }
-            textFieldTotalCharges.setText("Rs. " + charges);
-            textFieldtotalNetWt.setText(netWt + " Kg");
         });
         btnGo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnGo.setFocusable(false);
@@ -4441,373 +3308,7 @@ class WeighBridge {
         lblTotalNetWt.setBounds(20, 581, 120, 25);
         panelReport.add(lblTotalNetWt);
 
-        btnSaveReport = new JButton("Save");
-        btnSaveReport.addActionListener(e -> {
-            try {
-                if (rdbtnWeighing.isSelected()) {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                            ResultSet.CONCUR_UPDATABLE);
-                    PreparedStatement pstmt = dbConnection.prepareStatement("DELETE FROM WEIGHINGTEMP ");
-                    pstmt.executeUpdate();
-
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHINGTEMP ");
-                    DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
-                    for (int i = 1; i <= model.getRowCount(); i++) {
-                        rs.moveToInsertRow();
-                        rs.updateInt("SLNO", Integer.parseInt("" + model.getValueAt(i - 1, 0)));
-                        rs.updateString("DCNO", (String) model.getValueAt(i - 1, 1));
-
-                        if (("" + model.getValueAt(i - 1, 2)).trim().equals(""))
-                            ;
-                        else {
-                            Date date = dateAndTimeFormatdate.parse("" + model.getValueAt(i - 1, 2));
-                            rs.updateDate("DCNODATE", new java.sql.Date(date.getTime()));
-                        }
-
-                        rs.updateString("CUSTOMERNAME", (String) model.getValueAt(i - 1, 3));
-                        rs.updateString("DRIVERNAME", (String) model.getValueAt(i - 1, 4));
-                        rs.updateString("VEHICLENO", (String) model.getValueAt(i - 1, 5));
-                        rs.updateString("MATERIAL", (String) model.getValueAt(i - 1, 6));
-                        rs.updateInt("CHARGES", Integer.parseInt("" + model.getValueAt(i - 1, 7)));
-                        rs.updateInt("GROSSWT", Integer.parseInt("" + model.getValueAt(i - 1, 8)));
-
-                        if (("" + model.getValueAt(i - 1, 9)).trim().equals(""))
-                            ;
-                        else {
-                            Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 9));
-                            rs.updateDate("GROSSDATE", new java.sql.Date(date.getTime()));
-                            rs.updateTime("GROSSTIME", new Time(date.getTime()));
-                        }
-
-                        rs.updateInt("TAREWT", Integer.parseInt("" + model.getValueAt(i - 1, 10)));
-
-                        if (("" + model.getValueAt(i - 1, 11)).trim().equals(""))
-                            ;
-                        else {
-                            Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 11));
-                            rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
-                            rs.updateTime("TARETIME", new Time(date.getTime()));
-                        }
-                        rs.updateInt("NETWT", Integer.parseInt("" + model.getValueAt(i - 1, 12)));
-                        if (("" + model.getValueAt(i - 1, 13)).trim().equals(""))
-                            ;
-                        else {
-                            Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 13));
-                            rs.updateDate("NETDATE", new java.sql.Date(date.getTime()));
-                            rs.updateTime("NETTIME", new Time(date.getTime()));
-                        }
-                        rs.updateString("REMARKS", (String) model.getValueAt(i - 1, 14));
-                        rs.updateBoolean("MANUAL", (boolean) model.getValueAt(i - 1, 15));
-                        rs.insertRow();
-                    }
-                    pstmt = dbConnection.prepareStatement("DELETE FROM WEIGHING ");
-                    pstmt.executeUpdate();
-                    rs = stmt.executeQuery("SELECT * FROM WEIGHING ");
-                    for (int i = 1; i <= model.getRowCount(); i++) {
-                        rs.moveToInsertRow();
-                        rs.updateInt("SLNO", Integer.parseInt("" + model.getValueAt(i - 1, 0)));
-
-                        rs.updateString("DCNO", (String) model.getValueAt(i - 1, 1));
-
-                        if (("" + model.getValueAt(i - 1, 2)).trim().equals(""))
-                            ;
-                        else {
-                            Date date = dateAndTimeFormatdate.parse("" + model.getValueAt(i - 1, 2));
-                            rs.updateDate("DCNODATE", new java.sql.Date(date.getTime()));
-                        }
-
-                        rs.updateString("CUSTOMERNAME", (String) model.getValueAt(i - 1, 3));
-                        rs.updateString("DRIVERNAME", (String) model.getValueAt(i - 1, 4));
-                        rs.updateString("VEHICLENO", (String) model.getValueAt(i - 1, 5));
-                        rs.updateString("MATERIAL", (String) model.getValueAt(i - 1, 6));
-                        rs.updateInt("CHARGES", Integer.parseInt("" + model.getValueAt(i - 1, 7)));
-                        rs.updateInt("GROSSWT", Integer.parseInt("" + model.getValueAt(i - 1, 8)));
-
-                        if (("" + model.getValueAt(i - 1, 9)).trim().equals(""))
-                            ;
-                        else {
-                            Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 9));
-                            rs.updateDate("GROSSDATE", new java.sql.Date(date.getTime()));
-                            rs.updateTime("GROSSTIME", new Time(date.getTime()));
-                        }
-
-                        rs.updateInt("TAREWT", Integer.parseInt("" + model.getValueAt(i - 1, 10)));
-
-                        if (("" + model.getValueAt(i - 1, 11)).trim().equals(""))
-                            ;
-                        else {
-                            Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 11));
-                            rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
-                            rs.updateTime("TARETIME", new Time(date.getTime()));
-                        }
-                        rs.updateInt("NETWT", Integer.parseInt("" + model.getValueAt(i - 1, 12)));
-                        if (("" + model.getValueAt(i - 1, 13)).trim().equals(""))
-                            ;
-                        else {
-                            Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 13));
-                            rs.updateDate("NETDATE", new java.sql.Date(date.getTime()));
-                            rs.updateTime("NETTIME", new Time(date.getTime()));
-                        }
-                        rs.updateString("REMARKS", (String) model.getValueAt(i - 1, 14));
-                        rs.updateBoolean("MANUAL", (boolean) model.getValueAt(i - 1, 15));
-                        rs.insertRow();
-                    }
-                    tableReport.setEnabled(false);
-
-                }
-                btnEditReport.setEnabled(true);
-                btnSaveReport.setEnabled(false);
-                comboBox.setEnabled(true);
-                datePicker1.setEnabled(false);
-                datePicker2.setEnabled(false);
-                textFieldDetail.setEnabled(false);
-                comboBoxMaterialReport.setEnabled(false);
-                btnPrintReport.setEnabled(true);
-                btnGo.setEnabled(true);
-                btnExportToExcel.setEnabled(true);
-                tabbedPane.setEnabledAt(0, true);
-                rdbtnWeighing.setEnabled(true);
-                rdbtnBilling.setEnabled(true);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "SAVE FAILED\nPLEASE CHECK THE VALUES ENTERED\nLINE :2769",
-                        "SAVE ERROR", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        btnEditReport = new JButton("Edit");
-        btnEditReport.addActionListener(e -> {
-
-            int charges = 0, netWt = 0;
-            String message = "Plz Choose The Column To Show In Report ?";
-            int n;
-            if (rdbtnWeighing.isSelected()) {
-                Object[] params = {message, a1, a1a, a1b, aa, aaa, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11};
-                n = JOptionPane.showConfirmDialog(null, params, "Choose The Columns", JOptionPane.OK_CANCEL_OPTION);
-            } else {
-                Object[] params = {message, b1, b2, b3, b4, b41, b12, b5, b6, b7, b8, b9, b10, b11};
-                n = JOptionPane.showConfirmDialog(null, params, "Choose The Columns", JOptionPane.OK_CANCEL_OPTION);
-            }
-            if (n == 0) {
-                if (rdbtnWeighing.isSelected()) {
-                    rdbtnBilling.setEnabled(false);
-                    String temp = "SELECT * FROM WEIGHING ORDER BY SLNO";
-                    try {
-                        tableReport.setModel(new DefaultTableModel(new Object[][]{},
-                                new String[]{"Sl.No", "Dc. No", "Dc. Date", "Customer's Name",
-                                        "Transporter's Name", "Vehicle No", "Material", "Charges", "Gross Wt",
-                                        "Gross Date & Time", "Tare Wt", "Tare Date & Time", "Net Wt",
-                                        "Print Date & Time", "Remarks", "Manual"}) {
-                            /**
-                             *
-                             */
-                            private static final long serialVersionUID = 1L;
-                            final boolean[] columnEditables = new boolean[]{false, true, true, true, true, true, true,
-                                    true, true, true, true, true, true, true, true, false};
-
-                            public boolean isCellEditable(int row, int column) {
-                                return columnEditables[column];
-                            }
-                        });
-                        DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
-                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                                ResultSet.CONCUR_UPDATABLE);
-                        ResultSet rs = stmt.executeQuery(temp);
-                        while (rs.next()) {
-                            String date, time, gross,
-                                    tare, net;
-                            date = "" + rs.getDate("GROSSDATE");
-                            if (date.equals("null"))
-                                date = "";
-                            else
-                                date = dateAndTimeFormatdate.format(rs.getDate("GROSSDATE"));
-                            time = "" + rs.getTime("GROSSTIME");
-                            if (time.equals("null"))
-                                time = "";
-                            else
-                                time = timeFormat.format(rs.getTime("GROSSTIME"));
-                            gross = date + " " + time;
-                            date = "" + rs.getDate("TAREDATE");
-                            if (date.equals("null"))
-                                date = "";
-                            else
-                                date = dateAndTimeFormatdate.format(rs.getDate("TAREDATE"));
-                            time = "" + rs.getTime("TARETIME");
-                            if (time.equals("null"))
-                                time = "";
-                            else
-                                time = timeFormat.format(rs.getTime("TARETIME"));
-                            tare = date + " " + time;
-                            date = "" + rs.getDate("NETDATE");
-                            if (date.equals("null"))
-                                date = "";
-                            else
-                                date = dateAndTimeFormatdate.format(rs.getDate("NETDATE"));
-                            time = "" + rs.getTime("NETTIME");
-                            if (time.equals("null"))
-                                time = "";
-                            else
-                                time = timeFormat.format(rs.getTime("NETTIME"));
-                            net = date + " " + time;
-                            model.addRow(new Object[]{rs.getInt("SLNO"), rs.getString("DCNO"),
-                                    ("" + rs.getDate("DCNODATE")).equals("null") ? ""
-                                            : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")),
-                                    rs.getString("CUSTOMERNAME"), rs.getString("DRIVERNAME"),
-                                    rs.getString("VEHICLENO"), rs.getString("MATERIAL"), rs.getInt("CHARGES"),
-                                    rs.getInt("GROSSWT"), gross, rs.getInt("TAREWT"), tare, rs.getInt("NETWT"), net,
-                                    rs.getString("REMARKS"), rs.getBoolean("MANUAL")});
-                            charges += rs.getInt("CHARGES");
-                            netWt += rs.getInt("NETWT");
-                        }
-                        if (!a1.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Sl.No"));
-                        if (!a1a.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Dc. No"));
-                        if (!a1b.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Dc. Date"));
-                        if (!aa.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Customer's Name"));
-                        if (!aaa.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Transporter's Name"));
-                        if (!a2.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Vehicle No"));
-                        if (!a3.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Material"));
-                        if (!a4.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Charges"));
-                        if (!a5.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Gross Wt"));
-                        if (!a6.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Gross Date & Time"));
-                        if (!a7.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Tare Wt"));
-                        if (!a8.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Tare Date & Time"));
-                        if (!a9.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Net Wt"));
-                        if (!a10.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Print Date & Time"));
-                        if (!a11.isSelected())
-                            tableReport.removeColumn(tableReport.getColumn("Remarks"));
-                        if (!(a12.isSelected() && chckbxManualStatus.isSelected()))
-                            tableReport.removeColumn(tableReport.getColumn("Manual"));
-                        tableReport.setEnabled(true);
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2174",
-                                "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-                // {
-                // rdbtnWeighing.setEnabled(false);
-                // String temp = "SELECT * FROM BILLING";
-                // try {
-                // tableReport.setModel(new DefaultTableModel(
-                // new Object[][] {
-                // },
-                // new String[] {
-                // "Bill.No", "Reference SlNo", "Customer Name", "Customer
-                // Address","Customer Address1","Material Name","Billing
-                // Date","Cost Per Unit","No of
-                // Units","VAT","Discount","Total","Remarks"
-                // }
-                // ) {
-                // /**
-                // *
-                // */
-                // private static final long serialVersionUID = 1L;
-                // boolean[] columnEditables = new boolean[] {
-                // false, true, true, true,true, true, true,
-                // true,true,true,true,true,true
-                // };
-                // public boolean isCellEditable(int row, int column) {
-                // return columnEditables[column];
-                // }
-                // });
-                // DefaultTableModel model = (DefaultTableModel)
-                // tableReport.getModel();
-                // Statement stmt =
-                // dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                // ResultSet.CONCUR_UPDATABLE);
-                // ResultSet rs = stmt.executeQuery(temp);
-                // while(rs.next())
-                // {
-                // String date = new String();
-                // date = "" + rs.getDate("BILLDATE");
-                // if(date.equals("null"))
-                // date = "";
-                // else
-                // date =
-                // dateAndTimeFormatdate.format(rs.getDate("BILLDATE"));
-                // model.addRow(new
-                // Object[]{rs.getInt("BILLNO"),rs.getInt("REFERENCESLNO"),rs.getString("CUSTOMERNAME"),rs.getString("CUSTOMERADDRESS"),rs.getString("CUSTOMERADDRESS"),rs.getString("MATERIALNAME"),date,rs.getDouble("COSTPERUNIT"),rs.getInt("NOOFUNITS"),rs.getInt("VAT"),rs.getInt("DISCOUNT"),rs.getInt("TOTAL"),rs.getString("REMARK")});
-                // charges += rs.getInt("TOTAL");
-                // netWt += rs.getInt("NOOFUNITS");
-                // }
-                // }catch (SQLException ex) {
-                // JOptionPane.showMessageDialog(null,"SQL ERROR\nCHECK THE
-                // VALUES ENTERED\nLINE :2259","SQL
-                // ERROR",JOptionPane.ERROR_MESSAGE);
-                // }
-                // if(!b1.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("Bill.No"));
-                // if(!b2.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("Reference
-                // SlNo"));
-                // if(!b3.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("Customer
-                // Name"));
-                // if(!b4.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("Customer
-                // Address"));
-                // if(!b41.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("Customer
-                // Address1"));
-                // if(!b5.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("Billing
-                // Date"));
-                // if(!b6.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("Cost Per
-                // Unit"));
-                // if(!b7.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("No of
-                // Units"));
-                // if(!b8.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("VAT"));
-                // if(!b9.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("Discount"));
-                // if(!b10.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("Total"));
-                // if(!b11.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("Remarks"));
-                // if(!b12.isSelected())
-                // tableReport.removeColumn(tableReport.getColumn("Material
-                // Name"));
-                // }
-            }
-            textFieldTotalCharges.setText("Rs. " + charges);
-            textFieldtotalNetWt.setText(netWt + " Kg");
-            btnEditReport.setEnabled(false);
-            btnSaveReport.setEnabled(true);
-            comboBox.setEnabled(false);
-            datePicker1.setEnabled(false);
-            datePicker2.setEnabled(false);
-            textFieldDetail.setEnabled(false);
-            comboBoxMaterialReport.setEnabled(false);
-            btnPrintReport.setEnabled(false);
-            btnGo.setEnabled(false);
-            btnExportToExcel.setEnabled(false);
-            tabbedPane.setEnabledAt(0, false);
-        });
-        btnEditReport.setEnabled(false);
-        btnEditReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnEditReport.setFocusable(false);
-        btnEditReport.setBounds(439, 559, 150, 25);
-        panelReport.add(btnEditReport);
-        btnSaveReport.setEnabled(false);
-        btnSaveReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnSaveReport.setBounds(639, 559, 150, 25);
-        panelReport.add(btnSaveReport);
-
-        btnExportToExcel = new JButton("Export to Excel");
+        JButton btnExportToExcel = new JButton("Export to Excel");
         btnExportToExcel.addActionListener(e -> {
             JFrame parentFrame = new JFrame();
             JFileChooser fileChooser = new JFileChooser();
@@ -4829,12 +3330,10 @@ class WeighBridge {
         btnExportToExcel.setBounds(1040, 559, 186, 25);
         panelReport.add(btnExportToExcel);
 
-        btnPrintReport = new JButton("Print");
+        JButton btnPrintReport = new JButton("Print");
         btnPrintReport.addActionListener(e -> {
             if (rdbtnWeighing.isSelected())
                 printReportWeight();
-            else
-                printReportBill();
         });
         btnPrintReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnPrintReport.setFocusable(false);
@@ -4899,38 +3398,23 @@ class WeighBridge {
 
         JLabel lblAdministratorSettings = new JLabel("Administrator Settings");
         lblAdministratorSettings.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        lblAdministratorSettings.setBounds(599, 11, 200, 25);
+        lblAdministratorSettings.setBounds(638, 11, 200, 25);
         panelSettings.add(lblAdministratorSettings);
 
         JLabel lblPrinterSettings = new JLabel("Printer Settings");
         lblPrinterSettings.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        lblPrinterSettings.setBounds(824, 11, 200, 25);
+        lblPrinterSettings.setBounds(845, 11, 200, 25);
         panelSettings.add(lblPrinterSettings);
 
-        JLabel lblPrinter1 = new JLabel("Printer 1");
-        lblPrinter1.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblPrinter1.setBounds(824, 75, 100, 25);
-        panelSettings.add(lblPrinter1);
-
-        JLabel lblPrinter2 = new JLabel("Printer 2");
-        lblPrinter2.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblPrinter2.setBounds(824, 125, 100, 25);
-        panelSettings.add(lblPrinter2);
+        JLabel lblPrinter = new JLabel("Printer");
+        lblPrinter.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblPrinter.setBounds(845, 64, 100, 25);
+        panelSettings.add(lblPrinter);
 
         JLabel lblNoOfCopies = new JLabel("No Of Copies");
         lblNoOfCopies.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblNoOfCopies.setBounds(824, 170, 114, 25);
+        lblNoOfCopies.setBounds(845, 119, 114, 25);
         panelSettings.add(lblNoOfCopies);
-
-        JLabel lblBillingSettings = new JLabel("Billing Settings");
-        lblBillingSettings.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        lblBillingSettings.setBounds(336, 242, 200, 25);
-        panelSettings.add(lblBillingSettings);
-
-        JLabel lblTax = new JLabel("Vat");
-        lblTax.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblTax.setBounds(336, 278, 100, 25);
-        panelSettings.add(lblTax);
 
         JScrollPane scrollPane_1 = new JScrollPane();
         scrollPane_1.setBounds(10, 355, 300, 250);
@@ -4944,6 +3428,7 @@ class WeighBridge {
             private static final long serialVersionUID = 1L;
             final boolean[] columnEditables = new boolean[]{false, true, true};
 
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return columnEditables[column];
             }
@@ -4998,6 +3483,7 @@ class WeighBridge {
                 return columnTypes[columnIndex];
             }
 
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return columnEditables[column];
             }
@@ -5058,7 +3544,7 @@ class WeighBridge {
         textFieldTitle1.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldTitle1.setDisabledTextColor(Color.BLACK);
         textFieldTitle1.setColumns(10);
-        textFieldTitle1.setBounds(101, 47, 200, 30);
+        textFieldTitle1.setBounds(101, 47, 209, 30);
         panelSettings.add(textFieldTitle1);
 
         textFieldTitle2 = new JTextField();
@@ -5072,7 +3558,7 @@ class WeighBridge {
         textFieldTitle2.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldTitle2.setDisabledTextColor(Color.BLACK);
         textFieldTitle2.setColumns(10);
-        textFieldTitle2.setBounds(101, 97, 200, 30);
+        textFieldTitle2.setBounds(101, 97, 209, 30);
         panelSettings.add(textFieldTitle2);
 
         textFieldFooter = new JTextField();
@@ -5080,7 +3566,7 @@ class WeighBridge {
         textFieldFooter.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldFooter.setDisabledTextColor(Color.BLACK);
         textFieldFooter.setColumns(10);
-        textFieldFooter.setBounds(101, 147, 200, 30);
+        textFieldFooter.setBounds(101, 147, 209, 30);
         panelSettings.add(textFieldFooter);
 
         chckbxExcludeCharges = new JCheckBox("Exclude Charges");
@@ -5101,17 +3587,17 @@ class WeighBridge {
         textFieldBaudRate.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldBaudRate.setDisabledTextColor(Color.BLACK);
         textFieldBaudRate.setColumns(10);
-        textFieldBaudRate.setBounds(460, 45, 100, 30);
+        textFieldBaudRate.setBounds(446, 45, 175, 30);
         panelSettings.add(textFieldBaudRate);
 
         textFieldPortName = new JTextField();
-        textFieldPortName.setToolTipText("<Port Name>;<Data Bit>;<Parity>;<Pattern>");
+        textFieldPortName.setToolTipText("<Port Name>;<Data Bit(8)>;<Parity(0)>;<delimiter(10)>;<Pattern(~~~)>");
         textFieldPortName.setEnabled(false);
         textFieldPortName.setHorizontalAlignment(SwingConstants.CENTER);
         textFieldPortName.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldPortName.setDisabledTextColor(Color.BLACK);
         textFieldPortName.setColumns(10);
-        textFieldPortName.setBounds(460, 81, 100, 30);
+        textFieldPortName.setBounds(446, 81, 175, 30);
         panelSettings.add(textFieldPortName);
 
         chckbxManualEntry = new JCheckBox("Manual Entry");
@@ -5149,7 +3635,7 @@ class WeighBridge {
         chckbxManualEntry.setBackground(new Color(0, 255, 127));
         chckbxManualEntry.setEnabled(false);
         chckbxManualEntry.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        chckbxManualEntry.setBounds(600, 50, 200, 25);
+        chckbxManualEntry.setBounds(639, 50, 200, 25);
         panelSettings.add(chckbxManualEntry);
 
         chckbxEditEnable = new JCheckBox("Edit Enable");
@@ -5172,41 +3658,34 @@ class WeighBridge {
                     isCorrect = Arrays.equals(temp, correctPassword);
                 }
                 if (isCorrect) {
-                    btnEditReport.setEnabled(true);
+                    if (reportOpened)
+                        getReport();
                 } else {
+                    try {
+                        tableReport.removeColumn(tableReport.getColumn("Edit/Save"));
+                    } catch (IllegalArgumentException ignored) {
+                    }
                     chckbxEditEnable.setSelected(false);
                 }
-            } else {
-                btnEditReport.setEnabled(false);
             }
+            try {
+                tableReport.removeColumn(tableReport.getColumn("Edit/Save"));
+            } catch (IllegalArgumentException ignored) {
+            }
+
         });
         chckbxEditEnable.setBackground(new Color(0, 255, 127));
         chckbxEditEnable.setEnabled(false);
         chckbxEditEnable.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        chckbxEditEnable.setBounds(600, 75, 200, 25);
+        chckbxEditEnable.setBounds(639, 75, 200, 25);
         panelSettings.add(chckbxEditEnable);
 
-        comboBoxPrinter1 = new JComboBox<>();
-        comboBoxPrinter1.setFocusable(false);
-        comboBoxPrinter1.setModel(new DefaultComboBoxModel<>(printers));
-        comboBoxPrinter1.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        comboBoxPrinter1.setBounds(948, 75, 297, 30);
-        panelSettings.add(comboBoxPrinter1);
-
-        comboBoxPrinter2 = new JComboBox<>();
-        comboBoxPrinter2.setFocusable(false);
-        comboBoxPrinter2.setModel(new DefaultComboBoxModel<>(printers));
-        comboBoxPrinter2.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        comboBoxPrinter2.setBounds(948, 125, 297, 30);
-        panelSettings.add(comboBoxPrinter2);
-
-        textFieldTax = new JTextField();
-        textFieldTax.setEnabled(false);
-        textFieldTax.addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
-                lblVat.setText("Tax " + textFieldTax.getText() + " %");
-            }
-        });
+        comboBoxPrinter = new JComboBox<>();
+        comboBoxPrinter.setFocusable(false);
+        comboBoxPrinter.setModel(new DefaultComboBoxModel<>(printers));
+        comboBoxPrinter.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        comboBoxPrinter.setBounds(969, 61, 276, 30);
+        panelSettings.add(comboBoxPrinter);
 
         textFieldNoOfCopies = new JTextField();
         textFieldNoOfCopies.setText("0");
@@ -5214,23 +3693,8 @@ class WeighBridge {
         textFieldNoOfCopies.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldNoOfCopies.setDisabledTextColor(Color.BLACK);
         textFieldNoOfCopies.setColumns(10);
-        textFieldNoOfCopies.setBounds(948, 170, 35, 30);
+        textFieldNoOfCopies.setBounds(969, 116, 76, 30);
         panelSettings.add(textFieldNoOfCopies);
-
-        textFieldNoOfCopies1 = new JTextField();
-        textFieldNoOfCopies1.setText("0");
-        textFieldNoOfCopies1.setHorizontalAlignment(SwingConstants.CENTER);
-        textFieldNoOfCopies1.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldNoOfCopies1.setDisabledTextColor(Color.BLACK);
-        textFieldNoOfCopies1.setColumns(10);
-        textFieldNoOfCopies1.setBounds(1103, 172, 35, 30);
-        panelSettings.add(textFieldNoOfCopies1);
-        textFieldTax.setHorizontalAlignment(SwingConstants.CENTER);
-        textFieldTax.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldTax.setDisabledTextColor(Color.BLACK);
-        textFieldTax.setColumns(10);
-        textFieldTax.setBounds(460, 278, 100, 30);
-        panelSettings.add(textFieldTax);
 
         JButton btnUpdate = new JButton("Update");
         btnUpdate.setFocusable(false);
@@ -5268,13 +3732,18 @@ class WeighBridge {
                     try {
                         Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                                 ResultSet.CONCUR_UPDATABLE);
-                        PreparedStatement stmts = dbConnection.prepareStatement("DELETE FROM WEIGHING");
+                        PreparedStatement stmts = dbConnection.prepareStatement("CREATE TABLE WEIGHING_" +
+                                textFieldDateTime.getText().replace(" ", "_").replace("-", "_")
+                                        .replace(":", "_") + " AS SELECT * FROM WEIGHING");
+                        stmts.executeUpdate();
+                        stmts = dbConnection.prepareStatement("DELETE FROM WEIGHING");
                         stmts.executeUpdate();
                         ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                         rs.absolute(1);
                         rs.updateInt("SLNO", Integer.parseInt(response.replaceAll("[^0-9]", "")));
                         rs.updateRow();
                     } catch (SQLException ex) {
+                        ex.printStackTrace();
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2836",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -5320,7 +3789,6 @@ class WeighBridge {
                 if (isCorrect) {
                     chckbxManualEntry.setEnabled(true);
                     chckbxEditEnable.setEnabled(true);
-                    chckbxRemoveBillinTab.setEnabled(true);
                     chckbxCamera.setEnabled(true);
                     chckbxSms.setEnabled(true);
                     chckbxExcludeCustomer.setEnabled(true);
@@ -5341,7 +3809,6 @@ class WeighBridge {
             } else {
                 chckbxManualEntry.setEnabled(false);
                 chckbxEditEnable.setEnabled(false);
-                chckbxRemoveBillinTab.setEnabled(false);
                 chckbxCamera.setEnabled(false);
                 chckbxSms.setEnabled(false);
                 chckbxExcludeCustomer.setEnabled(false);
@@ -5365,84 +3832,19 @@ class WeighBridge {
         btnPassword.setBounds(664, 273, 150, 25);
         panelSettings.add(btnPassword);
 
-        btnResetBills = new JButton("Reset Bills");
-        btnResetBills.setFocusable(false);
-        btnResetBills.addActionListener(e -> {
-            JPasswordField password = new JPasswordField(10);
-            JPanel panel = new JPanel();
-            String[] ConnectOptionNames = {"Enter", "Cancel"};
-            panel.add(new JLabel("Please the Password ? "));
-            panel.add(password);
-            JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
-            char[] temp = password.getPassword();
-            boolean isCorrect;
-            char[] correctPassword = {'1', '2', '3', '4', '5', '6'};
-            if (temp.length != correctPassword.length) {
-                isCorrect = false;
-            } else {
-                isCorrect = Arrays.equals(temp, correctPassword);
-            }
-            if (isCorrect) {
-                String response;
-                response = JOptionPane.showInputDialog(null, "Please Enter the Starting Bill No ?", "Bill No",
-                        JOptionPane.QUESTION_MESSAGE);
-                if (response == null || Integer.parseInt(0 + response.replaceAll("[^0-9]", "")) == 0)
-                    JOptionPane.showMessageDialog(null, "Reset Failed ", "Value Entered is not correct",
-                            JOptionPane.ERROR_MESSAGE);
-                else {
-                    try {
-                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                                ResultSet.CONCUR_UPDATABLE);
-                        PreparedStatement stmts = dbConnection.prepareStatement("DELETE FROM BILLING");
-                        stmts.executeUpdate();
-                        ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
-                        rs.absolute(1);
-                        rs.updateInt("BILLNO", Integer.parseInt(response.replaceAll("[^0-9]", "")));
-                        rs.updateRow();
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2836",
-                                "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                    }
-                    settings();
-                    JOptionPane.showMessageDialog(null, "Reset Successful ", "Reset Successful",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
-            } else
-                JOptionPane.showMessageDialog(null, "Wrong Password ", "Value Entered the Correct Password",
-                        JOptionPane.ERROR_MESSAGE);
-        });
-        btnResetBills.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnResetBills.setBounds(1063, 273, 150, 25);
-        panelSettings.add(btnResetBills);
-
-        label = new JLabel("%");
-        label.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        label.setBounds(570, 278, 25, 25);
-        panelSettings.add(label);
-
         chckbxExcludeCustomer = new JCheckBox("Exclude Customer");
         chckbxExcludeCustomer.setEnabled(false);
         chckbxExcludeCustomer.setFocusable(false);
         chckbxExcludeCustomer.addChangeListener(e -> {
             if (chckbxExcludeCustomer.isSelected())
-                textFieldCustomerName.setEnabled(false);
+                comboBoxCustomerName.setEnabled(false);
             else
-                textFieldCustomerName.setEnabled(true);
+                comboBoxCustomerName.setEnabled(true);
         });
         chckbxExcludeCustomer.setFont(new Font("Times New Roman", Font.ITALIC, 15));
         chckbxExcludeCustomer.setBackground(new Color(0, 255, 127));
         chckbxExcludeCustomer.setBounds(25, 190, 145, 25);
         panelSettings.add(chckbxExcludeCustomer);
-
-        chckbxRemoveBillinTab = new JCheckBox("Remove Billing");
-        chckbxRemoveBillinTab.setFocusable(false);
-        chckbxRemoveBillinTab.setEnabled(false);
-        chckbxRemoveBillinTab.addActionListener(e -> billEvent());
-        chckbxRemoveBillinTab.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        chckbxRemoveBillinTab.setBackground(new Color(0, 255, 127));
-        chckbxRemoveBillinTab.setBounds(600, 100, 200, 25);
-        panelSettings.add(chckbxRemoveBillinTab);
 
         chckbxExcludeDrivers = new JCheckBox("Exclude Drivers");
         chckbxExcludeDrivers.setEnabled(false);
@@ -5466,22 +3868,15 @@ class WeighBridge {
         chckbxCamera.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         chckbxCamera.setEnabled(false);
         chckbxCamera.setBackground(new Color(0, 255, 127));
-        chckbxCamera.setBounds(600, 150, 199, 25);
+        chckbxCamera.setBounds(639, 119, 199, 25);
         panelSettings.add(chckbxCamera);
 
         comboBoxPrintOptionForWeight = new JComboBox<>();
         comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{"Pre Print", "Pre Print 2", "Plain Paper", "Camera", "Plain Camera", "Sri Pathy", "No Of Bags"}));
         comboBoxPrintOptionForWeight.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         comboBoxPrintOptionForWeight.setFocusable(false);
-        comboBoxPrintOptionForWeight.setBounds(988, 170, 105, 30);
+        comboBoxPrintOptionForWeight.setBounds(1055, 116, 190, 30);
         panelSettings.add(comboBoxPrintOptionForWeight);
-
-        comboBoxPrintOptionForBill = new JComboBox<>();
-        comboBoxPrintOptionForBill.setModel(new DefaultComboBoxModel<>(new String[]{"Pre Print", "Plain Paper"}));
-        comboBoxPrintOptionForBill.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        comboBoxPrintOptionForBill.setFocusable(false);
-        comboBoxPrintOptionForBill.setBounds(1144, 170, 101, 30);
-        panelSettings.add(comboBoxPrintOptionForBill);
 
         chckbxSms = new JCheckBox("SMS");
         chckbxSms.addActionListener(e -> {
@@ -5501,8 +3896,7 @@ class WeighBridge {
                 } else {
                     isCorrect = Arrays.equals(temp, correctPassword);
                 }
-                if (isCorrect) {
-                } else {
+                if (!isCorrect) {
                     chckbxSms.setSelected(false);
                 }
             }
@@ -5511,7 +3905,7 @@ class WeighBridge {
         chckbxSms.setFocusable(false);
         chckbxSms.setEnabled(false);
         chckbxSms.setBackground(new Color(0, 255, 127));
-        chckbxSms.setBounds(600, 175, 200, 25);
+        chckbxSms.setBounds(638, 147, 200, 25);
         panelSettings.add(chckbxSms);
 
         textFieldSMSPortName = new JTextField();
@@ -5521,7 +3915,7 @@ class WeighBridge {
         textFieldSMSPortName.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldSMSPortName.setDisabledTextColor(Color.BLACK);
         textFieldSMSPortName.setColumns(10);
-        textFieldSMSPortName.setBounds(460, 195, 100, 30);
+        textFieldSMSPortName.setBounds(446, 195, 175, 30);
         panelSettings.add(textFieldSMSPortName);
 
         textFieldSMSBaudRate = new JTextField();
@@ -5531,7 +3925,7 @@ class WeighBridge {
         textFieldSMSBaudRate.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldSMSBaudRate.setDisabledTextColor(Color.BLACK);
         textFieldSMSBaudRate.setColumns(10);
-        textFieldSMSBaudRate.setBounds(460, 159, 100, 30);
+        textFieldSMSBaudRate.setBounds(446, 159, 175, 30);
         panelSettings.add(textFieldSMSBaudRate);
 
         JLabel lblSmsSettings = new JLabel("SMS Settings");
@@ -5598,7 +3992,7 @@ class WeighBridge {
         chckbxExcludeRemarks.setFont(new Font("Times New Roman", Font.ITALIC, 15));
         chckbxExcludeRemarks.setFocusable(false);
         chckbxExcludeRemarks.setBackground(new Color(0, 255, 127));
-        chckbxExcludeRemarks.setBounds(175, 190, 145, 25);
+        chckbxExcludeRemarks.setBounds(172, 190, 145, 25);
         panelSettings.add(chckbxExcludeRemarks);
 
         chckbxAutoCharges = new JCheckBox("Auto Charges");
@@ -5621,7 +4015,7 @@ class WeighBridge {
         chckbxAutoCharges.setFocusable(false);
         chckbxAutoCharges.setEnabled(false);
         chckbxAutoCharges.setBackground(new Color(0, 255, 127));
-        chckbxAutoCharges.setBounds(175, 210, 115, 25);
+        chckbxAutoCharges.setBounds(172, 210, 115, 25);
         panelSettings.add(chckbxAutoCharges);
 
         chckbxMaterialSl = new JCheckBox("Material Sl");
@@ -5629,7 +4023,7 @@ class WeighBridge {
         chckbxMaterialSl.setFocusable(false);
         chckbxMaterialSl.setEnabled(false);
         chckbxMaterialSl.setBackground(new Color(0, 255, 127));
-        chckbxMaterialSl.setBounds(175, 230, 139, 25);
+        chckbxMaterialSl.setBounds(172, 250, 139, 25);
         panelSettings.add(chckbxMaterialSl);
 
         chckbxCharges = new JCheckBox("Charges2");
@@ -5652,7 +4046,7 @@ class WeighBridge {
         chckbxCharges.setFocusable(false);
         chckbxCharges.setEnabled(false);
         chckbxCharges.setBackground(new Color(0, 255, 127));
-        chckbxCharges.setBounds(286, 210, 25, 25);
+        chckbxCharges.setBounds(172, 229, 25, 25);
         panelSettings.add(chckbxCharges);
 
         chckbxenableSettings2 = new JCheckBox("Enable Settings Page 2");
@@ -5660,15 +4054,15 @@ class WeighBridge {
         chckbxenableSettings2.setEnabled(false);
         chckbxenableSettings2.addChangeListener(e -> {
             if (chckbxenableSettings2.isSelected()) {
-                tabbedPane.setEnabledAt(5, true);
-                tabbedPane.setTitleAt(5, "          Settings2          ");
+                tabbedPane.setEnabledAt(4, true);
+                tabbedPane.setTitleAt(4, "          Settings 2          ");
             } else {
-                tabbedPane.setEnabledAt(5, false);
-                tabbedPane.setTitleAt(5, "");
+                tabbedPane.setEnabledAt(4, false);
+                tabbedPane.setTitleAt(4, "");
             }
         });
         chckbxenableSettings2.setBackground(new Color(0, 255, 127));
-        chckbxenableSettings2.setBounds(76, 288, 179, 25);
+        chckbxenableSettings2.setBounds(930, 163, 179, 25);
         panelSettings.add(chckbxenableSettings2);
 
         chckbxExcludeNoOfBags = new JCheckBox("Exclude Bags");
@@ -5688,7 +4082,7 @@ class WeighBridge {
         JPanel panel = new JPanel();
         panel.setBackground(new Color(0, 255, 127));
         tabbedPane.addTab("", null, panel, null);
-        tabbedPane.setEnabledAt(5, false);
+        tabbedPane.setEnabledAt(4, false);
         panel.setLayout(null);
 
         JLabel lblLine1 = new JLabel("Line 1");
@@ -5837,12 +4231,192 @@ class WeighBridge {
         panel.add(chckbxManualStatus);
 
         JButton button = new JButton("Minimize");
-        button.addActionListener(e -> frmBabulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
+        button.addActionListener(e -> babulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
         button.setFont(new Font("Times New Roman", Font.BOLD, 20));
         button.setFocusable(false);
         button.setBounds(518, 11, 117, 30);
-        frmBabulensWeighbridgeDesigned.getContentPane().add(button);
+        babulensWeighbridgeDesigned.getContentPane().add(button);
 
+    }
+
+    private void getReport() {
+        String date1, date2, vehicleNo, material;
+        int charges = 0, netWt = 0, serialNo;
+        Date dateTemp12;
+        if (rdbtnWeighing.isSelected()) {
+            String temp = "SELECT * FROM WEIGHING";
+            switch (Objects.requireNonNull(comboBox.getSelectedItem()).toString()) {
+                case "Full Report":
+                    temp = "SELECT * FROM WEIGHING";
+                    break;
+                case "Daily Report":
+                    dateTemp12 = datePicker1.getDate();
+                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    temp = "SELECT * FROM WEIGHING WHERE NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                    break;
+                case "Datewise Report":
+                    dateTemp12 = datePicker1.getDate();
+                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    dateTemp12 = datePicker2.getDate();
+                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    temp = "SELECT * FROM WEIGHING WHERE NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                    break;
+                case "Serialwise Report":
+                    serialNo = Integer.parseInt(0 + textFieldDetail.getText().replaceAll("[^0-9]", ""));
+                    temp = "SELECT * FROM WEIGHING WHERE SLNO >= " + serialNo;
+                    break;
+                case "Vehiclewise Report":
+                    vehicleNo = textFieldDetail.getText();
+                    dateTemp12 = datePicker1.getDate();
+                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    dateTemp12 = datePicker2.getDate();
+                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    temp = "SELECT * FROM WEIGHING WHERE upper(VEHICLENO) LIKE UPPER('%" + vehicleNo
+                            + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                    break;
+                case "Materialwise Report":
+                    dateTemp12 = datePicker1.getDate();
+                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    dateTemp12 = datePicker2.getDate();
+                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    material = (String) comboBoxMaterialReport.getSelectedItem();
+                    if (material == null)
+                        material = "";
+                    temp = "SELECT * FROM WEIGHING WHERE upper(MATERIAL) LIKE UPPER('%" + material
+                            + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                    break;
+                case "Customerwise Report":
+                    dateTemp12 = datePicker1.getDate();
+                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    dateTemp12 = datePicker2.getDate();
+                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    vehicleNo = textFieldDetail.getText();
+                    material = "" + comboBoxMaterialReport.getSelectedItem();
+                    if ("null".contains(material.trim()) || "".contains(material.trim()))
+                        material = "";
+                    else
+                        material = "AND MATERIAL LIKE '" + material + "'";
+                    temp = "SELECT * FROM WEIGHING WHERE upper(CUSTOMERNAME) LIKE UPPER('%" + vehicleNo
+                            + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'" + material;
+                    break;
+                case "Transporterwise Report":
+                    dateTemp12 = datePicker1.getDate();
+                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    dateTemp12 = datePicker2.getDate();
+                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    vehicleNo = textFieldDetail.getText();
+                    temp = "SELECT * FROM WEIGHING WHERE upper(DRIVERNAME) LIKE UPPER('%" + vehicleNo
+                            + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                    break;
+            }
+            try {
+                tableReport.setModel(
+                        new TableReport(
+                                new Object[][]{},
+                                new String[]{"Edit/Save", "Sl.No", "Dc. No", "Dc. Date", "Customer's Name",
+                                        "Transporter's Name", "Vehicle No", "Material", "No Of Bags", "Charges", "Gross Wt",
+                                        "Gross Date & Time", "Tare Wt", "Tare Date & Time", "Bag Deduction", "Net Wt",
+                                        "Print Date & Time", "Remarks", "Manual"}));
+                DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
+                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
+                ResultSet rs = stmt.executeQuery(temp + " ORDER BY SLNO");
+                while (rs.next()) {
+                    String date, time, gross,
+                            tare, net;
+                    date = "" + rs.getDate("GROSSDATE");
+                    if (date.equals("null"))
+                        date = "";
+                    else
+                        date = dateAndTimeFormatdate.format(rs.getDate("GROSSDATE"));
+                    time = "" + rs.getTime("GROSSTIME");
+                    if (time.equals("null"))
+                        time = "";
+                    else
+                        time = timeFormat.format(rs.getTime("GROSSTIME"));
+                    gross = date + " " + time;
+                    date = "" + rs.getDate("TAREDATE");
+                    if (date.equals("null"))
+                        date = "";
+                    else
+                        date = dateAndTimeFormatdate.format(rs.getDate("TAREDATE"));
+                    time = "" + rs.getTime("TARETIME");
+                    if (time.equals("null"))
+                        time = "";
+                    else
+                        time = timeFormat.format(rs.getTime("TARETIME"));
+                    tare = date + " " + time;
+                    date = "" + rs.getDate("NETDATE");
+                    if (date.equals("null"))
+                        date = "";
+                    else
+                        date = dateAndTimeFormatdate.format(rs.getDate("NETDATE"));
+                    time = "" + rs.getTime("NETTIME");
+                    if (time.equals("null"))
+                        time = "";
+                    else
+                        time = timeFormat.format(rs.getTime("NETTIME"));
+                    net = date + " " + time;
+
+                    model.addRow(new Object[]{"Edit", rs.getInt("SLNO"), rs.getString("DCNO"),
+                            ("" + rs.getDate("DCNODATE")).equals("null") ? ""
+                                    : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")),
+                            rs.getString("CUSTOMERNAME"), rs.getString("DRIVERNAME"),
+                            rs.getString("VEHICLENO"), rs.getString("MATERIAL"), rs.getInt("NOOFBAGS"), rs.getInt("CHARGES"),
+                            rs.getInt("GROSSWT"), gross, rs.getInt("TAREWT"), tare, rs.getInt("BAGDEDUCTION"), rs.getInt("NETWT"), net,
+                            rs.getString("REMARKS"), rs.getBoolean("MANUAL")});
+                    charges += rs.getInt("CHARGES");
+                    netWt += rs.getInt("NETWT");
+                }
+                tableReport.getColumnModel().getColumn(0).setCellRenderer(new TableButtonRenderer());
+                tableReport.getColumnModel().getColumn(0).setCellEditor(new TableRenderer(new JCheckBox()));
+                if (!chckbxEditEnable.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Edit/Save"));
+                if (!a1.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Sl.No"));
+                if (!a1a.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Dc. No"));
+                if (!a1b.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Dc. Date"));
+                if (!aa.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Customer's Name"));
+                if (!aaa.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Transporter's Name"));
+                if (!a2.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Vehicle No"));
+                if (!a3.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Material"));
+                if (!a3a.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("No Of Bags"));
+                if (!a4.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Charges"));
+                if (!a5.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Gross Wt"));
+                if (!a6.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Gross Date & Time"));
+                if (!a7.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Tare Wt"));
+                if (!a8.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Tare Date & Time"));
+                if (!a8a.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Bag Deduction"));
+                if (!a9.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Net Wt"));
+                if (!a10.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Print Date & Time"));
+                if (!a11.isSelected())
+                    tableReport.removeColumn(tableReport.getColumn("Remarks"));
+                if (!(a12.isSelected() && chckbxManualStatus.isSelected()))
+                    tableReport.removeColumn(tableReport.getColumn("Manual"));
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2174",
+                        "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        textFieldTotalCharges.setText("Rs. " + charges);
+        textFieldtotalNetWt.setText(netWt + " Kg");
+        reportOpened = true;
     }
 
     private void rePrint(String response) {
@@ -5855,7 +4429,7 @@ class WeighBridge {
                 textFieldDcNo.setText(rs.getString("DCNO"));
                 textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? ""
                         : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
-                textFieldCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
+                comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                 textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
                 textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
                 comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
@@ -5877,7 +4451,6 @@ class WeighBridge {
                             .format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
                 textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
                 textFieldNetWt.setText(Integer.toString(rs.getInt("NETWT")));
-                textFieldNoOfUnits.setText(Integer.toString(rs.getInt("NETWT")));
                 textFieldNetDateTime.setText(rs.getDate("NETDATE") + " " + rs.getTime("NETTIME"));
                 if (textFieldNetDateTime.getText().equals("null null"))
                     textFieldNetDateTime.setText("");
@@ -5949,8 +4522,6 @@ class WeighBridge {
             ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
             rs.absolute(1);
             textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
-            textFieldReferenceSlNo.setText(Integer.toString(rs.getInt("SLNO")));
-            textFieldBillNo.setText(Integer.toString(rs.getInt("BILLNO")));
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2862", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
@@ -5969,7 +4540,7 @@ class WeighBridge {
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        textFieldCustomerName.setSelectedIndex(-1);
+        comboBoxCustomerName.setSelectedIndex(-1);
         textFieldDriverName.setSelectedIndex(-1);
         rdbtnGross.setEnabled(true);
         rdbtnGross.setSelected(true);
@@ -5990,7 +4561,6 @@ class WeighBridge {
         textFieldGrossWt.setText("0");
         textFieldTareWt.setText("0");
         textFieldNetWt.setText("0");
-        textFieldNoOfUnits.setText("0");
         textFieldGrossDateTime.setText("");
         textFieldTareDateTime.setText("");
         textFieldNetDateTime.setText("");
@@ -5998,53 +4568,17 @@ class WeighBridge {
         btnPrint.setEnabled(false);
         btnGetWeight.setEnabled(true);
 
-        textFieldReferenceSlNo.setEnabled(false);
-        button1.setEnabled(true);
-        comboBoxCustomerName.setEnabled(true);
-        comboBoxCustomerName.setSelectedIndex(-1);
-
-        textFieldCustomerAddress.setEnabled(false);
-        textFieldCustomerAddress.setText("");
-        button2.setEnabled(true);
-        textFieldCustomerAddress1.setEnabled(false);
-        textFieldCustomerAddress1.setText("");
-        button8.setEnabled(true);
-        comboBoxMaterialName.setEnabled(false);
-        comboBoxMaterialName.setSelectedIndex(-1);
-        button3.setEnabled(true);
-        textFieldCostPerunit.setEnabled(false);
-        textFieldCostPerunit.setText("0");
-        button4.setEnabled(true);
-        textFieldNoOfUnits.setEnabled(false);
-        textFieldNoOfUnits.setText("0");
-        button5.setEnabled(true);
-        datePicker.setEnabled(false);
-        button6.setEnabled(true);
-        textFieldDiscount.setEnabled(false);
-        textFieldDiscount.setText("0");
-        button7.setEnabled(true);
-        textFieldRemarks.setEnabled(true);
-        textFieldRemarks.setText("");
-        textFieldVat.setText("0");
-        textFieldTotal.setText("0");
-        textFieldTotalVat.setText("0");
-        textFieldAmountToBePaid.setText("0");
-        datePicker.setDate(null);
-        btnCalculate.setEnabled(true);
-        btnSaveBill.setEnabled(false);
-        btnPrintBill.setEnabled(false);
-        lblAmount.setText("0");
         if (chckbxExcludeCustomer.isSelected())
             if (chckbxExcludeDrivers.isSelected())
                 textFieldVehicleNo.requestFocus();
             else
                 textFieldDriverName.requestFocus();
         else
-            textFieldCustomerName.requestFocus();
+            comboBoxCustomerName.requestFocus();
         if (!chckbxExcludeCustomer.isSelected())
-            textFieldCustomerName.setEnabled(true);
+            comboBoxCustomerName.setEnabled(true);
         else
-            textFieldCustomerName.setEnabled(false);
+            comboBoxCustomerName.setEnabled(false);
         if (!chckbxExcludeDrivers.isSelected())
             textFieldDriverName.setEnabled(true);
         else
@@ -6076,7 +4610,6 @@ class WeighBridge {
         }
     }
 
-    // TODO print
     private void printPlainWeight() {
         JTextPane textPane = createTextPane1();
         textPane.setBackground(Color.white);
@@ -6095,7 +4628,7 @@ class WeighBridge {
         pBook.append(textPane.getPrintable(null, null), pf);
         pj.setPageable(pBook);
         try {
-            pj.setPrintService(printServices[comboBoxPrinter1.getSelectedIndex()]);
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
             pj.print();
         } catch (PrinterException ignored) {
         }
@@ -6123,7 +4656,7 @@ class WeighBridge {
                 StringUtils.center(title2.getText(), 65) + "\n",
                 "-----------------------------------------------------------------\n", // 65
                 String.format(format, "Sl.No", textFieldSlNo.getText(), "Date & Time", textFieldNetDateTime.getText()),
-                dc, String.format(format2, "Customer's Name", textFieldCustomerName.getEditor().getItem()), driver,
+                dc, String.format(format2, "Customer's Name", comboBoxCustomerName.getEditor().getItem()), driver,
                 String.format(format, "Vehicle No", textFieldVehicleNo.getText(), "Material",
                         comboBoxMaterial.getEditor().getItem()),
                 "-----------------------------------------------------------------\n",
@@ -6190,7 +4723,7 @@ class WeighBridge {
         pBook.append(textPane.getPrintable(null, null), pf);
         pj.setPageable(pBook);
         try {
-            pj.setPrintService(printServices[comboBoxPrinter1.getSelectedIndex()]);
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
             pj.print();
         } catch (PrinterException ignored) {
         }
@@ -6272,7 +4805,7 @@ class WeighBridge {
         pBook.append(textPane.getPrintable(null, null), pf);
         pj.setPageable(pBook);
         try {
-            pj.setPrintService(printServices[comboBoxPrinter1.getSelectedIndex()]);
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
             pj.print();
         } catch (PrinterException ignored) {
         }
@@ -6336,113 +4869,6 @@ class WeighBridge {
         s = doc.addStyle("3", regular);
         StyleConstants.setBold(s, true);
         StyleConstants.setFontSize(s, 8);
-    }
-
-    private void printPlainBill() {
-        JTextPane textPane = createTextPane2();
-        textPane.setBackground(Color.white);
-        PrinterJob pj = PrinterJob.getPrinterJob();
-        PageFormat pf = new PageFormat();
-        Paper paper = pf.getPaper();
-        double width = 8d * 72d;
-        double height = 12d * 72d;
-        double widthmargin = .75d * 72d;
-        double heightmargin = .5d * 72d;
-        paper.setSize(width, height);
-        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
-        pf.setPaper(paper);
-        Book pBook = new Book();
-        pBook.append(textPane.getPrintable(null, null), pf);
-        pj.setPageable(pBook);
-        try {
-            pj.setPrintService(printServices[comboBoxPrinter2.getSelectedIndex()]);
-            pj.print();
-        } catch (PrinterException ignored) {
-        }
-    }
-
-    private JTextPane createTextPane2() {
-        String format = " %1$-8s: %2$-36s%3$-5s: %4$-11s\n";
-        String formata = " %1$-4s %2$-58s\n";
-        String formatb = "%1$-38s %2$-12s %3$-12s\n";
-        String formatc = "%1$-30s%2$-35s\n";
-        String format2 = "%1$-42s%2$-36s\n";
-
-        String[] initString = {String.format(format2, table1.getValueAt(0, 0), table2.getValueAt(0, 0)),
-                String.format(format2, table1.getValueAt(1, 0), table2.getValueAt(1, 0)),
-                String.format(format2, table1.getValueAt(2, 0), table2.getValueAt(2, 0)),
-                String.format(format2, table1.getValueAt(3, 0), table2.getValueAt(3, 0)),
-                String.format(format2, table1.getValueAt(4, 0), table2.getValueAt(4, 0)),
-                StringUtils.center(labelBillTitle.getText(), 39) + "\n",
-                String.format(format2, table3.getValueAt(0, 0), table4.getValueAt(0, 0)),
-                String.format(format2, table3.getValueAt(1, 0), table4.getValueAt(1, 0)),
-                String.format(format2, table3.getValueAt(2, 0), table4.getValueAt(2, 0)),
-                String.format(format2, table3.getValueAt(3, 0), table4.getValueAt(3, 0)),
-                String.format(format2, table3.getValueAt(4, 0), table4.getValueAt(4, 0)),
-                String.format(format2, table3.getValueAt(5, 0), table4.getValueAt(5, 0)),
-                "-----------------------------------------------------------------\n", // 65
-                String.format(format, "Bill.No", textFieldBillNo.getText(), "Date",
-                        datePicker.getDate() != null ? dateAndTimeFormatdatep.format(datePicker.getDate()) : ""), // dateAndTimeFormatdatep.format(datePicker.getDate())),
-                String.format(formata, "M/s.", comboBoxCustomerName.getSelectedItem()),
-                String.format(formata, "", textFieldCustomerAddress.getText()),
-                String.format(formata, "", textFieldCustomerAddress1.getText()),
-                "\n-----------------------------------------------------------------\n",
-                String.format(formatb, StringUtils.center("Particulars", 38), StringUtils.center("Rate", 12),
-                        StringUtils.center("Amount", 12)),
-                "-----------------------------------------------------------------\n\n\n\n\n\n",
-                String.format(formatb, StringUtils.rightPad("  " + comboBoxMaterialName.getSelectedItem(), 38), "", ""),
-                String.format(formatb, StringUtils.rightPad("  " + textFieldNoOfUnits.getText() + " Kg", 38),
-                        StringUtils.center(textFieldCostPerunit.getText() + ".00", 9),
-                        StringUtils.leftPad(textFieldTotal.getText(), 9) + ".00"),
-                "\n\n\n\n\n\n\n\n\n\n\n\n\n" + toWord(Integer.parseInt(textFieldAmountToBePaid.getText()))
-                        + "\n\n-----------------------------------------------------------------\n",
-                String.format(formatb, "", StringUtils.rightPad("Sub Total", 11),
-                        StringUtils.leftPad(textFieldTotal.getText(), 9) + ".00"),
-                String.format(formatb, "", StringUtils.rightPad("VAT " + textFieldTax.getText() + "%", 11) + "+",
-                        StringUtils.leftPad(textFieldVat.getText(), 9) + ".00"),
-                String.format(formatb, "", StringUtils.rightPad("Dicount", 11) + "-",
-                        StringUtils.leftPad(textFieldDiscount.getText(), 9) + ".00"),
-                String.format(formatb, "", StringUtils.rightPad("Total", 12),
-                        StringUtils.leftPad(textFieldAmountToBePaid.getText(), 9) + ".00"),
-                "-----------------------------------------------------------------\n",
-                String.format(formatc, "", StringUtils.center("For " + labelBillTitle.getText(), 35)), "\n",
-                String.format(formatc, "", StringUtils.center("Authorised Signature", 35)),
-                "-----------------------------------------------------------------\n"};
-        String[] initStyles = {"2", "2", "2", "2", "2", "1", "2", "2", "2", "2", "2", "2", "3", "3", "3", "3", "3",
-                "3", "4", "3", "3", "3", "3", "4", "4", "4", "4", "3", "4", "3", "3", "3",};
-        JTextPane textPane = new JTextPane();
-        StyledDocument doc = textPane.getStyledDocument();
-        addStylesToDocument2(doc);
-
-        try {
-            for (int i = 0; i < initString.length; i++) {
-                doc.insertString(doc.getLength(), initString[i], doc.getStyle(initStyles[i]));
-            }
-        } catch (BadLocationException ignored) {
-        }
-        return textPane;
-    }
-
-    private void addStylesToDocument2(StyledDocument doc) {
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-
-        Style regular = doc.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "Courier New");
-
-        Style s = doc.addStyle("1", regular);
-        StyleConstants.setBold(s, true);
-        StyleConstants.setFontSize(s, 20);
-
-        s = doc.addStyle("2", regular);
-        StyleConstants.setItalic(s, true);
-        StyleConstants.setFontSize(s, 10);
-
-        s = doc.addStyle("3", regular);
-        StyleConstants.setFontSize(s, 12);
-
-        s = doc.addStyle("4", regular);
-        StyleConstants.setBold(s, true);
-        StyleConstants.setFontSize(s, 12);
     }
 
     private void printCameraWeight() {
@@ -6539,7 +4965,7 @@ class WeighBridge {
         }, pf);
         pj.setPageable(pBook);
         try {
-            pj.setPrintService(printServices[comboBoxPrinter1.getSelectedIndex()]);
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
             pj.print();
         } catch (PrinterException ignored) {
         }
@@ -6646,7 +5072,7 @@ class WeighBridge {
         }, pf);
         pj.setPageable(pBook);
         try {
-            pj.setPrintService(printServices[comboBoxPrinter1.getSelectedIndex()]);
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
             pj.print();
         } catch (PrinterException ignored) {
         }
@@ -6665,7 +5091,7 @@ class WeighBridge {
         pf.setPaper(paper);
         Book pBook = new Book();
         pBook.append(new Printable() {
-            private void drawString(Graphics g, String text, int y) {
+            private void drawString(Graphics g, String text, @SuppressWarnings("SameParameterValue") int y) {
                 int length = 0;
                 for (String line : text.split("\n")) {
                     g.drawString(line, 0, y += g.getFontMetrics().getHeight() - 1);
@@ -6697,10 +5123,10 @@ class WeighBridge {
                     temp2[1] = "";
                 }
 
-                String initString = "\n\n\n\n\n\n\n\n\n\n\n\n" + "         "
-                        + String.format("%72s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n" + "         "
-                        + StringUtils.center(textFieldLine1.getText(), 82) + "\n" + "          "
-                        + StringUtils.center(textFieldLine2.getText(), 82) + "\n" + "         "
+                String initString = "\n\n\n\n\n\n\n\n\n\n"
+                        + String.format("%85s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n"
+                        + StringUtils.center(textFieldLine1.getText(), 82) + "\n"
+                        + StringUtils.center(textFieldLine2.getText(), 82) + "\n"
                         + StringUtils.center(textFieldLine3.getText(), 82) + "\n\n" + "           Name of Contractor : "
                         + textFieldNameOfContractor.getText() + "\n\n"
                         + String.format(format1, "Department Name", textFieldDepartmentName.getText(), "Vehicle No",
@@ -6714,11 +5140,11 @@ class WeighBridge {
                         + "\n"
                         + String.format(format2, "Tare Wt.", textFieldTareWt.getText(), "Date", temp2[0], "Time",
                         temp2[1])
-                        + "\n" + String.format(format3, "Nett Wt.", textFieldNetWt.getText()) + "\n\n\n" + "         "
-                        + textFieldLine4.getText() + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" + "         "
-                        + String.format("%72s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n" + "         "
-                        + StringUtils.center(textFieldLine1.getText(), 82) + "\n" + "          "
-                        + StringUtils.center(textFieldLine2.getText(), 82) + "\n" + "         "
+                        + "\n" + String.format(format3, "Nett Wt.", textFieldNetWt.getText()) + "\n\n\n"
+                        + textFieldLine4.getText() + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+                        + String.format("%85s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n"
+                        + StringUtils.center(textFieldLine1.getText(), 82) + "\n"
+                        + StringUtils.center(textFieldLine2.getText(), 82) + "\n"
                         + StringUtils.center(textFieldLine3.getText(), 82) + "\n\n" + "           Name of Contractor : "
                         + textFieldNameOfContractor.getText() + "\n\n"
                         + String.format(format1, "Department Name", textFieldDepartmentName.getText(), "Vehicle No",
@@ -6732,7 +5158,7 @@ class WeighBridge {
                         + "\n"
                         + String.format(format2, "Tare Wt.", textFieldTareWt.getText(), "Date", temp2[0], "Time",
                         temp2[1])
-                        + "\n" + String.format(format3, "Nett Wt.", textFieldNetWt.getText()) + "\n\n\n" + "         "
+                        + "\n" + String.format(format3, "Nett Wt.", textFieldNetWt.getText()) + "\n\n\n"
                         + textFieldLine4.getText();
 
                 graphics.setFont(new Font("Courier New", Font.BOLD, 10));
@@ -6766,13 +5192,12 @@ class WeighBridge {
         }, pf);
         pj.setPageable(pBook);
         try {
-            pj.setPrintService(printServices[comboBoxPrinter1.getSelectedIndex()]);
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
             pj.print();
         } catch (PrinterException ignored) {
         }
     }
 
-    // TODO printPlainNoOfBagsWeight
     private void printPlainNoOfBagsWeight() {
         JTextPane textPane = createTextPane6();
         textPane.setBackground(Color.white);
@@ -6791,7 +5216,7 @@ class WeighBridge {
         pBook.append(textPane.getPrintable(null, null), pf);
         pj.setPageable(pBook);
         try {
-            pj.setPrintService(printServices[comboBoxPrinter1.getSelectedIndex()]);
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
             pj.print();
         } catch (PrinterException ignored) {
         }
@@ -6819,7 +5244,7 @@ class WeighBridge {
                 StringUtils.center(title2.getText(), 65) + "\n",
                 "-----------------------------------------------------------------\n", // 65
                 String.format(format, "Sl.No", ": " + textFieldSlNo.getText(), "Date & Time", textFieldNetDateTime.getText()),
-                dc, String.format(format2, "Customer's Name", textFieldCustomerName.getEditor().getItem()), driver,
+                dc, String.format(format2, "Customer's Name", comboBoxCustomerName.getEditor().getItem()), driver,
                 String.format(format, "Vehicle No", ": " + textFieldVehicleNo.getText(), "Material",
                         comboBoxMaterial.getEditor().getItem()),
                 String.format(format, "", "", "No Of Bags",
@@ -6890,7 +5315,7 @@ class WeighBridge {
         pBook.append(textPane.getPrintable(null, null), pf, 99);
         pj.setPageable(pBook);
         try {
-            pj.setPrintService(printServices[comboBoxPrinter1.getSelectedIndex()]);
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
             pj.print();
         } catch (PrinterException ignored) {
         }
@@ -6903,15 +5328,15 @@ class WeighBridge {
         String temp = "\n";
         for (int i = 0; i < model.getRowCount(); i++) {
             temp = temp.concat(String.format(format,
-                    StringUtils.center(model.getValueAt(i, 0) != null ? model.getValueAt(i, 0).toString() : "", 5),
-                    StringUtils.center(model.getValueAt(i, 13) != null ? model.getValueAt(i, 13).toString() : "", 10),
-                    StringUtils.center(model.getValueAt(i, 5) != null ? model.getValueAt(i, 5).toString() : "", 15),
+                    StringUtils.center(model.getValueAt(i, 1) != null ? model.getValueAt(i, 0).toString() : "", 5),
+                    StringUtils.center(model.getValueAt(i, 16) != null ? model.getValueAt(i, 16).toString() : "", 10),
                     StringUtils.center(model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "", 15),
-                    StringUtils.leftPad(model.getValueAt(i, 8) != null ? model.getValueAt(i, 9).toString() : "", 8,
+                    StringUtils.center(model.getValueAt(i, 7) != null ? model.getValueAt(i, 7).toString() : "", 15),
+                    StringUtils.leftPad(model.getValueAt(i, 10) != null ? model.getValueAt(i, 10).toString() : "", 8,
                             " "),
-                    StringUtils.leftPad(model.getValueAt(i, 10) != null ? model.getValueAt(i, 11).toString() : "", 8,
+                    StringUtils.leftPad(model.getValueAt(i, 12) != null ? model.getValueAt(i, 12).toString() : "", 8,
                             " "),
-                    StringUtils.leftPad(model.getValueAt(i, 12) != null ? model.getValueAt(i, 14).toString() : "", 8,
+                    StringUtils.leftPad(model.getValueAt(i, 15) != null ? model.getValueAt(i, 15).toString() : "", 8,
                             " ")));
             temp = temp.concat("\n");
         }
@@ -6945,7 +5370,6 @@ class WeighBridge {
     }
 
     private String getTitle() {
-
         if (rdbtnWeighing.isSelected()) {
             switch (Objects.requireNonNull(comboBox.getSelectedItem()).toString()) {
                 case "Full Report":
@@ -6974,119 +5398,8 @@ class WeighBridge {
                             + dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to "
                             + dateAndTimeFormatdatep.format(datePicker2.getDate());
             }
-        }  // switch(comboBox.getSelectedItem().toString())
-        // {
-        // case "Full Report":
-        // datePicker1.setEnabled(false);
-        // datePicker2.setEnabled(false);
-        // textFieldDetail.setEnabled(false);
-        // comboBoxMaterialReport.setEnabled(false);
-        // break;
-        // case "Daily Report":
-        // datePicker1.setEnabled(true);
-        // datePicker2.setEnabled(false);
-        // textFieldDetail.setEnabled(false);
-        // comboBoxMaterialReport.setEnabled(false);
-        // break;
-        // case "Datewise Report":
-        // datePicker1.setEnabled(true);
-        // datePicker2.setEnabled(true);
-        // textFieldDetail.setEnabled(false);
-        // comboBoxMaterialReport.setEnabled(false);
-        // break;
-        // case "BillNowise Report":
-        // detail.setText("Bill No");
-        // datePicker1.setEnabled(false);
-        // datePicker2.setEnabled(false);
-        // textFieldDetail.setEnabled(true);
-        // comboBoxMaterialReport.setEnabled(false);
-        // break;
-        // case "Customerwise Report":
-        // detail.setText("Customer Name");
-        // datePicker1.setEnabled(false);
-        // datePicker2.setEnabled(false);
-        // textFieldDetail.setEnabled(true);
-        // comboBoxMaterialReport.setEnabled(false);
-        // break;
-        // case "Materialwise Report":
-        // datePicker1.setEnabled(false);
-        // datePicker2.setEnabled(false);
-        // textFieldDetail.setEnabled(false);
-        // comboBoxMaterialReport.setEnabled(true);
-        // break;
-        // }
-
+        }
         return null;
-    }
-
-    private void printReportBill() {
-        JTextPane textPane = createTextPane4();
-        textPane.setBackground(Color.white);
-        PrinterJob pj = PrinterJob.getPrinterJob();
-        PageFormat pf = new PageFormat();
-        Paper paper = pf.getPaper();
-        double width = 8d * 72d;
-        double height = 12d * 72d;
-        double widthmargin = .75d * 72d;
-        double heightmargin = 1d * 72d;
-        paper.setSize(width, height);
-        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
-        pf.setPaper(paper);
-        Book pBook = new Book();
-        pBook.append(textPane.getPrintable(null, null), pf, 99);
-        pj.setPageable(pBook);
-        try {
-            pj.setPrintService(printServices[comboBoxPrinter1.getSelectedIndex()]);
-            pj.print();
-        } catch (PrinterException ignored) {
-        }
-
-    }
-
-    private JTextPane createTextPane4() {
-        TableModel model = tableReport.getModel();
-        String format = " %1$-7s %2$-10s %3$-22s %4$-15s %5$-8s %6$-8s %7$-8s\n";
-        String temp = "\n";
-        for (int i = 0; i < model.getRowCount(); i++) {
-            temp = temp.concat(String.format(format,
-                    StringUtils.center(model.getValueAt(i, 0) != null ? model.getValueAt(i, 0).toString() : "", 7),
-                    StringUtils.center(model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "", 10),
-                    StringUtils.center(model.getValueAt(i, 2) != null ? model.getValueAt(i, 2).toString() : "", 22),
-                    StringUtils.center(model.getValueAt(i, 5) != null ? model.getValueAt(i, 5).toString() : "", 15),
-                    StringUtils.leftPad(model.getValueAt(i, 7) != null ? model.getValueAt(i, 7).toString() : "", 8,
-                            " "),
-                    StringUtils.leftPad(model.getValueAt(i, 8) != null ? model.getValueAt(i, 8).toString() : "", 8,
-                            " "),
-                    StringUtils.leftPad(model.getValueAt(i, 11) != null ? model.getValueAt(i, 11).toString() : "", 8,
-                            " ")));
-            temp = temp.concat("\n");
-        }
-        String[] initString = {StringUtils.center(title1.getText(), 39) + "\n",
-                StringUtils.center(title2.getText(), 65) + "\n",
-                "==================================================================================================\n",
-                String.format(format, StringUtils.center("Bill.No", 7), StringUtils.center("Bill Date", 10),
-                        StringUtils.center("Customer Name", 22), StringUtils.center("Material Name", 15),
-                        StringUtils.center("Cost", 8), StringUtils.center("Weight", 8),
-                        StringUtils.center("Amount", 8)),
-                "==================================================================================================\n",
-                temp,
-                "==================================================================================================\n",
-                " ", "\n\tTotal No of Units    " + textFieldtotalNetWt.getText(),
-                "\n\tNet Total            " + textFieldTotalCharges.getText(), "\n\t\t\t\t\tSignature"};
-
-        String[] initStyles = {"1", "2", "3", "3", "3", "3", "3", "5", "5", "5", "5"};
-
-        JTextPane textPane = new JTextPane();
-        StyledDocument doc = textPane.getStyledDocument();
-        addStylesToDocument3(doc);
-
-        try {
-            for (int i = 0; i < initString.length; i++) {
-                doc.insertString(doc.getLength(), initString[i], doc.getStyle(initStyles[i]));
-            }
-        } catch (BadLocationException ignored) {
-        }
-        return textPane;
     }
 
     private void addStylesToDocument3(StyledDocument doc) {
@@ -7113,32 +5426,6 @@ class WeighBridge {
         s = doc.addStyle("5", regular);
         StyleConstants.setBold(s, true);
         StyleConstants.setFontSize(s, 10);
-    }
-
-    private String toNum(int n, String ch) {
-        String temp = "";
-        String[] one = {"", " One", " Two", " Three", " Four", " Five", " Six", " Seven", " Eight", " Nine", " Ten",
-                " Eleven", " Twelve", " Thirteen", " Fourteen", " Fifteen", " Sixteen", " Seventeen", " Eighteen",
-                " Nineteen"};
-        String[] ten = {"", "", " Twenty", " Thirty", " Forty", " Fifty", " Sixty", " Seventy", " Eighty", " Ninety"};
-        if (n > 19)
-            temp = temp + ten[n / 10] + "" + one[n % 10];
-        else
-            temp = temp + one[n];
-        if (n > 0)
-            temp = temp + ch;
-        return temp;
-    }
-
-    private String toWord(int n) {
-        String temp = "(Rupees.";
-        temp = temp + toNum((n / 10000000) % 100, " Crore");
-        temp = temp + toNum(((n / 100000) % 100), " Lakh");
-        temp = temp + toNum(((n / 1000) % 100), " Thousand");
-        temp = temp + toNum(((n / 100) % 10), " Hundred");
-        temp = temp + toNum((n % 100), "");
-        temp = temp + " Only)";
-        return temp;
     }
 
     private void toExcel(String excelFilePath) throws IOException {
@@ -7275,7 +5562,7 @@ class WeighBridge {
             rowNum++;
             row = sheet.createRow(rowNum);
             int c = 0;
-            j = 0;
+            j = 1;
             if (a1.isSelected()) {
                 cell = row.createCell(c++);
                 cell.setCellValue(Integer.parseInt(0 + model.getValueAt(i, j).toString()));
@@ -7418,14 +5705,13 @@ class WeighBridge {
     }
 
     private void initializeWeights() {
-        // TODO weight
         for (SerialPort serialPort : SerialPort.getCommPorts()) {
             if (serialPort.getSystemPortName().equals(textFieldPortName.getText().split(";")[0].toUpperCase())) {
                 comPort = serialPort;
                 break;
             }
         }
-        String[] temp = {"8", "0", "10", "~~~~"};
+        String[] temp = {"8", "0", "10", "~~~"};
         try {
             temp[0] = textFieldPortName.getText().split(";")[1];
             if (Objects.equals(temp[0], ""))
@@ -7478,7 +5764,7 @@ class WeighBridge {
 
     private WebcamPanel webcamStarter(WebcamPicker webcamPicker, int i, WebcamPanel panelCamera,
                                       JComboBox<DimensionTemplate> comboBoxResolution, JTextField textFieldCropX12, JTextField textFieldCropY12,
-                                      JTextField textFieldCropWidth12, JTextField textFieldCropHeight12, int x, int y, int z, int l) {
+                                      JTextField textFieldCropWidth12, JTextField textFieldCropHeight12, int x, int y, @SuppressWarnings("SameParameterValue") int z, int l) {
         if (chckbxCamera.isSelected())
             try {
                 if (webcamPicker.getSelectedWebcam() != null) {
@@ -7634,7 +5920,7 @@ class WeighBridge {
                 + comboBoxMaterial.getEditor().getItem() + "\nGross Wt : " + textFieldGrossWt.getText() + " Kg"
                 + "\nTare Wt : " + textFieldTareWt.getText() + " Kg" + "\nNet Wt : " + textFieldNetWt.getText() + " Kg"
                 + "\nFrom " + textFieldTitle1.getText();
-        // TODO: 15-07-2019 Message
+        // TODO: SMS
 
 //        try {
 //            CommPortIdentifier ports;
@@ -7689,59 +5975,6 @@ class WeighBridge {
         }
         webcamdispose();
         System.exit(0);
-    }
-
-    private void billEvent() {
-        if (chckbxRemoveBillinTab.isSelected()) {
-            tabbedPane.setEnabledAt(2, false);
-            tabbedPane.setTitleAt(2, "");
-            comboBoxPrinter2.setEnabled(false);
-            textFieldNoOfCopies1.setEnabled(false);
-            comboBoxPrintOptionForBill.setEnabled(false);
-            btnResetBills.setEnabled(false);
-            rdbtnBilling.setEnabled(false);
-            rdbtnWeighing.setSelected(true);
-            textFieldTax.setEnabled(false);
-        } else {
-            if (lock1) {
-                tabbedPane.setEnabledAt(2, true);
-                tabbedPane.setTitleAt(2, "           Billing          ");
-                comboBoxPrinter2.setEnabled(true);
-                textFieldNoOfCopies1.setEnabled(true);
-                comboBoxPrintOptionForBill.setEnabled(true);
-                btnResetBills.setEnabled(true);
-                rdbtnBilling.setEnabled(true);
-                textFieldTax.setEnabled(true);
-            } else {
-                JPasswordField password = new JPasswordField(10);
-                JPanel panel = new JPanel();
-                String[] ConnectOptionNames = {"Enter", "Cancel"};
-                panel.add(new JLabel("Please the Billing Password ? "));
-                panel.add(password);
-                JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
-                char[] temp = password.getPassword();
-                boolean isCorrect;
-                char[] correctPassword = {'l', 'e', 'n', 's', 'm', 'o', 's', 'e', 's', 'd', 'h', 'a', 's'};
-                if (temp.length != correctPassword.length) {
-                    isCorrect = false;
-                } else {
-                    isCorrect = Arrays.equals(temp, correctPassword);
-                }
-                if (isCorrect) {
-                    tabbedPane.setEnabledAt(2, true);
-                    tabbedPane.setTitleAt(2, "           Billing          ");
-                    comboBoxPrinter2.setEnabled(true);
-                    textFieldNoOfCopies1.setEnabled(true);
-                    comboBoxPrintOptionForBill.setEnabled(true);
-                    btnResetBills.setEnabled(true);
-                    rdbtnBilling.setEnabled(true);
-                    textFieldTax.setEnabled(true);
-                } else {
-                    chckbxRemoveBillinTab.setSelected(true);
-                }
-            }
-        }
     }
 
     private void cameraEvent() {
@@ -7818,8 +6051,8 @@ class WeighBridge {
         }
     }
 
-    static class MyIpCam extends IpCamDriver {
-        MyIpCam() {
+    static class IpCam extends IpCamDriver {
+        IpCam() {
             try {
                 super.register(new IpCamDevice("No Camera Available", "http:", IpCamMode.PULL));
             } catch (MalformedURLException ignored) {
@@ -7827,14 +6060,14 @@ class WeighBridge {
         }
     }
 
-    static class MyCompositeDriver extends WebcamCompositeDriver {
+    static class CompositeDriver extends WebcamCompositeDriver {
 
-        MyCompositeDriver() {
+        CompositeDriver() {
             try {
                 add(new IpCamDriver(new IpCamStorage("cameras.xml")));
 
             } catch (NullPointerException | WebcamException ex) {
-                add(new WeighBridge.MyIpCam());
+                add(new IpCam());
             }
             add(new WebcamDefaultDriver());
         }
@@ -7852,42 +6085,11 @@ class WeighBridge {
         }
     }
 
-    static class MyTableCellEditor extends AbstractCellEditor implements TableCellEditor {
-
-        private static final long serialVersionUID = 1L;
-        private final JTextField component = new JTextField();
-        private final Font font = new Font("Monospaced", Font.PLAIN, 15);
-
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int rowIndex,
-                                                     int vColIndex) {
-            component.setText((String) value);
-            component.setFont(font);
-            return component;
-        }
-
-        public Object getCellEditorValue() {
-            return component.getText();
-        }
-
-    }
-
     static class DimensionTemplate extends Dimension {
         private static final long serialVersionUID = 1L;
 
-        public DimensionTemplate() {
-            super();
-        }
-
         DimensionTemplate(Dimension d) {
             super(d);
-        }
-
-        public DimensionTemplate(int width, int height) {
-            super(width, height);
-        }
-
-        public DimensionTemplate(String string) {
-            super(Integer.parseInt(string.trim().split(" ")[0]), Integer.parseInt(string.trim().split(" ")[2]));
         }
 
         public String toString() {
@@ -7902,8 +6104,16 @@ class WeighBridge {
             super();
         }
 
-        public DivideByZeroException(String s) {
-            super(s);
+    }
+
+    static class TableButtonRenderer extends JButton implements TableCellRenderer {
+        private static final long serialVersionUID = 1L;
+
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setForeground(Color.black);
+            setBackground(UIManager.getColor("Button.background"));
+            setText((value == null) ? "" : value.toString());
+            return this;
         }
     }
 
@@ -8121,22 +6331,6 @@ class WeighBridge {
                             }
                             break;
 
-                        case 20:
-                            clearMemory();
-                            break;
-
-                        case 21:
-                            recallMemory();
-                            break;
-
-                        case 22:
-                            storeInMemory();
-                            break;
-
-                        case 23:
-                            addToMemory();
-                            break;
-
                         case 24:
                             if (displayMode != ERROR_MODE) {
                                 setDisplayString(getDisplayString().substring(0, getDisplayString().length() - 1));
@@ -8155,23 +6349,6 @@ class WeighBridge {
                     }
                 }
             }
-        }
-
-        private void addToMemory() {
-            // needs code
-
-        }
-
-        private void storeInMemory() {
-            // needs code
-        }
-
-        private void recallMemory() {
-            // needs code
-        }
-
-        private void clearMemory() {
-            // needs code
         }
 
         String getDisplayString() {
@@ -8305,6 +6482,135 @@ class WeighBridge {
             lastNumber = 0;
             displayMode = ERROR_MODE;
             clearOnNextDigit = true;
+        }
+    }
+
+    static class TableReport extends DefaultTableModel {
+        private static final long serialVersionUID = 1L;
+
+        private final Set<Integer> editableRow = new HashSet<>();
+
+        public TableReport(Object[][] objects, String[] strings) {
+            super(objects, strings);
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            switch (column) {
+                case 0:
+                    return true;
+                case 1:
+                case 18:
+                    return false;
+            }
+            return this.editableRow.contains(row);
+        }
+
+        public void removeEditableRow(int row) {
+            this.editableRow.remove(row);
+        }
+
+        public void addEditableRow(int row) {
+            this.editableRow.add(row);
+        }
+    }
+
+    class TableRenderer extends DefaultCellEditor {
+
+        private static final long serialVersionUID = 1L;
+        private final JButton button = new JButton();
+        private String label;
+        private boolean clicked;
+        private int row;
+        private JTable table;
+
+        public TableRenderer(JCheckBox checkBox) {
+            super(checkBox);
+            this.button.addActionListener(actionEvent -> fireEditingStopped());
+        }
+
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            this.table = table;
+            this.row = row;
+
+            button.setForeground(Color.black);
+            button.setBackground(UIManager.getColor("Button.background"));
+            label = (value == null) ? "" : value.toString();
+            button.setText(label);
+            clicked = true;
+            return button;
+        }
+
+        public Object getCellEditorValue() {
+            if (clicked) {
+                if (label.equals("Save")) {
+                    Statement stmt;
+                    try {
+                        stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+                                ResultSet.CONCUR_UPDATABLE);
+
+                        DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
+
+                        ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + model.getValueAt(row, 1));
+
+                        if (rs.next()) {
+
+                            rs.updateString("DCNO", (String) model.getValueAt(row, 2));
+
+                            if (!("" + model.getValueAt(row, 3)).trim().equals("")) {
+                                Date date = dateAndTimeFormatdate.parse("" + model.getValueAt(row, 3));
+                                rs.updateDate("DCNODATE", new java.sql.Date(date.getTime()));
+                            }
+
+                            rs.updateString("CUSTOMERNAME", (String) model.getValueAt(row, 4));
+                            rs.updateString("DRIVERNAME", (String) model.getValueAt(row, 5));
+                            rs.updateString("VEHICLENO", (String) model.getValueAt(row, 6));
+                            rs.updateString("MATERIAL", (String) model.getValueAt(row, 7));
+                            rs.updateInt("NOOFBAGS", Integer.parseInt("" + model.getValueAt(row, 8)));
+                            rs.updateInt("CHARGES", Integer.parseInt("" + model.getValueAt(row, 9)));
+                            rs.updateInt("GROSSWT", Integer.parseInt("" + model.getValueAt(row, 10)));
+
+                            if (!("" + model.getValueAt(row, 11)).trim().equals("")) {
+                                Date date = dateAndTimeFormat.parse("" + model.getValueAt(row, 11));
+                                rs.updateDate("GROSSDATE", new java.sql.Date(date.getTime()));
+                                rs.updateTime("GROSSTIME", new Time(date.getTime()));
+                            }
+
+                            rs.updateInt("TAREWT", Integer.parseInt("" + model.getValueAt(row, 12)));
+
+                            if (!("" + model.getValueAt(row, 13)).trim().equals("")) {
+                                Date date = dateAndTimeFormat.parse("" + model.getValueAt(row, 13));
+                                rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
+                                rs.updateTime("TARETIME", new Time(date.getTime()));
+                            }
+                            rs.updateInt("BAGDEDUCTION", Integer.parseInt("" + model.getValueAt(row, 14)));
+                            rs.updateInt("NETWT", Integer.parseInt("" + model.getValueAt(row, 15)));
+                            if (!("" + model.getValueAt(row, 16)).trim().equals("")) {
+                                Date date = dateAndTimeFormat.parse("" + model.getValueAt(row, 16));
+                                rs.updateDate("NETDATE", new java.sql.Date(date.getTime()));
+                                rs.updateTime("NETTIME", new Time(date.getTime()));
+                            }
+                            rs.updateString("REMARKS", (String) model.getValueAt(row, 17));
+                            rs.updateBoolean("MANUAL", true);
+                            rs.updateRow();
+                            label = "Edit";
+                            ((TableReport) tableReport.getModel()).removeEditableRow(row);
+                        }
+                    } catch (SQLException | ParseException ignored) {
+                    }
+                } else {
+                    label = "Save";
+                    ((TableReport) tableReport.getModel()).addEditableRow(row);
+                    JOptionPane.showMessageDialog(button, "Column with Value: " + table.getValueAt(row, 1) + " -  Clicked!");
+                }
+            }
+            clicked = false;
+            return label;
+        }
+
+        public boolean stopCellEditing() {
+            clicked = false;
+            return super.stopCellEditing();
         }
     }
 }
