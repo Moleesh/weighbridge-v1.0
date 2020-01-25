@@ -230,7 +230,7 @@ class WeighBridge {
 	 *
 	 * @wbp.parser.entryPoint
 	 */
-	private WeighBridge () {
+	private WeighBridge() {
 		try {
 			int i = 0;
 			printServices = PrintServiceLookup.lookupPrintServices(null, null);
@@ -255,7 +255,7 @@ class WeighBridge {
 			if (dbConnection == null) {
 				System.exit(0);
 			}
-			// TODO: start
+// TODO: start
 			initialize();
 			setup();
 			cameraSetting();
@@ -267,15 +267,15 @@ class WeighBridge {
 			});
 			t1.start();
 
-			//             rePrint("1");
-			//             printPlainSriPathyWeight();
-			//             close();
+//             rePrint("1");
+//             printPlainSriPathyWeight();
+//             close();
 
 		} catch (Error | Exception ignored) {
 		}
 	}
 
-	public static void main (String[] args) {
+	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception ex) {
@@ -287,7 +287,7 @@ class WeighBridge {
 		});
 	}
 
-	private void setup () {
+	private void setup() {
 		try {
 			Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM setup");
@@ -372,7 +372,7 @@ class WeighBridge {
 
 	}
 
-	private void startup (ResultSet rs) throws SQLException {
+	private void startup(ResultSet rs) throws SQLException {
 		JPasswordField password = new JPasswordField(10);
 		JPanel panel = new JPanel();
 		String[] ConnectOptionNames = {
@@ -422,7 +422,7 @@ class WeighBridge {
 			rs.updateTimestamp("ENDDATE",
 					new Timestamp(new Date().getTime() + 10 * (long) 8.64e+7));
 			rs.updateRow();
-			//endDate = rs.getDate("ENDDATE");
+//endDate = rs.getDate("ENDDATE");
 			JOptionPane.showMessageDialog(null,
 					"Trial Reset Successfull\n you got 10 days\n Plz Open again", "Reset",
 					JOptionPane.INFORMATION_MESSAGE);
@@ -434,11 +434,11 @@ class WeighBridge {
 		}
 	}
 
-	private String getUUID () {
+	private String getUUID() {
 		String tempDetail = "";
 		Process process;
 		try {
-			process = Runtime.getRuntime().exec(new String[] {
+			process = Runtime.getRuntime().exec(new String[]{
 					"wmic",
 					"csproduct",
 					"get",
@@ -454,7 +454,7 @@ class WeighBridge {
 		return tempDetail;
 	}
 
-	private void cameraSetting () {
+	private void cameraSetting() {
 		try {
 			Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM CAMERA");
@@ -579,7 +579,7 @@ class WeighBridge {
 		}
 	}
 
-	private void settings () {
+	private void settings() {
 		try {
 			Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
@@ -627,7 +627,7 @@ class WeighBridge {
 			model.setRowCount(0);
 			comboBoxCustomerName.removeAllItems();
 			while (rs.next()) {
-				model.addRow(new Object[] {
+				model.addRow(new Object[]{
 						rs.getString("CUSTOMER"), rs.getString("CUSTOMERADDRESS"),
 						rs.getString("CUSTOMERADDRESS1")
 				});
@@ -644,7 +644,7 @@ class WeighBridge {
 			model = (DefaultTableModel) tableVehicleTare.getModel();
 			model.setRowCount(0);
 			while (rs.next())
-				model.addRow(new Object[] {
+				model.addRow(new Object[]{
 						rs.getString("VEHICLENO"), rs.getInt("TAREWT"),
 						dateAndTimeFormat.format(new Date(dateAndTimeFormatSql
 								.parse(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME")).getTime()))
@@ -655,7 +655,7 @@ class WeighBridge {
 			comboBoxMaterial.removeAllItems();
 			comboBoxMaterialReport.removeAllItems();
 			while (rs.next()) {
-				model.addRow(new Object[] {
+				model.addRow(new Object[]{
 						rs.getInt("KEY"), rs.getString("MATERIALS"), rs.getDouble("COST")
 				});
 				comboBoxMaterial.addItem(rs.getString("MATERIALS"));
@@ -672,7 +672,7 @@ class WeighBridge {
 		}
 	}
 
-	private void updateSettings () {
+	private void updateSettings() {
 		try {
 			Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
@@ -758,7 +758,7 @@ class WeighBridge {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize () {
+	private void initialize() {
 		chckbxSelectSlNo.setSelected(true);
 		chckbxSelectCustomerName.setSelected(true);
 		chckbxSelectVehicleNo.setSelected(true);
@@ -898,7 +898,7 @@ class WeighBridge {
 		rdbtnTare = new JRadioButton("Tare");
 		rdbtnTare.setBackground(new Color(0, 255, 127));
 		rdbtnTare.addActionListener(e -> {
-			// comboBoxMaterial.setEnabled(false);
+// comboBoxMaterial.setEnabled(false);
 			comboBoxMaterial.getModel().setSelectedItem("EMPTY");
 			if (chckbxExcludeCustomer.isSelected())
 				if (chckbxExcludeDrivers.isSelected())
@@ -1360,7 +1360,7 @@ class WeighBridge {
 			rdbtnGross.setSelected(true);
 			JComboBox<String> comboBoxa = new JComboBox<>();
 			comboBoxa.setModel(
-					new DefaultComboBoxModel<>(new String[] {
+					new DefaultComboBoxModel<>(new String[]{
 							"Tare Sl.no",
 							"Gross Sl.no",
 							"Net Sl.no"
@@ -1443,7 +1443,7 @@ class WeighBridge {
 			rdbtnTare.setSelected(true);
 			JComboBox<String> comboBoxa = new JComboBox<>();
 			comboBoxa.setModel(
-					new DefaultComboBoxModel<>(new String[] {
+					new DefaultComboBoxModel<>(new String[]{
 							"Gross Sl.no",
 							"Tare Sl.no",
 							"Net Sl.no"
@@ -1847,8 +1847,11 @@ class WeighBridge {
 						rs.insertRow();
 					}
 				}
+			} catch (NumberFormatException ex) {
+				JOptionPane.showMessageDialog(null, "WEIGHT ERROR\nWeight is incorrect or negative\nLINE :1851", "WEIGHT ERROR",
+						JOptionPane.ERROR_MESSAGE);
 			} catch (SQLException | ParseException ex) {
-				JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :990", "SQL ERROR",
+				JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1854", "SQL ERROR",
 						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
@@ -1960,8 +1963,8 @@ class WeighBridge {
 		panelWeighing.add(lblCustmerName);
 
 		textFieldDriverName = new JComboBox<>();
-		// AutoCompleteDecorator.decorate(textFieldDriverName);// For Auto
-		// completion
+// AutoCompleteDecorator.decorate(textFieldDriverName);// For Auto
+// completion
 		textFieldDriverName.addActionListener(e -> textFieldVehicleNo.requestFocus());
 		textFieldDriverName.setFont(new Font("Times New Roman", Font.PLAIN, 18));
 		textFieldDriverName.setEditable(true);
@@ -2045,12 +2048,12 @@ class WeighBridge {
 				private boolean gained = false;
 
 				@Override
-				public void focusGained (FocusEvent e) {
+				public void focusGained(FocusEvent e) {
 					gained = true;
 				}
 
 				@Override
-				public void focusLost (FocusEvent e) {
+				public void focusLost(FocusEvent e) {
 					if (gained) {
 						jFrame.dispose();
 					}
@@ -2069,10 +2072,10 @@ class WeighBridge {
 										"0" + textFieldCropHeight11.getText().replaceAll("[^0-9]", "")));
 						JLabel jLabel = new JLabel(
 								new ImageIcon(cropImage.getScaledInstance(1280, 768, Image.SCALE_DEFAULT))); // 1280,
-						// 768
+// 768
 						jLabel.addMouseListener(new MouseAdapter() {
 							@Override
-							public void mouseClicked (MouseEvent e12) {
+							public void mouseClicked(MouseEvent e12) {
 								try {
 									jFrame.dispose();
 								} catch (NullPointerException ignored) {
@@ -2346,7 +2349,7 @@ class WeighBridge {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void insertString (int offs, String str, AttributeSet a) throws BadLocationException {
+			public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
 				if ((getLength() + str.length()) <= 100) {
 					super.insertString(offs, str, a);
 				} else {
@@ -2360,7 +2363,7 @@ class WeighBridge {
 		panelWeighing.add(textPaneRemarks);
 		textPaneRemarks.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed (KeyEvent e) {
+			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					btnGetWeight.requestFocus();
 				}
@@ -3255,7 +3258,7 @@ class WeighBridge {
 			}
 		});
 		comboBox.setFocusable(false);
-		comboBox.setModel(new DefaultComboBoxModel<>(new String[] {
+		comboBox.setModel(new DefaultComboBoxModel<>(new String[]{
 				"Full Report",
 				"Daily Report",
 				"Datewise Report",
@@ -3333,7 +3336,7 @@ class WeighBridge {
 			if (rdbtnWeighing.isSelected()) {
 				Object[] params;
 				if (chckbxManualStatus.isSelected()) {
-					params = new Object[] {
+					params = new Object[]{
 							message,
 							chckbxSelectSlNo,
 							chckbxSelectDCNo,
@@ -3355,7 +3358,7 @@ class WeighBridge {
 							chckbxSelectManual
 					};
 				} else {
-					params = new Object[] {
+					params = new Object[]{
 							message,
 							chckbxSelectSlNo,
 							chckbxSelectDCNo,
@@ -3546,20 +3549,20 @@ class WeighBridge {
 		tableMaterial.putClientProperty("terminateEditOnFocusLost", true);
 		tableMaterial.setFont(new Font("Times New Roman", Font.PLAIN, 15));
 		tableMaterial.getTableHeader().setFont(new Font("Times New Roman", Font.ITALIC | Font.BOLD, 15));
-		tableMaterial.setModel(new DefaultTableModel(new Object[][] {}, new String[] {
+		tableMaterial.setModel(new DefaultTableModel(new Object[][]{}, new String[]{
 				"Sl.No",
 				"Materials",
 				"Cost"
 		}) {
 			private static final long serialVersionUID = 1L;
-			final boolean[] columnEditables = new boolean[] {
+			final boolean[] columnEditables = new boolean[]{
 					false,
 					true,
 					true
 			};
 
 			@Override
-			public boolean isCellEditable (int row, int column) {
+			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
 			}
 		});
@@ -3572,7 +3575,7 @@ class WeighBridge {
 		JButton btnAddMaterialRow = new JButton("+");
 		btnAddMaterialRow.addActionListener(e -> {
 			DefaultTableModel model = (DefaultTableModel) tableMaterial.getModel();
-			model.addRow(new Object[] {
+			model.addRow(new Object[]{
 					model.getRowCount() + 1
 			});
 		});
@@ -3602,8 +3605,8 @@ class WeighBridge {
 		tableVehicleTare.putClientProperty("terminateEditOnFocusLost", true);
 		tableVehicleTare.setFont(new Font("Times New Roman", Font.PLAIN, 15));
 		tableVehicleTare.getTableHeader().setFont(new Font("Times New Roman", Font.ITALIC | Font.BOLD, 15));
-		tableVehicleTare.setModel(new DefaultTableModel(new Object[][] {},
-				new String[] {
+		tableVehicleTare.setModel(new DefaultTableModel(new Object[][]{},
+				new String[]{
 						"Vehicle No",
 						"Tare Wt",
 						"Tare Date & Time "
@@ -3612,21 +3615,21 @@ class WeighBridge {
 			 *
 			 */
 			private static final long serialVersionUID = 1L;
-			final Class<?>[] columnTypes = new Class[] {
+			final Class<?>[] columnTypes = new Class[]{
 					Object.class, Integer.class, Object.class
 			};
-			final boolean[] columnEditables = new boolean[] {
+			final boolean[] columnEditables = new boolean[]{
 					false,
 					false,
 					false
 			};
 
-			public Class<?> getColumnClass (int columnIndex) {
+			public Class<?> getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
 
 			@Override
-			public boolean isCellEditable (int row, int column) {
+			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
 			}
 		});
@@ -3650,8 +3653,8 @@ class WeighBridge {
 		tableCustomer.putClientProperty("terminateEditOnFocusLost", true);
 		tableCustomer.setFont(new Font("Times New Roman", Font.PLAIN, 15));
 		tableCustomer.getTableHeader().setFont(new Font("Times New Roman", Font.ITALIC | Font.BOLD, 15));
-		tableCustomer.setModel(new DefaultTableModel(new Object[][] {},
-				new String[] {
+		tableCustomer.setModel(new DefaultTableModel(new Object[][]{},
+				new String[]{
 						"Customer Name",
 						"Customer Address",
 						"Customer Address1"
@@ -3662,7 +3665,7 @@ class WeighBridge {
 		JButton btnAddCustomer = new JButton("+");
 		btnAddCustomer.addActionListener(e -> {
 			DefaultTableModel model = (DefaultTableModel) tableCustomer.getModel();
-			model.addRow(new Object[] {});
+			model.addRow(new Object[]{});
 		});
 		btnAddCustomer.setFont(new Font("Times New Roman", Font.BOLD, 15));
 		btnAddCustomer.setFocusable(false);
@@ -3682,7 +3685,7 @@ class WeighBridge {
 		textFieldTitle1 = new JTextField();
 		textFieldTitle1.setToolTipText("Only 30 letters");
 		textFieldTitle1.addKeyListener(new KeyAdapter() {
-			public void keyTyped (KeyEvent e) {
+			public void keyTyped(KeyEvent e) {
 				title1.setText(textFieldTitle1.getText());
 			}
 		});
@@ -3696,7 +3699,7 @@ class WeighBridge {
 		textFieldTitle2 = new JTextField();
 		textFieldTitle2.setToolTipText("Only 45 letters");
 		textFieldTitle2.addKeyListener(new KeyAdapter() {
-			public void keyTyped (KeyEvent e) {
+			public void keyTyped(KeyEvent e) {
 				title2.setText(textFieldTitle2.getText());
 			}
 		});
@@ -4066,7 +4069,7 @@ class WeighBridge {
 		panelSettings.add(chckbxCamera);
 
 		comboBoxPrintOptionForWeight = new JComboBox<>();
-		comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[] {
+		comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{
 				"Pre Print",
 				"Pre Print 2",
 				"Plain Paper",
@@ -4494,7 +4497,7 @@ class WeighBridge {
 
 	}
 
-	private void getReport () {
+	private void getReport() {
 		String date1, date2, vehicleNo, material;
 		int charges = 0, netWt = 0, serialNo;
 		Date dateTemp12;
@@ -4568,8 +4571,8 @@ class WeighBridge {
 			try {
 				tableReport.setModel(
 						new TableReport(
-								new Object[][] {},
-								new String[] {
+								new Object[][]{},
+								new String[]{
 										"Edit/Save",
 										"Sl.No",
 										"Dc. No",
@@ -4631,7 +4634,7 @@ class WeighBridge {
 						time = timeFormat.format(rs.getTime("NETTIME"));
 					net = date + " " + time;
 
-					model.addRow(new Object[] {
+					model.addRow(new Object[]{
 							"Edit",
 							rs.getInt("SLNO"),
 							rs.getString("DCNO"),
@@ -4706,12 +4709,12 @@ class WeighBridge {
 		reportOpened = true;
 	}
 
-	private void rePrint (String response) {
+	private void rePrint(String response) {
 		try {
 			Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + response);
 			if (rs.next()) {
-				// rs.absolute(Integer.parseInt(response));
+// rs.absolute(Integer.parseInt(response));
 				textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
 				textFieldDcNo.setText(rs.getString("DCNO"));
 				textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" :
@@ -4773,7 +4776,7 @@ class WeighBridge {
 		btnPrint.requestFocus();
 	}
 
-	private void clear () {
+	private void clear() {
 		if (chckbxCamera.isSelected()) {
 			if (checkBoxCamera1.isSelected()) {
 				try {
@@ -4897,7 +4900,7 @@ class WeighBridge {
 		}
 	}
 
-	private void printPlainWeight () {
+	private void printPlainWeight() {
 		JTextPane textPane = createTextPane1();
 		textPane.setBackground(Color.white);
 		PrinterJob pj = PrinterJob.getPrinterJob();
@@ -4922,14 +4925,14 @@ class WeighBridge {
 
 	}
 
-	private JTextPane createTextPane1 () {
+	private JTextPane createTextPane1() {
 		String format = " %1$-13s: %2$-15s%3$-12s: %4$-20s\n";
 		String format1 = "     %1$-9s: %2$-7s Kg               %3$-20s\n";
 		String format2 = " %1$-18s: %2$-30s\n";
 		String format3 = "     %1$-9s: %2$s";
 		String dc = "";
 		String driver = "";
-		//noinspection StatementWithEmptyBody
+//noinspection StatementWithEmptyBody
 		if (textFieldDcNo.getText().trim().equals("") || textFieldDcDate.getText().trim().equals(""))
 			;
 		else {
@@ -4991,7 +4994,7 @@ class WeighBridge {
 		return textPane;
 	}
 
-	private void addStylesToDocument1 (StyledDocument doc) {
+	private void addStylesToDocument1(StyledDocument doc) {
 		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
 		Style regular = doc.addStyle("regular", def);
@@ -5013,7 +5016,7 @@ class WeighBridge {
 		StyleConstants.setFontSize(s, 12);
 	}
 
-	private void printPreWeight () {
+	private void printPreWeight() {
 		JTextPane textPane = createTextPane5();
 		textPane.setBackground(Color.white);
 		PrinterJob pj = PrinterJob.getPrinterJob();
@@ -5038,7 +5041,7 @@ class WeighBridge {
 	}
 
 
-	private JTextPane createTextPane5 () {
+	private JTextPane createTextPane5() {
 		String format = "%1$-6s%2$-30s%3$-30s%4$-12s";
 		String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
 		String[] initString = {
@@ -5100,7 +5103,7 @@ class WeighBridge {
 		return textPane;
 	}
 
-	private void addStylesToDocument4 (StyledDocument doc) {
+	private void addStylesToDocument4(StyledDocument doc) {
 		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
 		Style regular = doc.addStyle("regular", def);
@@ -5117,7 +5120,7 @@ class WeighBridge {
 		StyleConstants.setFontSize(s, 14);
 	}
 
-	private void printPreWeight2 () {
+	private void printPreWeight2() {
 		JTextPane textPane = createTextPane7();
 		textPane.setBackground(Color.white);
 		PrinterJob pj = PrinterJob.getPrinterJob();
@@ -5142,7 +5145,7 @@ class WeighBridge {
 	}
 
 
-	private JTextPane createTextPane7 () {
+	private JTextPane createTextPane7() {
 		String format = "%1$-6s%2$-30s%3$-30s%4$-12s";
 		String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
 		String[] initString = {
@@ -5204,7 +5207,7 @@ class WeighBridge {
 		return textPane;
 	}
 
-	private void addStylesToDocument7 (StyledDocument doc) {
+	private void addStylesToDocument7(StyledDocument doc) {
 		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
 		Style regular = doc.addStyle("regular", def);
@@ -5222,7 +5225,7 @@ class WeighBridge {
 		StyleConstants.setFontSize(s, 8);
 	}
 
-	private void printCameraWeight () {
+	private void printCameraWeight() {
 		PrinterJob pj = PrinterJob.getPrinterJob();
 		PageFormat pf = new PageFormat();
 		Paper paper = pf.getPaper();
@@ -5236,7 +5239,7 @@ class WeighBridge {
 		Book pBook = new Book();
 		pBook.append(new Printable() {
 
-			private Coordinates drawString (Graphics g, String text, int x, int y) {
+			private Coordinates drawString(Graphics g, String text, int x, int y) {
 				int length = 0;
 				for (String line : text.split("\n")) {
 					g.drawString(line, x, y += g.getFontMetrics().getHeight() - 1);
@@ -5245,7 +5248,7 @@ class WeighBridge {
 				return new Coordinates(length, y + g.getFontMetrics().getHeight() - 1);
 			}
 
-			public int print (Graphics graphics, PageFormat pageFormat, int pageIndex) {
+			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
 				String format = "%1$-5s%2$-20s  ";
 
 				String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
@@ -5323,7 +5326,7 @@ class WeighBridge {
 		}
 	}
 
-	private void printPlainCameraWeight () {
+	private void printPlainCameraWeight() {
 		PrinterJob pj = PrinterJob.getPrinterJob();
 		PageFormat pf = new PageFormat();
 		Paper paper = pf.getPaper();
@@ -5337,7 +5340,7 @@ class WeighBridge {
 		Book pBook = new Book();
 		pBook.append(new Printable() {
 
-			private Coordinates drawString (Graphics g, String text, int x, int y) {
+			private Coordinates drawString(Graphics g, String text, int x, int y) {
 				int length = 0;
 				for (String line : text.split("\n")) {
 					g.drawString(line, x + 10, y += g.getFontMetrics().getHeight() - 1);
@@ -5346,7 +5349,7 @@ class WeighBridge {
 				return new Coordinates(length, y + g.getFontMetrics().getHeight() - 1);
 			}
 
-			public int print (Graphics graphics, PageFormat pageFormat, int pageIndex) {
+			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
 				String format = "%1$-5s%2$-20s: ";
 
 
@@ -5431,7 +5434,7 @@ class WeighBridge {
 		}
 	}
 
-	private void printPlainSriPathyWeight () {
+	private void printPlainSriPathyWeight() {
 		PrinterJob pj = PrinterJob.getPrinterJob();
 		PageFormat pf = new PageFormat();
 		Paper paper = pf.getPaper();
@@ -5444,7 +5447,7 @@ class WeighBridge {
 		pf.setPaper(paper);
 		Book pBook = new Book();
 		pBook.append(new Printable() {
-			private void drawString (Graphics g, String text, @SuppressWarnings("SameParameterValue") int y) {
+			private void drawString(Graphics g, String text, @SuppressWarnings("SameParameterValue") int y) {
 				int length = 0;
 				for (String line : text.split("\n")) {
 					g.drawString(line, 0, y += g.getFontMetrics().getHeight() - 1);
@@ -5453,7 +5456,7 @@ class WeighBridge {
 				new Coordinates(length, y + g.getFontMetrics().getHeight() - 1);
 			}
 
-			public int print (Graphics graphics, PageFormat pageFormat, int pageIndex) {
+			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
 				String format1 = "           %-19s: %-25s   %-10s : %s\n";
 				String format2 = "           %-10s:%7s Kg   %-10s : %-12s   %-10s : %s\n";
 				String format3 = "           %-10s:%7s Kg \n";
@@ -5551,7 +5554,7 @@ class WeighBridge {
 		}
 	}
 
-	private void printPlainNoOfBagsWeight () {
+	private void printPlainNoOfBagsWeight() {
 		JTextPane textPane = createTextPane6();
 		textPane.setBackground(Color.white);
 		PrinterJob pj = PrinterJob.getPrinterJob();
@@ -5577,14 +5580,14 @@ class WeighBridge {
 	}
 
 
-	private JTextPane createTextPane6 () {
+	private JTextPane createTextPane6() {
 		String format = " %1$-13s%2$-17s%3$-12s: %4$-20s\n";
 		String format1 = "     %1$-14s: %2$-7s Kg          %3$-20s\n";
 		String format2 = " %1$-18s: %2$-30s\n";
 		String format3 = "     %1$-14s: %2$s";
 		String dc = "";
 		String driver = "";
-		//noinspection StatementWithEmptyBody
+//noinspection StatementWithEmptyBody
 		if (textFieldDcNo.getText().trim().equals("") || textFieldDcDate.getText().trim().equals(""))
 			;
 		else {
@@ -5652,7 +5655,7 @@ class WeighBridge {
 		return textPane;
 	}
 
-	private void addStylesToDocument6 (StyledDocument doc) {
+	private void addStylesToDocument6(StyledDocument doc) {
 		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
 		Style regular = doc.addStyle("regular", def);
@@ -5674,7 +5677,7 @@ class WeighBridge {
 		StyleConstants.setFontSize(s, 12);
 	}
 
-	private void printReportWeight () {
+	private void printReportWeight() {
 		JTextPane textPane = createTextPane3();
 		textPane.setBackground(Color.white);
 		PrinterJob pj = PrinterJob.getPrinterJob();
@@ -5699,7 +5702,7 @@ class WeighBridge {
 	}
 
 
-	private JTextPane createTextPane3 () {
+	private JTextPane createTextPane3() {
 		TableModel model = tableReport.getModel();
 		String format = " %1$-5s %2$-19s %3$-15s %4$-15s %5$-8s %6$-8s %7$-8s\n";
 		String temp = "\n";
@@ -5764,7 +5767,7 @@ class WeighBridge {
 		return textPane;
 	}
 
-	private String getTitle () {
+	private String getTitle() {
 		if (rdbtnWeighing.isSelected()) {
 			switch (Objects.requireNonNull(comboBox.getSelectedItem()).toString()) {
 				case "Full Report":
@@ -5797,7 +5800,7 @@ class WeighBridge {
 		return null;
 	}
 
-	private void addStylesToDocument3 (StyledDocument doc) {
+	private void addStylesToDocument3(StyledDocument doc) {
 		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
 		Style regular = doc.addStyle("regular", def);
@@ -5823,7 +5826,7 @@ class WeighBridge {
 		StyleConstants.setFontSize(s, 10);
 	}
 
-	private void toExcel (String excelFilePath) throws IOException {
+	private void toExcel(String excelFilePath) throws IOException {
 		Workbook workbook;
 		if (excelFilePath.endsWith("xls")) {
 			workbook = new HSSFWorkbook();
@@ -6099,7 +6102,7 @@ class WeighBridge {
 		workbook.close();
 	}
 
-	private void initializeWeights () {
+	private void initializeWeights() {
 		for (SerialPort serialPort : SerialPort.getCommPorts()) {
 			if (serialPort.getSystemPortName().equals(textFieldPortName.getText().split(";")[0].toUpperCase())) {
 				comPort = serialPort;
@@ -6139,25 +6142,25 @@ class WeighBridge {
 			comPort.openPort();
 			comPort.addDataListener(new SerialPortMessageListener() {
 				@Override
-				public int getListeningEvents () {
+				public int getListeningEvents() {
 					return SerialPort.LISTENING_EVENT_DATA_RECEIVED;
 				}
 
 
 				@Override
-				public byte[] getMessageDelimiter () {
-					return new byte[] {
+				public byte[] getMessageDelimiter() {
+					return new byte[]{
 							(byte) (Integer.parseInt(0 + temp[2]) % 128)
 					};
 				}
 
 				@Override
-				public boolean delimiterIndicatesEndOfMessage () {
+				public boolean delimiterIndicatesEndOfMessage() {
 					return true;
 				}
 
 				@Override
-				public void serialEvent (SerialPortEvent event) {
+				public void serialEvent(SerialPortEvent event) {
 					lblWeight.setText("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^" +
 							"0-9" + temp[3] + "]", "").split(temp[3])[0]));
 				}
@@ -6166,9 +6169,9 @@ class WeighBridge {
 	}
 
 
-	private WebcamPanel webcamStarter (WebcamPicker webcamPicker, int i, WebcamPanel panelCamera,
-	                                   JComboBox<DimensionTemplate> comboBoxResolution, JTextField textFieldCropX12, JTextField textFieldCropY12,
-	                                   JTextField textFieldCropWidth12, JTextField textFieldCropHeight12, int x, int y, @SuppressWarnings("SameParameterValue") int z, int l) {
+	private WebcamPanel webcamStarter(WebcamPicker webcamPicker, int i, WebcamPanel panelCamera,
+	                                  JComboBox<DimensionTemplate> comboBoxResolution, JTextField textFieldCropX12, JTextField textFieldCropY12,
+	                                  JTextField textFieldCropWidth12, JTextField textFieldCropHeight12, int x, int y, @SuppressWarnings("SameParameterValue") int z, int l) {
 		if (chckbxCamera.isSelected())
 			try {
 				if (webcamPicker.getSelectedWebcam() != null) {
@@ -6229,7 +6232,7 @@ class WeighBridge {
 		return panelCamera;
 	}
 
-	private void webcamdispose () {
+	private void webcamdispose() {
 		if (webcam[1] != null) {
 			Runnable stuffToDo = new Thread(() -> webcam[1].close());
 			ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -6318,47 +6321,47 @@ class WeighBridge {
 	}
 
 	@SuppressWarnings("unused")
-	private void sentSMS (String mobileNo) {
+	private void sentSMS(String mobileNo) {
 		String smsMessage = "Sl.No : " + textFieldSlNo.getText() + "\nDate & Time : " + textFieldNetDateTime.getText() +
 				"\nVehicle No : " + textFieldVehicleNo.getText() + "\nMaterial : " +
 				comboBoxMaterial.getEditor().getItem() + "\nGross Wt : " + textFieldGrossWt.getText() + " Kg" +
 				"\nTare Wt : " + textFieldTareWt.getText() + " Kg" + "\nNet Wt : " + textFieldNetWt.getText() + " Kg" +
 				"\nFrom " + textFieldTitle1.getText();
-		// TODO: SMS
+// TODO: SMS
 
-		//        try {
-		//            CommPortIdentifier ports;
-		//            Enumeration<?> portEnum = CommPortIdentifier.getPortIdentifiers();
-		//            while (portEnum.hasMoreElements()) {
-		//                ports = (CommPortIdentifier) portEnum.nextElement();
-		//                if (ports.getPortType() == CommPortIdentifier.PORT_SERIAL && ports.getName().equals("COM2")) {
-		//                    comPort = ports;
-		//                    break;
-		//                }
-		//            }
-		//            SerialPort serialPortSms = (SerialPort) comPort.open(textFieldSMSPortName.getText(), 2000);
-		//            OutputStream outputStream = serialPortSms.getOutputStream();
-		//            serialPortSms.getInputStream();
-		//            serialPortSms.setSerialPortParams(Integer.parseInt(textFieldSMSBaudRate.getText()), SerialPort.DATABITS_8,
-		//                    SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-		//            char enter = 13;
-		//            outputStream.write(("AT+CMGS=\"" + mobileNo + "\"" + enter).getBytes());
-		//            Thread.sleep(100);
-		//            outputStream.flush();
-		//            char CTRLZ = 26;
-		//            outputStream.write((smsMessage + CTRLZ).getBytes());
-		//            outputStream.flush();
-		//            outputStream.close();
-		//            serialPortSms.close();
-		//        } catch (PortInUseException | IOException | UnsupportedCommOperationException | InterruptedException
-		//                | NullPointerException e) {
-		//            JOptionPane.showMessageDialog(null,
-		//                    "SMS ERROR\nSMS Funtion not working please check the connection 0or check the number entered",
-		//                    "SMS ERROR", JOptionPane.ERROR_MESSAGE);
-		//        }
+//        try {
+//            CommPortIdentifier ports;
+//            Enumeration<?> portEnum = CommPortIdentifier.getPortIdentifiers();
+//            while (portEnum.hasMoreElements()) {
+//                ports = (CommPortIdentifier) portEnum.nextElement();
+//                if (ports.getPortType() == CommPortIdentifier.PORT_SERIAL && ports.getName().equals("COM2")) {
+//                    comPort = ports;
+//                    break;
+//                }
+//            }
+//            SerialPort serialPortSms = (SerialPort) comPort.open(textFieldSMSPortName.getText(), 2000);
+//            OutputStream outputStream = serialPortSms.getOutputStream();
+//            serialPortSms.getInputStream();
+//            serialPortSms.setSerialPortParams(Integer.parseInt(textFieldSMSBaudRate.getText()), SerialPort.DATABITS_8,
+//                    SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+//            char enter = 13;
+//            outputStream.write(("AT+CMGS=\"" + mobileNo + "\"" + enter).getBytes());
+//            Thread.sleep(100);
+//            outputStream.flush();
+//            char CTRLZ = 26;
+//            outputStream.write((smsMessage + CTRLZ).getBytes());
+//            outputStream.flush();
+//            outputStream.close();
+//            serialPortSms.close();
+//        } catch (PortInUseException | IOException | UnsupportedCommOperationException | InterruptedException
+//                | NullPointerException e) {
+//            JOptionPane.showMessageDialog(null,
+//                    "SMS ERROR\nSMS Funtion not working please check the connection 0or check the number entered",
+//                    "SMS ERROR", JOptionPane.ERROR_MESSAGE);
+//        }
 	}
 
-	private void close () {
+	private void close() {
 		try {
 			Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM setup");
@@ -6381,7 +6384,7 @@ class WeighBridge {
 		System.exit(0);
 	}
 
-	private void cameraEvent () {
+	private void cameraEvent() {
 		if (chckbxCamera.isSelected()) {
 			if (lock1) {
 				tabbedPane.setEnabledAt(1, true);
@@ -6467,7 +6470,7 @@ class WeighBridge {
 	}
 
 	static class IpCam extends IpCamDriver {
-		IpCam () {
+		IpCam() {
 			try {
 				super.register(new IpCamDevice("No Camera Available", "http:", IpCamMode.PULL));
 			} catch (MalformedURLException ignored) {
@@ -6477,7 +6480,7 @@ class WeighBridge {
 
 	static class CompositeDriver extends WebcamCompositeDriver {
 
-		CompositeDriver () {
+		CompositeDriver() {
 			try {
 				add(new IpCamDriver(new IpCamStorage("cameras.xml")));
 
@@ -6493,7 +6496,7 @@ class WeighBridge {
 		final int x;
 		final int y;
 
-		Coordinates (int x, int y) {
+		Coordinates(int x, int y) {
 			super();
 			this.x = x;
 			this.y = y;
@@ -6503,13 +6506,13 @@ class WeighBridge {
 	static class DimensionTemplate extends Dimension {
 		private static final long serialVersionUID = 1L;
 
-		DimensionTemplate (Dimension d) {
+		DimensionTemplate(Dimension d) {
 			super(d);
 		}
 
 
 		@Override
-		public String toString () {
+		public String toString() {
 			return "  " + width + " * " + height;
 		}
 	}
@@ -6517,7 +6520,7 @@ class WeighBridge {
 	static class DivideByZeroException extends Exception {
 		private static final long serialVersionUID = 1L;
 
-		DivideByZeroException () {
+		DivideByZeroException() {
 			super();
 		}
 
@@ -6528,7 +6531,7 @@ class WeighBridge {
 
 
 		@Override
-		public Component getTableCellRendererComponent (JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			setForeground(Color.black);
 			setBackground(UIManager.getColor("Button.background"));
 			setText((value == null) ? "" : value.toString());
@@ -6551,7 +6554,7 @@ class WeighBridge {
 		double lastNumber;
 		String lastOperator;
 
-		Calculator () {
+		Calculator() {
 			setBackground(Color.gray);
 			JPanel jpMaster = new JPanel();
 			jlOutput = new JLabel("0");
@@ -6648,7 +6651,7 @@ class WeighBridge {
 			clearAll();
 
 			addWindowListener(new WindowAdapter() {
-				public void windowClosed (WindowEvent e) {
+				public void windowClosed(WindowEvent e) {
 					System.exit(0);
 				}
 			});
@@ -6656,7 +6659,7 @@ class WeighBridge {
 		}
 
 		@Override
-		public void actionPerformed (ActionEvent e) {
+		public void actionPerformed(ActionEvent e) {
 			double result;
 
 			for (int i = 0; i < jbButtons.length; i++) {
@@ -6773,15 +6776,15 @@ class WeighBridge {
 			}
 		}
 
-		String getDisplayString () {
+		String getDisplayString() {
 			return jlOutput.getText();
 		}
 
-		void setDisplayString (String s) {
+		void setDisplayString(String s) {
 			jlOutput.setText(s);
 		}
 
-		void addDigitToDisplay (int digit) {
+		void addDigitToDisplay(int digit) {
 			if (clearOnNextDigit) {
 				setDisplayString("");
 			}
@@ -6796,7 +6799,7 @@ class WeighBridge {
 			clearOnNextDigit = false;
 		}
 
-		void addDecimalPoint () {
+		void addDecimalPoint() {
 			displayMode = INPUT_MODE;
 			if (clearOnNextDigit) {
 				setDisplayString("");
@@ -6807,7 +6810,7 @@ class WeighBridge {
 			}
 		}
 
-		void processSignChange () {
+		void processSignChange() {
 			if (displayMode == INPUT_MODE) {
 				String input = getDisplayString();
 				if (input.length() > 0 && !input.equals("0")) {
@@ -6820,7 +6823,7 @@ class WeighBridge {
 			}
 		}
 
-		void clearAll () {
+		void clearAll() {
 			setDisplayString("0");
 			lastOperator = "0";
 			lastNumber = 0;
@@ -6828,18 +6831,18 @@ class WeighBridge {
 			clearOnNextDigit = true;
 		}
 
-		void clearExisting () {
+		void clearExisting() {
 			setDisplayString("0");
 			clearOnNextDigit = true;
 			displayMode = INPUT_MODE;
 		}
 
-		double getNumberInDisplay () {
+		double getNumberInDisplay() {
 			String input = jlOutput.getText();
 			return Double.parseDouble(input);
 		}
 
-		void processOperator (String op) {
+		void processOperator(String op) {
 			if (displayMode != ERROR_MODE) {
 				double numberInDisplay = getNumberInDisplay();
 				if (!lastOperator.equals("0")) {
@@ -6858,7 +6861,7 @@ class WeighBridge {
 			}
 		}
 
-		void processEquals () {
+		void processEquals() {
 			double result;
 			if (displayMode != ERROR_MODE) {
 				try {
@@ -6871,7 +6874,7 @@ class WeighBridge {
 			}
 		}
 
-		double processLastOperator () throws DivideByZeroException {
+		double processLastOperator() throws DivideByZeroException {
 			double result = 0;
 			double numberInDisplay = getNumberInDisplay();
 			if (lastOperator.equals("/")) {
@@ -6892,14 +6895,14 @@ class WeighBridge {
 			return result;
 		}
 
-		void displayResult (double result) {
+		void displayResult(double result) {
 			setDisplayString(Double.toString(result));
 			lastNumber = result;
 			displayMode = RESULT_MODE;
 			clearOnNextDigit = true;
 		}
 
-		void displayError (String errorMessage) {
+		void displayError(String errorMessage) {
 			setDisplayString(errorMessage);
 			lastNumber = 0;
 			displayMode = ERROR_MODE;
@@ -6912,12 +6915,12 @@ class WeighBridge {
 
 		private final Set<Integer> editableRow = new HashSet<>();
 
-		public TableReport (Object[][] objects, String[] strings) {
+		public TableReport(Object[][] objects, String[] strings) {
 			super(objects, strings);
 		}
 
 		@Override
-		public boolean isCellEditable (int row, int column) {
+		public boolean isCellEditable(int row, int column) {
 			switch (column) {
 				case 0:
 					return true;
@@ -6928,11 +6931,11 @@ class WeighBridge {
 			return this.editableRow.contains(row);
 		}
 
-		public void removeEditableRow (int row) {
+		public void removeEditableRow(int row) {
 			this.editableRow.remove(row);
 		}
 
-		public void addEditableRow (int row) {
+		public void addEditableRow(int row) {
 			this.editableRow.add(row);
 		}
 	}
@@ -6945,14 +6948,14 @@ class WeighBridge {
 		private boolean clicked;
 		private int row;
 
-		public TableRenderer (JCheckBox checkBox) {
+		public TableRenderer(JCheckBox checkBox) {
 			super(checkBox);
 			this.button.addActionListener(actionEvent -> fireEditingStopped());
 		}
 
 
 		@Override
-		public Component getTableCellEditorComponent (JTable table, Object value, boolean isSelected, int row, int column) {
+		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
 			this.row = row;
 
 			button.setForeground(Color.black);
@@ -6964,7 +6967,7 @@ class WeighBridge {
 		}
 
 		@Override
-		public Object getCellEditorValue () {
+		public Object getCellEditorValue() {
 			if (clicked) {
 				if (label.equals("Save")) {
 					Statement stmt;
@@ -6983,43 +6986,72 @@ class WeighBridge {
 							if (!("" + model.getValueAt(row, 3)).trim().equals("")) {
 								Date date = dateAndTimeFormatdate.parse("" + model.getValueAt(row, 3));
 								rs.updateDate("DCNODATE", new java.sql.Date(date.getTime()));
+							} else {
+								rs.updateDate("DCNODATE", null);
 							}
 
 							rs.updateString("CUSTOMERNAME", (String) model.getValueAt(row, 4));
 							rs.updateString("DRIVERNAME", (String) model.getValueAt(row, 5));
 							rs.updateString("VEHICLENO", (String) model.getValueAt(row, 6));
 							rs.updateString("MATERIAL", (String) model.getValueAt(row, 7));
-							rs.updateInt("NOOFBAGS", Integer.parseInt("" + model.getValueAt(row, 8)));
-							rs.updateInt("CHARGES", Integer.parseInt("" + model.getValueAt(row, 9)));
-							rs.updateInt("GROSSWT", Integer.parseInt("" + model.getValueAt(row, 10)));
+							rs.updateInt("NOOFBAGS", Integer.parseInt("0" + model.getValueAt(row, 8)));
+							rs.updateInt("CHARGES", Integer.parseInt("0" + model.getValueAt(row, 9)));
+							rs.updateInt("GROSSWT", Integer.parseInt("0" + model.getValueAt(row, 10)));
 
 							if (!("" + model.getValueAt(row, 11)).trim().equals("")) {
 								Date date = dateAndTimeFormat.parse("" + model.getValueAt(row, 11));
 								rs.updateDate("GROSSDATE", new java.sql.Date(date.getTime()));
 								rs.updateTime("GROSSTIME", new Time(date.getTime()));
+							} else {
+								rs.updateDate("GROSSDATE", null);
+								rs.updateTime("GROSSTIME", null);
 							}
 
-							rs.updateInt("TAREWT", Integer.parseInt("" + model.getValueAt(row, 12)));
+							rs.updateInt("TAREWT", Integer.parseInt("0" + model.getValueAt(row, 12)));
 
 							if (!("" + model.getValueAt(row, 13)).trim().equals("")) {
 								Date date = dateAndTimeFormat.parse("" + model.getValueAt(row, 13));
 								rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
 								rs.updateTime("TARETIME", new Time(date.getTime()));
+							} else {
+								rs.updateDate("TAREDATE", null);
+								rs.updateTime("TARETIME", null);
 							}
-							rs.updateInt("BAGDEDUCTION", Integer.parseInt("" + model.getValueAt(row, 14)));
-							rs.updateInt("NETWT", Integer.parseInt("" + model.getValueAt(row, 15)));
+
+							rs.updateInt("BAGDEDUCTION", Integer.parseInt("0" + model.getValueAt(row, 14)));
+							rs.updateInt("NETWT", Integer.parseInt("0" + model.getValueAt(row, 15)));
+
 							if (!("" + model.getValueAt(row, 16)).trim().equals("")) {
 								Date date = dateAndTimeFormat.parse("" + model.getValueAt(row, 16));
 								rs.updateDate("NETDATE", new java.sql.Date(date.getTime()));
 								rs.updateTime("NETTIME", new Time(date.getTime()));
 							}
+
 							rs.updateString("REMARKS", (String) model.getValueAt(row, 17));
 							rs.updateBoolean("MANUAL", true);
 							rs.updateRow();
+
+							model.setValueAt(rs.getInt("NOOFBAGS"), row, 8);
+							if (rs.getDate("DCNODATE") != null) {
+								model.setValueAt("" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")), row, 3);
+							} else {
+								model.setValueAt("", row, 3);
+							}
+							model.setValueAt(rs.getInt("CHARGES"), row, 9);
+							model.setValueAt(rs.getInt("GROSSWT"), row, 10);
+							model.setValueAt(rs.getInt("TAREWT"), row, 12);
+							model.setValueAt(rs.getInt("BAGDEDUCTION"), row, 14);
+							model.setValueAt(rs.getInt("NETWT"), row, 15);
+							model.setValueAt(rs.getBoolean("MANUAL"), row, 18);
+							model.setValueAt(dateAndTimeFormatdate.format(rs.getDate("NETDATE")) + " "
+									+ timeFormat.format(rs.getTime("NETTIME")), row, 16);
+
 							label = "Edit";
 							((TableReport) tableReport.getModel()).removeEditableRow(row);
 						}
-					} catch (SQLException | ParseException ignored) {
+					} catch (SQLException | ParseException | NumberFormatException | NullPointerException ignored) {
+						JOptionPane.showMessageDialog(null, "DATA ERROR\nCHECK THE VALUES ENTERED\nLINE :7037", "DATA ERROR",
+								JOptionPane.ERROR_MESSAGE);
 					}
 				} else {
 					label = "Save";
@@ -7031,7 +7063,7 @@ class WeighBridge {
 		}
 
 		@Override
-		public boolean stopCellEditing () {
+		public boolean stopCellEditing() {
 			clicked = false;
 			return super.stopCellEditing();
 		}
