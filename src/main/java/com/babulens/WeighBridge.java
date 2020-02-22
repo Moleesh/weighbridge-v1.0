@@ -422,7 +422,6 @@ class WeighBridge {
 			rs.updateTimestamp("ENDDATE",
 					new Timestamp(new Date().getTime() + 10 * (long) 8.64e+7));
 			rs.updateRow();
-//endDate = rs.getDate("ENDDATE");
 			JOptionPane.showMessageDialog(null,
 					"Trial Reset Successfull\n you got 10 days\n Plz Open again", "Reset",
 					JOptionPane.INFORMATION_MESSAGE);
@@ -647,7 +646,7 @@ class WeighBridge {
 				model.addRow(new Object[]{
 						rs.getString("VEHICLENO"), rs.getInt("TAREWT"),
 						dateAndTimeFormat.format(new Date(dateAndTimeFormatSql
-								.parse(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME")).getTime()))
+								                                  .parse(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME")).getTime()))
 				});
 			rs = stmt.executeQuery("SELECT * FROM MATERIALS ORDER BY KEY");
 			model = (DefaultTableModel) tableMaterial.getModel();
@@ -755,9 +754,6 @@ class WeighBridge {
 		}
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
 		chckbxSelectSlNo.setSelected(true);
 		chckbxSelectCustomerName.setSelected(true);
@@ -774,7 +770,10 @@ class WeighBridge {
 		babulensWeighbridgeDesigned.setBounds(new Rectangle(100, 100, 1280, 768));
 		babulensWeighbridgeDesigned.setExtendedState(Frame.MAXIMIZED_BOTH);
 		babulensWeighbridgeDesigned.setUndecorated(true);
-		babulensWeighbridgeDesigned.setIconImage(Toolkit.getDefaultToolkit().getImage("resources/logo.bmp"));
+		try {
+			babulensWeighbridgeDesigned.setIconImage(ImageIO.read(getClass().getResource("/logo.bmp")));
+		} catch (IOException ignored) {
+		}
 		babulensWeighbridgeDesigned.setTitle("BABULENS WEIGHBRIDGE designed by \"BABULENS ENTERPRISES\"");
 		babulensWeighbridgeDesigned.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		babulensWeighbridgeDesigned.getContentPane().setLayout(null);
@@ -898,7 +897,6 @@ class WeighBridge {
 		rdbtnTare = new JRadioButton("Tare");
 		rdbtnTare.setBackground(new Color(0, 255, 127));
 		rdbtnTare.addActionListener(e -> {
-// comboBoxMaterial.setEnabled(false);
 			comboBoxMaterial.getModel().setSelectedItem("EMPTY");
 			if (chckbxExcludeCustomer.isSelected())
 				if (chckbxExcludeDrivers.isSelected())
@@ -949,7 +947,7 @@ class WeighBridge {
 						Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 								ResultSet.CONCUR_UPDATABLE);
 						ResultSet rs = stmt.executeQuery("SELECT MATERIALS FROM MATERIALS where KEY =" +
-								Integer.parseInt(comboBoxMaterial.getEditor().getItem().toString()));
+								                                 Integer.parseInt(comboBoxMaterial.getEditor().getItem().toString()));
 						if (rs.next())
 							comboBoxMaterial.setSelectedItem(rs.getString("MATERIALS"));
 					} catch (SQLException | NumberFormatException ignored) {
@@ -982,7 +980,7 @@ class WeighBridge {
 						Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 								ResultSet.CONCUR_UPDATABLE);
 						ResultSet rs = stmt.executeQuery("SELECT * FROM VEHICLETARES WHERE VEHICLENO LIKE '" +
-								textFieldVehicleNo.getText() + "'");
+								                                 textFieldVehicleNo.getText() + "'");
 						if (rs.next()) {
 							int response = JOptionPane.showConfirmDialog(null,
 									"Please Select Yes to Enter the Stored tare Weight ?", "Tare Weight Available",
@@ -995,7 +993,7 @@ class WeighBridge {
 								else
 									textFieldTareDateTime
 											.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql
-													.parse(textFieldTareDateTime.getText()).getTime())));
+													                                           .parse(textFieldTareDateTime.getText()).getTime())));
 								textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
 							}
 						}
@@ -1008,7 +1006,7 @@ class WeighBridge {
 						Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 								ResultSet.CONCUR_UPDATABLE);
 						ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE VEHICLENO LIKE '" +
-								textFieldVehicleNo.getText() + "'");
+								                                 textFieldVehicleNo.getText() + "'");
 						if (rs.last())
 							if (rs.getInt("TAREWT") == 0) {
 								int response = JOptionPane.showConfirmDialog(null,
@@ -1025,7 +1023,7 @@ class WeighBridge {
 									else
 										textFieldGrossDateTime
 												.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql
-														.parse(textFieldGrossDateTime.getText()).getTime())));
+														                                           .parse(textFieldGrossDateTime.getText()).getTime())));
 									textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
 									comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
 								}
@@ -1041,7 +1039,7 @@ class WeighBridge {
 						Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 								ResultSet.CONCUR_UPDATABLE);
 						ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE VEHICLENO LIKE '" +
-								textFieldVehicleNo.getText() + "'");
+								                                 textFieldVehicleNo.getText() + "'");
 						if (rs.last())
 							if (rs.getInt("TAREWT") == 0) {
 								int response = JOptionPane.showConfirmDialog(null,
@@ -1059,7 +1057,7 @@ class WeighBridge {
 									else
 										textFieldGrossDateTime
 												.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql
-														.parse(textFieldGrossDateTime.getText()).getTime())));
+														                                           .parse(textFieldGrossDateTime.getText()).getTime())));
 									textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
 									comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
 								}
@@ -1074,7 +1072,7 @@ class WeighBridge {
 						Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 								ResultSet.CONCUR_UPDATABLE);
 						ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE VEHICLENO LIKE '" +
-								textFieldVehicleNo.getText() + "'");
+								                                 textFieldVehicleNo.getText() + "'");
 						if (rs.last())
 							if (rs.getInt("GROSSWT") == 0) {
 								int response = JOptionPane.showConfirmDialog(null,
@@ -1090,7 +1088,7 @@ class WeighBridge {
 									else
 										textFieldTareDateTime
 												.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql
-														.parse(textFieldTareDateTime.getText()).getTime())));
+														                                           .parse(textFieldTareDateTime.getText()).getTime())));
 									textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
 
 								}
@@ -1311,16 +1309,16 @@ class WeighBridge {
 			textFieldBagDeduction.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.0-9]", "")))));
 
 			if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText()) > 0 &&
-					!textFieldTareWt.getText().equals("0")) {
+					    !textFieldTareWt.getText().equals("0")) {
 				textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) -
-						Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText())));
+						                                        Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText())));
 			}
 			if (chckbxAutoCharges.isSelected() || chckbxChargecheck.isSelected()) {
 				try {
 					Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 							ResultSet.CONCUR_UPDATABLE);
 					ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIALS ='" +
-							comboBoxMaterial.getEditor().getItem() + "'");
+							                                 comboBoxMaterial.getEditor().getItem() + "'");
 					if (rs.next())
 						textFieldCharges.setText(
 								"" + (int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText())));
@@ -1384,8 +1382,8 @@ class WeighBridge {
 						JOptionPane.ERROR_MESSAGE);
 			}
 			if (!(response == null || ("".equals(response)) ||
-					Integer.parseInt(response.replaceAll("[^0-9]", "")) >= serialNo ||
-					Integer.parseInt(response.replaceAll("[^0-9]", "")) <= 0)) {
+					      Integer.parseInt(response.replaceAll("[^0-9]", "")) >= serialNo ||
+					      Integer.parseInt(response.replaceAll("[^0-9]", "")) <= 0)) {
 				try {
 					Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 							ResultSet.CONCUR_UPDATABLE);
@@ -1393,7 +1391,7 @@ class WeighBridge {
 					rs.next();
 					textFieldDcNo.setText(rs.getString("DCNO"));
 					textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" :
-							"" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+							                        "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
 					comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
 					textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
 					textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
@@ -1402,8 +1400,8 @@ class WeighBridge {
 					textFieldTareWt.setText(Integer.toString(
 							rs.getInt(Objects.requireNonNull(comboBoxa.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
 					textFieldTareDateTime.setText(rs
-							.getDate(comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") +
-							" " + rs.getTime(
+							                              .getDate(comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") +
+							                              " " + rs.getTime(
 							comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "TIME"));
 					if (textFieldTareDateTime.getText().equals("null null"))
 						textFieldTareDateTime.setText("");
@@ -1467,7 +1465,7 @@ class WeighBridge {
 						JOptionPane.ERROR_MESSAGE);
 			}
 			if (!(response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo ||
-					Integer.parseInt(response) <= 0)) {
+					      Integer.parseInt(response) <= 0)) {
 				try {
 					Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 							ResultSet.CONCUR_UPDATABLE);
@@ -1475,7 +1473,7 @@ class WeighBridge {
 					rs.next();
 					textFieldDcNo.setText(rs.getString("DCNO"));
 					textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" :
-							"" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+							                        "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
 					comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
 					textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
 					textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
@@ -1484,8 +1482,8 @@ class WeighBridge {
 					textFieldGrossWt.setText(Integer.toString(
 							rs.getInt(Objects.requireNonNull(comboBoxa.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
 					textFieldGrossDateTime.setText(rs
-							.getDate(comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") +
-							" " + rs.getTime(
+							                               .getDate(comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") +
+							                               " " + rs.getTime(
 							comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "TIME"));
 					if (textFieldGrossDateTime.getText().equals("null null"))
 						textFieldGrossDateTime.setText("");
@@ -1541,10 +1539,10 @@ class WeighBridge {
 										clickedImage
 												.getScaledInstance(
 														(int) (((double) 240 /
-																((Dimension) Objects.requireNonNull(comboBoxResolution1
-																		.getSelectedItem())).height *
-																((Dimension) comboBoxResolution1
-																		.getSelectedItem()).width)),
+																        ((Dimension) Objects.requireNonNull(comboBoxResolution1
+																		                                            .getSelectedItem())).height *
+																        ((Dimension) comboBoxResolution1
+																		                     .getSelectedItem()).width)),
 														240, Image.SCALE_SMOOTH)));
 						labelCamera1.setBounds(10, 11,
 								(int) ((double) 240 / labelCamera1.getHeight() * labelCamera1.getWidth()), 240);
@@ -1572,15 +1570,15 @@ class WeighBridge {
 										clickedImage
 												.getScaledInstance(
 														(int) (((double) 240 /
-																((Dimension) Objects.requireNonNull(comboBoxResolution2
-																		.getSelectedItem())).height *
-																((Dimension) comboBoxResolution2
-																		.getSelectedItem()).width)),
+																        ((Dimension) Objects.requireNonNull(comboBoxResolution2
+																		                                            .getSelectedItem())).height *
+																        ((Dimension) comboBoxResolution2
+																		                     .getSelectedItem()).width)),
 														240, Image.SCALE_SMOOTH)));
 						panelCameras.add(labelCamera2);
 						labelCamera2.setBounds(10, 11,
 								(int) (((double) 240 / ((Dimension) comboBoxResolution2.getSelectedItem()).height *
-										((Dimension) comboBoxResolution2.getSelectedItem()).width)),
+										        ((Dimension) comboBoxResolution2.getSelectedItem()).width)),
 								240);
 					} catch (NullPointerException ignored) {
 					}
@@ -1605,15 +1603,15 @@ class WeighBridge {
 										clickedImage
 												.getScaledInstance(
 														(int) (((double) 240 /
-																((Dimension) Objects.requireNonNull(comboBoxResolution3
-																		.getSelectedItem())).height *
-																((Dimension) comboBoxResolution3
-																		.getSelectedItem()).width)),
+																        ((Dimension) Objects.requireNonNull(comboBoxResolution3
+																		                                            .getSelectedItem())).height *
+																        ((Dimension) comboBoxResolution3
+																		                     .getSelectedItem()).width)),
 														240, Image.SCALE_SMOOTH)));
 						panelCameras.add(labelCamera3);
 						labelCamera3.setBounds(10, 11,
 								(int) (((double) 240 / ((Dimension) comboBoxResolution3.getSelectedItem()).height *
-										((Dimension) comboBoxResolution3.getSelectedItem()).width)),
+										        ((Dimension) comboBoxResolution3.getSelectedItem()).width)),
 								240);
 					} catch (NullPointerException ignored) {
 					}
@@ -1638,15 +1636,15 @@ class WeighBridge {
 										clickedImage
 												.getScaledInstance(
 														(int) (((double) 240 /
-																((Dimension) Objects.requireNonNull(comboBoxResolution4
-																		.getSelectedItem())).height *
-																((Dimension) comboBoxResolution4
-																		.getSelectedItem()).width)),
+																        ((Dimension) Objects.requireNonNull(comboBoxResolution4
+																		                                            .getSelectedItem())).height *
+																        ((Dimension) comboBoxResolution4
+																		                     .getSelectedItem()).width)),
 														240, Image.SCALE_SMOOTH)));
 						panelCameras.add(labelCamera4);
 						labelCamera4.setBounds(10, 11,
 								(int) (((double) 240 / ((Dimension) comboBoxResolution4.getSelectedItem()).height *
-										((Dimension) comboBoxResolution4.getSelectedItem()).width)),
+										        ((Dimension) comboBoxResolution4.getSelectedItem()).width)),
 								240);
 					} catch (NullPointerException ignored) {
 					}
@@ -1663,16 +1661,16 @@ class WeighBridge {
 			textFieldBagDeduction.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.0-9]", "")))));
 
 			if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText()) > 0 &&
-					!textFieldTareWt.getText().equals("0")) {
+					    !textFieldTareWt.getText().equals("0")) {
 				textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) -
-						Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText())));
+						                                        Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText())));
 			}
 			if (chckbxAutoCharges.isSelected() || chckbxChargecheck.isSelected()) {
 				try {
 					Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 							ResultSet.CONCUR_UPDATABLE);
 					ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIALS ='" +
-							comboBoxMaterial.getEditor().getItem() + "'");
+							                                 comboBoxMaterial.getEditor().getItem() + "'");
 					if (rs.next())
 						textFieldCharges.setText(
 								"" + (int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText())));
@@ -1758,7 +1756,7 @@ class WeighBridge {
 				ResultSet rs;
 				boolean update = false;
 				if (chckbxTareNoSlno.isSelected()) {
-					rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO=" + textFieldSlNo.getText());
+					rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + textFieldSlNo.getText());
 					if (rs.next()) {
 						rs.absolute(1);
 						update = true;
@@ -1823,7 +1821,7 @@ class WeighBridge {
 					stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 							ResultSet.CONCUR_UPDATABLE);
 					rs = stmt.executeQuery("SELECT * FROM VEHICLETARES WHERE VEHICLENO LIKE '" +
-							textFieldVehicleNo.getText() + "'");
+							                       textFieldVehicleNo.getText() + "'");
 					if (rs.next()) {
 						rs.updateInt("TAREWT", Integer.parseInt(0 + textFieldTareWt.getText()));
 						Date date = dateAndTimeFormat.parse(textFieldTareDateTime.getText());
@@ -1850,6 +1848,7 @@ class WeighBridge {
 			} catch (NumberFormatException ex) {
 				JOptionPane.showMessageDialog(null, "WEIGHT ERROR\nWeight is incorrect or negative\nLINE :1851", "WEIGHT ERROR",
 						JOptionPane.ERROR_MESSAGE);
+				return;
 			} catch (SQLException | ParseException ex) {
 				JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1854", "SQL ERROR",
 						JOptionPane.ERROR_MESSAGE);
@@ -1888,6 +1887,9 @@ class WeighBridge {
 							break;
 						} else if (Objects.requireNonNull(comboBoxPrintOptionForWeight.getSelectedItem()).equals("Pre Print 2")) {
 							printPreWeight2();
+							break;
+						} else if (Objects.requireNonNull(comboBoxPrintOptionForWeight.getSelectedItem()).equals("Pre Print 3")) {
+							printPreWeight3();
 							break;
 						} else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Camera"))
 							printCameraWeight();
@@ -1938,9 +1940,12 @@ class WeighBridge {
 		btnClear.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		btnClear.setBounds(445, 565, 150, 25);
 		panelWeighing.add(btnClear);
-		JLabel contact = new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().getImage("resources/contact.bmp")));
-		contact.setBounds(945, 505, 300, 100);
-		panelWeighing.add(contact);
+		try {
+			JLabel contact = new JLabel(new ImageIcon(ImageIO.read(getClass().getResource("/contact.bmp"))));
+			contact.setBounds(945, 505, 300, 100);
+			panelWeighing.add(contact);
+		} catch (IOException ignored) {
+		}
 
 		JLabel lblKg = new JLabel("Kg");
 		lblKg.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -1963,8 +1968,6 @@ class WeighBridge {
 		panelWeighing.add(lblCustmerName);
 
 		textFieldDriverName = new JComboBox<>();
-// AutoCompleteDecorator.decorate(textFieldDriverName);// For Auto
-// completion
 		textFieldDriverName.addActionListener(e -> textFieldVehicleNo.requestFocus());
 		textFieldDriverName.setFont(new Font("Times New Roman", Font.PLAIN, 18));
 		textFieldDriverName.setEditable(true);
@@ -2072,7 +2075,6 @@ class WeighBridge {
 										"0" + textFieldCropHeight11.getText().replaceAll("[^0-9]", "")));
 						JLabel jLabel = new JLabel(
 								new ImageIcon(cropImage.getScaledInstance(1280, 768, Image.SCALE_DEFAULT))); // 1280,
-// 768
 						jLabel.addMouseListener(new MouseAdapter() {
 							@Override
 							public void mouseClicked(MouseEvent e12) {
@@ -2157,7 +2159,7 @@ class WeighBridge {
 			if (result == 0)
 				rdbtnGross.setSelected(true);
 			else if (!(response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo ||
-					Integer.parseInt(response) <= 0 || result != 1)) {
+					           Integer.parseInt(response) <= 0 || result != 1)) {
 				try {
 					Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 							ResultSet.CONCUR_UPDATABLE);
@@ -2165,7 +2167,7 @@ class WeighBridge {
 					rs.next();
 					textFieldDcNo.setText(rs.getString("DCNO"));
 					textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" :
-							"" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+							                        "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
 					comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
 					textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
 					textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
@@ -2241,7 +2243,7 @@ class WeighBridge {
 			if (result == 0)
 				rdbtnTare.setSelected(true);
 			else if (!(response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo ||
-					Integer.parseInt(response) <= 0 || result != 1)) {
+					           Integer.parseInt(response) <= 0 || result != 1)) {
 				try {
 					Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 							ResultSet.CONCUR_UPDATABLE);
@@ -2249,7 +2251,7 @@ class WeighBridge {
 					rs.next();
 					textFieldDcNo.setText(rs.getString("DCNO"));
 					textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" :
-							"" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+							                        "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
 					comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
 					textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
 					textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
@@ -2303,7 +2305,7 @@ class WeighBridge {
 				Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 						ResultSet.CONCUR_UPDATABLE);
 				ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIALS ='" +
-						comboBoxMaterial.getEditor().getItem() + "'");
+						                                 comboBoxMaterial.getEditor().getItem() + "'");
 				if (rs.next())
 					textFieldCharges.setText(
 							"" + (int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText())));
@@ -3611,9 +3613,6 @@ class WeighBridge {
 						"Tare Wt",
 						"Tare Date & Time "
 				}) {
-			/**
-			 *
-			 */
 			private static final long serialVersionUID = 1L;
 			final Class<?>[] columnTypes = new Class[]{
 					Object.class, Integer.class, Object.class
@@ -3920,8 +3919,8 @@ class WeighBridge {
 						Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 								ResultSet.CONCUR_UPDATABLE);
 						PreparedStatement stmts = dbConnection.prepareStatement("CREATE TABLE WEIGHING_" +
-								textFieldDateTime.getText().replace(" ", "_").replace("-", "_")
-										.replace(":", "_") + " AS SELECT * FROM WEIGHING");
+								                                                        textFieldDateTime.getText().replace(" ", "_").replace("-", "_")
+										                                                        .replace(":", "_") + " AS SELECT * FROM WEIGHING");
 						stmts.executeUpdate();
 						stmts = dbConnection.prepareStatement("DELETE FROM WEIGHING");
 						stmts.executeUpdate();
@@ -4072,6 +4071,7 @@ class WeighBridge {
 		comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{
 				"Pre Print",
 				"Pre Print 2",
+				"Pre Print 3",
 				"Plain Paper",
 				"Camera",
 				"Plain Camera",
@@ -4531,7 +4531,7 @@ class WeighBridge {
 					dateTemp12 = datePicker2.getDate();
 					date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
 					temp = "SELECT * FROM WEIGHING WHERE upper(VEHICLENO) LIKE UPPER('%" + vehicleNo +
-							"%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+							       "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
 					break;
 				case "Materialwise Report":
 					dateTemp12 = datePicker1.getDate();
@@ -4542,7 +4542,7 @@ class WeighBridge {
 					if (material == null)
 						material = "";
 					temp = "SELECT * FROM WEIGHING WHERE upper(MATERIAL) LIKE UPPER('%" + material +
-							"%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+							       "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
 					break;
 				case "Customerwise Report":
 					dateTemp12 = datePicker1.getDate();
@@ -4556,7 +4556,7 @@ class WeighBridge {
 					else
 						material = "AND MATERIAL LIKE '" + material + "'";
 					temp = "SELECT * FROM WEIGHING WHERE upper(CUSTOMERNAME) LIKE UPPER('%" + vehicleNo +
-							"%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'" + material;
+							       "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'" + material;
 					break;
 				case "Transporterwise Report":
 					dateTemp12 = datePicker1.getDate();
@@ -4565,7 +4565,7 @@ class WeighBridge {
 					date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
 					vehicleNo = textFieldDetail.getText();
 					temp = "SELECT * FROM WEIGHING WHERE upper(DRIVERNAME) LIKE UPPER('%" + vehicleNo +
-							"%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+							       "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
 					break;
 			}
 			try {
@@ -4714,11 +4714,10 @@ class WeighBridge {
 			Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 			ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + response);
 			if (rs.next()) {
-// rs.absolute(Integer.parseInt(response));
 				textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
 				textFieldDcNo.setText(rs.getString("DCNO"));
 				textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" :
-						"" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+						                        "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
 				comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
 				textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
 				textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
@@ -4731,14 +4730,14 @@ class WeighBridge {
 					textFieldGrossDateTime.setText("");
 				else
 					textFieldGrossDateTime.setText(dateAndTimeFormat
-							.format(new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
+							                               .format(new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
 				textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
 				textFieldTareDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
 				if (textFieldTareDateTime.getText().equals("null null"))
 					textFieldTareDateTime.setText("");
 				else
 					textFieldTareDateTime.setText(dateAndTimeFormat
-							.format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
+							                              .format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
 				textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
 				textFieldNetWt.setText(Integer.toString(rs.getInt("NETWT")));
 				textFieldNetDateTime.setText(rs.getDate("NETDATE") + " " + rs.getTime("NETTIME"));
@@ -4746,7 +4745,7 @@ class WeighBridge {
 					textFieldNetDateTime.setText("");
 				else
 					textFieldNetDateTime.setText(dateAndTimeFormat
-							.format(new Date(dateAndTimeFormatSql.parse(textFieldNetDateTime.getText()).getTime())));
+							                             .format(new Date(dateAndTimeFormatSql.parse(textFieldNetDateTime.getText()).getTime())));
 				textPaneRemarks.setText(rs.getString("REMARKS"));
 			} else {
 				JOptionPane.showMessageDialog(null, "SQL ERROR\nRECORD NOT FOUND\nLINE :1085", "SQL ERROR",
@@ -4865,22 +4864,10 @@ class WeighBridge {
 				textFieldDriverName.requestFocus();
 		else
 			comboBoxCustomerName.requestFocus();
-		if (!chckbxExcludeCustomer.isSelected())
-			comboBoxCustomerName.setEnabled(true);
-		else
-			comboBoxCustomerName.setEnabled(false);
-		if (!chckbxExcludeDrivers.isSelected())
-			textFieldDriverName.setEnabled(true);
-		else
-			textFieldDriverName.setEnabled(false);
-		if (!chckbxExcludeCharges.isSelected())
-			textFieldCharges.setEnabled(true);
-		else
-			textFieldCharges.setEnabled(false);
-		if (!chckbxExcludeRemarks.isSelected())
-			textPaneRemarks.setEnabled(true);
-		else
-			textPaneRemarks.setEnabled(false);
+		comboBoxCustomerName.setEnabled(!chckbxExcludeCustomer.isSelected());
+		textFieldDriverName.setEnabled(!chckbxExcludeDrivers.isSelected());
+		textFieldCharges.setEnabled(!chckbxExcludeCharges.isSelected());
+		textPaneRemarks.setEnabled(!chckbxExcludeRemarks.isSelected());
 
 		if (chckbxCharges.isSelected())
 			chckbxChargecheck.setEnabled(true);
@@ -4932,14 +4919,11 @@ class WeighBridge {
 		String format3 = "     %1$-9s: %2$s";
 		String dc = "";
 		String driver = "";
-//noinspection StatementWithEmptyBody
-		if (textFieldDcNo.getText().trim().equals("") || textFieldDcDate.getText().trim().equals(""))
-			;
-		else {
+		if (!(textFieldDcNo.getText().trim().equals("") && textFieldDcDate.getText().trim().equals(""))) {
 			dc = String.format(format, "Dc. No", textFieldDcNo.getText(), "Dc. Date", textFieldDcDate.getText());
 		}
 		if (chckbxExcludeDrivers.isSelected() ||
-				!textFieldDriverName.getEditor().getItem().toString().trim().equals("")) {
+				    !textFieldDriverName.getEditor().getItem().toString().trim().equals("")) {
 			driver = String.format(format2, "Transpoter's Name", textFieldDriverName.getEditor().getItem());
 		}
 		String[] initString = {
@@ -5120,6 +5104,115 @@ class WeighBridge {
 		StyleConstants.setFontSize(s, 14);
 	}
 
+	private void printPreWeight3() {
+		JTextPane textPane = createTextPane8();
+		textPane.setBackground(Color.white);
+		PrinterJob pj = PrinterJob.getPrinterJob();
+		PageFormat pf = new PageFormat();
+		Paper paper = pf.getPaper();
+		double width = 8d * 72d;
+		double height = 6d * 72d;
+		double widthmargin = 0d * 72d;
+		double heightmargin = 1.25d * 72d;
+		paper.setSize(width, height);
+		paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+		pf.setPaper(paper);
+		Book pBook = new Book();
+		pBook.append(textPane.getPrintable(null, null), pf);
+		pj.setPageable(pBook);
+		try {
+			pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+			pj.print();
+		} catch (PrinterException ignored) {
+		}
+
+	}
+
+	private JTextPane createTextPane8() {
+		String format = "%1$-6s%2$-30s%3$-30s%4$-12s";
+		String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
+		String[] initString = {
+				String.format(format, "", textFieldSlNo.getText(), textFieldSlNo.getText(), textFieldSlNo.getText()),
+				"\n\n",
+				String.format(format, "", temp[0], temp[0], temp[0]),
+				"\n\n",
+				String.format(format, "", temp[1] + " " + temp[2], temp[1] + " " + temp[2], temp[1] + " " + temp[2]),
+				"\n\n",
+				String.format(format, "", textFieldVehicleNo.getText(), textFieldVehicleNo.getText(),
+						textFieldVehicleNo.getText()),
+				"\n\n",
+				String.format(format, "", comboBoxMaterial.getEditor().getItem(),
+						comboBoxMaterial.getEditor().getItem(), comboBoxMaterial.getEditor().getItem()),
+				"\n\n",
+				String.format(format, "", comboBoxCustomerName.getEditor().getItem(),
+						comboBoxCustomerName.getEditor().getItem(), comboBoxCustomerName.getEditor().getItem()),
+				"\n\n",
+				String.format(
+						format, "", (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
+				"\n\n",
+				String.format(format, "", textFieldGrossWt.getText() + " Kg", textFieldGrossWt.getText() + " Kg",
+						textFieldGrossWt.getText() + " Kg"),
+				"\n\n",
+				String.format(format, "", textFieldTareWt.getText() + " Kg", textFieldTareWt.getText() + " Kg",
+						textFieldTareWt.getText() + " Kg"),
+				"\n\n",
+				String.format(format, "", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg",
+						textFieldNetWt.getText() + " Kg")
+		};
+
+		String[] initStyles = {
+				"1",
+				"2",
+				"1",
+				"2",
+				"1",
+				"2",
+				"1",
+				"2",
+				"1",
+				"2",
+				"1",
+				"2",
+				"1",
+				"2",
+				"1",
+				"3",
+				"1",
+				"3",
+				"1",
+
+		};
+		JTextPane textPane = new JTextPane();
+		StyledDocument doc = textPane.getStyledDocument();
+		addStylesToDocument8(doc);
+
+		try {
+			for (int i = 0; i < initString.length; i++) {
+				doc.insertString(doc.getLength(), initString[i], doc.getStyle(initStyles[i]));
+			}
+		} catch (BadLocationException ignored) {
+		}
+		return textPane;
+	}
+
+	private void addStylesToDocument8(StyledDocument doc) {
+		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+
+		Style regular = doc.addStyle("regular", def);
+		StyleConstants.setFontFamily(def, "Courier New");
+
+		Style s = doc.addStyle("1", regular);
+		StyleConstants.setBold(s, true);
+		StyleConstants.setFontSize(s, 12);
+
+		s = doc.addStyle("2", regular);
+		StyleConstants.setFontSize(s, 8);
+
+		s = doc.addStyle("3", regular);
+		StyleConstants.setBold(s, true);
+		StyleConstants.setFontSize(s, 8);
+	}
+
 	private void printPreWeight2() {
 		JTextPane textPane = createTextPane7();
 		textPane.setBackground(Color.white);
@@ -5143,7 +5236,6 @@ class WeighBridge {
 		}
 
 	}
-
 
 	private JTextPane createTextPane7() {
 		String format = "%1$-6s%2$-30s%3$-30s%4$-12s";
@@ -5265,11 +5357,11 @@ class WeighBridge {
 				coordinates = drawString(graphics, initString, 0, coordinates.y);
 
 				initString = String.format(format, "", "") + textFieldSlNo.getText() + "\n\n" +
-						String.format(format, "", "") + temp[0] + "\n\n" + String.format(format, "", "") + temp[1] +
-						"\n\n" + String.format(format, "", "") + textFieldVehicleNo.getText() + "\n\n" +
-						String.format(format, "", "") + comboBoxMaterial.getEditor().getItem() + "\n\n" +
-						String.format(format, "", "") + comboBoxCustomerName.getEditor().getItem() + "\n\n" +
-						String.format(format, "", "") + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()) + "\n\n";
+						             String.format(format, "", "") + temp[0] + "\n\n" + String.format(format, "", "") + temp[1] +
+						             "\n\n" + String.format(format, "", "") + textFieldVehicleNo.getText() + "\n\n" +
+						             String.format(format, "", "") + comboBoxMaterial.getEditor().getItem() + "\n\n" +
+						             String.format(format, "", "") + comboBoxCustomerName.getEditor().getItem() + "\n\n" +
+						             String.format(format, "", "") + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()) + "\n\n";
 				graphics.setFont(new Font("Courier New", Font.BOLD, 10));
 				coordinates = drawString(graphics, initString, 0, coordinates.y);
 
@@ -5304,7 +5396,7 @@ class WeighBridge {
 
 				try {
 					BufferedImage printImage = ImageIO
-							.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
+							                           .read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
 					BufferedImage cropImage = printImage.getSubimage(
 							Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("[^0-9]", "")),
 							Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("[^0-9]", "")),
@@ -5367,12 +5459,12 @@ class WeighBridge {
 				coordinates = drawString(graphics, initString, 0, coordinates.y);
 
 				initString = String.format(format, "", "Sl.No") + textFieldSlNo.getText() + "\n\n" +
-						String.format(format, "", "Date") + temp[0] + "\n\n" + String.format(format, "", "Time") +
-						temp[1] + " " + temp[2] + "\n\n" + String.format(format, "", "Vehicle No") + textFieldVehicleNo.getText() +
-						"\n\n" + String.format(format, "", "Material") + comboBoxMaterial.getEditor().getItem() +
-						"\n\n" + String.format(format, "", "Customer Name") +
-						comboBoxCustomerName.getEditor().getItem() + "\n\n" + String.format(format, "", "Charges") +
-						"Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()) + "\n\n";
+						             String.format(format, "", "Date") + temp[0] + "\n\n" + String.format(format, "", "Time") +
+						             temp[1] + " " + temp[2] + "\n\n" + String.format(format, "", "Vehicle No") + textFieldVehicleNo.getText() +
+						             "\n\n" + String.format(format, "", "Material") + comboBoxMaterial.getEditor().getItem() +
+						             "\n\n" + String.format(format, "", "Customer Name") +
+						             comboBoxCustomerName.getEditor().getItem() + "\n\n" + String.format(format, "", "Charges") +
+						             "Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()) + "\n\n";
 				graphics.setFont(new Font("Courier New", Font.BOLD, 10));
 				coordinates = drawString(graphics, initString, 0, coordinates.y);
 
@@ -5406,13 +5498,13 @@ class WeighBridge {
 				coordinates = drawString(graphics, initString, coordinates.x, yTemp);
 
 				initString = "\n\n\n" + "     " + StringUtils.rightPad(textFieldFooter.getText(), 70, " ") +
-						"Signature";
+						             "Signature";
 				graphics.setFont(new Font("Courier New", Font.BOLD + Font.ITALIC, 10));
 				drawString(graphics, initString, 0, coordinates.y);
 
 				try {
 					BufferedImage printImage = ImageIO
-							.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
+							                           .read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
 					BufferedImage cropImage = printImage.getSubimage(
 							Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("[^0-9]", "")),
 							Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("[^0-9]", "")),
@@ -5464,7 +5556,7 @@ class WeighBridge {
 				String[] temp2 = new String[2];
 				try {
 					temp1 = dateAndTimeFormatPrint.format(dateAndTimeFormat.parse(textFieldGrossDateTime.getText()))
-							.split(" ");
+							        .split(" ");
 
 				} catch (ParseException pe) {
 					temp1[0] = "";
@@ -5472,7 +5564,7 @@ class WeighBridge {
 				}
 				try {
 					temp2 = dateAndTimeFormatPrint.format(dateAndTimeFormat.parse(textFieldTareDateTime.getText()))
-							.split(" ");
+							        .split(" ");
 
 				} catch (ParseException pe) {
 					temp2[0] = "";
@@ -5480,42 +5572,42 @@ class WeighBridge {
 				}
 
 				String initString = "\n\n\n\n\n\n\n\n\n\n" +
-						String.format("%85s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n" +
-						StringUtils.center(textFieldLine1.getText(), 82) + "\n" +
-						StringUtils.center(textFieldLine2.getText(), 82) + "\n" +
-						StringUtils.center(textFieldLine3.getText(), 82) + "\n\n" + "           Name of Contractor : " +
-						textFieldNameOfContractor.getText() + "\n\n" +
-						String.format(format1, "Department Name", textFieldDepartmentName.getText(), "Vehicle No",
-								textFieldVehicleNo.getText()) +
-						"\n" +
-						String.format(format1, "Site At", textFieldSiteAt.getText(), "Product",
-								comboBoxMaterial.getEditor().getItem()) +
-						"\n" +
-						String.format(
-								format2, "Gross Wt.", textFieldGrossWt.getText(), "Date", temp1[0], "Time", temp1[1]) +
-						"\n" +
-						String.format(format2, "Tare Wt.", textFieldTareWt.getText(), "Date", temp2[0], "Time",
-								temp2[1]) +
-						"\n" + String.format(format3, "Nett Wt.", textFieldNetWt.getText()) + "\n\n\n" +
-						textFieldLine4.getText() + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" +
-						String.format("%85s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n" +
-						StringUtils.center(textFieldLine1.getText(), 82) + "\n" +
-						StringUtils.center(textFieldLine2.getText(), 82) + "\n" +
-						StringUtils.center(textFieldLine3.getText(), 82) + "\n\n" + "           Name of Contractor : " +
-						textFieldNameOfContractor.getText() + "\n\n" +
-						String.format(format1, "Department Name", textFieldDepartmentName.getText(), "Vehicle No",
-								textFieldVehicleNo.getText()) +
-						"\n" +
-						String.format(format1, "Site At", textFieldSiteAt.getText(), "Product",
-								comboBoxMaterial.getEditor().getItem()) +
-						"\n" +
-						String.format(
-								format2, "Gross Wt.", textFieldGrossWt.getText(), "Date", temp1[0], "Time", temp1[1]) +
-						"\n" +
-						String.format(format2, "Tare Wt.", textFieldTareWt.getText(), "Date", temp2[0], "Time",
-								temp2[1]) +
-						"\n" + String.format(format3, "Nett Wt.", textFieldNetWt.getText()) + "\n\n\n" +
-						textFieldLine4.getText();
+						                    String.format("%85s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n" +
+						                    StringUtils.center(textFieldLine1.getText(), 82) + "\n" +
+						                    StringUtils.center(textFieldLine2.getText(), 82) + "\n" +
+						                    StringUtils.center(textFieldLine3.getText(), 82) + "\n\n" + "           Name of Contractor : " +
+						                    textFieldNameOfContractor.getText() + "\n\n" +
+						                    String.format(format1, "Department Name", textFieldDepartmentName.getText(), "Vehicle No",
+								                    textFieldVehicleNo.getText()) +
+						                    "\n" +
+						                    String.format(format1, "Site At", textFieldSiteAt.getText(), "Product",
+								                    comboBoxMaterial.getEditor().getItem()) +
+						                    "\n" +
+						                    String.format(
+								                    format2, "Gross Wt.", textFieldGrossWt.getText(), "Date", temp1[0], "Time", temp1[1]) +
+						                    "\n" +
+						                    String.format(format2, "Tare Wt.", textFieldTareWt.getText(), "Date", temp2[0], "Time",
+								                    temp2[1]) +
+						                    "\n" + String.format(format3, "Nett Wt.", textFieldNetWt.getText()) + "\n\n\n" +
+						                    textFieldLine4.getText() + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" +
+						                    String.format("%85s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n" +
+						                    StringUtils.center(textFieldLine1.getText(), 82) + "\n" +
+						                    StringUtils.center(textFieldLine2.getText(), 82) + "\n" +
+						                    StringUtils.center(textFieldLine3.getText(), 82) + "\n\n" + "           Name of Contractor : " +
+						                    textFieldNameOfContractor.getText() + "\n\n" +
+						                    String.format(format1, "Department Name", textFieldDepartmentName.getText(), "Vehicle No",
+								                    textFieldVehicleNo.getText()) +
+						                    "\n" +
+						                    String.format(format1, "Site At", textFieldSiteAt.getText(), "Product",
+								                    comboBoxMaterial.getEditor().getItem()) +
+						                    "\n" +
+						                    String.format(
+								                    format2, "Gross Wt.", textFieldGrossWt.getText(), "Date", temp1[0], "Time", temp1[1]) +
+						                    "\n" +
+						                    String.format(format2, "Tare Wt.", textFieldTareWt.getText(), "Date", temp2[0], "Time",
+								                    temp2[1]) +
+						                    "\n" + String.format(format3, "Nett Wt.", textFieldNetWt.getText()) + "\n\n\n" +
+						                    textFieldLine4.getText();
 
 				graphics.setFont(new Font("Courier New", Font.BOLD, 10));
 				drawString(graphics, initString, 0);
@@ -5587,14 +5679,11 @@ class WeighBridge {
 		String format3 = "     %1$-14s: %2$s";
 		String dc = "";
 		String driver = "";
-//noinspection StatementWithEmptyBody
-		if (textFieldDcNo.getText().trim().equals("") || textFieldDcDate.getText().trim().equals(""))
-			;
-		else {
+		if (!(textFieldDcNo.getText().trim().equals("") && textFieldDcDate.getText().trim().equals(""))) {
 			dc = String.format(format, "Dc. No", textFieldDcNo.getText(), "Dc. Date", textFieldDcDate.getText());
 		}
 		if (chckbxExcludeDrivers.isSelected() ||
-				!textFieldDriverName.getEditor().getItem().toString().trim().equals("")) {
+				    !textFieldDriverName.getEditor().getItem().toString().trim().equals("")) {
 			driver = String.format(format2, "Transpoter's Name", textFieldDriverName.getEditor().getItem());
 		}
 		String[] initString = {
@@ -5776,25 +5865,25 @@ class WeighBridge {
 					return "Daily Report - " + dateAndTimeFormatdatep.format(datePicker1.getDate());
 				case "Datewise Report":
 					return "Datewise Report - " + dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " +
-							dateAndTimeFormatdatep.format(datePicker2.getDate());
+							       dateAndTimeFormatdatep.format(datePicker2.getDate());
 				case "Serialwise Report":
 					return "Serialwise Report";
 				case "Vehiclewise Report":
 					return "Vehiclewise Report (" + textFieldDetail.getText() + ") - " +
-							dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " +
-							dateAndTimeFormatdatep.format(datePicker2.getDate());
+							       dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " +
+							       dateAndTimeFormatdatep.format(datePicker2.getDate());
 				case "Materialwise Report":
 					return "Materialwise Report (" + comboBoxMaterialReport.getSelectedItem() + ") - " +
-							dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " +
-							dateAndTimeFormatdatep.format(datePicker2.getDate());
+							       dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " +
+							       dateAndTimeFormatdatep.format(datePicker2.getDate());
 				case "Customerwise Report":
 					return "Customerwise Report (" + textFieldDetail.getText() + ") - " +
-							dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " +
-							dateAndTimeFormatdatep.format(datePicker2.getDate());
+							       dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " +
+							       dateAndTimeFormatdatep.format(datePicker2.getDate());
 				case "Transporterwise Report":
 					return "Transporterwise Report (" + textFieldDetail.getText() + ") - " +
-							dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " +
-							dateAndTimeFormatdatep.format(datePicker2.getDate());
+							       dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " +
+							       dateAndTimeFormatdatep.format(datePicker2.getDate());
 			}
 		}
 		return null;
@@ -6162,7 +6251,7 @@ class WeighBridge {
 				@Override
 				public void serialEvent(SerialPortEvent event) {
 					lblWeight.setText("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^" +
-							"0-9" + temp[3] + "]", "").split(temp[3])[0]));
+							                                                                                             "0-9" + temp[3] + "]", "").split(temp[3])[0]));
 				}
 			});
 		}
@@ -6218,13 +6307,13 @@ class WeighBridge {
 					panelCamera = new WebcamPanel(webcam[i]);
 					panelCamera.setBounds(x, y,
 							(int) (((double) z / ((Dimension) Objects.requireNonNull(comboBoxResolution.getSelectedItem())).height *
-									((Dimension) comboBoxResolution.getSelectedItem()).width)),
+									        ((Dimension) comboBoxResolution.getSelectedItem()).width)),
 							z);
 					panelCameras.add(panelCamera);
 					lock = true;
 				}
 			} catch (IllegalArgumentException | ArrayIndexOutOfBoundsException | WebcamException | NullPointerException |
-					ClassCastException ex) {
+					         ClassCastException ex) {
 				JOptionPane.showMessageDialog(null,
 						"CAMERA ERROR\nCamera has beed removed are resolution missmatch\nLINE :1547", "CAMERA ERROR",
 						JOptionPane.ERROR_MESSAGE);
@@ -6323,10 +6412,10 @@ class WeighBridge {
 	@SuppressWarnings("unused")
 	private void sentSMS(String mobileNo) {
 		String smsMessage = "Sl.No : " + textFieldSlNo.getText() + "\nDate & Time : " + textFieldNetDateTime.getText() +
-				"\nVehicle No : " + textFieldVehicleNo.getText() + "\nMaterial : " +
-				comboBoxMaterial.getEditor().getItem() + "\nGross Wt : " + textFieldGrossWt.getText() + " Kg" +
-				"\nTare Wt : " + textFieldTareWt.getText() + " Kg" + "\nNet Wt : " + textFieldNetWt.getText() + " Kg" +
-				"\nFrom " + textFieldTitle1.getText();
+				                    "\nVehicle No : " + textFieldVehicleNo.getText() + "\nMaterial : " +
+				                    comboBoxMaterial.getEditor().getItem() + "\nGross Wt : " + textFieldGrossWt.getText() + " Kg" +
+				                    "\nTare Wt : " + textFieldTareWt.getText() + " Kg" + "\nNet Wt : " + textFieldNetWt.getText() + " Kg" +
+				                    "\nFrom " + textFieldTitle1.getText();
 // TODO: SMS
 
 //        try {
@@ -7044,7 +7133,7 @@ class WeighBridge {
 							model.setValueAt(rs.getInt("NETWT"), row, 15);
 							model.setValueAt(rs.getBoolean("MANUAL"), row, 18);
 							model.setValueAt(dateAndTimeFormatdate.format(rs.getDate("NETDATE")) + " "
-									+ timeFormat.format(rs.getTime("NETTIME")), row, 16);
+									                 + timeFormat.format(rs.getTime("NETTIME")), row, 16);
 
 							label = "Edit";
 							((TableReport) tableReport.getModel()).removeEditableRow(row);

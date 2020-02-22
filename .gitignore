@@ -34,3 +34,4 @@ weighdata.trace.db
 .settings
 /src/main/java/com/babulens/test.java
 /bin/
+/pom.xml.versionsBackup
