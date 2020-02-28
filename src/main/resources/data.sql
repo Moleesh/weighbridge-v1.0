@@ -100,24 +100,28 @@ CREATE TABLE IF NOT EXISTS CUSTOMER (
 	PRIMARY KEY ( KEY )
 );
 DROP TABLE IF EXISTS CAMERA;
-CREATE TABLE IF NOT EXISTS CAMERA (
-	CAMERA INT NOT NULL,
-	ENABLE BOOLEAN,
-	NAME	VARCHAR ( 100 ),
-	RESOLUTION VARCHAR ( 100 ),
-	CROPX	INT,
-	CROPY	INT,
-	CROPWIDTH	INT,
-	CROPHEIGHT INT,
-	PRIMARY KEY ( CAMERA )
+CREATE TABLE IF NOT EXISTS CAMERA(
+                                     CAMERA     INT NOT NULL,
+                                     ENABLE     BOOLEAN,
+                                     NAME       VARCHAR(100),
+                                     RESOLUTION VARCHAR(100),
+                                     CROPX      INT,
+                                     CROPY      INT,
+                                     CROPWIDTH  INT,
+                                     CROPHEIGHT INT,
+                                     PRIMARY KEY (CAMERA)
 );
 -- TABLE INSERTION;
-INSERT INTO SETUP VALUES ( '2', NULL, NULL, NULL );
-INSERT INTO SETTINGS VALUES( 1, 1, 1200, 'COM0;8;0;10;~~~', 'BABULENS', 'NAGERCOIL', 'FOOTER', '',
-    TRUE, FALSE,  1, 'Pre Print', TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, 0,
-    '', '', '', '', '', '', '', '', FALSE, 0.0 );
-INSERT INTO CAMERA VALUES ( 1, 'TRUE' , 'WEBCAM TEMP', '770 * 433', 0, 0, 770, 433 );
-INSERT INTO CAMERA VALUES ( 2, 'FALSE', 'WEBCAM TEMP', ''         , 0, 0, 0  , 0   );
+INSERT INTO SETUP
+VALUES ('2', NULL, NULL, NULL);
+INSERT INTO SETTINGS
+VALUES (1, 1, 1200, 'COM0;8;0;10;~~~', 'BABULENS', 'NAGERCOIL', 'FOOTER', '',
+        TRUE, FALSE, 1, 'Pre Print', TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, 1200,
+        'COM0', '', '', '', '', '', '', '', FALSE, 0.0);
+INSERT INTO CAMERA
+VALUES (1, 'TRUE', 'WEBCAM TEMP', '770 * 433', 0, 0, 770, 433);
+INSERT INTO CAMERA
+VALUES (2, 'FALSE', 'WEBCAM TEMP', '', 0, 0, 0, 0);
 INSERT INTO CAMERA VALUES ( 3, 'FALSE', 'WEBCAM TEMP', ''         , 0, 0, 0  , 0   );
 INSERT INTO CAMERA VALUES ( 4, 'FALSE', 'WEBCAM TEMP', ''         , 0, 0, 0  , 0   );
 COMMIT;

@@ -6409,45 +6409,38 @@ class WeighBridge {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private void sentSMS(String mobileNo) {
 		String smsMessage = "Sl.No : " + textFieldSlNo.getText() + "\nDate & Time : " + textFieldNetDateTime.getText() +
 				                    "\nVehicle No : " + textFieldVehicleNo.getText() + "\nMaterial : " +
 				                    comboBoxMaterial.getEditor().getItem() + "\nGross Wt : " + textFieldGrossWt.getText() + " Kg" +
 				                    "\nTare Wt : " + textFieldTareWt.getText() + " Kg" + "\nNet Wt : " + textFieldNetWt.getText() + " Kg" +
 				                    "\nFrom " + textFieldTitle1.getText();
-// TODO: SMS
+		SerialPort serialPortSms = null;
+		for (SerialPort serialPort : SerialPort.getCommPorts()) {
+			if (serialPort.getSystemPortName().equals(textFieldSMSPortName.getText())) {
+				serialPortSms = serialPort;
+				break;
+			}
+		}
+		if (serialPortSms != null) {
+			serialPortSms.setComPortParameters(Integer.parseInt(textFieldSMSBaudRate.getText()),
+					8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
+			serialPortSms.openPort();
+			byte[] sendData = ("AT+CMGS=\"" + mobileNo + "\"" + 13).getBytes();
+			serialPortSms.writeBytes(sendData, sendData.length);
 
-//        try {
-//            CommPortIdentifier ports;
-//            Enumeration<?> portEnum = CommPortIdentifier.getPortIdentifiers();
-//            while (portEnum.hasMoreElements()) {
-//                ports = (CommPortIdentifier) portEnum.nextElement();
-//                if (ports.getPortType() == CommPortIdentifier.PORT_SERIAL && ports.getName().equals("COM2")) {
-//                    comPort = ports;
-//                    break;
-//                }
-//            }
-//            SerialPort serialPortSms = (SerialPort) comPort.open(textFieldSMSPortName.getText(), 2000);
-//            OutputStream outputStream = serialPortSms.getOutputStream();
-//            serialPortSms.getInputStream();
-//            serialPortSms.setSerialPortParams(Integer.parseInt(textFieldSMSBaudRate.getText()), SerialPort.DATABITS_8,
-//                    SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-//            char enter = 13;
-//            outputStream.write(("AT+CMGS=\"" + mobileNo + "\"" + enter).getBytes());
-//            Thread.sleep(100);
-//            outputStream.flush();
-//            char CTRLZ = 26;
-//            outputStream.write((smsMessage + CTRLZ).getBytes());
-//            outputStream.flush();
-//            outputStream.close();
-//            serialPortSms.close();
-//        } catch (PortInUseException | IOException | UnsupportedCommOperationException | InterruptedException
-//                | NullPointerException e) {
-//            JOptionPane.showMessageDialog(null,
-//                    "SMS ERROR\nSMS Funtion not working please check the connection 0or check the number entered",
-//                    "SMS ERROR", JOptionPane.ERROR_MESSAGE);
-//        }
+			sendData = smsMessage.getBytes();
+			serialPortSms.writeBytes(sendData, sendData.length);
+
+			sendData = (smsMessage + 26).getBytes();
+			serialPortSms.writeBytes(sendData, sendData.length);
+
+			serialPortSms.closePort();
+		} else {
+			JOptionPane.showMessageDialog(null,
+					"SMS ERROR\nSMS Funtion not working please check the connection 0or check the number entered",
+					"SMS ERROR", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	private void close() {
