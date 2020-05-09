@@ -255,8 +255,8 @@ class WeighBridge {
 			if (dbConnection == null) {
 				System.exit(0);
 			}
-// TODO: start
 
+			// TODO: start
 			initialize();
 			setup();
 			cameraSetting();
@@ -267,10 +267,6 @@ class WeighBridge {
 				textFieldDateTime.setText(dateAndTimeFormat.format(date));
 			});
 			t1.start();
-
-//             rePrint("1");
-//             printPlainSriPathyWeight();
-//             close();
 
 		} catch (Error | Exception ignored) {
 		}
