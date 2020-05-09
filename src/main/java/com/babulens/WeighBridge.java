@@ -256,6 +256,7 @@ class WeighBridge {
 				System.exit(0);
 			}
 // TODO: start
+
 			initialize();
 			setup();
 			cameraSetting();
@@ -709,7 +710,7 @@ class WeighBridge {
 			rs.updateBoolean("EXCLUDEBAGS", chckbxExcludeNoOfBags.isSelected());
 			rs.updateDouble("BAGWEIGHT", Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.0-9]", "")));
 			rs.updateRow();
-			PreparedStatement pstmt = dbConnection.prepareStatement("DELETE FROM CUSTOMER");
+			PreparedStatement pstmt = dbConnection.prepareStatement("TRUNCATE TABLE CUSTOMER");
 			pstmt.executeUpdate();
 			rs = stmt.executeQuery("SELECT * FROM CUSTOMER");
 			DefaultTableModel model = (DefaultTableModel) tableCustomer.getModel();
@@ -721,7 +722,7 @@ class WeighBridge {
 				rs.updateInt("KEY", i);
 				rs.insertRow();
 			}
-			pstmt = dbConnection.prepareStatement("DELETE FROM VEHICLETARES");
+			pstmt = dbConnection.prepareStatement("TRUNCATE TABLE VEHICLETARES");
 			pstmt.executeUpdate();
 			rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
 			model = (DefaultTableModel) tableVehicleTare.getModel();
@@ -735,7 +736,7 @@ class WeighBridge {
 				rs.updateInt("KEY", i);
 				rs.insertRow();
 			}
-			pstmt = dbConnection.prepareStatement("DELETE FROM MATERIALS");
+			pstmt = dbConnection.prepareStatement("TRUNCATE TABLE MATERIALS");
 			pstmt.executeUpdate();
 			rs = stmt.executeQuery("SELECT * FROM MATERIALS");
 			model = (DefaultTableModel) tableMaterial.getModel();
@@ -3922,7 +3923,7 @@ class WeighBridge {
 								                                                        textFieldDateTime.getText().replace(" ", "_").replace("-", "_")
 										                                                        .replace(":", "_") + " AS SELECT * FROM WEIGHING");
 						stmts.executeUpdate();
-						stmts = dbConnection.prepareStatement("DELETE FROM WEIGHING");
+						stmts = dbConnection.prepareStatement("TRUNCATE TABLE WEIGHING");
 						stmts.executeUpdate();
 						ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
 						rs.absolute(1);
@@ -6426,14 +6427,17 @@ class WeighBridge {
 			serialPortSms.setComPortParameters(Integer.parseInt(textFieldSMSBaudRate.getText()),
 					8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
 			serialPortSms.openPort();
-			byte[] sendData = ("AT+CMGS=\"" + mobileNo + "\"" + 13).getBytes();
-			serialPortSms.writeBytes(sendData, sendData.length);
+			byte[] sendData = ("AT+CMGS=\"" + mobileNo + "\"\r").getBytes();
 
-			sendData = smsMessage.getBytes();
-			serialPortSms.writeBytes(sendData, sendData.length);
-
-			sendData = (smsMessage + 26).getBytes();
-			serialPortSms.writeBytes(sendData, sendData.length);
+			try {
+				serialPortSms.writeBytes(sendData, sendData.length + 2);
+				Thread.sleep(500);
+				sendData = smsMessage.getBytes();
+				serialPortSms.writeBytes(sendData, sendData.length + 2);
+				Thread.sleep(500);
+				serialPortSms.writeBytes(new byte[]{0x1A}, 30);
+			} catch (InterruptedException ignored) {
+			}
 
 			serialPortSms.closePort();
 		} else {
@@ -6610,7 +6614,6 @@ class WeighBridge {
 
 	static class TableButtonRenderer extends JButton implements TableCellRenderer {
 		private static final long serialVersionUID = 1L;
-
 
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
