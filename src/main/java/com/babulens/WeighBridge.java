@@ -15,6 +15,7 @@ import com.github.sarxos.webcam.ds.ipcam.IpCamMode;
 import com.github.sarxos.webcam.ds.ipcam.IpCamStorage;
 import com.ibatis.common.jdbc.ScriptRunner;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -5459,7 +5460,6 @@ class WeighBridge {
 			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
 				String format = "%1$-5s%2$-20s: ";
 
-
 				String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
 				String initString = "\n\n" + StringUtils.center(title1.getText(), 62);
 				graphics.setFont(new Font("Courier New", Font.BOLD, 15));
@@ -5545,8 +5545,8 @@ class WeighBridge {
 		PrinterJob pj = PrinterJob.getPrinterJob();
 		PageFormat pf = new PageFormat();
 		Paper paper = pf.getPaper();
-		double width = 8d * 72d;
-		double height = 11.5d * 72d;
+		double width = 9d * 72d;
+		double height = 5.5d * 72d;
 		double widthmargin = 0d * 72d;
 		double heightmargin = 0d * 72d;
 		paper.setSize(width, height);
@@ -5554,101 +5554,72 @@ class WeighBridge {
 		pf.setPaper(paper);
 		Book pBook = new Book();
 		pBook.append(new Printable() {
-			private void drawString(Graphics g, String text, @SuppressWarnings("SameParameterValue") int y) {
-				int length = 0;
+			private void drawString(Graphics graphics, String text, int y, int x, int size) {
 				for (String line : text.split("\n")) {
-					g.drawString(line, 0, y += g.getFontMetrics().getHeight() - 1);
-					length = g.getFontMetrics().stringWidth(line);
+					y += graphics.getFontMetrics().getHeight() - 1;
+					String temp = line;
+					if (size > 0) {
+						temp = StringUtils.center(temp, size);
+					}
+					graphics.drawString(temp, 28 + x, y);
+					graphics.drawString(temp, 219 + x, y);
+					graphics.drawString(temp, 410 + x, y);
 				}
-				new Coordinates(length, y + g.getFontMetrics().getHeight() - 1);
 			}
 
 			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
-				String format1 = "           %-19s: %-25s   %-10s : %s\n";
-				String format2 = "           %-10s:%7s Kg   %-10s : %-12s   %-10s : %s\n";
-				String format3 = "           %-10s:%7s Kg \n";
-				String[] temp1 = new String[2];
-				String[] temp2 = new String[2];
-				try {
-					temp1 = dateAndTimeFormatPrint.format(dateAndTimeFormat.parse(textFieldGrossDateTime.getText()))
-							        .split(" ");
-
-				} catch (ParseException pe) {
-					temp1[0] = "";
-					temp1[1] = "";
-				}
-				try {
-					temp2 = dateAndTimeFormatPrint.format(dateAndTimeFormat.parse(textFieldTareDateTime.getText()))
-							        .split(" ");
-
-				} catch (ParseException pe) {
-					temp2[0] = "";
-					temp2[1] = "";
-				}
-
-				String initString = "\n\n\n\n\n\n\n\n\n\n" +
-						                    String.format("%85s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n" +
-						                    StringUtils.center(textFieldLine1.getText(), 82) + "\n" +
-						                    StringUtils.center(textFieldLine2.getText(), 82) + "\n" +
-						                    StringUtils.center(textFieldLine3.getText(), 82) + "\n\n" + "           Name of Contractor : " +
-						                    textFieldNameOfContractor.getText() + "\n\n" +
-						                    String.format(format1, "Department Name", textFieldDepartmentName.getText(), "Vehicle No",
-								                    textFieldVehicleNo.getText()) +
-						                    "\n" +
-						                    String.format(format1, "Site At", textFieldSiteAt.getText(), "Product",
-								                    comboBoxMaterial.getEditor().getItem()) +
-						                    "\n" +
-						                    String.format(
-								                    format2, "Gross Wt.", textFieldGrossWt.getText(), "Date", temp1[0], "Time", temp1[1]) +
-						                    "\n" +
-						                    String.format(format2, "Tare Wt.", textFieldTareWt.getText(), "Date", temp2[0], "Time",
-								                    temp2[1]) +
-						                    "\n" + String.format(format3, "Nett Wt.", textFieldNetWt.getText()) + "\n\n\n" +
-						                    textFieldLine4.getText() + "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" +
-						                    String.format("%85s", "Weighment Slip No : " + textFieldSlNo.getText()) + "\n\n" +
-						                    StringUtils.center(textFieldLine1.getText(), 82) + "\n" +
-						                    StringUtils.center(textFieldLine2.getText(), 82) + "\n" +
-						                    StringUtils.center(textFieldLine3.getText(), 82) + "\n\n" + "           Name of Contractor : " +
-						                    textFieldNameOfContractor.getText() + "\n\n" +
-						                    String.format(format1, "Department Name", textFieldDepartmentName.getText(), "Vehicle No",
-								                    textFieldVehicleNo.getText()) +
-						                    "\n" +
-						                    String.format(format1, "Site At", textFieldSiteAt.getText(), "Product",
-								                    comboBoxMaterial.getEditor().getItem()) +
-						                    "\n" +
-						                    String.format(
-								                    format2, "Gross Wt.", textFieldGrossWt.getText(), "Date", temp1[0], "Time", temp1[1]) +
-						                    "\n" +
-						                    String.format(format2, "Tare Wt.", textFieldTareWt.getText(), "Date", temp2[0], "Time",
-								                    temp2[1]) +
-						                    "\n" + String.format(format3, "Nett Wt.", textFieldNetWt.getText()) + "\n\n\n" +
-						                    textFieldLine4.getText();
-
+				String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
+				graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+				drawString(graphics, StringUtils.center(title1.getText().toUpperCase().split(" WEIGH")[0], 22), 20, 0, 0);
+				drawString(graphics, StringUtils.center("WEIGH BRIDGE", 22), 33, 0, 0);
+				graphics.setFont(new Font("Courier New", Font.ITALIC, 10));
+				drawString(graphics, WordUtils.wrap(title2.getText(), 27), 48, 0, 27);
+				graphics.drawLine(22, 75, 198, 75);
+				graphics.drawLine(213, 75, 389, 75);
+				graphics.drawLine(404, 75, 580, 75);
+				graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
+				graphics.drawString(StringUtils.center("ORIGINAL", 26), 28, 84);
+				graphics.drawString(StringUtils.center("DUPLICATE", 26), 219, 84);
+				graphics.drawString(StringUtils.center("TRIPLICATE", 26), 410, 84);
+				graphics.drawLine(22, 88, 198, 88);
+				graphics.drawLine(213, 88, 389, 88);
+				graphics.drawLine(404, 88, 580, 88);
+				graphics.setFont(new Font("Courier New", Font.PLAIN, 8));
+				drawString(graphics, "Slip No       : " + textFieldSlNo.getText(), 90, 0, 0);
+				drawString(graphics, "Date          : " + temp[0], 110, 0, 0);
+				drawString(graphics, "Time          : " + temp[1], 130, 0, 0);
+				drawString(graphics, "Vehicle No    : " + textFieldVehicleNo.getText(), 150, 0, 0);
+				drawString(graphics, "Material      : " + comboBoxMaterial.getEditor().getItem(), 170, 0, 0);
+				drawString(graphics, "Customer Name : ", 190, 0, 0);
+				drawString(graphics, "Charges       : " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), 230, 0, 0);
+				drawString(graphics, "Gross Wt      : ", 250, 0, 0);
+				drawString(graphics, "Tare Wt       : ", 270, 0, 0);
+				drawString(graphics, "Net Wt        : ", 290, 0, 0);
+				drawString(graphics, WordUtils.wrap(comboBoxCustomerName.getEditor().getItem().toString(), 17), 190, 77, 0);
 				graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-				drawString(graphics, initString, 0);
-				graphics.drawLine(56, 129, 544, 129);
-				graphics.drawLine(56, 173, 544, 173);
-				graphics.drawLine(56, 195, 544, 195);
-				graphics.drawLine(351, 195, 351, 239);
-				graphics.drawLine(56, 239, 544, 239);
-				graphics.drawLine(201, 239, 201, 283);
-				graphics.drawLine(369, 239, 369, 283);
-				graphics.drawLine(56, 283, 544, 283);
-				graphics.drawLine(56, 305, 544, 305);
-				graphics.drawLine(56, 129, 56, 305);
-				graphics.drawLine(544, 129, 544, 305);
+				drawString(graphics, StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", 248, 77, 0);
+				drawString(graphics, StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", 268, 77, 0);
+				drawString(graphics, StringUtils.leftPad(textFieldNetWt.getText(), 7) + " Kg", 288, 77, 0);
+				graphics.drawLine(22, 305, 198, 305);
+				graphics.drawLine(213, 305, 389, 305);
+				graphics.drawLine(404, 305, 580, 305);
+				graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
+				drawString(graphics, StringUtils.center("Thanks you visit again...", 26), 310, 0, 0);
 
-				graphics.drawLine(56, 547, 544, 547);
-				graphics.drawLine(56, 591, 544, 591);
-				graphics.drawLine(56, 613, 544, 613);
-				graphics.drawLine(351, 613, 351, 657);
-				graphics.drawLine(56, 657, 544, 657);
-				graphics.drawLine(201, 657, 201, 702);
-				graphics.drawLine(369, 657, 369, 702);
-				graphics.drawLine(56, 702, 544, 702);
-				graphics.drawLine(56, 724, 544, 724);
-				graphics.drawLine(56, 547, 56, 724);
-				graphics.drawLine(544, 547, 544, 724);
+
+				graphics.drawLine(22, 15, 22, 330);
+				graphics.drawLine(198, 15, 198, 330);
+				graphics.drawLine(213, 15, 213, 330);
+				graphics.drawLine(389, 15, 389, 330);
+				graphics.drawLine(404, 15, 404, 330);
+				graphics.drawLine(580, 15, 580, 330);
+				graphics.drawLine(22, 15, 198, 15);
+				graphics.drawLine(213, 15, 389, 15);
+				graphics.drawLine(404, 15, 580, 15);
+				graphics.drawLine(22, 330, 198, 330);
+				graphics.drawLine(213, 330, 389, 330);
+				graphics.drawLine(404, 330, 580, 330);
+
 
 				return PAGE_EXISTS;
 			}
@@ -5675,12 +5646,9 @@ class WeighBridge {
 		Book pBook = new Book();
 		pBook.append(new Printable() {
 			private void drawString(Graphics g, String text, @SuppressWarnings("SameParameterValue") int y) {
-				int length = 0;
 				for (String line : text.split("\n")) {
 					g.drawString(line, 0, y += g.getFontMetrics().getHeight() - 1);
-					length = g.getFontMetrics().stringWidth(line);
 				}
-				new Coordinates(length, y + g.getFontMetrics().getHeight() - 1);
 			}
 
 			public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
