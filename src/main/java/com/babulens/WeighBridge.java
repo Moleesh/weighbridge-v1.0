@@ -5502,7 +5502,7 @@ class WeighBridge {
 				graphics.drawLine(17, 88, 193, 88);
 				graphics.drawLine(203, 88, 379, 88);
 				graphics.drawLine(389, 88, 565, 88);
-				graphics.setFont(new Font("Courier New", Font.PLAIN, 8));
+				graphics.setFont(new Font("Courier New", Font.BOLD, 8));
 				drawString(graphics, "Slip No       : " + textFieldSlNo.getText(), 90, 0, 0);
 				drawString(graphics, "Date          : " + temp[0], 110, 0, 0);
 				drawString(graphics, "Time          : " + temp[1], 130, 0, 0);
@@ -5514,14 +5514,14 @@ class WeighBridge {
 				drawString(graphics, "Tare Wt       : ", 270, 0, 0);
 				drawString(graphics, "Net Wt        : ", 290, 0, 0);
 				drawString(graphics, WordUtils.wrap(comboBoxCustomerName.getEditor().getItem().toString(), 17), 190, 77, 0);
-				graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+				graphics.setFont(new Font("Courier New", Font.BOLD, 12));
 				drawString(graphics, StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", 248, 77, 0);
 				drawString(graphics, StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", 268, 77, 0);
 				drawString(graphics, StringUtils.leftPad(textFieldNetWt.getText(), 7) + " Kg", 288, 77, 0);
 				graphics.drawLine(17, 305, 193, 305);
 				graphics.drawLine(203, 305, 379, 305);
 				graphics.drawLine(389, 305, 565, 305);
-				graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 12));
+				graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
 				drawString(graphics, StringUtils.center("Thanks you visit again...", 26), 310, 0, 0);
 
 				graphics.drawLine(17, 15, 17, 330);
