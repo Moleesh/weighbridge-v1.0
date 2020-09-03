@@ -3812,6 +3812,7 @@ class WeighBridge {
 		chckbxManualEntry = new JCheckBox("Manual Entry");
 		chckbxManualEntry.setEnabled(false);
 		chckbxManualEntry.setFocusable(false);
+		chckbxManualEntry.setVisible(false);
 		chckbxManualEntry.addActionListener(e -> {
 			if (chckbxManualEntry.isSelected()) {
 				JPasswordField password = new JPasswordField(10);
@@ -3852,11 +3853,12 @@ class WeighBridge {
 		chckbxManualEntry.setBackground(new Color(0, 255, 127));
 		chckbxManualEntry.setEnabled(false);
 		chckbxManualEntry.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-		chckbxManualEntry.setBounds(639, 50, 200, 25);
+		chckbxManualEntry.setBounds(638, 119, 200, 25);
 		panelSettings.add(chckbxManualEntry);
 
 		chckbxEditEnable = new JCheckBox("Edit Enable");
 		chckbxEditEnable.setFocusable(false);
+		chckbxEditEnable.setVisible(false);
 		chckbxEditEnable.addActionListener(e -> {
 			if (chckbxEditEnable.isSelected()) {
 				JPasswordField password = new JPasswordField(10);
@@ -3897,7 +3899,7 @@ class WeighBridge {
 		chckbxEditEnable.setBackground(new Color(0, 255, 127));
 		chckbxEditEnable.setEnabled(false);
 		chckbxEditEnable.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-		chckbxEditEnable.setBounds(639, 75, 200, 25);
+		chckbxEditEnable.setBounds(638, 147, 200, 25);
 		panelSettings.add(chckbxEditEnable);
 
 		comboBoxPrinter = new JComboBox<>();
@@ -4094,7 +4096,7 @@ class WeighBridge {
 		chckbxCamera.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		chckbxCamera.setEnabled(false);
 		chckbxCamera.setBackground(new Color(0, 255, 127));
-		chckbxCamera.setBounds(639, 125, 199, 25);
+		chckbxCamera.setBounds(638, 47, 199, 25);
 		panelSettings.add(chckbxCamera);
 
 		comboBoxPrintOptionForWeight = new JComboBox<>();
@@ -4144,7 +4146,7 @@ class WeighBridge {
 		chckbxSms.setFocusable(false);
 		chckbxSms.setEnabled(false);
 		chckbxSms.setBackground(new Color(0, 255, 127));
-		chckbxSms.setBounds(638, 150, 200, 25);
+		chckbxSms.setBounds(638, 75, 200, 25);
 		panelSettings.add(chckbxSms);
 
 		textFieldSMSPortName = new JTextField();
@@ -4497,11 +4499,15 @@ class WeighBridge {
 		label_4.setBounds(316, 304, 25, 25);
 		panel.add(label_4);
 
-		chckbxManualStatus = new JCheckBox("Manual Status");
+		chckbxManualStatus = new JCheckBox("Status");
+		chckbxManualStatus.addActionListener(e -> {
+			chckbxManualEntry.setVisible(chckbxManualStatus.isSelected());
+			chckbxEditEnable.setVisible(chckbxManualStatus.isSelected());
+		});
 		chckbxManualStatus.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		chckbxManualStatus.setFocusable(false);
 		chckbxManualStatus.setBackground(new Color(0, 255, 127));
-		chckbxManualStatus.setBounds(839, 320, 200, 25);
+		chckbxManualStatus.setBounds(1049, 585, 200, 25);
 		panel.add(chckbxManualStatus);
 
 		JButton button = new JButton("Minimize");
