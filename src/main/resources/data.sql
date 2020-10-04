@@ -1,24 +1,24 @@
 -- TABLE CREATION;
 DROP TABLE IF EXISTS WEIGHING;
-CREATE TABLE IF NOT EXISTS WEIGHING (
-	SLNO	INTEGER NOT NULL,
-	DCNO	VARCHAR ( 20 ),
-	DCNODATE	DATE,
-	CUSTOMERNAME	VARCHAR ( 100 ),
-	DRIVERNAME VARCHAR ( 100 ),
-	VEHICLENO	VARCHAR ( 100 ),
-	MATERIAL	VARCHAR ( 100 ),
-	NOOFBAGS	INTEGER,
-	CHARGES	INTEGER,
-	GROSSWT	INTEGER,
-	GROSSDATE	DATE,
-	GROSSTIME	TIME,
-	TAREWT INTEGER,
-	TAREDATE	DATE,
-	TARETIME	TIME,
-	BAGDEDUCTION	INTEGER,
-	NETWT	INTEGER,
-	NETDATE	DATE,
+CREATE TABLE IF NOT EXISTS WEIGHING(
+                                       SLNO         INTEGER NOT NULL,
+                                       DCNO         VARCHAR(20),
+                                       DCNODATE     DATE,
+                                       CUSTOMERNAME VARCHAR(100),
+                                       DRIVERNAME   VARCHAR(100),
+                                       VEHICLENO    VARCHAR(100),
+                                       MATERIAL     VARCHAR(100),
+                                       NOOFBAGS     DOUBLE,
+                                       CHARGES      INTEGER,
+                                       GROSSWT      INTEGER,
+                                       GROSSDATE    DATE,
+                                       GROSSTIME    TIME,
+                                       TAREWT       INTEGER,
+                                       TAREDATE     DATE,
+                                       TARETIME     TIME,
+                                       BAGDEDUCTION INTEGER,
+                                       NETWT        INTEGER,
+                                       NETDATE      DATE,
 	NETTIME	TIME,
 	REMARKS	VARCHAR ( 100 ),
 	MANUAL BOOLEAN,
@@ -49,39 +49,50 @@ CREATE TABLE IF NOT EXISTS SETUP (
 );
 DROP TABLE IF EXISTS SETTINGS;
 CREATE TABLE IF NOT EXISTS SETTINGS (
-	KEY	INTEGER NOT NULL,
-	SLNO	INTEGER,
-	BAUDRATE	INTEGER,
-	PORTNAME	VARCHAR ( 100 ),
-	TITLE1 VARCHAR ( 100 ),
-	TITLE2 VARCHAR ( 100 ),
-	FOOTER VARCHAR ( 100 ),
-	PRINTER	VARCHAR ( 100 ),
-	EXCLUDECUSTOMERS	BOOLEAN,
-	EXCLUDECHARGES BOOLEAN,
-	COPIES INTEGER,
-	PRINTOPTIONFORWEIGHT	VARCHAR ( 100 ),
-	EXCLUDEDRIVER	BOOLEAN,
-	EXCLUDEREMARKS BOOLEAN,
-	EXCLUDEBAGS	BOOLEAN,
-	EXCLUDEDCNO     BOOLEAN,
-    MANUALCHARGE	BOOLEAN,
-	AUTOCHARGES	BOOLEAN,
-	MATERIALSL BOOLEAN,
-	SMS	BOOLEAN,
-	CAMERA BOOLEAN,
-	SMSBAUDRATE	INTEGER,
-	SMSPORTNAME	VARCHAR ( 100 ),
-	LINE1	VARCHAR ( 100 ),
-	LINE2	VARCHAR ( 100 ),
-	LINE3	VARCHAR ( 100 ),
-	LINE4	VARCHAR ( 100 ),
-	NAMEOFCONTRACTOR	VARCHAR ( 100 ),
-	DEPARTMENTNAME VARCHAR ( 100 ),
-	SITEAT VARCHAR ( 100 ),
-	TARENOSLNO BOOLEAN,
-	BAGWEIGHT	DOUBLE,
-	PRIMARY KEY ( KEY )
+                                        KEY                    INTEGER NOT NULL,
+                                        SLNO                   INTEGER,
+                                        BAUDRATE               INTEGER,
+                                        PORTNAME               VARCHAR ( 100 ),
+                                        TITLE1                 VARCHAR ( 100 ),
+                                        TITLE2                 VARCHAR ( 100 ),
+                                        FOOTER                 VARCHAR ( 100 ),
+                                        PRINTER                VARCHAR ( 100 ),
+                                        EXCLUDECUSTOMERS       BOOLEAN,
+                                        EXCLUDECHARGES         BOOLEAN,
+                                        COPIES                 INTEGER,
+                                        PRINTOPTIONFORWEIGHT   VARCHAR(100),
+                                        EXCLUDEDRIVER          BOOLEAN,
+                                        EXCLUDEREMARKS         BOOLEAN,
+                                        EXCLUDEBAGS            BOOLEAN,
+                                        EXCLUDEDCNO            BOOLEAN,
+                                        MANUALCHARGE           BOOLEAN,
+                                        AUTOCHARGES            BOOLEAN,
+                                        MATERIALSL             BOOLEAN,
+                                        ICEWATER               BOOLEAN,
+                                        SMS                    BOOLEAN,
+                                        CAMERA                 BOOLEAN,
+                                        SMSBAUDRATE            INTEGER,
+                                        SMSPORTNAME            VARCHAR(100),
+                                        LINE1                  VARCHAR(100),
+                                        LINE2                  VARCHAR(100),
+                                        LINE3                  VARCHAR(100),
+                                        LINE4                  VARCHAR(100),
+                                        NAMEOFCONTRACTOR       VARCHAR(100),
+                                        DEPARTMENTNAME         VARCHAR(100),
+                                        SITEAT                 VARCHAR(100),
+                                        TARENOSLNO             BOOLEAN,
+                                        BAGWEIGHT              DOUBLE,
+                                        NEED_LOGIN             BOOLEAN,
+                                        TRIAL_LICENSE_PASSWORD VARCHAR(20),
+                                        LICENSE_PASSWORD       VARCHAR(20),
+                                        UNLOCK_PASSWORD        VARCHAR(20),
+                                        CAMERA_PASSWORD        VARCHAR(20),
+                                        SMS_PASSWORD           VARCHAR(20),
+                                        MANUAL_ENTRY_PASSWORD  VARCHAR(20),
+                                        EDIT_ENABLE_PASSWORD   VARCHAR(20),
+                                        RESET_PASSWORD         VARCHAR(20),
+                                        LOGIN_PASSWORD         VARCHAR(20),
+                                        PRIMARY KEY (KEY)
 );
 
 DROP TABLE IF EXISTS MATERIALS;
@@ -100,24 +111,26 @@ CREATE TABLE IF NOT EXISTS CUSTOMER (
 	PRIMARY KEY ( KEY )
 );
 DROP TABLE IF EXISTS CAMERA;
-CREATE TABLE IF NOT EXISTS CAMERA(
-                                     CAMERA     INT NOT NULL,
-                                     ENABLE     BOOLEAN,
-                                     NAME       VARCHAR(100),
-                                     RESOLUTION VARCHAR(100),
-                                     CROPX      INT,
-                                     CROPY      INT,
-                                     CROPWIDTH  INT,
-                                     CROPHEIGHT INT,
-                                     PRIMARY KEY (CAMERA)
+CREATE TABLE IF NOT EXISTS CAMERA
+(
+    CAMERA     INT NOT NULL,
+    ENABLE     BOOLEAN,
+    NAME       VARCHAR(100),
+    RESOLUTION VARCHAR(100),
+    CROPX      INT,
+    CROPY      INT,
+    CROPWIDTH  INT,
+    CROPHEIGHT INT,
+    PRIMARY KEY (CAMERA)
 );
 -- TABLE INSERTION;
 INSERT INTO SETUP
 VALUES ('2', NULL, NULL, NULL);
 INSERT INTO SETTINGS
 VALUES (1, 1, 1200, 'COM0;8;0;10;~~~', 'BABULENS', 'NAGERCOIL', 'FOOTER', '',
-        TRUE, FALSE, 1, 'Standard', TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, 1200,
-        'COM0', '', '', '', '', '', '', '', FALSE, 0.0);
+        TRUE, FALSE, 1, 'Standard', TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, 1200,
+        'COM0', '', '', '', '', '', '', '', FALSE, 0.0, FALSE,
+        '147085', '147085aA', '147085', '147085', '147085', '147085', '147085', '147085', '123');
 INSERT INTO CAMERA
 VALUES (1, 'TRUE', 'WEBCAM TEMP', '770 * 433', 0, 0, 770, 433);
 INSERT INTO CAMERA

@@ -131,6 +131,15 @@ class WeighBridge {
 	private static final String DB_CONNECTION = "jdbc:h2:./weighdata";
 	private static final String DB_USER = "root";
 	private static final String DB_PASSWORD = "toor";
+	private String TRIAL_LICENSE_PASSWORD = "147085";
+	private String LICENSE_PASSWORD = "147085aA";
+	private String UNLOCK_PASSWORD = "147085";
+	private String CAMERA_PASSWORD = "147085";
+	private String SMS_PASSWORD = "147085";
+	private String MANUAL_ENTRY_PASSWORD = "147085";
+	private String EDIT_ENABLE_PASSWORD = "147085";
+	private String RESET_PASSWORD = "147085";
+	private String LOGIN_PASSWORD = "123";
 	static private SerialPort comPort;
 
 	static {
@@ -214,7 +223,7 @@ class WeighBridge {
 	private JTextField textFieldBaudRate;
 	private JTextField textFieldPortName;
 	private JTable tableCustomer;
-	private JButton btnPassword;
+	private JButton btnUnlock;
 	private JCheckBox chckbxEditEnable;
 	private JCheckBox chckbxManualEntry;
 	private JCheckBox chckbxExcludeCharges;
@@ -307,6 +316,10 @@ class WeighBridge {
 	private JCheckBox chckbxManualStatus;
 	private boolean reportOpened = false;
 	private JCheckBox chckbxExcludeDcNo;
+	private JTextField textFieldFinalWt;
+	private JTextField textFieldFinalAmount;
+	private JCheckBox chckbxIceWater;
+	private JCheckBox chckbxNeedLogin;
 
 	/**
 	 * Create the application.
@@ -466,8 +479,8 @@ class WeighBridge {
 		char[] temp = password.getPassword();
 		boolean isCorrect;
 		boolean isCorrect2;
-		char[] correctPassword = "147085aA".toCharArray();
-		char[] correctPassword2 = "147085".toCharArray();
+		char[] correctPassword = LICENSE_PASSWORD.toCharArray();
+		char[] correctPassword2 = TRIAL_LICENSE_PASSWORD.toCharArray();
 		if (temp.length != correctPassword.length) {
 			isCorrect = false;
 		} else {
@@ -667,6 +680,17 @@ class WeighBridge {
 			chckbxCharges.setSelected(rs.getBoolean("MANUALCHARGE"));
 			chckbxExcludeDcNo.setSelected(rs.getBoolean("EXCLUDEDCNO"));
 			chckbxMaterialSl.setSelected(rs.getBoolean("MATERIALSL"));
+			chckbxIceWater.setSelected(rs.getBoolean("ICEWATER"));
+			chckbxNeedLogin.setSelected(rs.getBoolean("NEED_LOGIN"));
+			TRIAL_LICENSE_PASSWORD = rs.getString("TRIAL_LICENSE_PASSWORD");
+			LICENSE_PASSWORD = rs.getString("LICENSE_PASSWORD");
+			UNLOCK_PASSWORD = rs.getString("UNLOCK_PASSWORD");
+			CAMERA_PASSWORD = rs.getString("CAMERA_PASSWORD");
+			SMS_PASSWORD = rs.getString("SMS_PASSWORD");
+			MANUAL_ENTRY_PASSWORD = rs.getString("MANUAL_ENTRY_PASSWORD");
+			EDIT_ENABLE_PASSWORD = rs.getString("EDIT_ENABLE_PASSWORD");
+			RESET_PASSWORD = rs.getString("RESET_PASSWORD");
+			LOGIN_PASSWORD = rs.getString("LOGIN_PASSWORD");
 			chckbxCamera.setSelected(rs.getBoolean("CAMERA"));
 			chckbxSms.setSelected(rs.getBoolean("SMS"));
 			textFieldSMSBaudRate.setText(Integer.toString(rs.getInt("SMSBAUDRATE")));
@@ -759,10 +783,11 @@ class WeighBridge {
 			rs.updateBoolean("MANUALCHARGE", chckbxCharges.isSelected());
 			rs.updateBoolean("EXCLUDEDCNO", chckbxExcludeDcNo.isSelected());
 			rs.updateBoolean("MATERIALSL", chckbxMaterialSl.isSelected());
+			rs.updateBoolean("ICEWATER", chckbxIceWater.isSelected());
+			rs.updateBoolean("NEED_LOGIN", chckbxNeedLogin.isSelected());
 			rs.updateBoolean("SMS", chckbxSms.isSelected());
 			rs.updateBoolean("CAMERA", chckbxCamera.isSelected());
-			rs.updateInt("SMSBAUDRATE",
-					Integer.parseInt(0 + textFieldSMSBaudRate.getText().replaceAll("[^0-9]", "")));
+			rs.updateInt("SMSBAUDRATE", Integer.parseInt(0 + textFieldSMSBaudRate.getText().replaceAll("[^0-9]", "")));
 			rs.updateString("SMSPORTNAME", textFieldSMSPortName.getText().toUpperCase());
 			rs.updateString("LINE1", textFieldLine1.getText());
 			rs.updateString("LINE2", textFieldLine2.getText());
@@ -1080,7 +1105,7 @@ class WeighBridge {
 										"Gross Weight Available", JOptionPane.YES_NO_OPTION,
 										JOptionPane.QUESTION_MESSAGE);
 								if (response == JOptionPane.YES_OPTION) {
-									textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
+									textFieldNoOfBags.setText(String.valueOf((rs.getDouble("NOOFBAGS") % 1) == 0 ? Math.round(rs.getDouble("NOOFBAGS")) : Math.round(rs.getDouble("NOOFBAGS") * 100d) / 100d));
 									textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
 									textFieldGrossDateTime
 											.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
@@ -1113,7 +1138,7 @@ class WeighBridge {
 										"Gross Weight Available", JOptionPane.YES_NO_OPTION,
 										JOptionPane.QUESTION_MESSAGE);
 								if (response == JOptionPane.YES_OPTION) {
-									textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
+									textFieldNoOfBags.setText(String.valueOf((rs.getDouble("NOOFBAGS") % 1) == 0 ? Math.round(rs.getDouble("NOOFBAGS")) : Math.round(rs.getDouble("NOOFBAGS") * 100d) / 100d));
 									textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
 									textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
 									textFieldGrossDateTime
@@ -1461,7 +1486,7 @@ class WeighBridge {
 					comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
 					textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
 					textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
-					textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
+					textFieldNoOfBags.setText(String.valueOf((rs.getDouble("NOOFBAGS") % 1) == 0 ? Math.round(rs.getDouble("NOOFBAGS")) : Math.round(rs.getDouble("NOOFBAGS") * 100d) / 100d));
 					textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
 					textFieldTareWt.setText(Integer.toString(
 							rs.getInt(Objects.requireNonNull(comboBoxa.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
@@ -1543,7 +1568,7 @@ class WeighBridge {
 					comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
 					textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
 					textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
-					textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
+					textFieldNoOfBags.setText(String.valueOf((rs.getDouble("NOOFBAGS") % 1) == 0 ? Math.round(rs.getDouble("NOOFBAGS")) : Math.round(rs.getDouble("NOOFBAGS") * 100d) / 100d));
 					textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
 					textFieldGrossWt.setText(Integer.toString(
 							rs.getInt(Objects.requireNonNull(comboBoxa.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
@@ -1850,8 +1875,7 @@ class WeighBridge {
 				rs.updateString("DRIVERNAME", tempp);
 				rs.updateString("VEHICLENO", textFieldVehicleNo.getText());
 				rs.updateString("MATERIAL", (String) comboBoxMaterial.getSelectedItem());
-				rs.updateInt("NOOFBAGS",
-						Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", "")));
+				rs.updateDouble("NOOFBAGS", Double.parseDouble(0 + textFieldNoOfBags.getText().replaceAll("[^.0-9]", "")));
 				rs.updateInt("CHARGES",
 						Integer.parseInt(0 + textFieldCharges.getText().replaceAll("[^0-9]", "")));
 				rs.updateInt("GROSSWT", Integer.parseInt(0 + textFieldGrossWt.getText()));
@@ -2239,7 +2263,7 @@ class WeighBridge {
 					comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
 					textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
 					textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
-					textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
+					textFieldNoOfBags.setText(String.valueOf((rs.getDouble("NOOFBAGS") % 1) == 0 ? Math.round(rs.getDouble("NOOFBAGS")) : Math.round(rs.getDouble("NOOFBAGS") * 100d) / 100d));
 					textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
 					textFieldGrossWt.setText(Integer.toString(rs.getInt("TAREWT")));
 					if (textFieldGrossWt.getText().equals("0")) {
@@ -2323,7 +2347,7 @@ class WeighBridge {
 					comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
 					textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
 					textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
-					textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
+					textFieldNoOfBags.setText(String.valueOf((rs.getDouble("NOOFBAGS") % 1) == 0 ? Math.round(rs.getDouble("NOOFBAGS")) : Math.round(rs.getDouble("NOOFBAGS") * 100d) / 100d));
 					textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
 					textFieldTareWt.setText(Integer.toString(rs.getInt("GROSSWT")));
 					if (textFieldTareWt.getText().equals("0")) {
@@ -2383,7 +2407,7 @@ class WeighBridge {
 		});
 		btnAuto.setFont(new Font("Times New Roman", Font.ITALIC, 15));
 		btnAuto.setFocusable(false);
-		btnAuto.setBounds(157, 390, 71, 25);
+		btnAuto.setBounds(152, 390, 76, 25);
 		panelWeighing.add(btnAuto);
 
 		chckbxChargecheck = new JCheckBox("Auto");
@@ -2391,13 +2415,13 @@ class WeighBridge {
 		chckbxChargecheck.setFocusable(false);
 		chckbxChargecheck.setEnabled(false);
 		chckbxChargecheck.setBackground(new Color(0, 255, 127));
-		chckbxChargecheck.setBounds(417, 390, 53, 25);
+		chckbxChargecheck.setBounds(417, 390, 65, 25);
 		panelWeighing.add(chckbxChargecheck);
 
-		JLabel lblNoOfNags = new JLabel("No Of Bags");
-		lblNoOfNags.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-		lblNoOfNags.setBounds(50, 350, 175, 25);
-		panelWeighing.add(lblNoOfNags);
+		JLabel lblNoOfBags = new JLabel("No Of Bags");
+		lblNoOfBags.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		lblNoOfBags.setBounds(50, 350, 175, 25);
+		panelWeighing.add(lblNoOfBags);
 
 		textFieldNoOfBags = new JTextField();
 		textFieldNoOfBags.addActionListener(e -> {
@@ -2462,6 +2486,39 @@ class WeighBridge {
 		label_5.setBounds(729, 390, 25, 25);
 		panelWeighing.add(label_5);
 
+		JLabel lblFinalWt = new JLabel("Final Wt");
+		lblFinalWt.setVisible(false);
+		lblFinalWt.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		lblFinalWt.setBounds(490, 468, 75, 25);
+		panelWeighing.add(lblFinalWt);
+
+		textFieldFinalWt = new JTextField();
+		textFieldFinalWt.setVisible(false);
+		textFieldFinalWt.setText("0");
+		textFieldFinalWt.setHorizontalAlignment(SwingConstants.RIGHT);
+		textFieldFinalWt.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+		textFieldFinalWt.setEnabled(false);
+		textFieldFinalWt.setDisabledTextColor(Color.BLACK);
+		textFieldFinalWt.setColumns(10);
+		textFieldFinalWt.setBounds(619, 468, 100, 25);
+		panelWeighing.add(textFieldFinalWt);
+
+		JLabel label_6 = new JLabel("Kg");
+		label_6.setVisible(false);
+		label_6.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		label_6.setBounds(729, 468, 25, 25);
+		panelWeighing.add(label_6);
+
+		textFieldFinalAmount = new JTextField();
+		textFieldFinalAmount.setVisible(false);
+		textFieldFinalAmount.setHorizontalAlignment(SwingConstants.CENTER);
+		textFieldFinalAmount.setFont(new Font("Times New Roman", Font.PLAIN, 15));
+		textFieldFinalAmount.setEnabled(false);
+		textFieldFinalAmount.setDisabledTextColor(Color.BLACK);
+		textFieldFinalAmount.setColumns(10);
+		textFieldFinalAmount.setBounds(775, 468, 175, 25);
+		panelWeighing.add(textFieldFinalAmount);
+
 		panelCameras = new JPanel();
 		panelCameras.setBackground(new Color(0, 255, 127));
 		tabbedPane.addTab("          Cameras          ", null, panelCameras, null);
@@ -2472,7 +2529,7 @@ class WeighBridge {
 			if (checkBoxCamera1.isSelected()) {
 				butttonUpdateCamera1.setEnabled(true);
 				panelCamera1 = webcamStarter(webcamPicker1, 1, panelCamera1, comboBoxResolution1, textFieldCropX1,
-						textFieldCropY1, textFieldCropWidth1, textFieldCropHeight1, 10, 11, 240, 0);
+						textFieldCropY1, textFieldCropWidth1, textFieldCropHeight1, 10, 11, 0);
 			} else {
 				butttonUpdateCamera1.setSelected(false);
 				butttonUpdateCamera1.setEnabled(false);
@@ -2503,7 +2560,7 @@ class WeighBridge {
 		webcamPicker1.addItemListener(e -> {
 			if (checkBoxCamera1.isSelected())
 				panelCamera1 = webcamStarter(webcamPicker1, 1, panelCamera1, comboBoxResolution1, textFieldCropX1,
-						textFieldCropY1, textFieldCropWidth1, textFieldCropHeight1, 10, 11, 240, 0);
+						textFieldCropY1, textFieldCropWidth1, textFieldCropHeight1, 10, 11, 0);
 		});
 		webcamPicker1.setBounds(41, 258, 270, 25);
 		panelCameras.add(webcamPicker1);
@@ -2513,7 +2570,7 @@ class WeighBridge {
 		comboBoxResolution1.addActionListener(e -> {
 			if (lock)
 				panelCamera1 = webcamStarter(webcamPicker1, 1, panelCamera1, comboBoxResolution1, textFieldCropX1,
-						textFieldCropY1, textFieldCropWidth1, textFieldCropHeight1, 10, 11, 240, 1);
+						textFieldCropY1, textFieldCropWidth1, textFieldCropHeight1, 10, 11, 1);
 		});
 		comboBoxResolution1.setFont(new Font("Times New Roman", Font.PLAIN, 18));
 		comboBoxResolution1.setFocusable(false);
@@ -2567,7 +2624,7 @@ class WeighBridge {
 		webcamPicker2.addItemListener(e -> {
 			if (checkBoxCamera2.isSelected())
 				panelCamera2 = webcamStarter(webcamPicker2, 2, panelCamera2, comboBoxResolution2, textFieldCropX2,
-						textFieldCropY2, textFieldCropWidth2, textFieldCropHeight2, 617, 11, 240, 0);
+						textFieldCropY2, textFieldCropWidth2, textFieldCropHeight2, 617, 11, 0);
 		});
 
 		butttonUpdateCamera1 = new JButton("Unlock");
@@ -2612,7 +2669,7 @@ class WeighBridge {
 		comboBoxResolution2.addActionListener(e -> {
 			if (lock)
 				panelCamera2 = webcamStarter(webcamPicker2, 2, panelCamera2, comboBoxResolution2, textFieldCropX2,
-						textFieldCropY2, textFieldCropWidth2, textFieldCropHeight2, 617, 11, 240, 1);
+						textFieldCropY2, textFieldCropWidth2, textFieldCropHeight2, 617, 11, 1);
 		});
 		comboBoxResolution2.setFont(new Font("Times New Roman", Font.PLAIN, 18));
 		comboBoxResolution2.setFocusable(false);
@@ -2624,7 +2681,7 @@ class WeighBridge {
 			if (checkBoxCamera2.isSelected()) {
 				butttonUpdateCamera2.setEnabled(true);
 				panelCamera2 = webcamStarter(webcamPicker2, 2, panelCamera2, comboBoxResolution2, textFieldCropX2,
-						textFieldCropY2, textFieldCropWidth2, textFieldCropHeight2, 617, 11, 240, 0);
+						textFieldCropY2, textFieldCropWidth2, textFieldCropHeight2, 617, 11, 0);
 			} else {
 				butttonUpdateCamera2.setSelected(false);
 				butttonUpdateCamera2.setEnabled(false);
@@ -2693,7 +2750,7 @@ class WeighBridge {
 			if (checkBoxCamera3.isSelected()) {
 				butttonUpdateCamera3.setEnabled(true);
 				panelCamera3 = webcamStarter(webcamPicker3, 3, panelCamera3, comboBoxResolution3, textFieldCropX3,
-						textFieldCropY3, textFieldCropWidth3, textFieldCropHeight3, 10, 310, 240, 0);
+						textFieldCropY3, textFieldCropWidth3, textFieldCropHeight3, 10, 310, 0);
 			} else {
 				butttonUpdateCamera3.setSelected(false);
 				butttonUpdateCamera3.setEnabled(false);
@@ -2752,7 +2809,7 @@ class WeighBridge {
 		webcamPicker3.addItemListener(e -> {
 			if (checkBoxCamera3.isSelected())
 				panelCamera3 = webcamStarter(webcamPicker3, 3, panelCamera3, comboBoxResolution3, textFieldCropX3,
-						textFieldCropY3, textFieldCropWidth3, textFieldCropHeight3, 10, 310, 240, 0);
+						textFieldCropY3, textFieldCropWidth3, textFieldCropHeight3, 10, 310, 0);
 		});
 		webcamPicker3.setBounds(41, 557, 270, 25);
 		panelCameras.add(webcamPicker3);
@@ -2762,7 +2819,7 @@ class WeighBridge {
 		comboBoxResolution3.addActionListener(e -> {
 			if (lock)
 				panelCamera3 = webcamStarter(webcamPicker3, 3, panelCamera3, comboBoxResolution3, textFieldCropX3,
-						textFieldCropY3, textFieldCropWidth3, textFieldCropHeight3, 10, 310, 240, 1);
+						textFieldCropY3, textFieldCropWidth3, textFieldCropHeight3, 10, 310, 1);
 		});
 		comboBoxResolution3.setFont(new Font("Times New Roman", Font.PLAIN, 18));
 		comboBoxResolution3.setFocusable(false);
@@ -2814,7 +2871,7 @@ class WeighBridge {
 			if (checkBoxCamera4.isSelected()) {
 				butttonUpdateCamera4.setEnabled(true);
 				panelCamera4 = webcamStarter(webcamPicker4, 4, panelCamera4, comboBoxResolution4, textFieldCropX4,
-						textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310, 240, 0);
+						textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310, 0);
 			} else {
 				butttonUpdateCamera4.setSelected(false);
 				butttonUpdateCamera4.setEnabled(false);
@@ -2872,7 +2929,7 @@ class WeighBridge {
 		webcamPicker4.addItemListener(e -> {
 			if (checkBoxCamera4.isSelected())
 				panelCamera4 = webcamStarter(webcamPicker4, 4, panelCamera4, comboBoxResolution4, textFieldCropX4,
-						textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310, 240, 0);
+						textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310, 0);
 		});
 		webcamPicker4.setBounds(648, 557, 270, 25);
 		panelCameras.add(webcamPicker4);
@@ -2882,7 +2939,7 @@ class WeighBridge {
 		comboBoxResolution4.addActionListener(e -> {
 			if (lock)
 				panelCamera4 = webcamStarter(webcamPicker4, 4, panelCamera4, comboBoxResolution4, textFieldCropX4,
-						textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310, 240, 1);
+						textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310, 1);
 		});
 		comboBoxResolution4.setFont(new Font("Times New Roman", Font.PLAIN, 18));
 		comboBoxResolution4.setFocusable(false);
@@ -2945,7 +3002,7 @@ class WeighBridge {
 						JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
 				char[] temp = password.getPassword();
 				boolean isCorrect;
-				char[] correctPassword = "147085".toCharArray();
+				char[] correctPassword = CAMERA_PASSWORD.toCharArray();
 				if (temp.length != correctPassword.length) {
 					isCorrect = false;
 				} else {
@@ -3827,7 +3884,7 @@ class WeighBridge {
 						JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
 				char[] temp = password.getPassword();
 				boolean isCorrect;
-				char[] correctPassword = "147085".toCharArray();
+				char[] correctPassword = MANUAL_ENTRY_PASSWORD.toCharArray();
 				if (temp.length != correctPassword.length) {
 					isCorrect = false;
 				} else {
@@ -3873,7 +3930,7 @@ class WeighBridge {
 						JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
 				char[] temp = password.getPassword();
 				boolean isCorrect;
-				char[] correctPassword = "147085".toCharArray();
+				char[] correctPassword = EDIT_ENABLE_PASSWORD.toCharArray();
 				if (temp.length != correctPassword.length) {
 					isCorrect = false;
 				} else {
@@ -3940,7 +3997,7 @@ class WeighBridge {
 					JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
 			char[] temp = password.getPassword();
 			boolean isCorrect;
-			char[] correctPassword = "147085".toCharArray();
+			char[] correctPassword = RESET_PASSWORD.toCharArray();
 			if (temp.length != correctPassword.length) {
 				isCorrect = false;
 			} else {
@@ -3991,11 +4048,11 @@ class WeighBridge {
 		btnResetWeights.setBounds(865, 273, 150, 25);
 		panelSettings.add(btnResetWeights);
 
-		btnPassword = new JButton("Unlock");
-		btnPassword.setFocusable(false);
-		btnPassword.addActionListener(e -> {
+		btnUnlock = new JButton("Unlock");
+		btnUnlock.setFocusable(false);
+		btnUnlock.addActionListener(e -> {
 
-			if (Objects.equals(btnPassword.getText(), "Unlock")) {
+			if (Objects.equals(btnUnlock.getText(), "Unlock")) {
 				JPasswordField password = new JPasswordField(10);
 				JPanel panel = new JPanel();
 				String[] ConnectOptionNames = {
@@ -4008,13 +4065,14 @@ class WeighBridge {
 						JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
 				char[] temp = password.getPassword();
 				boolean isCorrect;
-				char[] correctPassword = "147085".toCharArray();
+				char[] correctPassword = UNLOCK_PASSWORD.toCharArray();
 				if (temp.length != correctPassword.length) {
 					isCorrect = false;
 				} else {
 					isCorrect = Arrays.equals(temp, correctPassword);
 				}
 				if (isCorrect) {
+					btnUnlock.setText("Lock");
 					chckbxManualEntry.setEnabled(true);
 					chckbxEditEnable.setEnabled(true);
 					chckbxCamera.setEnabled(true);
@@ -4032,10 +4090,11 @@ class WeighBridge {
 					textFieldSMSPortName.setEnabled(true);
 					chckbxExcludeNoOfBags.setEnabled(true);
 					chckbxenableSettings2.setEnabled(true);
+					chckbxIceWater.setEnabled(true);
 					chckbxExcludeDcNo.setEnabled(true);
-					btnPassword.setText("Lock");
 				}
 			} else {
+				btnUnlock.setText("Unlock");
 				chckbxManualEntry.setEnabled(false);
 				chckbxEditEnable.setEnabled(false);
 				chckbxCamera.setEnabled(false);
@@ -4055,12 +4114,12 @@ class WeighBridge {
 				chckbxenableSettings2.setSelected(false);
 				chckbxenableSettings2.setEnabled(false);
 				chckbxExcludeDcNo.setEnabled(false);
-				btnPassword.setText("Unlock");
+				chckbxIceWater.setEnabled(false);
 			}
 		});
-		btnPassword.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-		btnPassword.setBounds(664, 273, 150, 25);
-		panelSettings.add(btnPassword);
+		btnUnlock.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		btnUnlock.setBounds(664, 273, 150, 25);
+		panelSettings.add(btnUnlock);
 
 		chckbxExcludeCustomer = new JCheckBox("Exclude Customer");
 		chckbxExcludeCustomer.setEnabled(false);
@@ -4131,7 +4190,7 @@ class WeighBridge {
 						JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
 				char[] temp = password.getPassword();
 				boolean isCorrect;
-				char[] correctPassword = "147085".toCharArray();
+				char[] correctPassword = SMS_PASSWORD.toCharArray();
 				if (temp.length != correctPassword.length) {
 					isCorrect = false;
 				} else {
@@ -4199,7 +4258,7 @@ class WeighBridge {
 					JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
 			char[] temp = password.getPassword();
 			boolean isCorrect;
-			char[] correctPassword = "147085".toCharArray();
+			char[] correctPassword = RESET_PASSWORD.toCharArray();
 			if (temp.length != correctPassword.length) {
 				isCorrect = false;
 			} else {
@@ -4250,7 +4309,7 @@ class WeighBridge {
 				if (chckbxCharges != null && !chckbxCharges.isSelected()) {
 					btnAuto.setEnabled(false);
 				}
-				if (Objects.equals(btnPassword.getText(), "Lock")) {
+				if (Objects.equals(btnUnlock.getText(), "Lock") && !chckbxIceWater.isSelected()) {
 					chckbxExcludeCharges.setEnabled(true);
 				}
 				btnAuto.setVisible(false);
@@ -4270,27 +4329,22 @@ class WeighBridge {
 		chckbxMaterialSl.setFocusable(false);
 		chckbxMaterialSl.setEnabled(false);
 		chckbxMaterialSl.setBackground(new Color(0, 255, 127));
-		chckbxMaterialSl.setBounds(172, 250, 139, 25);
+		chckbxMaterialSl.setBounds(171, 250, 139, 25);
 		panelSettings.add(chckbxMaterialSl);
 
 		chckbxCharges = new JCheckBox("Manual Charge");
 		chckbxCharges.addChangeListener(e -> {
-			if (!chckbxAutoCharges.isSelected()) {
-				chckbxCharges.setSelected(false);
-				return;
-			}
 			if (chckbxCharges.isSelected()) {
 				chckbxAutoCharges.setSelected(false);
-				chckbxExcludeCharges.setEnabled(true);
+				if (Objects.equals(btnUnlock.getText(), "Lock")) {
+					chckbxExcludeCharges.setEnabled(true);
+				}
 				chckbxExcludeCharges.setSelected(false);
 				btnAuto.setEnabled(true);
 				chckbxChargecheck.setEnabled(true);
 			} else {
-				if (!chckbxAutoCharges.isSelected())
-					btnAuto.setEnabled(false);
-				if (Objects.equals(btnPassword.getText(), "Lock")) {
-					chckbxChargecheck.setEnabled(false);
-				}
+				btnAuto.setEnabled(false);
+				chckbxChargecheck.setEnabled(false);
 			}
 		});
 		chckbxCharges.setFont(new Font("Times New Roman", Font.ITALIC, 15));
@@ -4320,14 +4374,14 @@ class WeighBridge {
 		chckbxExcludeNoOfBags.addChangeListener(e -> {
 			if (chckbxExcludeNoOfBags.isSelected()) {
 				textFieldNoOfBags.setEnabled(false);
-				lblNoOfNags.setVisible(false);
+				lblNoOfBags.setVisible(false);
 				textFieldNoOfBags.setVisible(false);
 				lblBagDeduction.setVisible(false);
 				textFieldBagDeduction.setVisible(false);
 				label_5.setVisible(false);
 			} else {
 				textFieldNoOfBags.setEnabled(true);
-				lblNoOfNags.setVisible(true);
+				lblNoOfBags.setVisible(true);
 				textFieldNoOfBags.setVisible(true);
 				lblBagDeduction.setVisible(true);
 				textFieldBagDeduction.setVisible(true);
@@ -4354,6 +4408,54 @@ class WeighBridge {
 		chckbxExcludeDcNo.setBackground(new Color(0, 255, 127));
 		chckbxExcludeDcNo.setBounds(25, 273, 145, 25);
 		panelSettings.add(chckbxExcludeDcNo);
+
+		chckbxIceWater = new JCheckBox("Ice water/Freight");
+		chckbxIceWater.setEnabled(false);
+		chckbxIceWater.setFont(new Font("Times New Roman", Font.ITALIC, 15));
+		chckbxIceWater.addChangeListener(e -> {
+			if (chckbxIceWater.isSelected()) {
+				lblDriversName.setText("Party's City");
+				lblCustmerName.setText("Party's Name");
+				lblBagDeduction.setText("Ice/Water Less");
+				lblCharges.setText("Rate");
+				lblNoOfBags.setText("Freight Charges");
+				chckbxExcludeCustomer.setEnabled(false);
+				chckbxExcludeCustomer.setSelected(false);
+				chckbxExcludeCharges.setEnabled(false);
+				chckbxExcludeCharges.setSelected(false);
+				chckbxAutoCharges.setEnabled(false);
+				chckbxAutoCharges.setSelected(false);
+				chckbxExcludeNoOfBags.setEnabled(false);
+				chckbxExcludeNoOfBags.setSelected(false);
+				chckbxExcludeDrivers.setEnabled(false);
+				chckbxExcludeDrivers.setSelected(false);
+				chckbxCharges.setEnabled(false);
+				chckbxCharges.setSelected(false);
+			} else {
+				lblDriversName.setText("Transporter's Name");
+				lblCustmerName.setText("Custmer's Name");
+				lblBagDeduction.setText("Bag Deduction");
+				lblCharges.setText("Charges");
+				lblNoOfBags.setText("No Of Bags");
+				if (Objects.equals(btnUnlock.getText(), "Lock")) {
+					chckbxExcludeCustomer.setEnabled(true);
+					chckbxExcludeCharges.setEnabled(true);
+					chckbxAutoCharges.setEnabled(true);
+					chckbxExcludeNoOfBags.setEnabled(true);
+					chckbxExcludeDrivers.setEnabled(true);
+					chckbxCharges.setEnabled(true);
+				}
+			}
+			lblFinalWt.setVisible(chckbxIceWater.isSelected());
+			textFieldFinalWt.setVisible(chckbxIceWater.isSelected());
+			label_6.setVisible(chckbxIceWater.isSelected());
+			textFieldFinalAmount.setVisible(chckbxIceWater.isSelected());
+			textFieldBagDeduction.setEnabled(chckbxIceWater.isSelected());
+		});
+		chckbxIceWater.setFocusable(false);
+		chckbxIceWater.setBackground(new Color(0, 255, 127));
+		chckbxIceWater.setBounds(172, 275, 145, 25);
+		panelSettings.add(chckbxIceWater);
 
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(0, 255, 127));
@@ -4472,7 +4574,7 @@ class WeighBridge {
 		chckbxTareNoSlno.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		chckbxTareNoSlno.setFocusable(false);
 		chckbxTareNoSlno.setBackground(new Color(0, 255, 127));
-		chckbxTareNoSlno.setBounds(839, 283, 200, 25);
+		chckbxTareNoSlno.setBounds(1004, 52, 200, 25);
 		panel.add(chckbxTareNoSlno);
 
 		JLabel lblBagsSetting = new JLabel("Bag Settings");
@@ -4507,8 +4609,16 @@ class WeighBridge {
 		chckbxManualStatus.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		chckbxManualStatus.setFocusable(false);
 		chckbxManualStatus.setBackground(new Color(0, 255, 127));
-		chckbxManualStatus.setBounds(1049, 585, 200, 25);
+		chckbxManualStatus.setBounds(1047, 582, 200, 25);
 		panel.add(chckbxManualStatus);
+
+		chckbxNeedLogin = new JCheckBox("Need Login");
+		chckbxNeedLogin.setSelected(true);
+		chckbxNeedLogin.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		chckbxNeedLogin.setFocusable(false);
+		chckbxNeedLogin.setBackground(new Color(0, 255, 127));
+		chckbxNeedLogin.setBounds(1005, 82, 199, 25);
+		panel.add(chckbxNeedLogin);
 
 		JButton button = new JButton("Minimize");
 		button.addActionListener(e -> babulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
@@ -4573,7 +4683,7 @@ class WeighBridge {
 					date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
 					vehicleNo = textFieldDetail.getText();
 					material = "" + comboBoxMaterialReport.getSelectedItem();
-					if ("null".contains(material.trim()) || "".contains(material.trim()))
+					if ("null".contains(material.trim()))
 						material = "";
 					else
 						material = "AND MATERIAL LIKE '" + material + "'";
@@ -4666,7 +4776,7 @@ class WeighBridge {
 							rs.getString("DRIVERNAME"),
 							rs.getString("VEHICLENO"),
 							rs.getString("MATERIAL"),
-							rs.getInt("NOOFBAGS"),
+							String.valueOf((rs.getDouble("NOOFBAGS") % 1) == 0 ? Math.round(rs.getDouble("NOOFBAGS")) : Math.round(rs.getDouble("NOOFBAGS") * 100d) / 100d),
 							rs.getInt("CHARGES"),
 							rs.getInt("GROSSWT"),
 							gross,
@@ -4744,7 +4854,7 @@ class WeighBridge {
 				textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
 				textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
 				comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
-				textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
+				textFieldNoOfBags.setText(String.valueOf((rs.getDouble("NOOFBAGS") % 1) == 0 ? Math.round(rs.getDouble("NOOFBAGS")) : Math.round(rs.getDouble("NOOFBAGS") * 100d) / 100d));
 				textFieldCharges.setText(Integer.toString(rs.getInt("CHARGES")));
 				textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
 				textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
@@ -5648,7 +5758,8 @@ class WeighBridge {
 		pf.setPaper(paper);
 		Book pBook = new Book();
 		pBook.append(new Printable() {
-			private void drawString(Graphics g, String text, @SuppressWarnings("SameParameterValue") int y) {
+			private void drawString(Graphics g, String text) {
+				int y = 0;
 				for (String line : text.split("\n")) {
 					g.drawString(line, 0, y += g.getFontMetrics().getHeight() - 1);
 				}
@@ -5716,7 +5827,7 @@ class WeighBridge {
 						                    textFieldLine4.getText();
 
 				graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-				drawString(graphics, initString, 0);
+				drawString(graphics, initString);
 				graphics.drawLine(56, 129, 544, 129);
 				graphics.drawLine(56, 173, 544, 173);
 				graphics.drawLine(56, 195, 544, 195);
@@ -6366,7 +6477,7 @@ class WeighBridge {
 
 	private WebcamPanel webcamStarter(WebcamPicker webcamPicker, int i, WebcamPanel panelCamera,
 	                                  JComboBox<DimensionTemplate> comboBoxResolution, JTextField textFieldCropX12, JTextField textFieldCropY12,
-	                                  JTextField textFieldCropWidth12, JTextField textFieldCropHeight12, int x, int y, @SuppressWarnings("SameParameterValue") int z, int l) {
+	                                  JTextField textFieldCropWidth12, JTextField textFieldCropHeight12, int x, int y, int l) {
 		if (chckbxCamera.isSelected())
 			try {
 				if (webcamPicker.getSelectedWebcam() != null) {
@@ -6412,9 +6523,9 @@ class WeighBridge {
 						webcam[i].setViewSize((Dimension) Objects.requireNonNull(comboBoxResolution.getSelectedItem()));
 					panelCamera = new WebcamPanel(webcam[i]);
 					panelCamera.setBounds(x, y,
-							(int) (((double) z / ((Dimension) Objects.requireNonNull(comboBoxResolution.getSelectedItem())).height *
+							(int) (((double) 240 / ((Dimension) Objects.requireNonNull(comboBoxResolution.getSelectedItem())).height *
 									        ((Dimension) comboBoxResolution.getSelectedItem()).width)),
-							z);
+							240);
 					panelCameras.add(panelCamera);
 					lock = true;
 				}
@@ -6582,16 +6693,16 @@ class WeighBridge {
 				tabbedPane.setTitleAt(1, "          Cameras          ");
 				if (checkBoxCamera1.isSelected())
 					panelCamera1 = webcamStarter(webcamPicker1, 1, panelCamera1, comboBoxResolution1, textFieldCropX1,
-							textFieldCropY1, textFieldCropWidth1, textFieldCropHeight1, 10, 11, 240, 2);
+							textFieldCropY1, textFieldCropWidth1, textFieldCropHeight1, 10, 11, 2);
 				if (checkBoxCamera2.isSelected())
 					panelCamera2 = webcamStarter(webcamPicker2, 2, panelCamera2, comboBoxResolution2, textFieldCropX2,
-							textFieldCropY2, textFieldCropWidth2, textFieldCropHeight2, 617, 11, 240, 2);
+							textFieldCropY2, textFieldCropWidth2, textFieldCropHeight2, 617, 11, 2);
 				if (checkBoxCamera3.isSelected())
 					panelCamera3 = webcamStarter(webcamPicker3, 3, panelCamera3, comboBoxResolution3, textFieldCropX3,
-							textFieldCropY3, textFieldCropWidth3, textFieldCropHeight3, 10, 310, 240, 2);
+							textFieldCropY3, textFieldCropWidth3, textFieldCropHeight3, 10, 310, 2);
 				if (checkBoxCamera4.isSelected())
 					panelCamera4 = webcamStarter(webcamPicker4, 4, panelCamera4, comboBoxResolution4, textFieldCropX4,
-							textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310, 240, 2);
+							textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310, 2);
 				btnClick.setEnabled(true);
 				butttonUpdateCamera.setEnabled(true);
 				buttonUnLockCamera.setEnabled(true);
@@ -6603,13 +6714,13 @@ class WeighBridge {
 						"Enter",
 						"Cancel"
 				};
-				panel.add(new JLabel("Please the Camera Password ? "));
+				panel.add(new JLabel("Please Enter the Camera Password ? "));
 				panel.add(password);
 				JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION,
 						JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
 				char[] temp = password.getPassword();
 				boolean isCorrect;
-				char[] correctPassword = "147085".toCharArray();
+				char[] correctPassword = CAMERA_PASSWORD.toCharArray();
 				if (temp.length != correctPassword.length) {
 					isCorrect = false;
 				} else {
@@ -6621,19 +6732,19 @@ class WeighBridge {
 					if (checkBoxCamera1.isSelected())
 						panelCamera1 = webcamStarter(webcamPicker1, 1, panelCamera1, comboBoxResolution1,
 								textFieldCropX1, textFieldCropY1, textFieldCropWidth1, textFieldCropHeight1, 10, 11,
-								240, 2);
+								2);
 					if (checkBoxCamera2.isSelected())
 						panelCamera2 = webcamStarter(webcamPicker2, 2, panelCamera2, comboBoxResolution2,
 								textFieldCropX2, textFieldCropY2, textFieldCropWidth2, textFieldCropHeight2, 617, 11,
-								240, 2);
+								2);
 					if (checkBoxCamera3.isSelected())
 						panelCamera3 = webcamStarter(webcamPicker3, 3, panelCamera3, comboBoxResolution3,
 								textFieldCropX3, textFieldCropY3, textFieldCropWidth3, textFieldCropHeight3, 10, 310,
-								240, 2);
+								2);
 					if (checkBoxCamera4.isSelected())
 						panelCamera4 = webcamStarter(webcamPicker4, 4, panelCamera4, comboBoxResolution4,
 								textFieldCropX4, textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310,
-								240, 2);
+								2);
 					btnClick.setEnabled(true);
 					butttonUpdateCamera.setEnabled(true);
 					buttonUnLockCamera.setEnabled(true);
@@ -7176,7 +7287,7 @@ class WeighBridge {
 							rs.updateString("DRIVERNAME", (String) model.getValueAt(row, 5));
 							rs.updateString("VEHICLENO", (String) model.getValueAt(row, 6));
 							rs.updateString("MATERIAL", (String) model.getValueAt(row, 7));
-							rs.updateInt("NOOFBAGS", Integer.parseInt("0" + model.getValueAt(row, 8)));
+							rs.updateDouble("NOOFBAGS", Double.parseDouble("0" + model.getValueAt(row, 8)));
 							rs.updateInt("CHARGES", Integer.parseInt("0" + model.getValueAt(row, 9)));
 							rs.updateInt("GROSSWT", Integer.parseInt("0" + model.getValueAt(row, 10)));
 
@@ -7213,7 +7324,7 @@ class WeighBridge {
 							rs.updateBoolean("MANUAL", true);
 							rs.updateRow();
 
-							model.setValueAt(rs.getInt("NOOFBAGS"), row, 8);
+							model.setValueAt(String.valueOf((rs.getDouble("NOOFBAGS") % 1) == 0 ? Math.round(rs.getDouble("NOOFBAGS")) : Math.round(rs.getDouble("NOOFBAGS") * 100d) / 100d), row, 8);
 							if (rs.getDate("DCNODATE") != null) {
 								model.setValueAt("" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")), row, 3);
 							} else {

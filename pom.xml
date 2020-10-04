@@ -85,7 +85,6 @@
     </dependencies>
     <build>
         <finalName>WeighBridge</finalName>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
