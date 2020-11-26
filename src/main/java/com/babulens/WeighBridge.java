@@ -275,9 +275,9 @@ class WeighBridge {
 
 			// TODO: start
 			initialize();
+			settings();
 			setup();
 			cameraSetting();
-			settings();
 			initializeWeights();
 			Timer t1 = new Timer(1000, e -> {
 				Date date = new Date();
@@ -357,8 +357,39 @@ class WeighBridge {
 				case "1":
 					UID = rs.getString("UID");
 					if (UID.equals(getUUID())) {
-						JOptionPane.showMessageDialog(null, "Welcome to the \"BABULENS WEIGHBRIDGE\" Software", "Welcome",
-								JOptionPane.INFORMATION_MESSAGE);
+						if (chckbxNeedLogin.isSelected()) {
+							JPasswordField password = new JPasswordField(10);
+							JPanel panel = new JPanel();
+							String[] ConnectOptionNames = {
+									"Enter",
+									"Cancel"
+							};
+							panel.add(new JLabel("<html>Welcome to the \"BABULENS WEIGHBRIDGE\" Software<br/><br/>Please Enter the Login Password ? </html>"));
+							panel.add(password);
+							while (true) {
+
+								int res = JOptionPane.showOptionDialog(null, panel, "Welcome ", JOptionPane.OK_CANCEL_OPTION,
+										JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
+								if (res != 0) {
+									close();
+								}
+								char[] temp = password.getPassword();
+								boolean isCorrect;
+								char[] correctPassword = LOGIN_PASSWORD.toCharArray();
+								if (temp.length != correctPassword.length) {
+									isCorrect = false;
+								} else {
+									isCorrect = Arrays.equals(temp, correctPassword);
+								}
+								if (isCorrect) {
+									break;
+								}
+							}
+						} else {
+							JOptionPane.showMessageDialog(null, "Welcome to the \"BABULENS WEIGHBRIDGE\" Software", "Welcome",
+									JOptionPane.INFORMATION_MESSAGE);
+						}
+
 					} else {
 						rs.updateString("ID", "0");
 						rs.updateRow();
@@ -971,7 +1002,7 @@ class WeighBridge {
 						Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 						ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL like '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
 						if (rs.next()) {
-							textFieldCharges.setText(("" + rs.getDouble("COST")).replaceAll(".0", ""));
+							textFieldCharges.setText(("" + rs.getDouble("COST")).replaceAll(".0$", ""));
 						}
 					} catch (SQLException | NumberFormatException ignored) {
 					}
@@ -1651,7 +1682,8 @@ class WeighBridge {
 				} catch (SQLException | NumberFormatException ignored) {
 				}
 			}
-			textFieldCharges.setText(Double.toString(Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^0-9]", ""))).replaceAll(".0", ""));
+			String[] temp = ("0" + textFieldCharges.getText() + ".0").replaceAll("[^.0-9]", "").split("\\.");
+			textFieldCharges.setText(Double.toString(Double.parseDouble(temp[0] + "." + temp[1])).replaceAll(".0$", ""));
 			textFieldNoOfBags.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", ""))));
 
 			if (chckbxIceWater.isSelected() && Integer.parseInt(textFieldNetWt.getText()) > 0) {
@@ -1783,13 +1815,13 @@ class WeighBridge {
 				}
 				rs.updateInt("BAGDEDUCTION", Integer.parseInt(0 + textFieldBagDeduction.getText()));
 				rs.updateInt("NETWT", Integer.parseInt(0 + textFieldNetWt.getText()));
-				rs.updateInt("FINALWT", Integer.parseInt(0 + textFieldFinalWt.getText()));
-				rs.updateInt("FINALAMOUNT", Integer.parseInt(0 + textFieldFinalAmount.getText()));
 				if (!textFieldNetDateTime.getText().equals("")) {
 					Date date = dateAndTimeFormat.parse(textFieldNetDateTime.getText());
 					rs.updateDate("NETDATE", new java.sql.Date(date.getTime()));
 					rs.updateTime("NETTIME", new Time(date.getTime()));
 				}
+				rs.updateInt("FINALWT", Integer.parseInt(0 + textFieldFinalWt.getText()));
+				rs.updateInt("FINALAMOUNT", Integer.parseInt(0 + textFieldFinalAmount.getText()));
 				rs.updateBoolean("MANUAL", chckbxManualEntry.isSelected());
 				if (!update) {
 					rs.insertRow();
@@ -3483,8 +3515,13 @@ class WeighBridge {
 
 		JButton btnPrintReport = new JButton("Print");
 		btnPrintReport.addActionListener(e -> {
-			if (rdbtnWeighing.isSelected())
-				printReportWeight();
+			if (rdbtnWeighing.isSelected()) {
+				if (chckbxIceWater.isSelected()) {
+					printReportWeightIceWater();
+				} else {
+					printReportWeight();
+				}
+			}
 		});
 		btnPrintReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		btnPrintReport.setFocusable(false);
@@ -4682,7 +4719,7 @@ class WeighBridge {
 							rs.getString("VEHICLENO"),
 							rs.getString("MATERIAL"),
 							rs.getInt("NOOFBAGS"),
-							("" + rs.getDouble("CHARGES")).replaceAll(".0", ""),
+							("" + rs.getDouble("CHARGES")).replaceAll(".0$", ""),
 							rs.getInt("GROSSWT"),
 							gross,
 							rs.getInt("TAREWT"),
@@ -4765,7 +4802,7 @@ class WeighBridge {
 				textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
 				comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
 				textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-				textFieldCharges.setText(Double.toString(rs.getDouble("CHARGES")).replaceAll(".0", ""));
+				textFieldCharges.setText(Double.toString(rs.getDouble("CHARGES")).replaceAll(".0$", ""));
 				textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
 				textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
 				if (textFieldGrossDateTime.getText().equals("null null"))
@@ -5075,35 +5112,42 @@ class WeighBridge {
 
 	}
 
-	// TODO: 11/25/2020   ice water
 	private JTextPane createTextPaneIceWater() {
 		String format = " %1$-13s: %2$-15s\n";
 		String format2 = " %1$-13s: %2$-20s%3$-12s: %4$-20s\n";
-		String format1 = "     %1$-9s: %2$-7s Kg               %3$-20s\n";
-		String format3 = "     %1$-9s: %2$s";
+		String format1 = "     %1$-15s: %2$-7s Kg               %3$-20s\n";
+		String format3 = "     %1$-15s: %2$s\n";
 
 		String[] initString = {
 				"\n" + StringUtils.center(title1.getText(), 39) + "\n",
 				StringUtils.center(title2.getText(), 65) + "\n",
-				"-----------------------------------------------------------------\n", // 65
+				"----------------------------------------------------------------------\n", // 65
 				String.format(format, "Ticket No", textFieldSlNo.getText()),
 				String.format(format2, "Party Name", comboBoxCustomerName.getEditor().getItem(), "Part City", textFieldDriverName.getEditor().getItem()),
 				String.format(format2, "Vehicle No", textFieldVehicleNo.getText(), "Material", comboBoxMaterial.getEditor().getItem()),
-				"-----------------------------------------------------------------\n",
-				String.format(format1, "Gross Wt", StringUtils.leftPad(textFieldGrossWt.getText(), 7, " "),
-						textFieldGrossDateTime.getText()),
-				String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "),
-						textFieldTareDateTime.getText()),
-				String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "),
-						"Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
-				chckbxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? "" :
-						String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n",
-				"-----------------------------------------------------------------\n",
+				"----------------------------------------------------------------------\n",
+				String.format(format1, "Gross Wt", StringUtils.leftPad(textFieldGrossWt.getText(), 7, " "), textFieldGrossDateTime.getText()),
+				String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "), textFieldTareDateTime.getText()),
+				String.format(format1, "Nett Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "), ""),
+				String.format(format1, "Ice/Water Less", StringUtils.leftPad(textFieldBagDeduction.getText(), 7, " "), textFieldNetDateTime.getText()),
+				String.format(format1, "Final Wt", StringUtils.leftPad(textFieldFinalWt.getText(), 7, " "), ""),
+				String.format(format3, "Rate", textFieldCharges.getText()),
+				String.format(format3, "Total Amount", (int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.0-9]", "")))),
+				String.format(format3, "Freight Charges", textFieldNoOfBags.getText()),
+				String.format(format3, "Final Amount", textFieldFinalAmount.getText()),
+				String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n\n",
+				"----------------------------------------------------------------------\n",
 				StringUtils.rightPad(textFieldFooter.getText(), 50, " ") + "Signature"
 		};
 		String[] initStyles = {
 				"1",
 				"2",
+				"3",
+				"3",
+				"3",
+				"3",
+				"3",
+				"3",
 				"3",
 				"3",
 				"3",
@@ -6026,7 +6070,7 @@ class WeighBridge {
 		String temp = "\n";
 		for (int i = 0; i < model.getRowCount(); i++) {
 			temp = temp.concat(String.format(format,
-					StringUtils.center(model.getValueAt(i, 1) != null ? model.getValueAt(i, 0).toString() : "", 5),
+					StringUtils.center(model.getValueAt(i, 1) != null ? model.getValueAt(i, 1).toString() : "", 5),
 					StringUtils.center(model.getValueAt(i, 16) != null ? model.getValueAt(i, 16).toString() : "", 10),
 					StringUtils.center(model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "", 15),
 					StringUtils.center(model.getValueAt(i, 7) != null ? model.getValueAt(i, 7).toString() : "", 15),
@@ -6085,6 +6129,158 @@ class WeighBridge {
 		return textPane;
 	}
 
+	private void addStylesToDocument3(StyledDocument doc) {
+		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+
+		Style regular = doc.addStyle("regular", def);
+		StyleConstants.setFontFamily(def, "Courier New");
+
+		Style s = doc.addStyle("1", regular);
+		StyleConstants.setBold(s, true);
+		StyleConstants.setFontSize(s, 20);
+
+		s = doc.addStyle("2", regular);
+		StyleConstants.setItalic(s, true);
+		StyleConstants.setFontSize(s, 12);
+
+		s = doc.addStyle("3", regular);
+		StyleConstants.setFontSize(s, 9);
+
+		s = doc.addStyle("4", regular);
+		StyleConstants.setBold(s, true);
+		StyleConstants.setFontSize(s, 8);
+
+		s = doc.addStyle("5", regular);
+		StyleConstants.setBold(s, true);
+		StyleConstants.setFontSize(s, 10);
+	}
+
+	private void printReportWeightIceWater() {
+		JTextPane textPane = createTextPaneReportWeightIceWater();
+		textPane.setBackground(Color.white);
+		PrinterJob pj = PrinterJob.getPrinterJob();
+		PageFormat pf = new PageFormat();
+		Paper paper = pf.getPaper();
+		double width = 8d * 72d;
+		double height = 12d * 72d;
+		double widthmargin = .25d * 72d;
+		double heightmargin = .25d * 72d;
+		paper.setSize(width, height);
+		paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+		pf.setPaper(paper);
+		pf.setOrientation(PageFormat.REVERSE_LANDSCAPE);
+		Book pBook = new Book();
+		pBook.append(textPane.getPrintable(null, null), pf, 99);
+		pj.setPageable(pBook);
+		try {
+			pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+			pj.print();
+		} catch (PrinterException ignored) {
+		}
+
+	}
+
+
+	private JTextPane createTextPaneReportWeightIceWater() {
+		TableModel model = tableReport.getModel();
+		String format = " %1$-17s %2$-11s %3$-4s %4$-12s %5$-9s %6$-9s %7$-8s %8$-8s %9$-8s %10$-8s %11$-10s %12$s\n";
+		String temp = "\n";
+		for (int i = 0; i < model.getRowCount(); i++) {
+			int test = (int) (Integer.parseInt(0 + ("" + model.getValueAt(i, 15)).replaceAll("[^.0-9]", "")) * Double.parseDouble(0 + ("" + model.getValueAt(i, 9)).replaceAll("[^.0-9]", "")));
+			temp = temp.concat(String.format(format,
+					model.getValueAt(i, 4) != null ? model.getValueAt(i, 4).toString() : "",
+					model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "",
+					StringUtils.leftPad(model.getValueAt(i, 1) != null ? model.getValueAt(i, 1).toString() : "", 4, " "),
+					model.getValueAt(i, 7) != null ? model.getValueAt(i, 7).toString() : "",
+					StringUtils.center(model.getValueAt(i, 8) != null ? model.getValueAt(i, 8).toString() : "", 9),
+					StringUtils.leftPad(model.getValueAt(i, 15) != null ? model.getValueAt(i, 15).toString() : "", 8, " "),
+					StringUtils.leftPad(model.getValueAt(i, 14) != null ? model.getValueAt(i, 14).toString() : "", 8, " "),
+					StringUtils.leftPad(model.getValueAt(i, 9) != null ? model.getValueAt(i, 9).toString() : "", 8, " "),
+					StringUtils.leftPad("" + test, 8, " "),
+					StringUtils.leftPad(model.getValueAt(i, 8) != null ? model.getValueAt(i, 8).toString() : "", 8, " "),
+					StringUtils.leftPad(model.getValueAt(i, 18) != null ? model.getValueAt(i, 18).toString() : "", 8, " "),
+					model.getValueAt(i, 19) != null ? model.getValueAt(i, 19).toString().replaceAll(".{29}(?=.)",
+							"$0\n                                                                                                                    ") : ""
+			));
+		}
+
+		String[] initString = {
+				StringUtils.center(title1.getText(), 65) + "\n",
+				StringUtils.center(title2.getText(), 107) + "\n",
+				StringUtils.center(getTitle(), 107) + "\n",
+				"==================================================================================================================================================\n",
+				String.format(format, "Supplier", "Vehicle No", StringUtils.leftPad("Slip", 4, " "), "Supplier", "Item",
+						StringUtils.leftPad("Purchase", 9, " "), StringUtils.leftPad("Ice", 9, " "), StringUtils.leftPad("Rate", 8, " ")
+						, StringUtils.leftPad("Value", 8, " "), StringUtils.leftPad("Freight", 8, " ")
+						, StringUtils.leftPad("Nett", 8, " "), "Comments"),
+				String.format(format, "", "", StringUtils.leftPad("No", 4, " "), "City", "",
+						"", StringUtils.leftPad("Reduced", 9, " "), ""
+						, "", StringUtils.leftPad("Charges", 8, " ")
+						, StringUtils.leftPad("Amount", 8, " "), ""),
+				"==================================================================================================================================================\n",
+				temp,
+				"==================================================================================================================================================\n",
+				" ",
+				"\n\tTotal Final Wt     : " + textFieldtotalNetWt.getText(),
+				"\n\tTotal Final Amount : " + textFieldTotalCharges.getText(),
+				"\n\t\t\t\t\t\t\t\t\tSignature"
+		};
+
+		String[] initStyles = {
+				"1",
+				"2",
+				"2",
+				"3",
+				"3",
+				"3",
+				"3",
+				"3",
+				"3",
+				"5",
+				"5",
+				"5",
+				"5"
+		};
+
+		JTextPane textPane = new JTextPane();
+		StyledDocument doc = textPane.getStyledDocument();
+		addStylesToDocumentReportWeightIceWater(doc);
+
+		try {
+			for (int i = 0; i < initString.length; i++) {
+				doc.insertString(doc.getLength(), initString[i], doc.getStyle(initStyles[i]));
+			}
+		} catch (BadLocationException ignored) {
+		}
+		return textPane;
+	}
+
+	private void addStylesToDocumentReportWeightIceWater(StyledDocument doc) {
+		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+
+		Style regular = doc.addStyle("regular", def);
+		StyleConstants.setFontFamily(def, "Courier New");
+
+		Style s = doc.addStyle("1", regular);
+		StyleConstants.setBold(s, true);
+		StyleConstants.setFontSize(s, 20);
+
+		s = doc.addStyle("2", regular);
+		StyleConstants.setItalic(s, true);
+		StyleConstants.setFontSize(s, 12);
+
+		s = doc.addStyle("3", regular);
+		StyleConstants.setFontSize(s, 9);
+
+		s = doc.addStyle("4", regular);
+		StyleConstants.setBold(s, true);
+		StyleConstants.setFontSize(s, 8);
+
+		s = doc.addStyle("5", regular);
+		StyleConstants.setBold(s, true);
+		StyleConstants.setFontSize(s, 10);
+	}
+
 	private String getTitle() {
 		if (rdbtnWeighing.isSelected()) {
 			switch (Objects.requireNonNull(comboBox.getSelectedItem()).toString()) {
@@ -6116,32 +6312,6 @@ class WeighBridge {
 			}
 		}
 		return null;
-	}
-
-	private void addStylesToDocument3(StyledDocument doc) {
-		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-
-		Style regular = doc.addStyle("regular", def);
-		StyleConstants.setFontFamily(def, "Courier New");
-
-		Style s = doc.addStyle("1", regular);
-		StyleConstants.setBold(s, true);
-		StyleConstants.setFontSize(s, 20);
-
-		s = doc.addStyle("2", regular);
-		StyleConstants.setItalic(s, true);
-		StyleConstants.setFontSize(s, 12);
-
-		s = doc.addStyle("3", regular);
-		StyleConstants.setFontSize(s, 9);
-
-		s = doc.addStyle("4", regular);
-		StyleConstants.setBold(s, true);
-		StyleConstants.setFontSize(s, 8);
-
-		s = doc.addStyle("5", regular);
-		StyleConstants.setBold(s, true);
-		StyleConstants.setFontSize(s, 10);
 	}
 
 	private void toExcel(String excelFilePath) throws IOException {
@@ -7352,8 +7522,10 @@ class WeighBridge {
 								rs.updateDate("NETDATE", new java.sql.Date(date.getTime()));
 								rs.updateTime("NETTIME", new Time(date.getTime()));
 							}
+							rs.updateInt("FINALWT", Integer.parseInt("0" + model.getValueAt(row, 17)));
+							rs.updateInt("FINALAMOUNT", Integer.parseInt("0" + model.getValueAt(row, 18)));
 
-							rs.updateString("REMARKS", (String) model.getValueAt(row, 17));
+							rs.updateString("REMARKS", "" + model.getValueAt(row, 19));
 							rs.updateBoolean("MANUAL", true);
 							rs.updateRow();
 
@@ -7363,11 +7535,13 @@ class WeighBridge {
 							} else {
 								model.setValueAt("", row, 3);
 							}
-							model.setValueAt(rs.getDouble("CHARGES"), row, 9);
+							model.setValueAt(("" + rs.getDouble("CHARGES")).replaceAll(".0$", ""), row, 9);
 							model.setValueAt(rs.getInt("GROSSWT"), row, 10);
 							model.setValueAt(rs.getInt("TAREWT"), row, 12);
 							model.setValueAt(rs.getInt("BAGDEDUCTION"), row, 14);
 							model.setValueAt(rs.getInt("NETWT"), row, 15);
+							model.setValueAt(rs.getInt("FINALWT"), row, 17);
+							model.setValueAt(rs.getInt("FINALAMOUNT"), row, 18);
 							model.setValueAt(rs.getBoolean("MANUAL"), row, 18);
 							model.setValueAt(dateAndTimeFormatdate.format(rs.getDate("NETDATE")) + " "
 									+ timeFormat.format(rs.getTime("NETTIME")), row, 16);
@@ -7375,7 +7549,7 @@ class WeighBridge {
 							label = "Edit";
 							((TableReport) tableReport.getModel()).removeEditableRow(row);
 						}
-					} catch (SQLException | ParseException | NumberFormatException | NullPointerException ignored) {
+					} catch (SQLException | ParseException | NumberFormatException | NullPointerException | ClassCastException ignored) {
 						JOptionPane.showMessageDialog(null, "DATA ERROR\nCHECK THE VALUES ENTERED\nLINE :7037", "DATA ERROR",
 								JOptionPane.ERROR_MESSAGE);
 					}
