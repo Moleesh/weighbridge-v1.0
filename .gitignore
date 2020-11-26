@@ -25,7 +25,7 @@ hs_err_pid*
 
 .idea
 target
-WeighBridge
+WeighBridge 1.0
 *.iml
 weighdata.mv.db
 weighdata.trace.db
