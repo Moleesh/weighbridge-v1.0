@@ -124,7 +124,6 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>WeighBridge 1.0</directory>
                             <directory>target</directory>
                         </fileset>
                     </filesets>
