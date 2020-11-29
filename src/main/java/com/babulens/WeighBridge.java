@@ -6164,7 +6164,7 @@ class WeighBridge {
 		double width = 8d * 72d;
 		double height = 12d * 72d;
 		double widthmargin = .25d * 72d;
-		double heightmargin = .25d * 72d;
+		double heightmargin = .6d * 72d;
 		paper.setSize(width, height);
 		paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
 		pf.setPaper(paper);
@@ -6199,16 +6199,16 @@ class WeighBridge {
 					StringUtils.leftPad("" + test, 8, " "),
 					StringUtils.leftPad(model.getValueAt(i, 8) != null ? model.getValueAt(i, 8).toString() : "", 8, " "),
 					StringUtils.leftPad(model.getValueAt(i, 18) != null ? model.getValueAt(i, 18).toString() : "", 8, " "),
-					model.getValueAt(i, 19) != null ? model.getValueAt(i, 19).toString().replaceAll(".{29}(?=.)",
+					model.getValueAt(i, 19) != null ? model.getValueAt(i, 19).toString().replaceAll(".{24}(?=.)",
 							"$0\n                                                                                                                    ") : ""
 			));
 		}
 
 		String[] initString = {
-				StringUtils.center(title1.getText(), 65) + "\n",
-				StringUtils.center(title2.getText(), 107) + "\n",
-				StringUtils.center(getTitle(), 107) + "\n",
-				"==================================================================================================================================================\n",
+				StringUtils.center(title1.getText(), 64) + "\n",
+				StringUtils.center(title2.getText(), 106) + "\n",
+				StringUtils.center(getTitle(), 106) + "\n",
+				"==============================================================================================================================================\n",
 				String.format(format, "Supplier", "Vehicle No", StringUtils.leftPad("Slip", 4, " "), "Supplier", "Item",
 						StringUtils.leftPad("Purchase", 9, " "), StringUtils.leftPad("Ice", 9, " "), StringUtils.leftPad("Rate", 8, " ")
 						, StringUtils.leftPad("Value", 8, " "), StringUtils.leftPad("Freight", 8, " ")
@@ -6217,9 +6217,9 @@ class WeighBridge {
 						"", StringUtils.leftPad("Reduced", 9, " "), ""
 						, "", StringUtils.leftPad("Charges", 8, " ")
 						, StringUtils.leftPad("Amount", 8, " "), ""),
-				"==================================================================================================================================================\n",
+				"==============================================================================================================================================\n",
 				temp,
-				"==================================================================================================================================================\n",
+				"==============================================================================================================================================\n",
 				" ",
 				"\n\tTotal Final Wt     : " + textFieldtotalNetWt.getText(),
 				"\n\tTotal Final Amount : " + textFieldTotalCharges.getText(),
