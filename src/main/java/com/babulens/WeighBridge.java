@@ -17,6 +17,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.h2.util.DateTimeUtils;
 import org.jdesktop.swingx.JXDatePicker;
 
 import javax.imageio.ImageIO;
@@ -42,6 +43,8 @@ import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.*;
 import java.util.concurrent.*;
@@ -60,6 +63,7 @@ class WeighBridge {
 	private String RESET_PASSWORD = "147085";
 	private String LOGIN_PASSWORD = "123";
 	private int noOfCopies = 0;
+	private boolean takeBackup = false;
 	private boolean valueEntered = false;
 	private boolean afterStart = false;
 	static private SerialPort comPort;
@@ -246,6 +250,7 @@ class WeighBridge {
 	private JCheckBox chckbxNeedLogin;
 	private JCheckBox chckbxPrinterCopyDialog;
 	private JButton btnReprint;
+	private JCheckBox chckbxTakeBackup;
 
 	/**
 	 * Create the application.
@@ -284,11 +289,21 @@ class WeighBridge {
 			setup();
 			cameraSetting();
 			initializeWeights();
-			Timer t1 = new Timer(1000, e -> {
+			new Timer(1000, e -> {
 				Date date = new Date();
 				textFieldDateTime.setText(dateAndTimeFormat.format(date));
+			}).start();
+			Timer timer = new Timer(21600000, e -> {
+				try {
+					if (takeBackup) {
+						Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+						stmt.execute("BACKUP TO 'backup/backup_" + DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm").format(LocalDateTime.now()) + ".zip'");
+					}
+				} catch (SQLException ignored) {
+				}
 			});
-			t1.start();
+			timer.setInitialDelay(300000);
+			timer.start();
 			afterStart = true;
 		} catch (Error | Exception ignored) {
 		}
@@ -365,7 +380,7 @@ class WeighBridge {
 						if (chckbxNeedLogin.isSelected()) {
 							JPasswordField password = new JPasswordField(10);
 							valueEntered = false;
-							password.addActionListener(le -> {
+							password.addActionListener(l -> {
 								valueEntered = true;
 								JOptionPane.getRootFrame().dispose();
 							});
@@ -430,7 +445,7 @@ class WeighBridge {
 
 	private void startup(ResultSet rs) throws SQLException {
 		JPasswordField password = new JPasswordField(10);
-		password.addActionListener(le -> JOptionPane.getRootFrame().dispose());
+		password.addActionListener(l -> JOptionPane.getRootFrame().dispose());
 		JPanel panel = new JPanel();
 		String[] ConnectOptionNames = {
 				"Enter",
@@ -648,6 +663,9 @@ class WeighBridge {
 			chckbxIceWater.setSelected(rs.getBoolean("ICEWATER"));
 			chckbxNeedLogin.setSelected(rs.getBoolean("NEED_LOGIN"));
 			chckbxPrinterCopyDialog.setSelected(rs.getBoolean("NEED_PRINT_COPY_DIALOG"));
+			chckbxManualStatus.setSelected(rs.getBoolean("SHOW_STATUS"));
+			chckbxTakeBackup.setSelected(rs.getBoolean("TAKE_BACKUP"));
+			takeBackup = chckbxTakeBackup.isSelected();
 			TRIAL_LICENSE_PASSWORD = rs.getString("TRIAL_LICENSE_PASSWORD");
 			LICENSE_PASSWORD = rs.getString("LICENSE_PASSWORD");
 			UNLOCK_PASSWORD = rs.getString("UNLOCK_PASSWORD");
@@ -752,6 +770,8 @@ class WeighBridge {
 			rs.updateBoolean("ICEWATER", chckbxIceWater.isSelected());
 			rs.updateBoolean("NEED_LOGIN", chckbxNeedLogin.isSelected());
 			rs.updateBoolean("NEED_PRINT_COPY_DIALOG", chckbxPrinterCopyDialog.isSelected());
+			rs.updateBoolean("SHOW_STATUS", chckbxManualStatus.isSelected());
+			rs.updateBoolean("TAKE_BACKUP", chckbxTakeBackup.isSelected());
 			rs.updateBoolean("SMS", chckbxSms.isSelected());
 			rs.updateBoolean("CAMERA", chckbxCamera.isSelected());
 			rs.updateInt("SMSBAUDRATE", Integer.parseInt(0 + textFieldSMSBaudRate.getText().replaceAll("[^0-9]", "")));
@@ -846,7 +866,7 @@ class WeighBridge {
 		close.setFocusable(false);
 		close.setBounds(646, 11, 100, 30);
 		close.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		close.addActionListener(le -> close());
+		close.addActionListener(l -> close());
 		close.setFont(new Font("Times New Roman", Font.BOLD, 20));
 		babulensWeighbridgeDesigned.getContentPane().add(close);
 
@@ -934,7 +954,7 @@ class WeighBridge {
 
 		rdbtnGross = new JRadioButton("Gross");
 		rdbtnGross.setBackground(new Color(0, 255, 127));
-		rdbtnGross.addActionListener(le -> {
+		rdbtnGross.addActionListener(l -> {
 			comboBoxMaterial.setEnabled(true);
 			comboBoxMaterial.setSelectedIndex(-1);
 			if (chckbxExcludeCustomer.isSelected())
@@ -954,7 +974,7 @@ class WeighBridge {
 
 		rdbtnTare = new JRadioButton("Tare");
 		rdbtnTare.setBackground(new Color(0, 255, 127));
-		rdbtnTare.addActionListener(le -> {
+		rdbtnTare.addActionListener(l -> {
 			comboBoxMaterial.getModel().setSelectedItem("EMPTY");
 			if (chckbxExcludeCustomer.isSelected())
 				if (chckbxExcludeDrivers.isSelected())
@@ -971,7 +991,7 @@ class WeighBridge {
 		panelWeighing.add(rdbtnTare);
 
 		textFieldCharges = new JTextField();
-		textFieldCharges.addActionListener(le -> {
+		textFieldCharges.addActionListener(l -> {
 			if (chckbxIceWater.isSelected())
 				textFieldBagDeduction.requestFocus();
 			else if (chckbxExcludeRemarks.isSelected())
@@ -988,7 +1008,7 @@ class WeighBridge {
 
 		comboBoxCustomerName = new JComboBox<>();
 		comboBoxCustomerName.setEditable(true);
-		comboBoxCustomerName.addActionListener(le -> {
+		comboBoxCustomerName.addActionListener(l -> {
 			if (chckbxExcludeDrivers.isSelected())
 				textFieldVehicleNo.requestFocus();
 			else
@@ -1000,7 +1020,7 @@ class WeighBridge {
 		panelWeighing.add(comboBoxCustomerName);
 
 		comboBoxMaterial = new JComboBox<>();
-		comboBoxMaterial.addActionListener(le -> {
+		comboBoxMaterial.addActionListener(l -> {
 			if (comboBoxMaterial.getActionCommand().equals("comboBoxEdited")) {
 				if (chckbxMaterialSl.isSelected()) {
 					try {
@@ -1041,7 +1061,7 @@ class WeighBridge {
 		panelWeighing.add(comboBoxMaterial);
 
 		textFieldVehicleNo = new JTextField();
-		textFieldVehicleNo.addActionListener(le -> {
+		textFieldVehicleNo.addActionListener(l -> {
 			textFieldVehicleNo.setText(textFieldVehicleNo.getText().toUpperCase().replaceAll(" ", ""));
 			if (!chckbxTareNoSlno.isSelected()) {
 				if (rdbtnGross.isSelected()) {
@@ -1259,7 +1279,7 @@ class WeighBridge {
 		btnGetGross.setVisible(false);
 		btnGetGross.setFocusable(false);
 		btnGetGross.setEnabled(false);
-		btnGetGross.addActionListener(le -> {
+		btnGetGross.addActionListener(l -> {
 
 			String[] ConnectOptionNames = {
 					"Set Gross",
@@ -1310,7 +1330,7 @@ class WeighBridge {
 		btnGetTare.setVisible(false);
 		btnGetTare.setFocusable(false);
 		btnGetTare.setEnabled(false);
-		btnGetTare.addActionListener(le -> {
+		btnGetTare.addActionListener(l -> {
 			String[] ConnectOptionNames = {
 					"Set Tare",
 					"Cancel"
@@ -1357,7 +1377,7 @@ class WeighBridge {
 		btnTotal = new JButton("Total");
 		btnTotal.setVisible(false);
 		btnTotal.setFocusable(false);
-		btnTotal.addActionListener(le -> {
+		btnTotal.addActionListener(l -> {
 
 			textFieldVehicleNo.setText(textFieldVehicleNo.getText().toUpperCase().replaceAll(" ", ""));
 			if (rdbtnGross.isSelected()) {
@@ -1423,7 +1443,7 @@ class WeighBridge {
 
 		btnGetTareSl = new JButton("Get Tare Wt");
 		btnGetTareSl.setFocusable(false);
-		btnGetTareSl.addActionListener(le -> {
+		btnGetTareSl.addActionListener(l -> {
 			rdbtnGross.setSelected(true);
 			JComboBox<String> comboBoxa = new JComboBox<>();
 			comboBoxa.setModel(
@@ -1501,7 +1521,7 @@ class WeighBridge {
 
 		btnGetGrossSl = new JButton("Get Gross Wt");
 		btnGetGrossSl.setFocusable(false);
-		btnGetGrossSl.addActionListener(le -> {
+		btnGetGrossSl.addActionListener(l -> {
 
 			rdbtnTare.setSelected(true);
 			JComboBox<String> comboBoxa = new JComboBox<>();
@@ -1575,7 +1595,7 @@ class WeighBridge {
 		panelWeighing.add(btnGetGrossSl);
 
 		btnGetWeight = new JButton("Get Weight");
-		btnGetWeight.addActionListener(le -> {
+		btnGetWeight.addActionListener(l -> {
 			if (chckbxCamera.isSelected()) {
 				if (checkBoxCamera1.isSelected())
 					try {
@@ -1731,7 +1751,7 @@ class WeighBridge {
 		panelWeighing.add(btnGetWeight);
 
 		btnSave = new JButton("Save");
-		btnSave.addActionListener(le -> {
+		btnSave.addActionListener(l -> {
 			if (chckbxCamera.isSelected()) {
 				if (checkBoxCamera1.isSelected()) {
 					File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg");
@@ -1900,7 +1920,7 @@ class WeighBridge {
 		panelWeighing.add(btnSave);
 
 		btnPrint = new JButton("Print");
-		btnPrint.addActionListener(le -> {
+		btnPrint.addActionListener(l -> {
 			try {
 				boolean skipPrint = false;
 				if(chckbxPrinterCopyDialog.isSelected()) {
@@ -1984,7 +2004,7 @@ class WeighBridge {
 
 		btnReprint = new JButton("RePrint");
 		btnReprint.setFocusable(false);
-		btnReprint.addActionListener(le -> {
+		btnReprint.addActionListener(l -> {
 			String response = JOptionPane.showInputDialog(null, "Please Enter the Sl.no to Reprint ?", "Reprint", JOptionPane.QUESTION_MESSAGE);
 			if (response != null)
 				rePrint(response);
@@ -1995,7 +2015,7 @@ class WeighBridge {
 
 		JButton btnClear = new JButton("Clear");
 		btnClear.setFocusable(false);
-		btnClear.addActionListener(le -> clear());
+		btnClear.addActionListener(l -> clear());
 		btnClear.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		btnClear.setBounds(445, 565, 150, 25);
 		panelWeighing.add(btnClear);
@@ -2027,7 +2047,7 @@ class WeighBridge {
 		panelWeighing.add(lblCustmerName);
 
 		textFieldDriverName = new JComboBox<>();
-		textFieldDriverName.addActionListener(le -> textFieldVehicleNo.requestFocus());
+		textFieldDriverName.addActionListener(l -> textFieldVehicleNo.requestFocus());
 		textFieldDriverName.setFont(new Font("Times New Roman", Font.PLAIN, 18));
 		textFieldDriverName.setEditable(true);
 		textFieldDriverName.setBounds(775, 190, 175, 25);
@@ -2063,7 +2083,7 @@ class WeighBridge {
 
 		btnGetDcDetails = new JButton("Get Dc. Details");
 		btnGetDcDetails.setFocusable(false);
-		btnGetDcDetails.addActionListener(le -> {
+		btnGetDcDetails.addActionListener(l -> {
 			String[] ConnectOptionNames = {
 					"Set Dc. No",
 					"Clear",
@@ -2100,7 +2120,7 @@ class WeighBridge {
 		panelWeighing.add(btnGetDcDetails);
 
 		btnClick = new JButton("Click");
-		btnClick.addActionListener(le -> {
+		btnClick.addActionListener(l -> {
 			try {
 				jFrame.dispose();
 			} catch (NullPointerException ignored) {
@@ -2169,7 +2189,7 @@ class WeighBridge {
 		panelWeighing.add(btnClick);
 
 		JButton btnCalc = new JButton("Calc");
-		btnCalc.addActionListener(le -> {
+		btnCalc.addActionListener(l -> {
 			if (calc == null) {
 				calc = new Calculator();
 				calc.setTitle("Calculator");
@@ -2359,7 +2379,7 @@ class WeighBridge {
 		panelWeighing.add(lblRemarks);
 
 		btnAuto = new JButton("Check");
-		btnAuto.addActionListener(le -> {
+		btnAuto.addActionListener(l -> {
 			try {
 				Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 						ResultSet.CONCUR_UPDATABLE);
@@ -2390,7 +2410,7 @@ class WeighBridge {
 		panelWeighing.add(lblNoOfBags);
 
 		textFieldNoOfBags = new JTextField();
-		textFieldNoOfBags.addActionListener(le -> {
+		textFieldNoOfBags.addActionListener(l -> {
 			textFieldCharges.requestFocus();
 			if (chckbxExcludeCharges.isSelected())
 				if (chckbxExcludeRemarks.isSelected())
@@ -2438,7 +2458,7 @@ class WeighBridge {
 		panelWeighing.add(lblBagDeduction);
 
 		textFieldBagDeduction = new JTextField();
-		textFieldBagDeduction.addActionListener(le -> {
+		textFieldBagDeduction.addActionListener(l -> {
 			if (chckbxExcludeRemarks.isSelected())
 				btnGetWeight.requestFocus();
 			else
@@ -2498,7 +2518,7 @@ class WeighBridge {
 		panelCameras.setLayout(null);
 
 		checkBoxCamera1 = new JCheckBox("");
-		checkBoxCamera1.addActionListener(le -> {
+		checkBoxCamera1.addActionListener(l -> {
 			if (checkBoxCamera1.isSelected()) {
 				butttonUpdateCamera1.setEnabled(true);
 				panelCamera1 = webcamStarter(webcamPicker1, 1, panelCamera1, comboBoxResolution1, textFieldCropX1,
@@ -2540,7 +2560,7 @@ class WeighBridge {
 
 		comboBoxResolution1 = new JComboBox<>();
 		comboBoxResolution1.setEnabled(false);
-		comboBoxResolution1.addActionListener(le -> {
+		comboBoxResolution1.addActionListener(l -> {
 			if (lock)
 				panelCamera1 = webcamStarter(webcamPicker1, 1, panelCamera1, comboBoxResolution1, textFieldCropX1,
 						textFieldCropY1, textFieldCropWidth1, textFieldCropHeight1, 10, 11, 1);
@@ -2602,7 +2622,7 @@ class WeighBridge {
 
 		butttonUpdateCamera1 = new JButton("Unlock");
 		butttonUpdateCamera1.setEnabled(false);
-		butttonUpdateCamera1.addActionListener(le -> {
+		butttonUpdateCamera1.addActionListener(l -> {
 			if (checkBoxCamera1.isSelected())
 				if (Objects.equals(butttonUpdateCamera1.getText(), "Unlock")) {
 					webcamPicker1.setEnabled(true);
@@ -2639,7 +2659,7 @@ class WeighBridge {
 
 		comboBoxResolution2 = new JComboBox<>();
 		comboBoxResolution2.setEnabled(false);
-		comboBoxResolution2.addActionListener(le -> {
+		comboBoxResolution2.addActionListener(l -> {
 			if (lock)
 				panelCamera2 = webcamStarter(webcamPicker2, 2, panelCamera2, comboBoxResolution2, textFieldCropX2,
 						textFieldCropY2, textFieldCropWidth2, textFieldCropHeight2, 617, 11, 1);
@@ -2650,7 +2670,7 @@ class WeighBridge {
 		panelCameras.add(comboBoxResolution2);
 
 		checkBoxCamera2 = new JCheckBox("");
-		checkBoxCamera2.addActionListener(le -> {
+		checkBoxCamera2.addActionListener(l -> {
 			if (checkBoxCamera2.isSelected()) {
 				butttonUpdateCamera2.setEnabled(true);
 				panelCamera2 = webcamStarter(webcamPicker2, 2, panelCamera2, comboBoxResolution2, textFieldCropX2,
@@ -2719,7 +2739,7 @@ class WeighBridge {
 		panelCameras.add(textFieldCropHeight2);
 
 		checkBoxCamera3 = new JCheckBox("");
-		checkBoxCamera3.addActionListener(le -> {
+		checkBoxCamera3.addActionListener(l -> {
 			if (checkBoxCamera3.isSelected()) {
 				butttonUpdateCamera3.setEnabled(true);
 				panelCamera3 = webcamStarter(webcamPicker3, 3, panelCamera3, comboBoxResolution3, textFieldCropX3,
@@ -2746,7 +2766,7 @@ class WeighBridge {
 
 		butttonUpdateCamera2 = new JButton("Unlock");
 		butttonUpdateCamera2.setEnabled(false);
-		butttonUpdateCamera2.addActionListener(le -> {
+		butttonUpdateCamera2.addActionListener(l -> {
 			if (checkBoxCamera2.isSelected())
 				if (Objects.equals(butttonUpdateCamera2.getText(), "Unlock")) {
 					webcamPicker2.setEnabled(true);
@@ -2789,7 +2809,7 @@ class WeighBridge {
 
 		comboBoxResolution3 = new JComboBox<>();
 		comboBoxResolution3.setEnabled(false);
-		comboBoxResolution3.addActionListener(le -> {
+		comboBoxResolution3.addActionListener(l -> {
 			if (lock)
 				panelCamera3 = webcamStarter(webcamPicker3, 3, panelCamera3, comboBoxResolution3, textFieldCropX3,
 						textFieldCropY3, textFieldCropWidth3, textFieldCropHeight3, 10, 310, 1);
@@ -2840,7 +2860,7 @@ class WeighBridge {
 		panelCameras.add(textFieldCropHeight3);
 
 		checkBoxCamera4 = new JCheckBox("");
-		checkBoxCamera4.addActionListener(le -> {
+		checkBoxCamera4.addActionListener(l -> {
 			if (checkBoxCamera4.isSelected()) {
 				butttonUpdateCamera4.setEnabled(true);
 				panelCamera4 = webcamStarter(webcamPicker4, 4, panelCamera4, comboBoxResolution4, textFieldCropX4,
@@ -2867,7 +2887,7 @@ class WeighBridge {
 
 		butttonUpdateCamera3 = new JButton("Unlock");
 		butttonUpdateCamera3.setEnabled(false);
-		butttonUpdateCamera3.addActionListener(le -> {
+		butttonUpdateCamera3.addActionListener(l -> {
 			if (Objects.equals(butttonUpdateCamera3.getText(), "Unlock")) {
 				webcamPicker3.setEnabled(true);
 				textFieldCropX3.setEnabled(true);
@@ -2909,7 +2929,7 @@ class WeighBridge {
 
 		comboBoxResolution4 = new JComboBox<>();
 		comboBoxResolution4.setEnabled(false);
-		comboBoxResolution4.addActionListener(le -> {
+		comboBoxResolution4.addActionListener(l -> {
 			if (lock)
 				panelCamera4 = webcamStarter(webcamPicker4, 4, panelCamera4, comboBoxResolution4, textFieldCropX4,
 						textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310, 1);
@@ -2961,10 +2981,10 @@ class WeighBridge {
 
 		buttonUnLockCamera = new JButton("Unlock");
 		buttonUnLockCamera.setEnabled(false);
-		buttonUnLockCamera.addActionListener(le -> {
+		buttonUnLockCamera.addActionListener(l -> {
 			if (Objects.equals(buttonUnLockCamera.getText(), "Unlock")) {
 				JPasswordField password = new JPasswordField(10);
-				password.addActionListener(l -> JOptionPane.getRootFrame().dispose());
+				password.addActionListener(li -> JOptionPane.getRootFrame().dispose());
 				JPanel panel = new JPanel();
 				String[] ConnectOptionNames = {
 						"Enter",
@@ -3033,7 +3053,7 @@ class WeighBridge {
 
 		butttonUpdateCamera4 = new JButton("Unlock");
 		butttonUpdateCamera4.setEnabled(false);
-		butttonUpdateCamera4.addActionListener(le -> {
+		butttonUpdateCamera4.addActionListener(l -> {
 			if (Objects.equals(butttonUpdateCamera4.getText(), "Unlock")) {
 				webcamPicker4.setEnabled(true);
 				textFieldCropX4.setEnabled(true);
@@ -3060,7 +3080,7 @@ class WeighBridge {
 
 		butttonUpdateCamera = new JButton("Update");
 		butttonUpdateCamera.setEnabled(false);
-		butttonUpdateCamera.addActionListener(le -> {
+		butttonUpdateCamera.addActionListener(l -> {
 			try {
 				Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 						ResultSet.CONCUR_UPDATABLE);
@@ -3169,7 +3189,7 @@ class WeighBridge {
 		panelCameras.add(lblXYWt_3);
 
 		JButton btnRefreshCamera = new JButton("Refresh");
-		btnRefreshCamera.addActionListener(le -> {
+		btnRefreshCamera.addActionListener(l -> {
 			lock1 = true;
 			cameraEvent();
 			lock1 = false;
@@ -3226,7 +3246,7 @@ class WeighBridge {
 
 		rdbtnWeighing = new JRadioButton("Weighing Report");
 		rdbtnWeighing.setBackground(new Color(0, 255, 127));
-		rdbtnWeighing.addActionListener(le -> {
+		rdbtnWeighing.addActionListener(l -> {
 			comboBox.removeAllItems();
 			comboBox.addItem("Full Report");
 			comboBox.addItem("Daily Report");
@@ -3424,7 +3444,7 @@ class WeighBridge {
 		panelReport.add(lblMaterialReport);
 
 		JButton btnGo = new JButton("Go");
-		btnGo.addActionListener(le -> {
+		btnGo.addActionListener(l -> {
 			String message = "Plz Choose The Column To Show In Report ?";
 			int n = -1;
 			if (rdbtnWeighing.isSelected()) {
@@ -3537,7 +3557,7 @@ class WeighBridge {
 		panelReport.add(lblTotalNetWt);
 
 		JButton btnExportToExcel = new JButton("Export to Excel");
-		btnExportToExcel.addActionListener(le -> {
+		btnExportToExcel.addActionListener(l -> {
 			JFrame parentFrame = new JFrame();
 			JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home") + File.separator + "Desktop");
 			fileChooser.setDialogTitle("Specify a file name to save your report");
@@ -3561,7 +3581,7 @@ class WeighBridge {
 		panelReport.add(btnExportToExcel);
 
 		JButton btnPrintReport = new JButton("Print");
-		btnPrintReport.addActionListener(le -> {
+		btnPrintReport.addActionListener(l -> {
 			if (rdbtnWeighing.isSelected()) {
 				if (chckbxIceWater.isSelected()) {
 					printReportWeightIceWater();
@@ -3683,7 +3703,7 @@ class WeighBridge {
 		scrollPane_1.setViewportView(tableMaterial);
 
 		JButton btnAddMaterialRow = new JButton("+");
-		btnAddMaterialRow.addActionListener(le -> {
+		btnAddMaterialRow.addActionListener(l -> {
 			DefaultTableModel model = (DefaultTableModel) tableMaterial.getModel();
 			model.addRow(new Object[]{
 					model.getRowCount() + 1
@@ -3695,7 +3715,7 @@ class WeighBridge {
 		panelSettings.add(btnAddMaterialRow);
 
 		JButton btnDeleteMaterialRow = new JButton("-");
-		btnDeleteMaterialRow.addActionListener(le -> {
+		btnDeleteMaterialRow.addActionListener(l -> {
 			DefaultTableModel model = (DefaultTableModel) tableMaterial.getModel();
 			if (tableMaterial.getSelectedRow() != -1)
 				model.removeRow(tableMaterial.getSelectedRow());
@@ -3743,7 +3763,7 @@ class WeighBridge {
 		scrollPane_2.setViewportView(tableVehicleTare);
 
 		JButton btnDeleteVehicleRow = new JButton("-");
-		btnDeleteVehicleRow.addActionListener(le -> {
+		btnDeleteVehicleRow.addActionListener(l -> {
 			if (tableVehicleTare.getSelectedRow() != -1)
 				((DefaultTableModel) tableVehicleTare.getModel()).removeRow(tableVehicleTare.getSelectedRow());
 		});
@@ -3770,7 +3790,7 @@ class WeighBridge {
 		scrollPane_3.setViewportView(tableCustomer);
 
 		JButton btnAddCustomer = new JButton("+");
-		btnAddCustomer.addActionListener(le -> {
+		btnAddCustomer.addActionListener(l -> {
 			DefaultTableModel model = (DefaultTableModel) tableCustomer.getModel();
 			model.addRow(new Object[]{});
 		});
@@ -3780,7 +3800,7 @@ class WeighBridge {
 		panelSettings.add(btnAddCustomer);
 
 		JButton btnDeleteCustomer = new JButton("-");
-		btnDeleteCustomer.addActionListener(le -> {
+		btnDeleteCustomer.addActionListener(l -> {
 			if (tableCustomer.getSelectedRow() != -1)
 				((DefaultTableModel) tableCustomer.getModel()).removeRow(tableCustomer.getSelectedRow());
 		});
@@ -3861,10 +3881,10 @@ class WeighBridge {
 		chckbxManualEntry.setEnabled(false);
 		chckbxManualEntry.setFocusable(false);
 		chckbxManualEntry.setVisible(false);
-		chckbxManualEntry.addActionListener(le -> {
+		chckbxManualEntry.addActionListener(l -> {
 			if (chckbxManualEntry.isSelected()) {
 				JPasswordField password = new JPasswordField(10);
-				password.addActionListener(l -> JOptionPane.getRootFrame().dispose());
+				password.addActionListener(li -> JOptionPane.getRootFrame().dispose());
 				JPanel panel = new JPanel();
 				String[] ConnectOptionNames = {
 						"Enter",
@@ -3908,10 +3928,10 @@ class WeighBridge {
 		chckbxEditEnable = new JCheckBox("Edit Enable");
 		chckbxEditEnable.setFocusable(false);
 		chckbxEditEnable.setVisible(false);
-		chckbxEditEnable.addActionListener(le -> {
+		chckbxEditEnable.addActionListener(l -> {
 			if (chckbxEditEnable.isSelected()) {
 				JPasswordField password = new JPasswordField(10);
-				password.addActionListener(l -> JOptionPane.getRootFrame().dispose());
+				password.addActionListener(li -> JOptionPane.getRootFrame().dispose());
 				JPanel panel = new JPanel();
 				String[] ConnectOptionNames = {
 						"Enter",
@@ -3970,16 +3990,16 @@ class WeighBridge {
 
 		JButton btnUpdate = new JButton("Update");
 		btnUpdate.setFocusable(false);
-		btnUpdate.addActionListener(le -> updateSettings());
+		btnUpdate.addActionListener(l -> updateSettings());
 		btnUpdate.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		btnUpdate.setBounds(664, 228, 150, 25);
 		panelSettings.add(btnUpdate);
 
 		JButton btnResetWeights = new JButton("Reset Weights");
 		btnResetWeights.setFocusable(false);
-		btnResetWeights.addActionListener(le -> {
+		btnResetWeights.addActionListener(l -> {
 			JPasswordField password = new JPasswordField(10);
-			password.addActionListener(l -> JOptionPane.getRootFrame().dispose());
+			password.addActionListener(li -> JOptionPane.getRootFrame().dispose());
 			JPanel panel = new JPanel();
 			String[] ConnectOptionNames = {
 					"Enter",
@@ -4018,7 +4038,6 @@ class WeighBridge {
 						rs.updateInt("SLNO", Integer.parseInt(response.replaceAll("[^0-9]", "")));
 						rs.updateRow();
 					} catch (SQLException ex) {
-						ex.printStackTrace();
 						JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2836",
 								"SQL ERROR", JOptionPane.ERROR_MESSAGE);
 					}
@@ -4033,7 +4052,7 @@ class WeighBridge {
 
 		JButton btnRefresh = new JButton("Refresh");
 		btnRefresh.setFocusable(false);
-		btnRefresh.addActionListener(le -> settings());
+		btnRefresh.addActionListener(l -> settings());
 		btnRefresh.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		btnRefresh.setBounds(865, 228, 150, 25);
 		panelSettings.add(btnRefresh);
@@ -4043,11 +4062,11 @@ class WeighBridge {
 
 		btnUnlock = new JButton("Unlock");
 		btnUnlock.setFocusable(false);
-		btnUnlock.addActionListener(le -> {
+		btnUnlock.addActionListener(l -> {
 
 			if (Objects.equals(btnUnlock.getText(), "Unlock")) {
 				JPasswordField password = new JPasswordField(10);
-				password.addActionListener(l -> JOptionPane.getRootFrame().dispose());
+				password.addActionListener(li -> JOptionPane.getRootFrame().dispose());
 				JPanel panel = new JPanel();
 				String[] ConnectOptionNames = {
 						"Enter",
@@ -4147,7 +4166,7 @@ class WeighBridge {
 
 		chckbxCamera = new JCheckBox("Camera");
 		chckbxCamera.setSelected(true);
-		chckbxCamera.addActionListener(le -> cameraEvent());
+		chckbxCamera.addActionListener(l -> cameraEvent());
 
 		chckbxCamera.setFocusable(false);
 		chckbxCamera.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -4164,10 +4183,10 @@ class WeighBridge {
 		panelSettings.add(comboBoxPrintOptionForWeight);
 
 		chckbxSms = new JCheckBox("SMS");
-		chckbxSms.addActionListener(le -> {
+		chckbxSms.addActionListener(l -> {
 			if (chckbxSms.isSelected()) {
 				JPasswordField password = new JPasswordField(10);
-				password.addActionListener(l -> JOptionPane.getRootFrame().dispose());
+				password.addActionListener(li -> JOptionPane.getRootFrame().dispose());
 				JPanel panel = new JPanel();
 				String[] ConnectOptionNames = {
 						"Enter",
@@ -4233,10 +4252,10 @@ class WeighBridge {
 		panelSettings.add(label_3);
 
 		JButton btnResetTrasporter = new JButton("Reset Driver");
-		btnResetTrasporter.addActionListener(le -> {
+		btnResetTrasporter.addActionListener(l -> {
 
 			JPasswordField password = new JPasswordField(10);
-			password.addActionListener(l -> JOptionPane.getRootFrame().dispose());
+			password.addActionListener(li -> JOptionPane.getRootFrame().dispose());
 			JPanel panel = new JPanel();
 			String[] ConnectOptionNames = {
 					"Enter",
@@ -4605,15 +4624,15 @@ class WeighBridge {
 		label_4.setBounds(316, 304, 25, 25);
 		panel.add(label_4);
 
-		chckbxManualStatus = new JCheckBox("Status");
-		chckbxManualStatus.addActionListener(le -> {
+		chckbxManualStatus = new JCheckBox("Show Status");
+		chckbxManualStatus.addActionListener(l -> {
 			chckbxManualEntry.setVisible(chckbxManualStatus.isSelected());
 			chckbxEditEnable.setVisible(chckbxManualStatus.isSelected());
 		});
 		chckbxManualStatus.setFont(new Font("Times New Roman", Font.ITALIC, 20));
 		chckbxManualStatus.setFocusable(false);
 		chckbxManualStatus.setBackground(new Color(0, 255, 127));
-		chckbxManualStatus.setBounds(1047, 582, 200, 25);
+		chckbxManualStatus.setBounds(1000, 110, 198, 25);
 		panel.add(chckbxManualStatus);
 
 		chckbxNeedLogin = new JCheckBox("Need Login");
@@ -4623,9 +4642,22 @@ class WeighBridge {
 		chckbxNeedLogin.setBackground(new Color(0, 255, 127));
 		chckbxNeedLogin.setBounds(1000, 80, 200, 25);
 		panel.add(chckbxNeedLogin);
+		
+		chckbxTakeBackup = new JCheckBox("Take Backup");
+		chckbxTakeBackup.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		chckbxTakeBackup.setFocusable(false);
+		chckbxTakeBackup.setBackground(new Color(0, 255, 127));
+		chckbxTakeBackup.setBounds(1000, 140, 200, 25);
+		chckbxTakeBackup.addActionListener(l -> takeBackup = chckbxTakeBackup.isSelected());
+		panel.add(chckbxTakeBackup);
+		
+		JLabel lbleveryhrs = new JLabel("(every 6hrs)");
+		lbleveryhrs.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+		lbleveryhrs.setBounds(1021, 163, 179, 25);
+		panel.add(lbleveryhrs);
 
 		JButton button = new JButton("Minimize");
-		button.addActionListener(le -> babulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
+		button.addActionListener(l -> babulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
 		button.setFont(new Font("Times New Roman", Font.BOLD, 20));
 		button.setFocusable(false);
 		button.setBounds(518, 11, 117, 30);
@@ -6921,7 +6953,6 @@ class WeighBridge {
 				serialPortSms.writeBytes(new byte[]{0x1A}, 30);
 			} catch (InterruptedException ignored) {
 			}
-
 			serialPortSms.closePort();
 		} else {
 			JOptionPane.showMessageDialog(null,
