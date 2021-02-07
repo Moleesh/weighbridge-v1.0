@@ -17,7 +17,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.h2.util.DateTimeUtils;
 import org.jdesktop.swingx.JXDatePicker;
 
 import javax.imageio.ImageIO;
