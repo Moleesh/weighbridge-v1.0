@@ -1861,29 +1861,28 @@ class WeighBridge {
                 }
                 rs.updateRow();
                 if (rdbtnTare.isSelected()) {
-                    stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                            ResultSet.CONCUR_UPDATABLE);
+                    stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     rs = stmt.executeQuery("SELECT * FROM VEHICLETARES WHERE VEHICLENO LIKE '" +
                             textFieldVehicleNo.getText() + "'");
                     if (rs.next()) {
-                        rs.updateInt("TAREWT", Integer.parseInt(0 + textFieldTareWt.getText()));
+                        rs.updateInt("TAREWT", Integer.parseInt(textFieldTareWt.getText()));
                         Date date = dateAndTimeFormat.parse(textFieldTareDateTime.getText());
                         rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                         rs.updateTime("TARETIME", new Time(date.getTime()));
                         rs.updateRow();
                     } else {
                         rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
-                        int key = 1;
-                        if (rs.last())
+                        int key = -1;
+                        if (rs.last()) {
                             key = rs.getInt("KEY");
+                        }
                         rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
                         rs.moveToInsertRow();
                         rs.updateString("VEHICLENO", textFieldVehicleNo.getText());
-                        rs.updateInt("TAREWT", Integer.parseInt(0 + textFieldTareWt.getText()));
+                        rs.updateInt("TAREWT", Integer.parseInt(textFieldTareWt.getText()));
                         Date date = dateAndTimeFormat.parse(textFieldTareDateTime.getText());
                         rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                         rs.updateTime("TARETIME", new Time(date.getTime()));
-                        rs.updateInt("TAREWT", Integer.parseInt(0 + textFieldTareWt.getText()));
                         rs.updateInt("KEY", key + 1);
                         rs.insertRow();
                     }
