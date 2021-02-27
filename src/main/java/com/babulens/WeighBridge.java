@@ -1285,13 +1285,17 @@ class WeighBridge {
                     "Cancel"
             };
             JTextField jTextField = new JTextField(10);
+            valueEntered = false;
+            jTextField.addActionListener(li -> {
+                valueEntered = true;
+                JOptionPane.getRootFrame().dispose();
+            });
             JXDatePicker datePicker = new JXDatePicker();
             datePicker.setFormats("dd-MM-yyyy");
             datePicker.setDate(new Date());
             datePicker.getEditor().setEditable(false);
             JSpinner timeSpinner = new JSpinner(new SpinnerDateModel());
-            JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner,
-                    ((SimpleDateFormat) timeFormat).toPattern());
+            JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, ((SimpleDateFormat) timeFormat).toPattern());
             timeSpinner.setEditor(timeEditor);
             timeSpinner.setValue(new Date());
             ((DefaultEditor) timeSpinner.getEditor()).getTextField().setEditable(false);
@@ -1303,13 +1307,12 @@ class WeighBridge {
             panel.add(new JLabel("Gross Time "));
             panel.add(timeSpinner);
             if (JOptionPane.showOptionDialog(null, panel, "Enter Gross Wt ", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, "") == 0) {
+                    JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, "") == 0 || valueEntered) {
                 try {
                     textFieldGrossWt.setText(Integer.toString(Integer.parseInt(jTextField.getText())));
                     Date dateTemp = datePicker.getDate();
                     Date dateTemp1 = (Date) timeSpinner.getModel().getValue();
-                    textFieldGrossDateTime
-                            .setText(dateAndTimeFormatdate.format(dateTemp) + " " + timeFormat.format(dateTemp1));
+                    textFieldGrossDateTime.setText(dateAndTimeFormatdate.format(dateTemp) + " " + timeFormat.format(dateTemp1));
                     btnGetGross.setEnabled(false);
                     if (rdbtnGross.isSelected())
                         btnTotal.setEnabled(true);
@@ -1335,13 +1338,17 @@ class WeighBridge {
                     "Cancel"
             };
             JTextField jTextField = new JTextField(10);
+            valueEntered = false;
+            jTextField.addActionListener(li -> {
+                valueEntered = true;
+                JOptionPane.getRootFrame().dispose();
+            });
             JXDatePicker datePicker = new JXDatePicker();
             datePicker.setFormats("dd-MM-yyyy");
             datePicker.setDate(new Date());
             datePicker.getEditor().setEditable(false);
             JSpinner timeSpinner = new JSpinner(new SpinnerDateModel());
-            JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner,
-                    ((SimpleDateFormat) timeFormat).toPattern());
+            JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, ((SimpleDateFormat) timeFormat).toPattern());
             timeSpinner.setEditor(timeEditor);
             timeSpinner.setValue(new Date());
             ((DefaultEditor) timeSpinner.getEditor()).getTextField().setEditable(false);
@@ -1353,13 +1360,12 @@ class WeighBridge {
             panel.add(new JLabel("Tare Time "));
             panel.add(timeSpinner);
             if (JOptionPane.showOptionDialog(null, panel, "Enter Tare Wt ", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null) == 0) {
+                    JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null) == 0 || valueEntered) {
                 try {
                     textFieldTareWt.setText(Integer.toString(Integer.parseInt(jTextField.getText())));
                     Date dateTemp = datePicker.getDate();
                     Date dateTemp1 = (Date) timeSpinner.getModel().getValue();
-                    textFieldTareDateTime
-                            .setText(dateAndTimeFormatdate.format(dateTemp) + " " + timeFormat.format(dateTemp1));
+                    textFieldTareDateTime.setText(dateAndTimeFormatdate.format(dateTemp) + " " + timeFormat.format(dateTemp1));
                     btnGetTare.setEnabled(false);
                     if (rdbtnTare.isSelected())
                         btnTotal.setEnabled(true);
@@ -2091,6 +2097,11 @@ class WeighBridge {
                     "Cancel"
             };
             JTextField jTextField = new JTextField(10);
+            valueEntered = false;
+            jTextField.addActionListener(li -> {
+                valueEntered = true;
+                JOptionPane.getRootFrame().dispose();
+            });
             JXDatePicker datePicker = new JXDatePicker();
             datePicker.setFormats("dd-MM-yyyy");
             datePicker.setDate(new Date());
@@ -2102,7 +2113,7 @@ class WeighBridge {
             panel.add(datePicker);
             int response = JOptionPane.showOptionDialog(null, panel, "Enter Dc. No ", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, "");
-            if (response == JOptionPane.YES_OPTION) {
+            if (response == JOptionPane.YES_OPTION || valueEntered) {
                 try {
                     textFieldDcNo.setText(jTextField.getText().trim());
                     Date dateTemp = datePicker.getDate();
@@ -3624,7 +3635,7 @@ class WeighBridge {
                 JTextField jTextFieldRows = new JFormattedTextField(numberFormatterRows);
                 jTextFieldRows.setText("1");
                 JPanel panel = new JPanel(new GridLayout(2, 2));
-                panel.add(new JLabel("Insert after"));
+                panel.add(new JLabel("Insert at (before)"));
                 jTextFieldAt.addKeyListener(new KeyAdapter() {
                     @Override
                     public void keyPressed(final KeyEvent e) {
@@ -7787,11 +7798,15 @@ class WeighBridge {
                                 Date date = dateAndTimeFormat.parse("" + model.getValueAt(row, 16));
                                 rs.updateDate("NETDATE", new java.sql.Date(date.getTime()));
                                 rs.updateTime("NETTIME", new Time(date.getTime()));
+                            } else {
+                                rs.updateDate("NETDATE", null);
+                                rs.updateTime("NETTIME", null);
                             }
+
                             rs.updateInt("FINALWT", Integer.parseInt("0" + model.getValueAt(row, 17)));
                             rs.updateInt("FINALAMOUNT", Integer.parseInt("0" + model.getValueAt(row, 18)));
 
-                            rs.updateString("REMARKS", "" + model.getValueAt(row, 19));
+                            rs.updateString("REMARKS", model.getValueAt(row, 19) != null ? "" + model.getValueAt(row, 19) : "");
                             rs.updateBoolean("MANUAL", true);
                             rs.updateRow();
 
@@ -7808,15 +7823,13 @@ class WeighBridge {
                             model.setValueAt(rs.getInt("NETWT"), row, 15);
                             model.setValueAt(rs.getInt("FINALWT"), row, 17);
                             model.setValueAt(rs.getInt("FINALAMOUNT"), row, 18);
-                            model.setValueAt(rs.getBoolean("MANUAL"), row, 18);
-                            model.setValueAt(dateAndTimeFormatdate.format(rs.getDate("NETDATE")) + " "
-                                    + timeFormat.format(rs.getTime("NETTIME")), row, 16);
+                            model.setValueAt(rs.getBoolean("MANUAL"), row, 20);
 
                             label = "Edit";
                             ((TableReport) tableReport.getModel()).removeEditableRow(row);
                         }
                     } catch (SQLException | ParseException | NumberFormatException | NullPointerException | ClassCastException ignored) {
-                        JOptionPane.showMessageDialog(null, "DATA ERROR\nCHECK THE VALUES ENTERED\nLINE :7037", "DATA ERROR",
+                        JOptionPane.showMessageDialog(null, "DATA ERROR\nCHECK THE VALUES ENTERED IN ALL FIELDS\nLINE :7037", "DATA ERROR",
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
