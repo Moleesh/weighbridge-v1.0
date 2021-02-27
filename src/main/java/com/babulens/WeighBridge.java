@@ -3602,6 +3602,7 @@ class WeighBridge {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 int serialNo = rs.getInt("SLNO");
+                valueEntered = false;
                 String[] ConnectOptionNames = {
                         "Insert Row(s)",
                         "Cancel"
@@ -3624,12 +3625,29 @@ class WeighBridge {
                 jTextFieldRows.setText("1");
                 JPanel panel = new JPanel(new GridLayout(2, 2));
                 panel.add(new JLabel("Insert after"));
+                jTextFieldAt.addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyPressed(final KeyEvent e) {
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            jTextFieldRows.requestFocus();
+                        }
+                    }
+                });
+                jTextFieldRows.addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyPressed(final KeyEvent e) {
+                        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                            valueEntered = true;
+                            JOptionPane.getRootFrame().dispose();
+                        }
+                    }
+                });
                 panel.add(jTextFieldAt);
                 panel.add(jTextFieldRows);
                 panel.add(new JLabel(" Row(s) 100 max"));
 
-                if (JOptionPane.showOptionDialog(null, panel, "Enter Gross Wt ", JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, "") == 0) {
+                if (JOptionPane.showOptionDialog(null, panel, "Insert Row(s) in Report", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, "") == 0 || valueEntered) {
                     int rows = Integer.parseInt("0" + jTextFieldRows.getText());
                     int at = Integer.parseInt("0" + jTextFieldAt.getText());
                     stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
@@ -4029,6 +4047,7 @@ class WeighBridge {
             } catch (IllegalArgumentException ignored) {
             }
             btnInsertAt.setVisible(false);
+            chckbxEditEnable.setSelected(false);
         });
         chckbxEditEnable.setBackground(new Color(0, 255, 127));
         chckbxEditEnable.setEnabled(false);
