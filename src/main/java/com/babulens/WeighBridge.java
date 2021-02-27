@@ -250,6 +250,7 @@ class WeighBridge {
     private JCheckBox chckbxPrinterCopyDialog;
     private JButton btnReprint;
     private JCheckBox chckbxTakeBackup;
+    private JButton btnInsertAt;
 
     /**
      * Create the application.
@@ -1279,12 +1280,11 @@ class WeighBridge {
         btnGetGross.setFocusable(false);
         btnGetGross.setEnabled(false);
         btnGetGross.addActionListener(l -> {
-
             String[] ConnectOptionNames = {
                     "Set Gross",
                     "Cancel"
             };
-            JTextField userid = new JTextField(10);
+            JTextField jTextField = new JTextField(10);
             JXDatePicker datePicker = new JXDatePicker();
             datePicker.setFormats("dd-MM-yyyy");
             datePicker.setDate(new Date());
@@ -1297,7 +1297,7 @@ class WeighBridge {
             ((DefaultEditor) timeSpinner.getEditor()).getTextField().setEditable(false);
             JPanel panel = new JPanel(new GridLayout(3, 2));
             panel.add(new JLabel("Gross Wt "));
-            panel.add(userid);
+            panel.add(jTextField);
             panel.add(new JLabel("Gross Date "));
             panel.add(datePicker);
             panel.add(new JLabel("Gross Time "));
@@ -1305,7 +1305,7 @@ class WeighBridge {
             if (JOptionPane.showOptionDialog(null, panel, "Enter Gross Wt ", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, "") == 0) {
                 try {
-                    textFieldGrossWt.setText(Integer.toString(Integer.parseInt(userid.getText())));
+                    textFieldGrossWt.setText(Integer.toString(Integer.parseInt(jTextField.getText())));
                     Date dateTemp = datePicker.getDate();
                     Date dateTemp1 = (Date) timeSpinner.getModel().getValue();
                     textFieldGrossDateTime
@@ -1334,7 +1334,7 @@ class WeighBridge {
                     "Set Tare",
                     "Cancel"
             };
-            JTextField userid = new JTextField(10);
+            JTextField jTextField = new JTextField(10);
             JXDatePicker datePicker = new JXDatePicker();
             datePicker.setFormats("dd-MM-yyyy");
             datePicker.setDate(new Date());
@@ -1347,7 +1347,7 @@ class WeighBridge {
             ((DefaultEditor) timeSpinner.getEditor()).getTextField().setEditable(false);
             JPanel panel = new JPanel(new GridLayout(3, 2));
             panel.add(new JLabel("Tare Wt "));
-            panel.add(userid);
+            panel.add(jTextField);
             panel.add(new JLabel("Tare Date "));
             panel.add(datePicker);
             panel.add(new JLabel("Tare Time "));
@@ -1355,7 +1355,7 @@ class WeighBridge {
             if (JOptionPane.showOptionDialog(null, panel, "Enter Tare Wt ", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null) == 0) {
                 try {
-                    textFieldTareWt.setText(Integer.toString(Integer.parseInt(userid.getText())));
+                    textFieldTareWt.setText(Integer.toString(Integer.parseInt(jTextField.getText())));
                     Date dateTemp = datePicker.getDate();
                     Date dateTemp1 = (Date) timeSpinner.getModel().getValue();
                     textFieldTareDateTime
@@ -2090,21 +2090,21 @@ class WeighBridge {
                     "Clear",
                     "Cancel"
             };
-            JTextField userid = new JTextField(10);
+            JTextField jTextField = new JTextField(10);
             JXDatePicker datePicker = new JXDatePicker();
             datePicker.setFormats("dd-MM-yyyy");
             datePicker.setDate(new Date());
             datePicker.getEditor().setEditable(false);
             JPanel panel = new JPanel(new GridLayout(2, 2));
             panel.add(new JLabel("Dc. No "));
-            panel.add(userid);
+            panel.add(jTextField);
             panel.add(new JLabel("Dc. Date "));
             panel.add(datePicker);
             int response = JOptionPane.showOptionDialog(null, panel, "Enter Dc. No ", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, "");
             if (response == JOptionPane.YES_OPTION) {
                 try {
-                    textFieldDcNo.setText(userid.getText().trim());
+                    textFieldDcNo.setText(jTextField.getText().trim());
                     Date dateTemp = datePicker.getDate();
                     textFieldDcDate.setText(dateAndTimeFormatdate.format(dateTemp));
                 } catch (NumberFormatException ex) {
@@ -2311,8 +2311,7 @@ class WeighBridge {
             String result = text.getText();
             int serialNo = 0;
             try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 serialNo = rs.getInt("SLNO");
@@ -3578,7 +3577,7 @@ class WeighBridge {
         });
         btnExportToExcel.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnExportToExcel.setFocusable(false);
-        btnExportToExcel.setBounds(1040, 559, 186, 25);
+        btnExportToExcel.setBounds(1000, 550, 186, 25);
         panelReport.add(btnExportToExcel);
 
         JButton btnPrintReport = new JButton("Print");
@@ -3593,8 +3592,75 @@ class WeighBridge {
         });
         btnPrintReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnPrintReport.setFocusable(false);
-        btnPrintReport.setBounds(840, 559, 150, 25);
+        btnPrintReport.setBounds(825, 550, 150, 25);
         panelReport.add(btnPrintReport);
+
+        btnInsertAt = new JButton("Insert at");
+        btnInsertAt.addActionListener(l -> {
+            try {
+                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
+                rs.absolute(1);
+                int serialNo = rs.getInt("SLNO");
+                String[] ConnectOptionNames = {
+                        "Insert Row(s)",
+                        "Cancel"
+                };
+                NumberFormatter numberFormatterAt = new NumberFormatter();
+                numberFormatterAt.setValueClass(Integer.class);
+                numberFormatterAt.setMaximum(serialNo);
+                numberFormatterAt.setMinimum(1);
+                numberFormatterAt.setAllowsInvalid(false);
+                numberFormatterAt.setCommitsOnValidEdit(true);
+                JTextField jTextFieldAt = new JFormattedTextField(numberFormatterAt);
+                jTextFieldAt.setText("1");
+                NumberFormatter numberFormatterRows = new NumberFormatter();
+                numberFormatterRows.setValueClass(Integer.class);
+                numberFormatterRows.setMaximum(100);
+                numberFormatterRows.setMinimum(1);
+                numberFormatterRows.setAllowsInvalid(false);
+                numberFormatterRows.setCommitsOnValidEdit(true);
+                JTextField jTextFieldRows = new JFormattedTextField(numberFormatterRows);
+                jTextFieldRows.setText("1");
+                JPanel panel = new JPanel(new GridLayout(2, 2));
+                panel.add(new JLabel("Insert after"));
+                panel.add(jTextFieldAt);
+                panel.add(jTextFieldRows);
+                panel.add(new JLabel(" Row(s) 100 max"));
+
+                if (JOptionPane.showOptionDialog(null, panel, "Enter Gross Wt ", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, "") == 0) {
+                    int rows = Integer.parseInt("0" + jTextFieldRows.getText());
+                    int at = Integer.parseInt("0" + jTextFieldAt.getText());
+                    stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    stmt.execute("UPDATE WEIGHING SET SLNO = SLNO + " + rows + " WHERE SLNO >= " + at);
+                    rs = stmt.executeQuery("SELECT * FROM WEIGHING");
+                    for (int i = 0; i < rows; i++) {
+                        rs.moveToInsertRow();
+                        rs.updateInt("SLNO", at + i);
+                        rs.updateBoolean("MANUAL", true);
+                        rs.insertRow();
+                    }
+                    if (reportOpened) {
+                        getReport();
+                    }
+                    rs = stmt.executeQuery("SELECT * FROM WEIGHING ORDER BY SLNO DESC limit 1");
+                    rs.absolute(1);
+                    serialNo = rs.getInt("SLNO");
+                    rs = stmt.executeQuery("SELECT * FROM SETTINGS");
+                    rs.absolute(1);
+                    rs.updateInt("SLNO", serialNo + 1);
+                    rs.updateRow();
+                    textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
+                }
+            } catch (SQLException ignored) {
+            }
+        });
+        btnInsertAt.setVisible(false);
+        btnInsertAt.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnInsertAt.setFocusable(false);
+        btnInsertAt.setBounds(650, 550, 150, 25);
+        panelReport.add(btnInsertAt);
 
         JPanel panelSettings = new JPanel();
         panelSettings.setBackground(new Color(0, 255, 127));
@@ -3951,21 +4017,18 @@ class WeighBridge {
                     isCorrect = Arrays.equals(temp, correctPassword);
                 }
                 if (isCorrect) {
-                    if (reportOpened)
+                    if (reportOpened) {
                         getReport();
-                } else {
-                    try {
-                        tableReport.removeColumn(tableReport.getColumn("Edit/Save"));
-                    } catch (IllegalArgumentException ignored) {
                     }
-                    chckbxEditEnable.setSelected(false);
+                    btnInsertAt.setVisible(true);
+                    return;
                 }
             }
             try {
                 tableReport.removeColumn(tableReport.getColumn("Edit/Save"));
             } catch (IllegalArgumentException ignored) {
             }
-
+            btnInsertAt.setVisible(false);
         });
         chckbxEditEnable.setBackground(new Color(0, 255, 127));
         chckbxEditEnable.setEnabled(false);
@@ -4626,7 +4689,7 @@ class WeighBridge {
         panel.add(label_4);
 
         chckbxManualStatus = new JCheckBox("Show Status");
-        chckbxManualStatus.addActionListener(l -> {
+        chckbxManualStatus.addChangeListener(l -> {
             chckbxManualEntry.setVisible(chckbxManualStatus.isSelected());
             chckbxEditEnable.setVisible(chckbxManualStatus.isSelected());
         });
