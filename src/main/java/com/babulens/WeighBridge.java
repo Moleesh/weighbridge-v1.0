@@ -3635,7 +3635,7 @@ class WeighBridge {
                 JTextField jTextFieldRows = new JFormattedTextField(numberFormatterRows);
                 jTextFieldRows.setText("1");
                 JPanel panel = new JPanel(new GridLayout(2, 2));
-                panel.add(new JLabel("Insert at (before)"));
+                panel.add(new JLabel("Insert at"));
                 jTextFieldAt.addKeyListener(new KeyAdapter() {
                     @Override
                     public void keyPressed(final KeyEvent e) {
