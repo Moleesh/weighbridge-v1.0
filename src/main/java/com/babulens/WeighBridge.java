@@ -274,7 +274,7 @@ class WeighBridge {
                     ScriptRunner scriptExecutor = new ScriptRunner(dbConnection, true, false);
                     scriptExecutor.runScript(new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResource("data.sql")).openStream())));
                 }
-            } catch (SQLException | NullPointerException | IOException ex) {
+            } catch (SQLException | NullPointerException | IOException ignored) {
                 JOptionPane.showMessageDialog(null,
                         "DATABASE ALREADY OPEN\nPLZ CLOSE ALL OPEN SOFTWARE FILES\nLINE :328", "DATABASE ERROR",
                         JOptionPane.ERROR_MESSAGE);
@@ -312,7 +312,7 @@ class WeighBridge {
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
             JOptionPane.showMessageDialog(null, "UI NOT SUPPORTED\nLINE :306", "UI ERROR", JOptionPane.ERROR_MESSAGE);
         }
         EventQueue.invokeLater(() -> {
@@ -436,7 +436,7 @@ class WeighBridge {
                 default:
                     close();
             }
-        } catch (SQLException ex) {
+        } catch (SQLException ignored) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :540", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -630,7 +630,7 @@ class WeighBridge {
             rs.absolute(4);
             checkBoxCamera4.setSelected(rs.getBoolean("ENABLE"));
 
-        } catch (SQLException ex) {
+        } catch (SQLException ignored) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :414", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -739,7 +739,7 @@ class WeighBridge {
             lock1 = true;
             cameraEvent();
             lock1 = false;
-        } catch (SQLException | ParseException ex) {
+        } catch (SQLException | ParseException ignored) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :806", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -826,7 +826,7 @@ class WeighBridge {
                 rs.insertRow();
             }
             settings();
-        } catch (SQLException | ParseException ex) {
+        } catch (SQLException | ParseException ignored) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :477", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -1085,7 +1085,7 @@ class WeighBridge {
                                 textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
                             }
                         }
-                    } catch (SQLException | ParseException ex) {
+                    } catch (SQLException | ParseException ignored) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -1115,7 +1115,7 @@ class WeighBridge {
                                     comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
                                 }
                             }
-                    } catch (SQLException | ParseException ex) {
+                    } catch (SQLException | ParseException ignored) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -1142,7 +1142,7 @@ class WeighBridge {
                                     comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
                                 }
                             }
-                    } catch (SQLException | ParseException ex) {
+                    } catch (SQLException | ParseException ignored) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -1172,7 +1172,7 @@ class WeighBridge {
 
                                 }
                             }
-                    } catch (SQLException | ParseException ex) {
+                    } catch (SQLException | ParseException ignored) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -1316,7 +1316,7 @@ class WeighBridge {
                     btnGetGross.setEnabled(false);
                     if (rdbtnGross.isSelected())
                         btnTotal.setEnabled(true);
-                } catch (NumberFormatException ex) {
+                } catch (NumberFormatException ignored) {
                     JOptionPane.showMessageDialog(null, "Plz check the Value Entered\n\nLINE :922", "Value ERROR",
                             JOptionPane.ERROR_MESSAGE);
 
@@ -1369,7 +1369,7 @@ class WeighBridge {
                     btnGetTare.setEnabled(false);
                     if (rdbtnTare.isSelected())
                         btnTotal.setEnabled(true);
-                } catch (NumberFormatException ex) {
+                } catch (NumberFormatException ignored) {
                     JOptionPane.showMessageDialog(null, "Plz check the Value Entered\n\nLINE :969", "Value ERROR",
                             JOptionPane.ERROR_MESSAGE);
                 }
@@ -1470,7 +1470,7 @@ class WeighBridge {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 serialNo = rs.getInt("SLNO");
-            } catch (SQLException ex) {
+            } catch (SQLException ignored) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1550", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -1498,7 +1498,7 @@ class WeighBridge {
                     else
                         textFieldTareDateTime.setText(dateAndTimeFormat.format(
                                 new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
-                } catch (SQLException | ParseException ex) {
+                } catch (SQLException | ParseException ignored) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :820",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1550,7 +1550,7 @@ class WeighBridge {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 serialNo = rs.getInt("SLNO");
-            } catch (SQLException ex) {
+            } catch (SQLException ignored) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :847", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -1574,7 +1574,7 @@ class WeighBridge {
                     else
                         textFieldGrossDateTime.setText(dateAndTimeFormat.format(
                                 new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
-                } catch (SQLException | ParseException ex) {
+                } catch (SQLException | ParseException ignored) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :861",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1762,7 +1762,7 @@ class WeighBridge {
                     File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg");
                     try {
                         ImageIO.write(webcam[1].getImage(), "jpg", outputfile);
-                    } catch (IOException | IllegalArgumentException ex) {
+                    } catch (IOException | IllegalArgumentException ignored) {
                         JOptionPane.showMessageDialog(null,
                                 "CAMERA ERROR\nCHECK THE CAMERA IN SETTINGS\nLINE :1370", "CAMERA ERROR",
                                 JOptionPane.ERROR_MESSAGE);
@@ -1772,7 +1772,7 @@ class WeighBridge {
                     File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_2.jpg");
                     try {
                         ImageIO.write(webcam[2].getImage(), "jpg", outputfile);
-                    } catch (IOException | IllegalArgumentException ex) {
+                    } catch (IOException | IllegalArgumentException ignored) {
                         JOptionPane.showMessageDialog(null,
                                 "CAMERA ERROR\nCHECK THE CAMERA IN SETTINGS\nLINE :1370", "CAMERA ERROR",
                                 JOptionPane.ERROR_MESSAGE);
@@ -1782,7 +1782,7 @@ class WeighBridge {
                     File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_3.jpg");
                     try {
                         ImageIO.write(webcam[3].getImage(), "jpg", outputfile);
-                    } catch (IOException | IllegalArgumentException ex) {
+                    } catch (IOException | IllegalArgumentException ignored) {
                         JOptionPane.showMessageDialog(null,
                                 "CAMERA ERROR\nCHECK THE CAMERA IN SETTINGS\nLINE :1370", "CAMERA ERROR",
                                 JOptionPane.ERROR_MESSAGE);
@@ -1792,7 +1792,7 @@ class WeighBridge {
                     File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_4.jpg");
                     try {
                         ImageIO.write(webcam[4].getImage(), "jpg", outputfile);
-                    } catch (IOException | IllegalArgumentException ex) {
+                    } catch (IOException | IllegalArgumentException ignored) {
                         JOptionPane.showMessageDialog(null,
                                 "CAMERA ERROR\nCHECK THE CAMERA IN SETTINGS\nLINE :1370", "CAMERA ERROR",
                                 JOptionPane.ERROR_MESSAGE);
@@ -1893,11 +1893,11 @@ class WeighBridge {
                         rs.insertRow();
                     }
                 }
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException ignored) {
                 JOptionPane.showMessageDialog(null, "WEIGHT ERROR\nWeight is incorrect or negative\nLINE :1851", "WEIGHT ERROR",
                         JOptionPane.ERROR_MESSAGE);
                 return;
-            } catch (SQLException | ParseException ex) {
+            } catch (SQLException | ParseException ignored) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1854", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
                 return;
@@ -1999,7 +1999,7 @@ class WeighBridge {
                         break;
                 }
                 clear();
-            } catch (NullPointerException ex) {
+            } catch (NullPointerException ignored) {
                 JOptionPane.showMessageDialog(null, "Print ERROR\nPlease Use another Printer Option", "Print ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -2118,7 +2118,7 @@ class WeighBridge {
                     textFieldDcNo.setText(jTextField.getText().trim());
                     Date dateTemp = datePicker.getDate();
                     textFieldDcDate.setText(dateAndTimeFormatdate.format(dateTemp));
-                } catch (NumberFormatException ex) {
+                } catch (NumberFormatException ignored) {
                     JOptionPane.showMessageDialog(null, "Plz check the Value Entered\n\nLINE :1485", "Value ERROR",
                             JOptionPane.ERROR_MESSAGE);
                 }
@@ -2243,7 +2243,7 @@ class WeighBridge {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 serialNo = rs.getInt("SLNO");
-            } catch (SQLException ex) {
+            } catch (SQLException ignored) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :806", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -2276,7 +2276,7 @@ class WeighBridge {
                     else
                         textFieldGrossDateTime.setText(dateAndTimeFormat.format(
                                 new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
-                } catch (SQLException | ParseException ex) {
+                } catch (SQLException | ParseException ignored) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :820",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                 }
@@ -2326,7 +2326,7 @@ class WeighBridge {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 serialNo = rs.getInt("SLNO");
-            } catch (SQLException ex) {
+            } catch (SQLException ignored) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :847", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -2358,7 +2358,7 @@ class WeighBridge {
                     else
                         textFieldTareDateTime.setText(dateAndTimeFormat.format(
                                 new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
-                } catch (SQLException | ParseException ex) {
+                } catch (SQLException | ParseException ignored) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :861",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                 }
@@ -3165,7 +3165,7 @@ class WeighBridge {
                         Integer.parseInt(0 + textFieldCropHeight11.getText().replaceAll("[^0-9]", "")));
                 rs.updateRow();
 
-            } catch (SQLException ex) {
+            } catch (SQLException ignored) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :3259", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -3580,7 +3580,7 @@ class WeighBridge {
                 String fname = fileToSave.getAbsolutePath();
                 try {
                     toExcel(fname);
-                } catch (IOException ex) {
+                } catch (IOException ignored) {
                     JOptionPane.showMessageDialog(null, "Plz Close the Excel file\nLINE :3027", "FILE ERROR",
                             JOptionPane.ERROR_MESSAGE);
                 }
@@ -4131,7 +4131,7 @@ class WeighBridge {
                         rs.absolute(1);
                         rs.updateInt("SLNO", Integer.parseInt(response.replaceAll("[^0-9]", "")));
                         rs.updateRow();
-                    } catch (SQLException ex) {
+                    } catch (SQLException ignored) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2836",
                                 "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
@@ -4967,7 +4967,7 @@ class WeighBridge {
                     tableReport.removeColumn(tableReport.getColumn("Remarks"));
                 if (!(chckbxSelectManual.isSelected() && chckbxManualStatus.isSelected()))
                     tableReport.removeColumn(tableReport.getColumn("Manual"));
-            } catch (SQLException ex) {
+            } catch (SQLException ignored) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2174",
                         "SQL ERROR", JOptionPane.ERROR_MESSAGE);
             }
@@ -5038,7 +5038,7 @@ class WeighBridge {
                         JOptionPane.ERROR_MESSAGE);
                 btnReprint.requestFocus();
             }
-        } catch (SQLException | ParseException ex) {
+        } catch (SQLException | ParseException ignored) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1085", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
             btnReprint.requestFocus();
@@ -5082,7 +5082,7 @@ class WeighBridge {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                 rs.absolute(1);
                 textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
-            } catch (SQLException ex) {
+            } catch (SQLException ignored) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2862", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -5095,7 +5095,7 @@ class WeighBridge {
                     textFieldDriverName.addItem(rs.getString("TRANSPORTER"));
                     textFieldDriverName.setSelectedIndex(-1);
                 }
-            } catch (SQLException ex) {
+            } catch (SQLException ignored) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2862", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -7010,7 +7010,7 @@ class WeighBridge {
                     lock = true;
                 }
             } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException | WebcamException | NullPointerException |
-                    ClassCastException ex) {
+                    ClassCastException ignored) {
                 JOptionPane.showMessageDialog(null,
                         "CAMERA ERROR\nCamera has beed removed are resolution missmatch\nLINE :1547", "CAMERA ERROR",
                         JOptionPane.ERROR_MESSAGE);
@@ -7149,7 +7149,7 @@ class WeighBridge {
             rs.absolute(1);
             rs.updateTimestamp("LASTLOGIN", new java.sql.Timestamp(new Date().getTime()));
             rs.updateRow();
-        } catch (SQLException ex) {
+        } catch (SQLException ignored) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :7720", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
         }
@@ -7258,7 +7258,7 @@ class WeighBridge {
             try {
                 add(new IpCamDriver(new IpCamStorage("cameras.xml")));
 
-            } catch (NullPointerException | WebcamException ex) {
+            } catch (NullPointerException | WebcamException ignored) {
                 add(new IpCam());
             }
             add(new WebcamDefaultDriver());
@@ -7496,7 +7496,7 @@ class WeighBridge {
 
                                     result = Math.sqrt(getNumberInDisplay());
                                     displayResult(result);
-                                } catch (Exception ex) {
+                                } catch (Exception ignored) {
                                     displayError("Invalid input for function.");
                                     displayMode = ERROR_MODE;
                                 }
@@ -7508,7 +7508,7 @@ class WeighBridge {
                                 try {
                                     result = getNumberInDisplay() / 100;
                                     displayResult(result);
-                                } catch (Exception ex) {
+                                } catch (Exception ignored) {
                                     displayError("Invalid input for function.");
                                     displayMode = ERROR_MODE;
                                 }
@@ -7522,7 +7522,7 @@ class WeighBridge {
                                         displayError("Cannot divide by zero.");
                                     result = 1 / getNumberInDisplay();
                                     displayResult(result);
-                                } catch (Exception ex) {
+                                } catch (Exception ignored) {
                                     displayError("Cannot divide by zero.");
                                     displayMode = ERROR_MODE;
                                 }
@@ -7623,7 +7623,7 @@ class WeighBridge {
                         double result = processLastOperator();
                         displayResult(result);
                         lastNumber = result;
-                    } catch (DivideByZeroException ex) {
+                    } catch (DivideByZeroException ignored) {
                         displayError("Cannot divide by sero.");
                     }
                 } else {
@@ -7640,7 +7640,7 @@ class WeighBridge {
                 try {
                     result = processLastOperator();
                     displayResult(result);
-                } catch (DivideByZeroException ex) {
+                } catch (DivideByZeroException ignored) {
                     displayError("Cannot divide by sero.");
                 }
                 lastOperator = "0";
