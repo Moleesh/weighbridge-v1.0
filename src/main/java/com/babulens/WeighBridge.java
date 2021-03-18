@@ -250,7 +250,9 @@ class WeighBridge {
     private JCheckBox chckbxPrinterCopyDialog;
     private JButton btnReprint;
     private JCheckBox chckbxTakeBackup;
-    private JButton btnInsertAt;
+    private JButton btnInsertRow;
+    private JButton btnDeleteRow;
+    private JButton btnImportFromExcel;
 
     /**
      * Create the application.
@@ -3588,7 +3590,7 @@ class WeighBridge {
         });
         btnExportToExcel.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnExportToExcel.setFocusable(false);
-        btnExportToExcel.setBounds(1000, 550, 186, 25);
+        btnExportToExcel.setBounds(1027, 550, 186, 25);
         panelReport.add(btnExportToExcel);
 
         JButton btnPrintReport = new JButton("Print");
@@ -3603,11 +3605,11 @@ class WeighBridge {
         });
         btnPrintReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnPrintReport.setFocusable(false);
-        btnPrintReport.setBounds(825, 550, 150, 25);
+        btnPrintReport.setBounds(912, 550, 105, 25);
         panelReport.add(btnPrintReport);
 
-        btnInsertAt = new JButton("Insert at");
-        btnInsertAt.addActionListener(l -> {
+        btnInsertRow = new JButton("Insert row(s)");
+        btnInsertRow.addActionListener(l -> {
             try {
                 Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
@@ -3685,11 +3687,54 @@ class WeighBridge {
             } catch (SQLException ignored) {
             }
         });
-        btnInsertAt.setVisible(false);
-        btnInsertAt.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnInsertAt.setFocusable(false);
-        btnInsertAt.setBounds(650, 550, 150, 25);
-        panelReport.add(btnInsertAt);
+        btnInsertRow.setVisible(false);
+        btnInsertRow.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnInsertRow.setFocusable(false);
+        btnInsertRow.setBounds(765, 550, 137, 25);
+        panelReport.add(btnInsertRow);
+        
+        btnDeleteRow = new JButton("Delete row");
+        btnDeleteRow.addActionListener(l -> {
+            try {
+                String response = JOptionPane.showInputDialog(null, "Please Enter the Sl.no to Delete ?", "Delete Row", JOptionPane.QUESTION_MESSAGE);
+                if (response != null) {
+                    int serialNo = Integer.parseInt(response);
+                    if (serialNo > 0) {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        stmt.executeUpdate("DELETE FROM WEIGHING WHERE SLNO = " + response);
+                        stmt.executeUpdate("UPDATE WEIGHING SET SLNO = SLNO - 1 WHERE SLNO >= " + response);
+                        if (reportOpened) {
+                            getReport();
+                        }
+                        ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING ORDER BY SLNO DESC limit 1");
+                        if (rs.isBeforeFirst()) {
+                            rs.absolute(1);
+                            serialNo = rs.getInt("SLNO");
+                        } else {
+                            serialNo = 0;
+                        }
+                        rs = stmt.executeQuery("SELECT * FROM SETTINGS");
+                        rs.absolute(1);
+                        rs.updateInt("SLNO", serialNo + 1);
+                        rs.updateRow();
+                        textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
+                    }
+                }
+            } catch (NumberFormatException | SQLException ignored) {
+            }
+        });
+        btnDeleteRow.setVisible(false);
+        btnDeleteRow.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnDeleteRow.setFocusable(false);
+        btnDeleteRow.setBounds(617, 550, 137, 25);
+        panelReport.add(btnDeleteRow);
+        
+        btnImportFromExcel = new JButton("Import from Excel");
+        btnImportFromExcel.setVisible(false);
+        btnImportFromExcel.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnImportFromExcel.setFocusable(false);
+        btnImportFromExcel.setBounds(429, 550, 180, 25);
+        panelReport.add(btnImportFromExcel);
 
         JPanel panelSettings = new JPanel();
         panelSettings.setBackground(new Color(0, 255, 127));
@@ -4049,7 +4094,9 @@ class WeighBridge {
                     if (reportOpened) {
                         getReport();
                     }
-                    btnInsertAt.setVisible(true);
+                    btnInsertRow.setVisible(true);
+//                    btnImportFromExcel.setVisible(true);
+                    btnDeleteRow.setVisible(true);
                     return;
                 }
             }
@@ -4057,7 +4104,9 @@ class WeighBridge {
                 tableReport.removeColumn(tableReport.getColumn("Edit/Save"));
             } catch (IllegalArgumentException ignored) {
             }
-            btnInsertAt.setVisible(false);
+            btnInsertRow.setVisible(false);
+            btnImportFromExcel.setVisible(false);
+            btnDeleteRow.setVisible(false);
             chckbxEditEnable.setSelected(false);
         });
         chckbxEditEnable.setBackground(new Color(0, 255, 127));
