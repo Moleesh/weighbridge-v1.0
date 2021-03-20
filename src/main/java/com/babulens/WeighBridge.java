@@ -342,6 +342,7 @@ class WeighBridge {
     private JButton btnInsertRow;
     private JButton btnDeleteRow;
     private JButton btnImportFromExcel;
+    private JButton btnMassPrint;
 
     /**
      * Create the application.
@@ -2051,34 +2052,8 @@ class WeighBridge {
                     }
                 }
 
-                for (int i = 0; !skipPrint && i < noOfCopies; i++) {
-                    if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Pre Print")) {
-                        printPreWeight();
-                        break;
-                    } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Pre Print 2")) {
-                        printPreWeight2();
-                        break;
-                    } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Pre Print 3")) {
-                        printPreWeight3();
-                        break;
-                    } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Camera")) {
-                        printCameraWeight();
-                    } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Plain Camera")) {
-                        printPlainCameraWeight();
-                    } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Sri Pathy")) {
-                        printPlainSriPathyWeight();
-                    } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("No Of Bags")) {
-                        printPlainNoOfBagsWeight();
-                    } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Standard")) {
-                        printStandard();
-                    } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Ice Water")) {
-                        printIceWater();
-                    } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("EMJAY")) {
-                        printEmjay();
-                        break;
-                    } else {
-                        printPlainWeight();
-                    }
+                if (!skipPrint) {
+                    print();
                 }
 
                 while (chckbxSms.isSelected()) {
@@ -3827,6 +3802,25 @@ class WeighBridge {
         btnImportFromExcel.setFocusable(false);
         btnImportFromExcel.setBounds(429, 550, 180, 25);
         panelReport.add(btnImportFromExcel);
+        
+        btnMassPrint = new JButton("Mass Print");
+        btnMassPrint.addActionListener(l -> {
+            if (JOptionPane.showConfirmDialog(null, "Do you want to Print ?", "Print", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                noOfCopies = Integer.parseInt(textFieldNoOfCopies.getText());
+                getReport();
+                TableModel model = tableReport.getModel();
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    rePrint(model.getValueAt(i, 1).toString());
+                    print();
+                }
+                clear();
+            }
+        });
+        btnMassPrint.setVisible(true);
+        btnMassPrint.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnMassPrint.setFocusable(false);
+        btnMassPrint.setBounds(901, 579, 128, 25);
+        panelReport.add(btnMassPrint);
 
         JPanel panelSettings = new JPanel();
         panelSettings.setBackground(new Color(0, 255, 127));
@@ -4189,6 +4183,7 @@ class WeighBridge {
                     btnInsertRow.setVisible(true);
                     btnImportFromExcel.setVisible(true);
                     btnDeleteRow.setVisible(true);
+                    btnMassPrint.setVisible(true);
                     return;
                 }
             }
@@ -4200,6 +4195,7 @@ class WeighBridge {
             btnImportFromExcel.setVisible(false);
             btnDeleteRow.setVisible(false);
             chckbxEditEnable.setSelected(false);
+            btnMassPrint.setVisible(false);
         });
         chckbxEditEnable.setBackground(new Color(0, 255, 127));
         chckbxEditEnable.setEnabled(false);
@@ -4898,6 +4894,38 @@ class WeighBridge {
         button.setBounds(518, 11, 117, 30);
         babulensWeighbridgeDesigned.getContentPane().add(button);
 
+    }
+
+    private void print() {
+        for (int i = 0; i < noOfCopies; i++) {
+            if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Pre Print")) {
+                printPreWeight();
+                break;
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Pre Print 2")) {
+                printPreWeight2();
+                break;
+            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Pre Print 3")) {
+                printPreWeight3();
+                break;
+            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Camera")) {
+                printCameraWeight();
+            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Plain Camera")) {
+                printPlainCameraWeight();
+            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Sri Pathy")) {
+                printPlainSriPathyWeight();
+            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("No Of Bags")) {
+                printPlainNoOfBagsWeight();
+            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Standard")) {
+                printStandard();
+            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Ice Water")) {
+                printIceWater();
+            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("EMJAY")) {
+                printEmjay();
+                break;
+            } else {
+                printPlainWeight();
+            }
+        }
     }
 
     private void refreshSlNo() {
