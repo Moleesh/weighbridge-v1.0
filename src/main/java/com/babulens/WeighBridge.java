@@ -103,6 +103,7 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -120,9 +121,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.Set;
@@ -151,7 +154,7 @@ class WeighBridge {
     private final DateFormat dateAndTimeFormatSql = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final DateFormat dateAndTimeFormatdate = new SimpleDateFormat("dd-MM-yyyy");
     private final DateFormat dateAndTimeFormatdatep = new SimpleDateFormat("dd/MM/yyyy");
-    private final DateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+    private final DateFormat dateAndTimeFormattime = new SimpleDateFormat("hh:mm a");
     private final JCheckBox chckbxSelectSlNo = new JCheckBox("Sl.No");
     private final JCheckBox chckbxSelectDCNo = new JCheckBox("Dc. No");
     private final JCheckBox chckbxSelectDCDate = new JCheckBox("Dc. Date");
@@ -1382,7 +1385,7 @@ class WeighBridge {
             datePicker.setDate(new Date());
             datePicker.getEditor().setEditable(false);
             JSpinner timeSpinner = new JSpinner(new SpinnerDateModel());
-            JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, ((SimpleDateFormat) timeFormat).toPattern());
+            JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, ((SimpleDateFormat) dateAndTimeFormattime).toPattern());
             timeSpinner.setEditor(timeEditor);
             timeSpinner.setValue(new Date());
             ((DefaultEditor) timeSpinner.getEditor()).getTextField().setEditable(false);
@@ -1399,7 +1402,7 @@ class WeighBridge {
                     textFieldGrossWt.setText(Integer.toString(Integer.parseInt(jTextField.getText())));
                     Date dateTemp = datePicker.getDate();
                     Date dateTemp1 = (Date) timeSpinner.getModel().getValue();
-                    textFieldGrossDateTime.setText(dateAndTimeFormatdate.format(dateTemp) + " " + timeFormat.format(dateTemp1));
+                    textFieldGrossDateTime.setText(dateAndTimeFormatdate.format(dateTemp) + " " + dateAndTimeFormattime.format(dateTemp1));
                     btnGetGross.setEnabled(false);
                     if (rdbtnGross.isSelected())
                         btnTotal.setEnabled(true);
@@ -1435,7 +1438,7 @@ class WeighBridge {
             datePicker.setDate(new Date());
             datePicker.getEditor().setEditable(false);
             JSpinner timeSpinner = new JSpinner(new SpinnerDateModel());
-            JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, ((SimpleDateFormat) timeFormat).toPattern());
+            JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, ((SimpleDateFormat) dateAndTimeFormattime).toPattern());
             timeSpinner.setEditor(timeEditor);
             timeSpinner.setValue(new Date());
             ((DefaultEditor) timeSpinner.getEditor()).getTextField().setEditable(false);
@@ -1452,7 +1455,7 @@ class WeighBridge {
                     textFieldTareWt.setText(Integer.toString(Integer.parseInt(jTextField.getText())));
                     Date dateTemp = datePicker.getDate();
                     Date dateTemp1 = (Date) timeSpinner.getModel().getValue();
-                    textFieldTareDateTime.setText(dateAndTimeFormatdate.format(dateTemp) + " " + timeFormat.format(dateTemp1));
+                    textFieldTareDateTime.setText(dateAndTimeFormatdate.format(dateTemp) + " " + dateAndTimeFormattime.format(dateTemp1));
                     btnGetTare.setEnabled(false);
                     if (rdbtnTare.isSelected())
                         btnTotal.setEnabled(true);
@@ -3656,13 +3659,12 @@ class WeighBridge {
 
         JButton btnExportToExcel = new JButton("Export to Excel");
         btnExportToExcel.addActionListener(l -> {
-            JFrame parentFrame = new JFrame();
+            JFrame jFrame = new JFrame();
             JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home") + File.separator + "Desktop");
             fileChooser.setDialogTitle("Specify a file name to save your report");
             fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Documents", "xls", "xlsx"));
             fileChooser.setSelectedFile(new File("report.xlsx"));
-            int userSelection = fileChooser.showSaveDialog(parentFrame);
-            if (userSelection == JFileChooser.APPROVE_OPTION) {
+            if (fileChooser.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
                 String fname = fileToSave.getAbsolutePath();
                 try {
@@ -3760,14 +3762,7 @@ class WeighBridge {
                     if (reportOpened) {
                         getReport();
                     }
-                    rs = stmt.executeQuery("SELECT * FROM WEIGHING ORDER BY SLNO DESC limit 1");
-                    rs.absolute(1);
-                    serialNo = rs.getInt("SLNO");
-                    rs = stmt.executeQuery("SELECT * FROM SETTINGS");
-                    rs.absolute(1);
-                    rs.updateInt("SLNO", serialNo + 1);
-                    rs.updateRow();
-                    textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
+                    refreshSlNo();
                 }
             } catch (SQLException ignored) {
             }
@@ -3791,18 +3786,7 @@ class WeighBridge {
                         if (reportOpened) {
                             getReport();
                         }
-                        ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING ORDER BY SLNO DESC limit 1");
-                        if (rs.isBeforeFirst()) {
-                            rs.absolute(1);
-                            serialNo = rs.getInt("SLNO");
-                        } else {
-                            serialNo = 0;
-                        }
-                        rs = stmt.executeQuery("SELECT * FROM SETTINGS");
-                        rs.absolute(1);
-                        rs.updateInt("SLNO", serialNo + 1);
-                        rs.updateRow();
-                        textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
+                        refreshSlNo();
                     }
                 }
             } catch (NumberFormatException | SQLException ignored) {
@@ -3815,6 +3799,29 @@ class WeighBridge {
         panelReport.add(btnDeleteRow);
         
         btnImportFromExcel = new JButton("Import from Excel");
+        btnImportFromExcel.addActionListener(l -> {
+            JFrame jFrame = new JFrame();
+            JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home") + File.separator + "Desktop");
+            fileChooser.setDialogTitle("Please select a file to import");
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Documents", "xls", "xlsx"));
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            if (fileChooser.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION) {
+                try {
+                    List<Integer> failedSlNo = fromExcel(fileChooser.getSelectedFile());
+                    if (!failedSlNo.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Following row no(s) had some errors\n" + failedSlNo.toString() + "\n Please correct them", "Excel File Warning", JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Import Successful", "Excel Import", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                    refreshSlNo();
+                    if (reportOpened) {
+                        getReport();
+                    }
+                } catch (IOException ignored) {
+                    JOptionPane.showMessageDialog(null, "Plz Close the Excel file\nLINE :3831", "FILE ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
         btnImportFromExcel.setVisible(false);
         btnImportFromExcel.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnImportFromExcel.setFocusable(false);
@@ -4180,7 +4187,7 @@ class WeighBridge {
                         getReport();
                     }
                     btnInsertRow.setVisible(true);
-//                    btnImportFromExcel.setVisible(true);
+                    btnImportFromExcel.setVisible(true);
                     btnDeleteRow.setVisible(true);
                     return;
                 }
@@ -4893,6 +4900,26 @@ class WeighBridge {
 
     }
 
+    private void refreshSlNo() {
+        try {
+            int serialNo;
+            Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING ORDER BY SLNO DESC limit 1");
+            if (rs.isBeforeFirst()) {
+                rs.absolute(1);
+                serialNo = rs.getInt("SLNO");
+            } else {
+                serialNo = 0;
+            }
+            rs = stmt.executeQuery("SELECT * FROM SETTINGS");
+            rs.absolute(1);
+            rs.updateInt("SLNO", serialNo + 1);
+            rs.updateRow();
+            clear();
+        } catch (SQLException ignored) {
+        }
+    }
+
     private void getReport() {
         String date1, date2, vehicleNo, material;
         int charges = 0, netWt = 0, serialNo;
@@ -5006,7 +5033,7 @@ class WeighBridge {
                     if (time.equals("null"))
                         time = "";
                     else
-                        time = timeFormat.format(rs.getTime("GROSSTIME"));
+                        time = dateAndTimeFormattime.format(rs.getTime("GROSSTIME"));
                     gross = date + " " + time;
                     date = "" + rs.getDate("TAREDATE");
                     if (date.equals("null"))
@@ -5017,7 +5044,7 @@ class WeighBridge {
                     if (time.equals("null"))
                         time = "";
                     else
-                        time = timeFormat.format(rs.getTime("TARETIME"));
+                        time = dateAndTimeFormattime.format(rs.getTime("TARETIME"));
                     tare = date + " " + time;
                     date = "" + rs.getDate("NETDATE");
                     if (date.equals("null"))
@@ -5028,7 +5055,7 @@ class WeighBridge {
                     if (time.equals("null"))
                         time = "";
                     else
-                        time = timeFormat.format(rs.getTime("NETTIME"));
+                        time = dateAndTimeFormattime.format(rs.getTime("NETTIME"));
                     net = date + " " + time;
 
                     model.addRow(new Object[]{
@@ -6858,9 +6885,11 @@ class WeighBridge {
         }
         TableModel model = tableReport.getModel();
 
-        CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
-        cellStyle.setDataFormat(
-                creationHelper.createDataFormat().getFormat(((SimpleDateFormat) dateAndTimeFormat).toPattern()));
+        CellStyle cellStyleDateTime = sheet.getWorkbook().createCellStyle();
+        cellStyleDateTime.setDataFormat(creationHelper.createDataFormat().getFormat("dd-MM-yyyy hh:mm AM/PM"));
+
+        CellStyle cellStyleDate = sheet.getWorkbook().createCellStyle();
+        cellStyleDate.setDataFormat(creationHelper.createDataFormat().getFormat(((SimpleDateFormat) dateAndTimeFormatdate).toPattern()));
         int charge = -1;
         int grossWt = -1;
         int tareWt = -1;
@@ -6884,7 +6913,7 @@ class WeighBridge {
             if (chckbxSelectDCDate.isSelected()) {
                 cell = row.createCell(c++);
                 cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
-                cell.setCellStyle(cellStyle);
+                cell.setCellStyle(cellStyleDate);
             }
             j++;
             if (chckbxSelectCustomerName.isSelected()) {
@@ -6927,7 +6956,7 @@ class WeighBridge {
             if (chckbxSelectGrossDateAndTime.isSelected()) {
                 cell = row.createCell(c++);
                 cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
-                cell.setCellStyle(cellStyle);
+                cell.setCellStyle(cellStyleDateTime);
             }
             j++;
             if (chckbxSelectTareWeight.isSelected()) {
@@ -6939,7 +6968,7 @@ class WeighBridge {
             if (chckbxSelectTareDateAndTime.isSelected()) {
                 cell = row.createCell(c++);
                 cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
-                cell.setCellStyle(cellStyle);
+                cell.setCellStyle(cellStyleDateTime);
             }
             j++;
             if (chckbxSelectBagDeduction.isSelected()) {
@@ -6956,7 +6985,7 @@ class WeighBridge {
             if (chckbxSelectNettDateAndTime.isSelected()) {
                 cell = row.createCell(c++);
                 cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
-                cell.setCellStyle(cellStyle);
+                cell.setCellStyle(cellStyleDateTime);
             }
             j++;
             if (chckbxSelectFinalWt.isSelected()) {
@@ -7021,6 +7050,98 @@ class WeighBridge {
         workbook.write(fileOut);
         fileOut.close();
         workbook.close();
+    }
+
+    private List<Integer> fromExcel(File excelFilePath) throws IOException {
+        Workbook workbook;
+        FileInputStream filein = new FileInputStream(excelFilePath);
+        if (excelFilePath.getName().endsWith("xls")) {
+            workbook = new HSSFWorkbook(filein);
+        } else {
+            workbook = new XSSFWorkbook(filein);
+        }
+        Sheet sheet = workbook.getSheetAt(0);
+        List<Integer> failedSlNo = new ArrayList<>();
+
+        for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
+            Row row = sheet.getRow(rowNum);
+            int colNum = 0;
+            try {
+                int slNo = (int) row.getCell(colNum).getNumericCellValue();
+                boolean update = false;
+                if (slNo <= 0) {
+                    failedSlNo.add(rowNum);
+                    continue;
+                }
+                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + slNo);
+                if (rs.next()) {
+                    rs.absolute(1);
+                    update = true;
+                } else {
+                    rs = stmt.executeQuery("SELECT * FROM WEIGHING");
+                    rs.moveToInsertRow();
+                }
+
+                rs.updateInt("SLNO", slNo);
+                rs.updateString("DCNO", row.getCell(++ colNum) != null ? row.getCell(colNum).toString() : "");
+                if (row.getCell(++ colNum) != null && row.getCell(colNum).getDateCellValue() != null) {
+                    rs.updateDate("DCNODATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
+                } else {
+                    rs.updateDate("DCNODATE", null);
+                }
+
+                rs.updateString("CUSTOMERNAME", row.getCell(++ colNum) != null ? row.getCell(colNum).toString() : "");
+                rs.updateString("DRIVERNAME", row.getCell(++ colNum) != null ? row.getCell(colNum).toString() : "");
+                rs.updateString("VEHICLENO", row.getCell(++ colNum) != null ? row.getCell(colNum).toString() : "");
+                rs.updateString("MATERIAL", row.getCell(++ colNum) != null ? row.getCell(colNum).toString() : "");
+                rs.updateInt("NOOFBAGS", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                rs.updateDouble("CHARGES", row.getCell(++ colNum) != null ? row.getCell(colNum).getNumericCellValue() : 0);
+
+                rs.updateInt("GROSSWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                if (row.getCell(++ colNum) != null && row.getCell(colNum).getDateCellValue() != null) {
+                    rs.updateDate("GROSSDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
+                    rs.updateTime("GROSSTIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
+                } else {
+                    rs.updateDate("GROSSDATE", null);
+                    rs.updateTime("GROSSTIME", null);
+                }
+
+                rs.updateInt("TAREWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                if (row.getCell(++ colNum) != null && row.getCell(colNum).getDateCellValue() != null) {
+                    rs.updateDate("TAREDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
+                    rs.updateTime("TARETIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
+                } else {
+                    rs.updateDate("TAREDATE", null);
+                    rs.updateTime("TARETIME", null);
+                }
+
+                rs.updateInt("BAGDEDUCTION",row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+
+                rs.updateInt("NETWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                if (row.getCell(++ colNum) != null && row.getCell(colNum).getDateCellValue() != null) {
+                    rs.updateDate("NETDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
+                    rs.updateTime("NETTIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
+                } else {
+                    rs.updateDate("NETDATE", null);
+                    rs.updateTime("NETTIME", null);
+                }
+                rs.updateInt("FINALWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                rs.updateInt("FINALAMOUNT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                rs.updateString("REMARKS", row.getCell(colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                rs.updateBoolean("MANUAL", true);
+                if (!update) {
+                    rs.insertRow();
+                } else {
+                    rs.updateRow();
+                }
+            } catch (IllegalStateException | NumberFormatException | SQLException ignored) {
+                failedSlNo.add(rowNum + 1);
+            }
+        }
+        workbook.close();
+        filein.close();
+        return failedSlNo;
     }
 
     private void initializeWeights() {
