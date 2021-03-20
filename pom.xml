@@ -137,6 +137,7 @@
                         <phase>verify</phase>
                         <configuration>
                             <target>
+                                <delete dir="WeighBridge 1.0" quiet="true" failonerror="false"/>
                                 <mkdir dir="WeighBridge 1.0"/>
                                 <copy file="cameras.xml" tofile="WeighBridge 1.0/cameras.xml"/>
                                 <copy file="sample.xlsx" tofile="WeighBridge 1.0/sample.xlsx"/>
