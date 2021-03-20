@@ -3816,7 +3816,7 @@ class WeighBridge {
                 clear();
             }
         });
-        btnMassPrint.setVisible(true);
+        btnMassPrint.setVisible(false);
         btnMassPrint.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnMassPrint.setFocusable(false);
         btnMassPrint.setBounds(901, 579, 128, 25);
