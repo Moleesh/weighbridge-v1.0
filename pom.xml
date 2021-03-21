@@ -82,6 +82,23 @@
             <artifactId>jaxb-runtime</artifactId>
             <version>3.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.lgooddatepicker</groupId>
+            <artifactId>LGoodDatePicker</artifactId>
+            <version>11.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.3.0</version>
+            <type>maven-plugin</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>3.0.0</version>
+            <type>maven-plugin</type>
+        </dependency>
     </dependencies>
     <build>
         <finalName>WeighBridge</finalName>
@@ -96,7 +113,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptorRefs>
@@ -119,6 +135,7 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
@@ -131,19 +148,18 @@
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
                 <executions>
                     <execution>
                         <phase>verify</phase>
                         <configuration>
-                            <target>
+                            <tasks>
                                 <delete dir="WeighBridge 1.0" quiet="true" failonerror="false"/>
                                 <mkdir dir="WeighBridge 1.0"/>
                                 <copy file="cameras.xml" tofile="WeighBridge 1.0/cameras.xml"/>
                                 <copy file="sample.xlsx" tofile="WeighBridge 1.0/sample.xlsx"/>
                                 <copy file="target/WeighBridge-jar-with-dependencies.jar" tofile="WeighBridge 1.0/Weighbridge.jar"/>
                                 <mkdir dir="WeighBridge 1.0/CameraOutput"/>
-                            </target>
+                            </tasks>
                         </configuration>
                         <goals>
                             <goal>run</goal>

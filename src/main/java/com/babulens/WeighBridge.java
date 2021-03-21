@@ -3,6 +3,9 @@ package com.babulens;
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortEvent;
 import com.fazecast.jSerialComm.SerialPortMessageListener;
+import com.github.lgooddatepicker.components.DatePickerSettings;
+import com.github.lgooddatepicker.components.DateTimePicker;
+import com.github.lgooddatepicker.components.TimePickerSettings;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamCompositeDriver;
 import com.github.sarxos.webcam.WebcamException;
@@ -53,11 +56,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
-import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -1377,33 +1378,39 @@ class WeighBridge {
             };
             JTextField jTextField = new JTextField(10);
             valueEntered = false;
+            DatePickerSettings datePickerSettings = new DatePickerSettings();
+            datePickerSettings.setFormatForDatesCommonEra("dd-MM-yyyy");
+            datePickerSettings.setFormatForDatesBeforeCommonEra("dd-MM-yyyy");
+            TimePickerSettings timePickerSettings = new TimePickerSettings();
+            timePickerSettings.setFormatForDisplayTime("hh:mm a");
+            DateTimePicker dateTimePicker = new DateTimePicker(datePickerSettings, timePickerSettings);
+            dateTimePicker.setDateTimeStrict(LocalDateTime.now());
             jTextField.addActionListener(li -> {
+                dateTimePicker.datePicker.getComponentDateTextField().selectAll();
+                dateTimePicker.datePicker.getComponentDateTextField().requestFocus();
+            });
+
+            dateTimePicker.datePicker.getComponentDateTextField().addActionListener(li -> {
+                dateTimePicker.timePicker.getComponentTimeTextField().selectAll();
+                dateTimePicker.timePicker.getComponentTimeTextField().requestFocus();
+            });
+
+            dateTimePicker.timePicker.getComponentTimeTextField().addActionListener(li -> {
                 valueEntered = true;
                 JOptionPane.getRootFrame().dispose();
             });
-            JXDatePicker datePicker = new JXDatePicker();
-            datePicker.setFormats("dd-MM-yyyy");
-            datePicker.setDate(new Date());
-            datePicker.getEditor().setEditable(false);
-            JSpinner timeSpinner = new JSpinner(new SpinnerDateModel());
-            JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, ((SimpleDateFormat) dateAndTimeFormattime).toPattern());
-            timeSpinner.setEditor(timeEditor);
-            timeSpinner.setValue(new Date());
-            ((DefaultEditor) timeSpinner.getEditor()).getTextField().setEditable(false);
-            JPanel panel = new JPanel(new GridLayout(3, 2));
+
+            JPanel panel = new JPanel(new GridLayout(2, 2));
             panel.add(new JLabel("Gross Wt "));
             panel.add(jTextField);
-            panel.add(new JLabel("Gross Date "));
-            panel.add(datePicker);
-            panel.add(new JLabel("Gross Time "));
-            panel.add(timeSpinner);
+            panel.add(new JLabel("Gross Date & time"));
+            panel.add(dateTimePicker);
+
             if (JOptionPane.showOptionDialog(null, panel, "Enter Gross Wt ", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, "") == 0 || valueEntered) {
                 try {
                     textFieldGrossWt.setText(Integer.toString(Integer.parseInt(jTextField.getText())));
-                    Date dateTemp = datePicker.getDate();
-                    Date dateTemp1 = (Date) timeSpinner.getModel().getValue();
-                    textFieldGrossDateTime.setText(dateAndTimeFormatdate.format(dateTemp) + " " + dateAndTimeFormattime.format(dateTemp1));
+                    textFieldGrossDateTime.setText(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a").format(dateTimePicker.getDateTimeStrict()));
                     btnGetGross.setEnabled(false);
                     if (rdbtnGross.isSelected())
                         btnTotal.setEnabled(true);
@@ -1430,33 +1437,39 @@ class WeighBridge {
             };
             JTextField jTextField = new JTextField(10);
             valueEntered = false;
+            DatePickerSettings datePickerSettings = new DatePickerSettings();
+            datePickerSettings.setFormatForDatesCommonEra("dd-MM-yyyy");
+            datePickerSettings.setFormatForDatesBeforeCommonEra("dd-MM-yyyy");
+            TimePickerSettings timePickerSettings = new TimePickerSettings();
+            timePickerSettings.setFormatForDisplayTime("hh:mm a");
+            DateTimePicker dateTimePicker = new DateTimePicker(datePickerSettings, timePickerSettings);
+            dateTimePicker.setDateTimeStrict(LocalDateTime.now());
+
             jTextField.addActionListener(li -> {
+                dateTimePicker.datePicker.getComponentDateTextField().selectAll();
+                dateTimePicker.datePicker.getComponentDateTextField().requestFocus();
+            });
+
+            dateTimePicker.datePicker.getComponentDateTextField().addActionListener(li -> {
+                dateTimePicker.timePicker.getComponentTimeTextField().selectAll();
+                dateTimePicker.timePicker.getComponentTimeTextField().requestFocus();
+            });
+
+            dateTimePicker.timePicker.getComponentTimeTextField().addActionListener(li -> {
                 valueEntered = true;
                 JOptionPane.getRootFrame().dispose();
             });
-            JXDatePicker datePicker = new JXDatePicker();
-            datePicker.setFormats("dd-MM-yyyy");
-            datePicker.setDate(new Date());
-            datePicker.getEditor().setEditable(false);
-            JSpinner timeSpinner = new JSpinner(new SpinnerDateModel());
-            JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, ((SimpleDateFormat) dateAndTimeFormattime).toPattern());
-            timeSpinner.setEditor(timeEditor);
-            timeSpinner.setValue(new Date());
-            ((DefaultEditor) timeSpinner.getEditor()).getTextField().setEditable(false);
-            JPanel panel = new JPanel(new GridLayout(3, 2));
+
+            JPanel panel = new JPanel(new GridLayout(2, 2));
             panel.add(new JLabel("Tare Wt "));
             panel.add(jTextField);
-            panel.add(new JLabel("Tare Date "));
-            panel.add(datePicker);
-            panel.add(new JLabel("Tare Time "));
-            panel.add(timeSpinner);
+            panel.add(new JLabel("Tare  Date & time"));
+            panel.add(dateTimePicker);
             if (JOptionPane.showOptionDialog(null, panel, "Enter Tare Wt ", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null) == 0 || valueEntered) {
                 try {
                     textFieldTareWt.setText(Integer.toString(Integer.parseInt(jTextField.getText())));
-                    Date dateTemp = datePicker.getDate();
-                    Date dateTemp1 = (Date) timeSpinner.getModel().getValue();
-                    textFieldTareDateTime.setText(dateAndTimeFormatdate.format(dateTemp) + " " + dateAndTimeFormattime.format(dateTemp1));
+                    textFieldTareDateTime.setText(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a").format(dateTimePicker.getDateTimeStrict()));
                     btnGetTare.setEnabled(false);
                     if (rdbtnTare.isSelected())
                         btnTotal.setEnabled(true);
