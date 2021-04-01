@@ -118,6 +118,7 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -3698,9 +3699,13 @@ class WeighBridge {
                 NumberFormatter numberFormatterAt = new NumberFormatter();
                 numberFormatterAt.setValueClass(Integer.class);
                 numberFormatterAt.setMaximum(serialNo);
+                NumberFormat numberFormat = NumberFormat.getIntegerInstance();
+                numberFormat.setGroupingUsed(false);
+                numberFormatterAt.setFormat(numberFormat);
                 numberFormatterAt.setMinimum(1);
                 numberFormatterAt.setAllowsInvalid(false);
                 numberFormatterAt.setCommitsOnValidEdit(true);
+
                 JTextField jTextFieldAt = new JFormattedTextField(numberFormatterAt);
                 jTextFieldAt.setText("1");
                 NumberFormatter numberFormatterRows = new NumberFormatter();
