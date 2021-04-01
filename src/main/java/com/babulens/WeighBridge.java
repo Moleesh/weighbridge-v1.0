@@ -1158,10 +1158,107 @@ class WeighBridge {
         textFieldVehicleNo.addFocusListener(new FocusAdapter() {
         	@Override
         	public void focusLost(FocusEvent e) {
-                textFieldVehicleNoAction();
+                textFieldVehicleNo.setText(textFieldVehicleNo.getText().toUpperCase().replaceAll(" ", ""));
             }
         });
         textFieldVehicleNo.addActionListener(l -> {
+            textFieldVehicleNo.setText(textFieldVehicleNo.getText().toUpperCase().replaceAll(" ", ""));
+            if (!chckbxTareNoSlno.isSelected()) {
+                if (rdbtnGross.isSelected()) {
+                    try {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        ResultSet rs = stmt.executeQuery("SELECT * FROM VEHICLETARES WHERE VEHICLENO LIKE '" + textFieldVehicleNo.getText() + "'");
+                        if (rs.next()) {
+                            if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the Stored tare Weight ?", "Tare Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                                textFieldTareDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
+                                if (textFieldTareDateTime.getText().equals("null null")) {
+                                    textFieldTareDateTime.setText("");
+                                } else {
+                                    textFieldTareDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
+                                }
+                                textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
+                            }
+                        }
+                    } catch (SQLException | ParseException ignored) {
+                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    try {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE VEHICLENO LIKE '" + textFieldVehicleNo.getText() + "'");
+                        if (rs.last())
+                            if (rs.getInt("TAREWT") == 0) {
+                                if (JOptionPane.showConfirmDialog(null,
+                                        "Please Select Yes to Enter the last gross Weight ?",
+                                        "Gross Weight Available", JOptionPane.YES_NO_OPTION,
+                                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                                    textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
+                                    textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
+                                    textFieldGrossDateTime
+                                            .setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
+                                    if (textFieldGrossDateTime.getText().equals("null null"))
+                                        textFieldGrossDateTime.setText("");
+                                    else
+                                        textFieldGrossDateTime
+                                                .setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql
+                                                        .parse(textFieldGrossDateTime.getText()).getTime())));
+                                    textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
+                                    comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
+                                }
+                            }
+                    } catch (SQLException | ParseException ignored) {
+                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
+                                "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } else {
+                if (rdbtnTare.isSelected()) {
+                    try {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE VEHICLENO LIKE '" +
+                                textFieldVehicleNo.getText() + "'");
+                        if (rs.last())
+                            if (rs.getInt("TAREWT") == 0) {
+                                if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the last gross Weight ?", "Gross Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                                    textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
+                                    textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
+                                    textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
+                                    textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
+                                    if (textFieldGrossDateTime.getText().equals("null null"))
+                                        textFieldGrossDateTime.setText("");
+                                    else
+                                        textFieldGrossDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
+                                    textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
+                                    comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
+                                }
+                            }
+                    } catch (SQLException | ParseException ignored) {
+                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
+                                "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    try {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE VEHICLENO LIKE '" + textFieldVehicleNo.getText() + "'");
+                        if (rs.last())
+                            if (rs.getInt("GROSSWT") == 0) {
+                                if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the last tare Weight ?", "Tare Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                                    textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
+                                    textFieldTareDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
+                                    if (textFieldTareDateTime.getText().equals("null null"))
+                                        textFieldTareDateTime.setText("");
+                                    else
+                                        textFieldTareDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
+                                    textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
+                                }
+                            }
+                    } catch (SQLException | ParseException ignored) {
+                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
+                                "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+
+                }
+            }
             if (comboBoxMaterial.isEditable())
                 comboBoxMaterial.requestFocus();
             else {
@@ -1378,7 +1475,6 @@ class WeighBridge {
         btnTotal.setVisible(false);
         btnTotal.setFocusable(false);
         btnTotal.addActionListener(l -> {
-
             textFieldVehicleNo.setText(textFieldVehicleNo.getText().toUpperCase().replaceAll(" ", ""));
             if (rdbtnGross.isSelected()) {
                 textFieldNetDateTime.setText(textFieldGrossDateTime.getText());
@@ -1474,7 +1570,7 @@ class WeighBridge {
                     ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + response);
                     rs.next();
                     if (chckbxTareNoSlno.isSelected()) {
-                        if (rs.getInt("TAREWT") != 0) {
+                        if (rs.getInt("GROSSWT") != 0) {
                             JOptionPane.showMessageDialog(null, "Record already updated.\nPlease try a new Entry.", "RECORD ERROR", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
@@ -1555,7 +1651,7 @@ class WeighBridge {
                     ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + response);
                     rs.next();
                     if (chckbxTareNoSlno.isSelected()) {
-                        if (rs.getInt("GROSSWT") != 0) {
+                        if (rs.getInt("TAREWT") != 0) {
                             JOptionPane.showMessageDialog(null, "Record already updated.\nPlease try a new Entry.", "RECORD ERROR", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
@@ -4810,107 +4906,6 @@ class WeighBridge {
         button.setBounds(518, 11, 117, 30);
         babulensWeighbridgeDesigned.getContentPane().add(button);
 
-    }
-
-    private void textFieldVehicleNoAction() {
-        textFieldVehicleNo.setText(textFieldVehicleNo.getText().toUpperCase().replaceAll(" ", ""));
-        if (!chckbxTareNoSlno.isSelected()) {
-            if (rdbtnGross.isSelected()) {
-                try {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM VEHICLETARES WHERE VEHICLENO LIKE '" + textFieldVehicleNo.getText() + "'");
-                    if (rs.next()) {
-                        if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the Stored tare Weight ?", "Tare Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                            textFieldTareDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
-                            if (textFieldTareDateTime.getText().equals("null null")) {
-                                textFieldTareDateTime.setText("");
-                            } else {
-                                textFieldTareDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
-                            }
-                            textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
-                        }
-                    }
-                } catch (SQLException | ParseException ignored) {
-                    JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                try {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE VEHICLENO LIKE '" + textFieldVehicleNo.getText() + "'");
-                    if (rs.last())
-                        if (rs.getInt("TAREWT") == 0) {
-                            if (JOptionPane.showConfirmDialog(null,
-                                    "Please Select Yes to Enter the last gross Weight ?",
-                                    "Gross Weight Available", JOptionPane.YES_NO_OPTION,
-                                    JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                                textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                                textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
-                                textFieldGrossDateTime
-                                        .setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
-                                if (textFieldGrossDateTime.getText().equals("null null"))
-                                    textFieldGrossDateTime.setText("");
-                                else
-                                    textFieldGrossDateTime
-                                            .setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql
-                                                    .parse(textFieldGrossDateTime.getText()).getTime())));
-                                textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
-                                comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
-                            }
-                        }
-                } catch (SQLException | ParseException ignored) {
-                    JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
-                            "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        } else {
-            if (rdbtnTare.isSelected()) {
-                try {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                            ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE VEHICLENO LIKE '" +
-                            textFieldVehicleNo.getText() + "'");
-                    if (rs.last())
-                        if (rs.getInt("TAREWT") == 0) {
-                            if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the last gross Weight ?", "Gross Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                                textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                                textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
-                                textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
-                                textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
-                                if (textFieldGrossDateTime.getText().equals("null null"))
-                                    textFieldGrossDateTime.setText("");
-                                else
-                                    textFieldGrossDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
-                                textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
-                                comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
-                            }
-                        }
-                } catch (SQLException | ParseException ignored) {
-                    JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
-                            "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                try {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE VEHICLENO LIKE '" + textFieldVehicleNo.getText() + "'");
-                    if (rs.last())
-                        if (rs.getInt("GROSSWT") == 0) {
-                            if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the last tare Weight ?", "Tare Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                                textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
-                                textFieldTareDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
-                                if (textFieldTareDateTime.getText().equals("null null"))
-                                    textFieldTareDateTime.setText("");
-                                else
-                                    textFieldTareDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
-                                textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
-                            }
-                        }
-                } catch (SQLException | ParseException ignored) {
-                    JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680",
-                            "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-
-            }
-        }
     }
 
     private void print() {
