@@ -1555,8 +1555,8 @@ class WeighBridge {
         btnGetTareSl.setFocusable(false);
         btnGetTareSl.addActionListener(l -> {
             rdbtnGross.setSelected(true);
-            JComboBox<String> comboBoxa = new JComboBox<>();
-            comboBoxa.setModel(
+            JComboBox<String> jComboBox = new JComboBox<>();
+            jComboBox.setModel(
                     new DefaultComboBoxModel<>(new String[]{
                             "Tare Sl.no",
                             "Gross Sl.no",
@@ -1564,7 +1564,7 @@ class WeighBridge {
                     }));
             Object[] params = {
                     "Select the field type for Tare Wt ?",
-                    comboBoxa,
+                    jComboBox,
                     "Enter the Sl.no To Get Tare Wt ?"
             };
             String response = JOptionPane.showInputDialog(null, params, "Getting the Sl.no for Tare Wt ",
@@ -1579,9 +1579,7 @@ class WeighBridge {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1550", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
-            if (!(response == null || ("".equals(response)) ||
-                    Integer.parseInt(response.replaceAll("[^0-9]", "")) >= serialNo ||
-                    Integer.parseInt(response.replaceAll("[^0-9]", "")) <= 0)) {
+            if (!(response == null || ("".equals(response)) || Integer.parseInt(response.replaceAll("[^0-9]", "")) >= serialNo || Integer.parseInt(response.replaceAll("[^0-9]", "")) <= 0)) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + response);
@@ -1593,16 +1591,16 @@ class WeighBridge {
                     textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
                     textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
-                    textFieldTareWt.setText(Integer.toString(rs.getInt(Objects.requireNonNull(comboBoxa.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
-                    textFieldTareDateTime.setText(rs
-                            .getDate(comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") +
-                            " " + rs.getTime(
-                            comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "TIME"));
-                    if (textFieldTareDateTime.getText().equals("null null"))
+                    textFieldTareWt.setText(Integer.toString(rs.getInt(Objects.requireNonNull(jComboBox.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
+                    textFieldTareDateTime.setText(rs.getDate(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") + " " + rs.getTime(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "TIME"));
+                    if (chckbxTareNoSlno.isSelected()) {
+                        textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
+                    }
+                    if (textFieldTareDateTime.getText().equals("null null")) {
                         textFieldTareDateTime.setText("");
-                    else
-                        textFieldTareDateTime.setText(dateAndTimeFormat.format(
-                                new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
+                    } else {
+                        textFieldTareDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
+                    }
                 } catch (SQLException | ParseException ignored) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :820",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
@@ -1634,8 +1632,8 @@ class WeighBridge {
         btnGetGrossSl.addActionListener(l -> {
 
             rdbtnTare.setSelected(true);
-            JComboBox<String> comboBoxa = new JComboBox<>();
-            comboBoxa.setModel(
+            JComboBox<String> jComboBox = new JComboBox<>();
+            jComboBox.setModel(
                     new DefaultComboBoxModel<>(new String[]{
                             "Gross Sl.no",
                             "Tare Sl.no",
@@ -1643,11 +1641,10 @@ class WeighBridge {
                     }));
             Object[] params = {
                     "Select the field type for Gross Wt ?",
-                    comboBoxa,
+                    jComboBox,
                     "Enter the Sl.no To Get Gross Wt ?"
             };
-            String response = JOptionPane.showInputDialog(null, params, "Getting the Sl.no for Gross Wt ",
-                    JOptionPane.QUESTION_MESSAGE);
+            String response = JOptionPane.showInputDialog(null, params, "Getting the Sl.no for Gross Wt ", JOptionPane.QUESTION_MESSAGE);
             int serialNo = 0;
             try {
                 Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -1656,11 +1653,9 @@ class WeighBridge {
                 rs.absolute(1);
                 serialNo = rs.getInt("SLNO");
             } catch (SQLException ignored) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :847", "SQL ERROR",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :847", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
             }
-            if (!(response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo ||
-                    Integer.parseInt(response) <= 0)) {
+            if (!(response == null || ("".equals(response)) || Integer.parseInt(response) >= serialNo || Integer.parseInt(response) <= 0)) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + response);
@@ -1672,13 +1667,16 @@ class WeighBridge {
                     textFieldVehicleNo.setText(rs.getString("VEHICLENO"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
                     textFieldBagDeduction.setText(Integer.toString(rs.getInt("BAGDEDUCTION")));
-                    textFieldGrossWt.setText(Integer.toString(rs.getInt(Objects.requireNonNull(comboBoxa.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
-                    textFieldGrossDateTime.setText(rs.getDate(comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") + " " + rs.getTime(comboBoxa.getSelectedItem().toString().replace("Sl.no", "").trim() + "TIME"));
-                    if (textFieldGrossDateTime.getText().equals("null null"))
+                    textFieldGrossWt.setText(Integer.toString(rs.getInt(Objects.requireNonNull(jComboBox.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
+                    textFieldGrossDateTime.setText(rs.getDate(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") + " " + rs.getTime(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "TIME"));
+                    if (chckbxTareNoSlno.isSelected()) {
+                        textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
+                    }
+                    if (textFieldGrossDateTime.getText().equals("null null")) {
                         textFieldGrossDateTime.setText("");
-                    else
-                        textFieldGrossDateTime.setText(dateAndTimeFormat.format(
-                                new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
+                    } else {
+                        textFieldGrossDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
+                    }
                 } catch (SQLException | ParseException ignored) {
                     JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :861",
                             "SQL ERROR", JOptionPane.ERROR_MESSAGE);
