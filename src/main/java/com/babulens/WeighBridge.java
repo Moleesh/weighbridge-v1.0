@@ -3699,9 +3699,7 @@ class WeighBridge {
                 NumberFormatter numberFormatterAt = new NumberFormatter();
                 numberFormatterAt.setValueClass(Integer.class);
                 numberFormatterAt.setMaximum(serialNo);
-                NumberFormat numberFormat = NumberFormat.getIntegerInstance();
-                numberFormat.setGroupingUsed(false);
-                numberFormatterAt.setFormat(numberFormat);
+                ((NumberFormat) numberFormatterAt.getFormat()).setGroupingUsed(false);
                 numberFormatterAt.setMinimum(1);
                 numberFormatterAt.setAllowsInvalid(false);
                 numberFormatterAt.setCommitsOnValidEdit(true);
