@@ -4107,7 +4107,7 @@ class WeighBridge {
         panelSettings.add(textFieldBaudRate);
 
         textFieldPortName = new JTextField();
-        textFieldPortName.setToolTipText("<Port Name>;<Data Bit(8)>;<Parity(0)>;<delimiter(10)>;<Pattern(~~~)>");
+        textFieldPortName.setToolTipText("<Port Name>;<Data Bit(8)>;<Parity(0)>;<delimiter(10)>;<Pattern(~~~);<reverse(f)>");
         textFieldPortName.setEnabled(false);
         textFieldPortName.setHorizontalAlignment(SwingConstants.CENTER);
         textFieldPortName.setFont(new Font("Times New Roman", Font.PLAIN, 20));
@@ -4238,7 +4238,7 @@ class WeighBridge {
         btnUpdate.setBounds(664, 228, 150, 25);
         panelSettings.add(btnUpdate);
 
-        JButton btnResetWeights = new JButton("Reset Weights");
+        JButton btnResetWeights = new JButton("Reset Sl No");
         btnResetWeights.setFocusable(false);
         btnResetWeights.addActionListener(l -> {
             JPasswordField password = new JPasswordField(10);
@@ -7194,7 +7194,8 @@ class WeighBridge {
                 "8",
                 "0",
                 "10",
-                "~~~"
+                "~~~",
+                "f"
         };
         try {
             temp[0] = textFieldPortName.getText().split(";")[1];
@@ -7214,6 +7215,10 @@ class WeighBridge {
         }
         try {
             temp[3] = textFieldPortName.getText().split(";")[4];
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+        try {
+            temp[4] = textFieldPortName.getText().split(";")[5];
         } catch (ArrayIndexOutOfBoundsException ignored) {
         }
 
@@ -7242,7 +7247,11 @@ class WeighBridge {
 
                 @Override
                 public void serialEvent(SerialPortEvent event) {
-                    lblWeight.setText("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^" + "0-9" + temp[3] + "]", "").split(temp[3])[0]));
+                    if(temp[4].equals("t")) {
+                        lblWeight.setText(new StringBuilder("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^" + "0-9" + temp[3] + "]", "").split(temp[3])[0])).reverse().toString());
+                    } else {
+                        lblWeight.setText("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^" + "0-9" + temp[3] + "]", "").split(temp[3])[0]));
+                    }
                 }
             });
         }
