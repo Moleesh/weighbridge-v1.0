@@ -7248,7 +7248,7 @@ class WeighBridge {
                 @Override
                 public void serialEvent(SerialPortEvent event) {
                     if(temp[4].equals("t")) {
-                        lblWeight.setText(new StringBuilder("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^" + "0-9" + temp[3] + "]", "").split(temp[3])[0])).reverse().toString());
+                        lblWeight.setText("" + Integer.parseInt("0" + new StringBuilder(new String(event.getReceivedData())).reverse().toString().replaceAll("[^" + "0-9" + temp[3] + "]", "").split(temp[3])[0]));
                     } else {
                         lblWeight.setText("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^" + "0-9" + temp[3] + "]", "").split(temp[3])[0]));
                     }
