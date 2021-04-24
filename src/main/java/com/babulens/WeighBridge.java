@@ -242,7 +242,6 @@ class WeighBridge {
     private JTextField textFieldBaudRate;
     private JTextField textFieldPortName;
     private JTable tableCustomer;
-    private JButton btnUnlock;
     private JCheckBox chckbxEditEnable;
     private JCheckBox chckbxManualEntry;
     private JCheckBox chckbxExcludeCharges;
@@ -4303,7 +4302,7 @@ class WeighBridge {
         btnResetWeights.setBounds(865, 273, 150, 25);
         panelSettings.add(btnResetWeights);
 
-        btnUnlock = new JButton("Unlock");
+        JButton btnUnlock = new JButton("Unlock");
         btnUnlock.setFocusable(false);
         btnUnlock.addActionListener(l -> {
 
@@ -4494,7 +4493,7 @@ class WeighBridge {
         label_3.setBounds(336, 195, 100, 25);
         panelSettings.add(label_3);
 
-        JButton btnResetTrasporter = new JButton("Reset Driver");
+        JButton btnResetTrasporter = new JButton("Reset Tares");
         btnResetTrasporter.addActionListener(l -> {
 
             JPasswordField password = new JPasswordField(10);
@@ -4533,7 +4532,7 @@ class WeighBridge {
         });
         btnResetTrasporter.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnResetTrasporter.setFocusable(false);
-        btnResetTrasporter.setBounds(1063, 228, 150, 25);
+        btnResetTrasporter.setBounds(1060, 228, 165, 25);
         panelSettings.add(btnResetTrasporter);
 
         chckbxExcludeRemarks = new JCheckBox("Exclude Remarks");
@@ -4722,6 +4721,20 @@ class WeighBridge {
         chckbxPrinterCopyDialog.setBounds(845, 148, 180, 25);
         chckbxPrinterCopyDialog.addChangeListener(e -> textFieldNoOfCopies.setEnabled(!chckbxPrinterCopyDialog.isSelected()));
         panelSettings.add(chckbxPrinterCopyDialog);
+        
+        JButton btnRefreshWeight = new JButton("Refresh Weight");
+        btnRefreshWeight.addActionListener(l -> {
+            if (comPort != null) {
+                comPort.removeDataListener();
+                comPort.closePort();
+                comPort = null;
+            }
+            initializeWeights();
+        });
+        btnRefreshWeight.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnRefreshWeight.setFocusable(false);
+        btnRefreshWeight.setBounds(1060, 273, 165, 25);
+        panelSettings.add(btnRefreshWeight);
 
         JPanel panel = new JPanel();
         panel.setBackground(new Color(0, 255, 127));
@@ -7183,7 +7196,7 @@ class WeighBridge {
         return failedSlNo;
     }
 
-    private void initializeWeights() {
+    private synchronized void initializeWeights() {
         for (SerialPort serialPort : SerialPort.getCommPorts()) {
             if (serialPort.getSystemPortName().equals(textFieldPortName.getText().split(";")[0].toUpperCase())) {
                 comPort = serialPort;
@@ -7223,8 +7236,7 @@ class WeighBridge {
         }
 
         if (comPort != null) {
-            comPort.setComPortParameters(Integer.parseInt(textFieldBaudRate.getText()),
-                    Integer.parseInt(0 + temp[0]), SerialPort.ONE_STOP_BIT, Integer.parseInt(0 + temp[1]));
+            comPort.setComPortParameters(Integer.parseInt(textFieldBaudRate.getText()), Integer.parseInt(0 + temp[0]), SerialPort.ONE_STOP_BIT, Integer.parseInt(0 + temp[1]));
             comPort.openPort();
             comPort.addDataListener(new SerialPortMessageListener() {
                 @Override
