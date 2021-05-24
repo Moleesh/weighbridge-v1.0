@@ -942,7 +942,7 @@ class WeighBridge {
         babulensWeighbridgeDesigned.setExtendedState(Frame.MAXIMIZED_BOTH);
         babulensWeighbridgeDesigned.setUndecorated(true);
         try {
-            babulensWeighbridgeDesigned.setIconImage(ImageIO.read(getClass().getResource("/logo.bmp")));
+            babulensWeighbridgeDesigned.setIconImage(ImageIO.read(Objects.requireNonNull(getClass().getResource("/logo.bmp"))));
         } catch (IOException ignored) {
         }
         babulensWeighbridgeDesigned.setTitle("BABULENS WEIGHBRIDGE designed by \"BABULENS ENTERPRISES\"");
@@ -2101,7 +2101,7 @@ class WeighBridge {
         btnClear.setBounds(445, 565, 150, 25);
         panelWeighing.add(btnClear);
         try {
-            JLabel contact = new JLabel(new ImageIcon(ImageIO.read(getClass().getResource("/contact.bmp"))));
+            JLabel contact = new JLabel(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/contact.bmp")))));
             contact.setBounds(945, 505, 300, 100);
             panelWeighing.add(contact);
         } catch (IOException ignored) {
@@ -3795,7 +3795,7 @@ class WeighBridge {
                 try {
                     List<Integer> failedSlNo = fromExcel(fileChooser.getSelectedFile());
                     if (!failedSlNo.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "Following row no(s) had some errors\n" + failedSlNo.toString() + "\n Please correct them", "Excel File Warning", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Following row no(s) had some errors\n" + failedSlNo + "\n Please correct them", "Excel File Warning", JOptionPane.WARNING_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(null, "Import Successful", "Excel Import", JOptionPane.INFORMATION_MESSAGE);
                     }
@@ -5246,6 +5246,10 @@ class WeighBridge {
                 btnMinusGross.setEnabled(false);
                 btnPlusTare.setEnabled(false);
                 textPaneRemarks.setEnabled(false);
+                comboBoxCustomerName.setEnabled(false);
+                textFieldDriverName.setEnabled(false);
+                textFieldNoOfBags.setEnabled(false);
+                textFieldBagDeduction.setEnabled(false);
                 btnPrint.requestFocus();
             } else {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nRECORD NOT FOUND\nLINE :1085", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
@@ -6811,7 +6815,7 @@ class WeighBridge {
         } else {
             workbook = new XSSFWorkbook();
         }
-        String safeName = WorkbookUtil.createSafeSheetName("Weighing - " + Objects.requireNonNull(comboBox.getSelectedItem()).toString());
+        String safeName = WorkbookUtil.createSafeSheetName("Weighing - " + Objects.requireNonNull(comboBox.getSelectedItem()));
         Sheet sheet = workbook.createSheet(safeName);
         int rowNum = 0;
         Row row = sheet.createRow(rowNum);
