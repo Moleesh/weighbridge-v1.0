@@ -714,6 +714,12 @@ class WeighBridge {
             textFieldCropWidth4.setText(Integer.toString(rs.getInt("CROPWIDTH")));
             textFieldCropHeight4.setText(Integer.toString(rs.getInt("CROPHEIGHT")));
 
+            rs.absolute(5);
+            textFieldCropX11.setText(Integer.toString(rs.getInt("CROPX")));
+            textFieldCropY11.setText(Integer.toString(rs.getInt("CROPY")));
+            textFieldCropWidth11.setText(Integer.toString(rs.getInt("CROPWIDTH")));
+            textFieldCropHeight11.setText(Integer.toString(rs.getInt("CROPHEIGHT")));
+
             rs.absolute(1);
             checkBoxCamera1.setSelected(rs.getBoolean("ENABLE"));
             rs.absolute(2);
@@ -722,7 +728,9 @@ class WeighBridge {
             checkBoxCamera3.setSelected(rs.getBoolean("ENABLE"));
             rs.absolute(4);
             checkBoxCamera4.setSelected(rs.getBoolean("ENABLE"));
-
+            lock1 = true;
+            cameraEvent();
+            lock1 = false;
         } catch (SQLException ignored) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :414", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
@@ -829,9 +837,6 @@ class WeighBridge {
                 comboBoxMaterialReport.addItem(rs.getString("MATERIAL"));
                 comboBoxMaterialReport.setSelectedIndex(-1);
             }
-            lock1 = true;
-            cameraEvent();
-            lock1 = false;
         } catch (SQLException | ParseException ignored) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :806", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
@@ -4088,8 +4093,9 @@ class WeighBridge {
         chckbxExcludeCharges.setFocusable(false);
         chckbxExcludeCharges.setBackground(new Color(0, 255, 127));
         chckbxExcludeCharges.addChangeListener(e -> {
-            textFieldCharges.setEnabled(!chckbxExcludeCharges.isSelected());
-            textFieldCharges.setText("");
+            textFieldCharges.setEnabled(!chckbxExcludeCustomer.isSelected());
+            textFieldCharges.setVisible(!chckbxExcludeCustomer.isSelected());
+            lblCharges.setVisible(!chckbxExcludeCustomer.isSelected());
             clear();
         });
         chckbxExcludeCharges.setFont(new Font("Times New Roman", Font.ITALIC, 15));
@@ -7502,6 +7508,7 @@ class WeighBridge {
                     panelCamera4 = webcamStarter(webcamPicker4, 4, panelCamera4, comboBoxResolution4, textFieldCropX4,
                             textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310, 2);
                 btnClick.setEnabled(true);
+                btnClick.setVisible(true);
                 butttonUpdateCamera.setEnabled(true);
                 buttonUnLockCamera.setEnabled(true);
 
@@ -7545,6 +7552,7 @@ class WeighBridge {
                                 textFieldCropX4, textFieldCropY4, textFieldCropWidth4, textFieldCropHeight4, 617, 310,
                                 2);
                     btnClick.setEnabled(true);
+                    btnClick.setVisible(false);
                     butttonUpdateCamera.setEnabled(true);
                     buttonUnLockCamera.setEnabled(true);
 
