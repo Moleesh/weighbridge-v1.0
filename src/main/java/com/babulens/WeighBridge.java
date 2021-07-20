@@ -4093,9 +4093,9 @@ class WeighBridge {
         chckbxExcludeCharges.setFocusable(false);
         chckbxExcludeCharges.setBackground(new Color(0, 255, 127));
         chckbxExcludeCharges.addChangeListener(e -> {
-            textFieldCharges.setEnabled(!chckbxExcludeCustomer.isSelected());
-            textFieldCharges.setVisible(!chckbxExcludeCustomer.isSelected());
-            lblCharges.setVisible(!chckbxExcludeCustomer.isSelected());
+            textFieldCharges.setEnabled(!chckbxExcludeCharges.isSelected());
+            textFieldCharges.setVisible(!chckbxExcludeCharges.isSelected());
+            lblCharges.setVisible(!chckbxExcludeCharges.isSelected());
             clear();
         });
         chckbxExcludeCharges.setFont(new Font("Times New Roman", Font.ITALIC, 15));
@@ -5441,7 +5441,7 @@ class WeighBridge {
                         textFieldGrossDateTime.getText()),
                 String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "),
                         textFieldTareDateTime.getText()),
-                String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "),
+                chckbxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" : String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "),
                         "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
                 chckbxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? "" :
                         String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n",
@@ -6156,9 +6156,9 @@ class WeighBridge {
                         String.format(format, "", "Date") + temp[0] + "\n\n" + String.format(format, "", "Time") +
                         temp[1] + " " + temp[2] + "\n\n" + String.format(format, "", "Vehicle No") + textFieldVehicleNo.getText() +
                         "\n\n" + String.format(format, "", "Material") + comboBoxMaterial.getEditor().getItem() +
-                        "\n\n" + String.format(format, "", "Customer Name") +
-                        comboBoxCustomerName.getEditor().getItem() + "\n\n" + String.format(format, "", "Charges") +
-                        "Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()) + "\n\n";
+                        "\n\n" + String.format(format, "", "Customer/Supplier") +
+                        comboBoxCustomerName.getEditor().getItem() + "\n\n" + (chckbxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" : String.format(format, "", "Charges") +
+                        "Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()) + "\n\n");
                 graphics.setFont(new Font("Courier New", Font.BOLD, 10));
                 coordinates = drawString(graphics, initString, 0, coordinates.y);
 
@@ -6191,8 +6191,8 @@ class WeighBridge {
                 graphics.setFont(new Font("Courier New", Font.BOLD, 12));
                 coordinates = drawString(graphics, initString, coordinates.x, yTemp);
 
-                initString = "\n\n\n" + "     " + StringUtils.rightPad(textFieldFooter.getText(), 70, " ") +
-                        "Signature";
+                initString = "\n\n\n" + "     " + StringUtils.rightPad(textFieldFooter.getText(), 60, " ") +
+                        "Authorised Signature";
                 graphics.setFont(new Font("Courier New", Font.BOLD + Font.ITALIC, 10));
                 drawString(graphics, initString, 0, coordinates.y);
 
@@ -7565,6 +7565,7 @@ class WeighBridge {
             tabbedPane.setEnabledAt(1, false);
             tabbedPane.setTitleAt(1, "");
             btnClick.setEnabled(false);
+            btnClick.setVisible(false);
             butttonUpdateCamera.setEnabled(false);
             buttonUnLockCamera.setEnabled(false);
         }
