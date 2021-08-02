@@ -3809,7 +3809,7 @@ class WeighBridge {
                     if (reportOpened) {
                         getReport();
                     }
-                } catch (IOException ignored) {
+                } catch (Exception ignored) {
                     JOptionPane.showMessageDialog(null, "Plz Close the Excel file\nLINE :3831", "FILE ERROR", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -7147,10 +7147,10 @@ class WeighBridge {
                 }
 
                 rs.updateInt("SLNO", slNo);
-                rs.updateString("DCNO", row.getCell(++ colNum) != null ? row.getCell(colNum).toString() : "");
-                if (row.getCell(++ colNum) != null) {
+                rs.updateString("DCNO", row.getCell(++ colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                if (row.getCell(++ colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
                     if (row.getCell(colNum).getCellType() == CellType.STRING) {
-                        rs.updateDate("DCNODATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
+                        rs.updateDate("DCNODATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
                     } else {
                         rs.updateDate("DCNODATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
                     }
@@ -7158,18 +7158,18 @@ class WeighBridge {
                     rs.updateDate("DCNODATE", null);
                 }
 
-                rs.updateString("CUSTOMERNAME", row.getCell(++ colNum) != null ? row.getCell(colNum).toString() : "");
-                rs.updateString("DRIVERNAME", row.getCell(++ colNum) != null ? row.getCell(colNum).toString() : "");
-                rs.updateString("VEHICLENO", row.getCell(++ colNum) != null ? row.getCell(colNum).toString() : "");
-                rs.updateString("MATERIAL", row.getCell(++ colNum) != null ? row.getCell(colNum).toString() : "");
+                rs.updateString("CUSTOMERNAME", row.getCell(++ colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                rs.updateString("DRIVERNAME", row.getCell(++ colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                rs.updateString("VEHICLENO", row.getCell(++ colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                rs.updateString("MATERIAL", row.getCell(++ colNum) != null ? row.getCell(colNum).toString().trim() : "");
                 rs.updateInt("NOOFBAGS", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
                 rs.updateDouble("CHARGES", row.getCell(++ colNum) != null ? row.getCell(colNum).getNumericCellValue() : 0);
 
                 rs.updateInt("GROSSWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                if (row.getCell(++ colNum) != null) {
+                if (row.getCell(++ colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
                     if (row.getCell(colNum).getCellType() == CellType.STRING) {
-                        rs.updateDate("GROSSDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
-                        rs.updateTime("GROSSTIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
+                        rs.updateDate("GROSSDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
+                        rs.updateTime("GROSSTIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
                     } else {
                         rs.updateDate("GROSSDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
                         rs.updateTime("GROSSTIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
@@ -7180,10 +7180,10 @@ class WeighBridge {
                 }
 
                 rs.updateInt("TAREWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                if (row.getCell(++ colNum) != null) {
+                if (row.getCell(++ colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
                     if (row.getCell(colNum).getCellType() == CellType.STRING) {
-                        rs.updateDate("TAREDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
-                        rs.updateTime("TARETIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
+                        rs.updateDate("TAREDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
+                        rs.updateTime("TARETIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
                     } else {
                         rs.updateDate("TAREDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
                         rs.updateTime("TARETIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
@@ -7196,10 +7196,10 @@ class WeighBridge {
                 rs.updateInt("BAGDEDUCTION",row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
 
                 rs.updateInt("NETWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                if (row.getCell(++ colNum) != null) {
+                if (row.getCell(++ colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
                     if (row.getCell(colNum).getCellType() == CellType.STRING) {
-                        rs.updateDate("NETDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
-                        rs.updateTime("NETTIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
+                        rs.updateDate("NETDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
+                        rs.updateTime("NETTIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
                     } else {
                         rs.updateDate("NETDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
                         rs.updateTime("NETTIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
@@ -7210,14 +7210,14 @@ class WeighBridge {
                 }
                 rs.updateInt("FINALWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
                 rs.updateInt("FINALAMOUNT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                rs.updateString("REMARKS", row.getCell(colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                rs.updateString("REMARKS", row.getCell(colNum) != null ? row.getCell(colNum).toString().trim().trim() : "");
                 rs.updateBoolean("MANUAL", true);
                 if (!update) {
                     rs.insertRow();
                 } else {
                     rs.updateRow();
                 }
-            } catch (IllegalStateException | NumberFormatException | SQLException | ParseException ignored) {
+            } catch (IllegalStateException | NumberFormatException | SQLException | ParseException | NullPointerException ignored) {
                 failedSlNo.add(rowNum + 1);
             }
         }
