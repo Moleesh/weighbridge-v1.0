@@ -35,3 +35,4 @@ weighdata.trace.db
 /bin/
 /pom.xml.versionsBackup
 backup
+/weighdata.lock.db

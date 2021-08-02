@@ -22,6 +22,7 @@ import org.apache.commons.lang.WordUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
@@ -7147,8 +7148,12 @@ class WeighBridge {
 
                 rs.updateInt("SLNO", slNo);
                 rs.updateString("DCNO", row.getCell(++ colNum) != null ? row.getCell(colNum).toString() : "");
-                if (row.getCell(++ colNum) != null && row.getCell(colNum).getDateCellValue() != null) {
-                    rs.updateDate("DCNODATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
+                if (row.getCell(++ colNum) != null) {
+                    if (row.getCell(colNum).getCellType() == CellType.STRING) {
+                        rs.updateDate("DCNODATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
+                    } else {
+                        rs.updateDate("DCNODATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
+                    }
                 } else {
                     rs.updateDate("DCNODATE", null);
                 }
@@ -7161,18 +7166,28 @@ class WeighBridge {
                 rs.updateDouble("CHARGES", row.getCell(++ colNum) != null ? row.getCell(colNum).getNumericCellValue() : 0);
 
                 rs.updateInt("GROSSWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                if (row.getCell(++ colNum) != null && row.getCell(colNum).getDateCellValue() != null) {
-                    rs.updateDate("GROSSDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
-                    rs.updateTime("GROSSTIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
+                if (row.getCell(++ colNum) != null) {
+                    if (row.getCell(colNum).getCellType() == CellType.STRING) {
+                        rs.updateDate("GROSSDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
+                        rs.updateTime("GROSSTIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
+                    } else {
+                        rs.updateDate("GROSSDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
+                        rs.updateTime("GROSSTIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
+                    }
                 } else {
                     rs.updateDate("GROSSDATE", null);
                     rs.updateTime("GROSSTIME", null);
                 }
 
                 rs.updateInt("TAREWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                if (row.getCell(++ colNum) != null && row.getCell(colNum).getDateCellValue() != null) {
-                    rs.updateDate("TAREDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
-                    rs.updateTime("TARETIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
+                if (row.getCell(++ colNum) != null) {
+                    if (row.getCell(colNum).getCellType() == CellType.STRING) {
+                        rs.updateDate("TAREDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
+                        rs.updateTime("TARETIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
+                    } else {
+                        rs.updateDate("TAREDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
+                        rs.updateTime("TARETIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
+                    }
                 } else {
                     rs.updateDate("TAREDATE", null);
                     rs.updateTime("TARETIME", null);
@@ -7181,9 +7196,14 @@ class WeighBridge {
                 rs.updateInt("BAGDEDUCTION",row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
 
                 rs.updateInt("NETWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                if (row.getCell(++ colNum) != null && row.getCell(colNum).getDateCellValue() != null) {
-                    rs.updateDate("NETDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
-                    rs.updateTime("NETTIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
+                if (row.getCell(++ colNum) != null) {
+                    if (row.getCell(colNum).getCellType() == CellType.STRING) {
+                        rs.updateDate("NETDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
+                        rs.updateTime("NETTIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString()).getTime()));
+                    } else {
+                        rs.updateDate("NETDATE", new java.sql.Date(row.getCell(colNum).getDateCellValue().getTime()));
+                        rs.updateTime("NETTIME", new Time(row.getCell(colNum).getDateCellValue().getTime()));
+                    }
                 } else {
                     rs.updateDate("NETDATE", null);
                     rs.updateTime("NETTIME", null);
@@ -7197,7 +7217,7 @@ class WeighBridge {
                 } else {
                     rs.updateRow();
                 }
-            } catch (IllegalStateException | NumberFormatException | SQLException ignored) {
+            } catch (IllegalStateException | NumberFormatException | SQLException | ParseException ignored) {
                 failedSlNo.add(rowNum + 1);
             }
         }
