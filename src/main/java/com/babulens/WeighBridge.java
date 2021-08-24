@@ -3335,7 +3335,7 @@ class WeighBridge {
         tabbedPane.addTab("           Report           ", null, panelReport, null);
         panelReport.setLayout(null);
 
-        rdbtnWeighing = new JRadioButton("Weighing Report");
+        rdbtnWeighing = new JRadioButton("Weighing Report (max 1000 rows)");
         rdbtnWeighing.setBackground(new Color(0, 255, 127));
         rdbtnWeighing.addActionListener(l -> {
             comboBox.removeAllItems();
@@ -3352,7 +3352,7 @@ class WeighBridge {
         rdbtnWeighing.setSelected(true);
         rdbtnWeighing.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         rdbtnWeighing.setFocusable(false);
-        rdbtnWeighing.setBounds(75, 25, 200, 25);
+        rdbtnWeighing.setBounds(75, 25, 328, 25);
         panelReport.add(rdbtnWeighing);
 
         JLabel lblPleaseSelectThe = new JLabel("Please Select the Type of Report");
@@ -5080,7 +5080,7 @@ class WeighBridge {
                 DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
                 Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                         ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery(temp + " ORDER BY SLNO FETCH LAST 1000 ROWS ONLY");
+                ResultSet rs = stmt.executeQuery(temp + " ORDER BY SLNO LIMIT 1000");
                 while (rs.next()) {
                     String date, time, gross,
                             tare, net;
