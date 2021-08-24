@@ -5080,7 +5080,7 @@ class WeighBridge {
                 DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
                 Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                         ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery(temp + " ORDER BY SLNO");
+                ResultSet rs = stmt.executeQuery(temp + " ORDER BY SLNO FETCH LAST 1000 ROWS ONLY");
                 while (rs.next()) {
                     String date, time, gross,
                             tare, net;
@@ -7290,15 +7290,14 @@ class WeighBridge {
                 @Override
                 public void serialEvent(SerialPortEvent event) {
                     if(temp[4].equals("t")) {
-                        lblWeight.setText("" + Integer.parseInt("0" + new StringBuilder(new String(event.getReceivedData())).reverse().toString().replaceAll("[^" + "0-9" + temp[3] + "]", "").split(temp[3])[0]));
+                        lblWeight.setText("" + Integer.parseInt("0" + new StringBuilder(new String(event.getReceivedData())).reverse().toString().replaceAll("[^0-9" + temp[3] + "]", "").split(temp[3])[0]));
                     } else {
-                        lblWeight.setText("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^" + "0-9" + temp[3] + "]", "").split(temp[3])[0]));
+                        lblWeight.setText("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^0-9" + temp[3] + "]", "").split(temp[3])[0]));
                     }
                 }
             });
         }
     }
-
 
     private WebcamPanel webcamStarter(WebcamPicker webcamPicker, int i, WebcamPanel panelCamera,
                                       JComboBox<DimensionTemplate> comboBoxResolution, JTextField textFieldCropX12, JTextField textFieldCropY12,
