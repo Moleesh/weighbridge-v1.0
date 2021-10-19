@@ -5442,7 +5442,8 @@ class WeighBridge {
                         textFieldGrossDateTime.getText()),
                 String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "),
                         textFieldTareDateTime.getText()),
-                chckbxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" : String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "),
+                String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "),
+                        chckbxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" :
                         "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
                 chckbxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? "" :
                         String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n",
