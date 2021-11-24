@@ -4056,7 +4056,7 @@ class WeighBridge {
         textFieldTitle1 = new JTextField();
         textFieldTitle1.setToolTipText("Only 30 letters");
         textFieldTitle1.addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
+            public void keyReleased(KeyEvent e) {
                 title1.setText(textFieldTitle1.getText());
             }
         });
@@ -4070,7 +4070,7 @@ class WeighBridge {
         textFieldTitle2 = new JTextField();
         textFieldTitle2.setToolTipText("Only 45 letters");
         textFieldTitle2.addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
+            public void keyReleased(KeyEvent e) {
                 title2.setText(textFieldTitle2.getText());
             }
         });
