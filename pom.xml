@@ -153,18 +153,20 @@
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.0.0</version>
+                <inherited>false</inherited>
                 <executions>
                     <execution>
                         <phase>verify</phase>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <delete dir="WeighBridge 1.0" quiet="true" failonerror="false"/>
                                 <mkdir dir="WeighBridge 1.0"/>
                                 <copy file="cameras.xml" tofile="WeighBridge 1.0/cameras.xml"/>
                                 <copy file="sample.xlsx" tofile="WeighBridge 1.0/sample.xlsx"/>
                                 <copy file="target/WeighBridge-jar-with-dependencies.jar" tofile="WeighBridge 1.0/Weighbridge.jar"/>
                                 <mkdir dir="WeighBridge 1.0/CameraOutput"/>
-                            </tasks>
+                            </target>
                         </configuration>
                         <goals>
                             <goal>run</goal>
