@@ -17,8 +17,8 @@ import com.github.sarxos.webcam.ds.ipcam.IpCamDriver;
 import com.github.sarxos.webcam.ds.ipcam.IpCamMode;
 import com.github.sarxos.webcam.ds.ipcam.IpCamStorage;
 import com.ibatis.common.jdbc.ScriptRunner;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.WordUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -4936,22 +4936,22 @@ class WeighBridge {
             } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Pre Print 2")) {
                 printPreWeight2();
                 break;
-            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Pre Print 3")) {
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Pre Print 3")) {
                 printPreWeight3();
                 break;
-            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Camera")) {
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Camera")) {
                 printCameraWeight();
-            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Plain Camera")) {
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Plain Camera")) {
                 printPlainCameraWeight();
-            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Sri Pathy")) {
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Sri Pathy")) {
                 printPlainSriPathyWeight();
-            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("No Of Bags")) {
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "No Of Bags")) {
                 printPlainNoOfBagsWeight();
-            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Standard")) {
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Standard")) {
                 printStandard();
-            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("Ice Water")) {
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Ice Water")) {
                 printIceWater();
-            } else if (comboBoxPrintOptionForWeight.getSelectedItem().equals("EMJAY")) {
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "EMJAY")) {
                 printEmjay();
                 break;
             } else {
