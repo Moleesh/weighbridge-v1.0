@@ -824,14 +824,14 @@ class WeighBridge {
                         dateAndTimeFormat.format(new Date(dateAndTimeFormatSql
                                 .parse(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME")).getTime()))
                 });
-            rs = stmt.executeQuery("SELECT * FROM MATERIALS ORDER BY KEY");
+            rs = stmt.executeQuery("SELECT * FROM MATERIALS ORDER BY SQNO");
             model = (DefaultTableModel) tableMaterial.getModel();
             model.setRowCount(0);
             comboBoxMaterial.removeAllItems();
             comboBoxMaterialReport.removeAllItems();
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getInt("KEY"), rs.getString("MATERIAL"), rs.getDouble("COST")
+                        rs.getInt("SQNO"), rs.getString("MATERIAL"), rs.getDouble("COST")
                 });
                 comboBoxMaterial.addItem(rs.getString("MATERIAL"));
                 comboBoxMaterial.setSelectedIndex(-1);
@@ -895,7 +895,7 @@ class WeighBridge {
                 rs.updateString("CUSTOMER", (String) model.getValueAt(i - 1, 0));
                 rs.updateString("CUSTOMERADDRESS", (String) model.getValueAt(i - 1, 1));
                 rs.updateString("CUSTOMERADDRESS1", (String) model.getValueAt(i - 1, 2));
-                rs.updateInt("KEY", i);
+                rs.updateInt("SQNO", i);
                 rs.insertRow();
             }
             pstmt = dbConnection.prepareStatement("TRUNCATE TABLE VEHICLETARES");
@@ -909,7 +909,7 @@ class WeighBridge {
                 Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 2));
                 rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                 rs.updateTime("TARETIME", new java.sql.Time(date.getTime()));
-                rs.updateInt("KEY", i);
+                rs.updateInt("SQNO", i);
                 rs.insertRow();
             }
             pstmt = dbConnection.prepareStatement("TRUNCATE TABLE MATERIALS");
@@ -921,7 +921,7 @@ class WeighBridge {
                 rs.updateString("MATERIAL", model.getValueAt(i - 1, 1).toString().toUpperCase());
                 rs.updateDouble("COST",
                         Double.parseDouble(("0" + model.getValueAt(i - 1, 2)).replaceAll("[^.0-9]", "")));
-                rs.updateInt("KEY", (int) model.getValueAt(i - 1, 0));
+                rs.updateInt("SQNO", (int) model.getValueAt(i - 1, 0));
                 rs.insertRow();
             }
             settings();
@@ -1124,7 +1124,7 @@ class WeighBridge {
                 if (chckbxMaterialSl.isSelected()) {
                     try {
                         Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                        ResultSet rs = stmt.executeQuery("SELECT MATERIAL FROM MATERIALS where KEY =" + Integer.parseInt(comboBoxMaterial.getEditor().getItem().toString()));
+                        ResultSet rs = stmt.executeQuery("SELECT MATERIAL FROM MATERIALS where SQNO =" + Integer.parseInt(comboBoxMaterial.getEditor().getItem().toString()));
                         if (rs.next()) {
                             comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
                         }
@@ -1983,9 +1983,9 @@ class WeighBridge {
                         rs.updateRow();
                     } else {
                         rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
-                        int key = -1;
+                        int sqNo = -1;
                         if (rs.last()) {
-                            key = rs.getInt("KEY");
+                            sqNo = rs.getInt("SQNO");
                         }
                         rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
                         rs.moveToInsertRow();
@@ -1994,7 +1994,7 @@ class WeighBridge {
                         Date date = dateAndTimeFormat.parse(textFieldTareDateTime.getText());
                         rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                         rs.updateTime("TARETIME", new Time(date.getTime()));
-                        rs.updateInt("KEY", key + 1);
+                        rs.updateInt("SQNO", sqNo + 1);
                         rs.insertRow();
                     }
                 }
