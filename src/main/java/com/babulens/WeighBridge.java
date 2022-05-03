@@ -6,11 +6,7 @@ import com.fazecast.jSerialComm.SerialPortMessageListener;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.components.DateTimePicker;
 import com.github.lgooddatepicker.components.TimePickerSettings;
-import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamCompositeDriver;
-import com.github.sarxos.webcam.WebcamException;
-import com.github.sarxos.webcam.WebcamPanel;
-import com.github.sarxos.webcam.WebcamPicker;
+import com.github.sarxos.webcam.*;
 import com.github.sarxos.webcam.ds.buildin.WebcamDefaultDriver;
 import com.github.sarxos.webcam.ds.ipcam.IpCamDevice;
 import com.github.sarxos.webcam.ds.ipcam.IpCamDriver;
@@ -20,14 +16,7 @@ import com.ibatis.common.jdbc.ScriptRunner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -36,110 +25,32 @@ import org.jdesktop.swingx.JXDatePicker;
 import javax.imageio.ImageIO;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 import javax.swing.Timer;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.NumberFormatter;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
-import java.awt.BorderLayout;
+import javax.swing.text.*;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.awt.print.Book;
-import java.awt.print.PageFormat;
-import java.awt.print.Paper;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.awt.print.*;
+import java.io.*;
 import java.net.MalformedURLException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.Vector;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.awt.event.FocusAdapter;
+import java.util.*;
+import java.util.concurrent.*;
 
 class WeighBridge {
     private static final String DB_CONNECTION = "jdbc:h2:./weighdata";
@@ -346,6 +257,8 @@ class WeighBridge {
     private JButton btnDeleteRow;
     private JButton btnImportFromExcel;
     private JButton btnMassPrint;
+    private JTextField textFieldTitle3;
+    private JComboBox<String> comboBoxReport;
 
     /**
      * Create the application.
@@ -447,13 +360,13 @@ class WeighBridge {
                                     Timer countDown = new Timer((int) (endDate.getTime() - new Date().getTime()),
                                             e -> {
                                                 JOptionPane.showMessageDialog(null,
-                                                        "Your Trial Lisense is over\nplease buy the lisence", "WARNING",
+                                                        "Your Trial License is over\nplease buy the licence", "WARNING",
                                                         JOptionPane.INFORMATION_MESSAGE);
                                                 close();
                                             });
                                     countDown.start();
                                 } else {
-                                    JOptionPane.showMessageDialog(null, "Your Trial Lisense is over\nplease buy the lisence",
+                                    JOptionPane.showMessageDialog(null, "Your Trial License is over\nplease buy the licence",
                                             "WARNING", JOptionPane.INFORMATION_MESSAGE);
                                     close();
                                 }
@@ -513,7 +426,7 @@ class WeighBridge {
                     } else {
                         rs.updateString("ID", "0");
                         rs.updateRow();
-                        JOptionPane.showMessageDialog(null, "Your Lisense is not Valid\nPlease get a Valid Lisense",
+                        JOptionPane.showMessageDialog(null, "Your License is not Valid\nPlease get a Valid License",
                                 "ERROR", JOptionPane.ERROR_MESSAGE);
                         close();
                     }
@@ -575,11 +488,11 @@ class WeighBridge {
                     new Timestamp(new Date().getTime() + 10 * (long) 8.64e+7));
             rs.updateRow();
             JOptionPane.showMessageDialog(null,
-                    "Trial Reset Successfull\n you got 10 days\n Plz Open again", "Reset",
+                    "Trial Reset Successfully\n you got 10 days\n Plz Open again", "Reset",
                     JOptionPane.INFORMATION_MESSAGE);
             close();
         } else {
-            JOptionPane.showMessageDialog(null, "Your Lisense is not Valid\nPlease get a Valid Lisense",
+            JOptionPane.showMessageDialog(null, "Your License is not Valid\nPlease get a Valid License",
                     "ERROR", JOptionPane.ERROR_MESSAGE);
             close();
         }
@@ -748,12 +661,14 @@ class WeighBridge {
             title1.setText(rs.getString("TITLE1"));
             textFieldTitle2.setText(rs.getString("TITLE2"));
             title2.setText(rs.getString("TITLE2"));
+            textFieldTitle3.setText(rs.getString("TITLE3"));
             textFieldFooter.setText(rs.getString("FOOTER"));
             textFieldBaudRate.setText(Integer.toString(rs.getInt("BAUDRATE")));
             textFieldPortName.setText(rs.getString("PORTNAME"));
             textFieldNoOfCopies.setText(Integer.toString(rs.getInt("COPIES")));
             noOfCopies = Integer.parseInt(textFieldNoOfCopies.getText());
             comboBoxPrintOptionForWeight.getModel().setSelectedItem(rs.getString("PRINTOPTIONFORWEIGHT"));
+            comboBoxReport.getModel().setSelectedItem(rs.getString("REPORT"));
             chckbxExcludeCharges.setSelected(rs.getBoolean("EXCLUDECHARGES"));
             chckbxExcludeDrivers.setSelected(rs.getBoolean("EXCLUDEDRIVER"));
             chckbxExcludeCustomer.setSelected(rs.getBoolean("EXCLUDECUSTOMERS"));
@@ -851,14 +766,15 @@ class WeighBridge {
             rs.absolute(1);
             rs.updateString("TITLE1", textFieldTitle1.getText());
             rs.updateString("TITLE2", textFieldTitle2.getText());
+            rs.updateString("TITLE3", textFieldTitle3.getText());
             rs.updateString("FOOTER", textFieldFooter.getText());
-            rs.updateBoolean("PRINTOPTIONFORWEIGHT", chckbxExcludeCharges.isSelected());
             rs.updateBoolean("EXCLUDECUSTOMERS", chckbxExcludeCustomer.isSelected());
             rs.updateString("PRINTOPTIONFORWEIGHT", (String) comboBoxPrintOptionForWeight.getSelectedItem());
-            rs.updateInt("BAUDRATE", Integer.parseInt(0 + textFieldBaudRate.getText().replaceAll("[^0-9]", "")));
+            rs.updateString("REPORT", (String) comboBoxReport.getSelectedItem());
+            rs.updateInt("BAUDRATE", Integer.parseInt(0 + textFieldBaudRate.getText().replaceAll("\\D", "")));
             rs.updateString("PORTNAME", textFieldPortName.getText());
             rs.updateString("PRINTER", (String) comboBoxPrinter.getSelectedItem());
-            rs.updateInt("COPIES", Integer.parseInt(0 + textFieldNoOfCopies.getText().replaceAll("[^0-9]", "")));
+            rs.updateInt("COPIES", Integer.parseInt(0 + textFieldNoOfCopies.getText().replaceAll("\\D", "")));
             rs.updateBoolean("EXCLUDECHARGES", chckbxExcludeCharges.isSelected());
             rs.updateBoolean("EXCLUDEDRIVER", chckbxExcludeDrivers.isSelected());
             rs.updateBoolean("EXCLUDEREMARKS", chckbxExcludeRemarks.isSelected());
@@ -873,7 +789,7 @@ class WeighBridge {
             rs.updateBoolean("TAKE_BACKUP", chckbxTakeBackup.isSelected());
             rs.updateBoolean("SMS", chckbxSms.isSelected());
             rs.updateBoolean("CAMERA", chckbxCamera.isSelected());
-            rs.updateInt("SMSBAUDRATE", Integer.parseInt(0 + textFieldSMSBaudRate.getText().replaceAll("[^0-9]", "")));
+            rs.updateInt("SMSBAUDRATE", Integer.parseInt(0 + textFieldSMSBaudRate.getText().replaceAll("\\D", "")));
             rs.updateString("SMSPORTNAME", textFieldSMSPortName.getText().toUpperCase());
             rs.updateString("LINE1", textFieldLine1.getText());
             rs.updateString("LINE2", textFieldLine2.getText());
@@ -884,7 +800,7 @@ class WeighBridge {
             rs.updateString("SITEAT", textFieldSiteAt.getText());
             rs.updateBoolean("TARENOSLNO", chckbxTareNoSlno.isSelected());
             rs.updateBoolean("EXCLUDEBAGS", chckbxExcludeNoOfBags.isSelected());
-            rs.updateDouble("BAGWEIGHT", Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.0-9]", "")));
+            rs.updateDouble("BAGWEIGHT", Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")));
             rs.updateRow();
             PreparedStatement pstmt = dbConnection.prepareStatement("TRUNCATE TABLE CUSTOMER");
             pstmt.executeUpdate();
@@ -905,7 +821,7 @@ class WeighBridge {
             for (int i = 1; i <= model.getRowCount(); i++) {
                 rs.moveToInsertRow();
                 rs.updateString("VEHICLENO", (String) model.getValueAt(i - 1, 0));
-                rs.updateInt("TAREWT", Integer.parseInt(("0" + model.getValueAt(i - 1, 1)).replaceAll("[^0-9]", "")));
+                rs.updateInt("TAREWT", Integer.parseInt(("0" + model.getValueAt(i - 1, 1)).replaceAll("\\D", "")));
                 Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 2));
                 rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                 rs.updateTime("TARETIME", new java.sql.Time(date.getTime()));
@@ -920,7 +836,7 @@ class WeighBridge {
                 rs.moveToInsertRow();
                 rs.updateString("MATERIAL", model.getValueAt(i - 1, 1).toString().toUpperCase());
                 rs.updateDouble("COST",
-                        Double.parseDouble(("0" + model.getValueAt(i - 1, 2)).replaceAll("[^.0-9]", "")));
+                        Double.parseDouble(("0" + model.getValueAt(i - 1, 2)).replaceAll("[^.\\d]", "")));
                 rs.updateInt("SQNO", (int) model.getValueAt(i - 1, 0));
                 rs.insertRow();
             }
@@ -1161,8 +1077,8 @@ class WeighBridge {
 
         textFieldVehicleNo = new JTextField();
         textFieldVehicleNo.addFocusListener(new FocusAdapter() {
-        	@Override
-        	public void focusLost(FocusEvent e) {
+            @Override
+            public void focusLost(FocusEvent e) {
                 textFieldVehicleNo.setText(textFieldVehicleNo.getText().toUpperCase().replaceAll(" ", ""));
             }
         });
@@ -1487,13 +1403,13 @@ class WeighBridge {
                 textFieldNetDateTime.setText(textFieldTareDateTime.getText());
             }
             if (chckbxIceWater.isSelected()) {
-                textFieldBagDeduction.setText(Integer.toString(Integer.parseInt(0 + textFieldBagDeduction.getText().replaceAll("[^0-9]", ""))));
+                textFieldBagDeduction.setText(Integer.toString(Integer.parseInt(0 + textFieldBagDeduction.getText().replaceAll("\\D", ""))));
 
                 if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
                     textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText())));
                 }
             } else {
-                textFieldBagDeduction.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.0-9]", "")))));
+                textFieldBagDeduction.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")))));
 
                 if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
                     textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText())));
@@ -1510,8 +1426,8 @@ class WeighBridge {
                 }
             }
             if (chckbxIceWater.isSelected() && Integer.parseInt(textFieldNetWt.getText()) > 0) {
-                textFieldFinalWt.setText(Integer.toString(Integer.parseInt(textFieldNetWt.getText()) - Integer.parseInt(0 + textFieldBagDeduction.getText().replaceAll("[^0-9]", ""))));
-                textFieldFinalAmount.setText(Integer.toString((int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.0-9]", ""))) - Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", ""))));
+                textFieldFinalWt.setText(Integer.toString(Integer.parseInt(textFieldNetWt.getText()) - Integer.parseInt(0 + textFieldBagDeduction.getText().replaceAll("\\D", ""))));
+                textFieldFinalAmount.setText(Integer.toString((int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", ""))) - Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
             }
             btnTotal.setEnabled(false);
             btnGetGross.setEnabled(false);
@@ -1569,7 +1485,7 @@ class WeighBridge {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1550", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
-            if (!(response == null || ("".equals(response)) || Integer.parseInt(response.replaceAll("[^0-9]", "")) >= serialNo || Integer.parseInt(response.replaceAll("[^0-9]", "")) <= 0)) {
+            if (!(response == null || ("".equals(response)) || Integer.parseInt(response.replaceAll("\\D", "")) >= serialNo || Integer.parseInt(response.replaceAll("\\D", "")) <= 0)) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + response);
@@ -1802,13 +1718,13 @@ class WeighBridge {
                 textFieldTareDateTime.setText(textFieldDateTime.getText());
             }
             if (chckbxIceWater.isSelected()) {
-                textFieldBagDeduction.setText(Integer.toString(Integer.parseInt(0 + textFieldBagDeduction.getText().replaceAll("[^0-9]", ""))));
+                textFieldBagDeduction.setText(Integer.toString(Integer.parseInt(0 + textFieldBagDeduction.getText().replaceAll("\\D", ""))));
 
                 if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
                     textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText())));
                 }
             } else {
-                textFieldBagDeduction.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.0-9]", "")))));
+                textFieldBagDeduction.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")))));
 
                 if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
                     textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldBagDeduction.getText())));
@@ -1823,13 +1739,13 @@ class WeighBridge {
                 } catch (SQLException | NumberFormatException ignored) {
                 }
             }
-            String[] temp = ("0" + textFieldCharges.getText() + ".0").replaceAll("[^.0-9]", "").split("\\.");
+            String[] temp = ("0" + textFieldCharges.getText() + ".0").replaceAll("[^.\\d]", "").split("\\.");
             textFieldCharges.setText(Double.toString(Double.parseDouble(temp[0] + "." + temp[1])).replaceAll(".0$", ""));
-            textFieldNoOfBags.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", ""))));
+            textFieldNoOfBags.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
 
             if (chckbxIceWater.isSelected() && Integer.parseInt(textFieldNetWt.getText()) > 0) {
-                textFieldFinalWt.setText(Integer.toString(Integer.parseInt(textFieldNetWt.getText()) - Integer.parseInt(0 + textFieldBagDeduction.getText().replaceAll("[^0-9]", ""))));
-                textFieldFinalAmount.setText(Integer.toString((int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.0-9]", ""))) - Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", ""))));
+                textFieldFinalWt.setText(Integer.toString(Integer.parseInt(textFieldNetWt.getText()) - Integer.parseInt(0 + textFieldBagDeduction.getText().replaceAll("\\D", ""))));
+                textFieldFinalAmount.setText(Integer.toString((int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", ""))) - Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
             }
             textFieldNetDateTime.setText(textFieldDateTime.getText());
             comboBoxCustomerName.setEnabled(false);
@@ -1928,18 +1844,18 @@ class WeighBridge {
                     Date date = dateAndTimeFormatdate.parse(textFieldDcDate.getText());
                     rs.updateDate("DCNODATE", new java.sql.Date(date.getTime()));
                 }
-                String tempp = ("" + comboBoxCustomerName.getSelectedItem()).toUpperCase();
-                if (tempp.equals("NULL"))
-                    tempp = "";
-                rs.updateString("CUSTOMERNAME", tempp);
-                tempp = ("" + textFieldDriverName.getSelectedItem()).toUpperCase();
-                if (tempp.equals("NULL"))
-                    tempp = "";
-                rs.updateString("DRIVERNAME", tempp);
+                String temp = ("" + comboBoxCustomerName.getSelectedItem()).toUpperCase();
+                if (temp.equals("NULL"))
+                    temp = "";
+                rs.updateString("CUSTOMERNAME", temp);
+                temp = ("" + textFieldDriverName.getSelectedItem()).toUpperCase();
+                if (temp.equals("NULL"))
+                    temp = "";
+                rs.updateString("DRIVERNAME", temp);
                 rs.updateString("VEHICLENO", textFieldVehicleNo.getText());
                 rs.updateString("MATERIAL", (String) comboBoxMaterial.getSelectedItem());
-                rs.updateInt("NOOFBAGS", Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("[^0-9]", "")));
-                rs.updateDouble("CHARGES", Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.0-9]", "")));
+                rs.updateInt("NOOFBAGS", Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", "")));
+                rs.updateDouble("CHARGES", Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", "")));
                 rs.updateInt("GROSSWT", Integer.parseInt(textFieldGrossWt.getText()));
                 rs.updateString("REMARKS", textPaneRemarks.getText());
 
@@ -2012,10 +1928,10 @@ class WeighBridge {
                         ResultSet.CONCUR_UPDATABLE);
                 ResultSet rs = stmt.executeQuery("SELECT * FROM TRANSPORTER ");
                 rs.moveToInsertRow();
-                String tempp = ("" + textFieldDriverName.getSelectedItem()).toUpperCase();
-                if (tempp.equals("NULL"))
-                    tempp = "";
-                rs.updateString("TRANSPORTER", tempp);
+                String temp = ("" + textFieldDriverName.getSelectedItem()).toUpperCase();
+                if (temp.equals("NULL"))
+                    temp = "";
+                rs.updateString("TRANSPORTER", temp);
                 rs.insertRow();
             } catch (SQLException ignored) {
             }
@@ -2128,10 +2044,10 @@ class WeighBridge {
         label_1.setBounds(729, 430, 25, 25);
         panelWeighing.add(label_1);
 
-        JLabel lblCustmerName = new JLabel("Customer's Name");
-        lblCustmerName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblCustmerName.setBounds(50, 190, 175, 25);
-        panelWeighing.add(lblCustmerName);
+        JLabel lblCustomerName = new JLabel("Customer's Name");
+        lblCustomerName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblCustomerName.setBounds(50, 190, 175, 25);
+        panelWeighing.add(lblCustomerName);
 
         textFieldDriverName = new JComboBox<>();
         textFieldDriverName.addActionListener(l -> textFieldVehicleNo.requestFocus());
@@ -2239,11 +2155,11 @@ class WeighBridge {
                     Runnable stuffToDo = new Thread(() -> {
                         BufferedImage previewImage = webcam[1].getImage();
                         BufferedImage cropImage = previewImage.getSubimage(
-                                Integer.parseInt(0 + textFieldCropX11.getText().replaceAll("[^0-9]", "")),
-                                Integer.parseInt(0 + textFieldCropY11.getText().replaceAll("[^0-9]", "")),
-                                Integer.parseInt(0 + textFieldCropWidth11.getText().replaceAll("[^0-9]", "")),
+                                Integer.parseInt(0 + textFieldCropX11.getText().replaceAll("\\D", "")),
+                                Integer.parseInt(0 + textFieldCropY11.getText().replaceAll("\\D", "")),
+                                Integer.parseInt(0 + textFieldCropWidth11.getText().replaceAll("\\D", "")),
                                 Integer.parseInt(
-                                        "0" + textFieldCropHeight11.getText().replaceAll("[^0-9]", "")));
+                                        "0" + textFieldCropHeight11.getText().replaceAll("\\D", "")));
                         JLabel jLabel = new JLabel(
                                 new ImageIcon(cropImage.getScaledInstance(1280, 768, Image.SCALE_DEFAULT))); // 1280,
                         jLabel.addMouseListener(new MouseAdapter() {
@@ -2525,7 +2441,7 @@ class WeighBridge {
                     super.insertString(offs, str, a);
                 } else {
                     JOptionPane.showMessageDialog(null,
-                            "LIMIT REACHED\nLimit is 100 character\nPlease cutshot your Remarks\nLINE :2606",
+                            "LIMIT REACHED\nLimit is 100 character\nPlease cut shot your Remarks\nLINE :2606",
                             "LIMIT REACHED", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -3183,12 +3099,12 @@ class WeighBridge {
                         comboBoxResolution1.getSelectedItem() != null ?
                                 comboBoxResolution1.getSelectedItem().toString() :
                                 "");
-                rs.updateInt("CROPX", Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("[^0-9]", "")));
-                rs.updateInt("CROPY", Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("[^0-9]", "")));
+                rs.updateInt("CROPX", Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")));
+                rs.updateInt("CROPY", Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")));
                 rs.updateInt("CROPWIDTH",
-                        Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("[^0-9]", "")));
+                        Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")));
                 rs.updateInt("CROPHEIGHT",
-                        Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("[^0-9]", "")));
+                        Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                 rs.updateRow();
 
                 rs.absolute(2);
@@ -3198,12 +3114,12 @@ class WeighBridge {
                         comboBoxResolution2.getSelectedItem() != null ?
                                 comboBoxResolution2.getSelectedItem().toString() :
                                 "");
-                rs.updateInt("CROPX", Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("[^0-9]", "")));
-                rs.updateInt("CROPY", Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("[^0-9]", "")));
+                rs.updateInt("CROPX", Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")));
+                rs.updateInt("CROPY", Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")));
                 rs.updateInt("CROPWIDTH",
-                        Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("[^0-9]", "")));
+                        Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")));
                 rs.updateInt("CROPHEIGHT",
-                        Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("[^0-9]", "")));
+                        Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
                 rs.updateRow();
 
                 rs.absolute(3);
@@ -3213,12 +3129,12 @@ class WeighBridge {
                         comboBoxResolution3.getSelectedItem() != null ?
                                 comboBoxResolution3.getSelectedItem().toString() :
                                 "");
-                rs.updateInt("CROPX", Integer.parseInt(0 + textFieldCropX3.getText().replaceAll("[^0-9]", "")));
-                rs.updateInt("CROPY", Integer.parseInt(0 + textFieldCropY3.getText().replaceAll("[^0-9]", "")));
+                rs.updateInt("CROPX", Integer.parseInt(0 + textFieldCropX3.getText().replaceAll("\\D", "")));
+                rs.updateInt("CROPY", Integer.parseInt(0 + textFieldCropY3.getText().replaceAll("\\D", "")));
                 rs.updateInt("CROPWIDTH",
-                        Integer.parseInt(0 + textFieldCropWidth3.getText().replaceAll("[^0-9]", "")));
+                        Integer.parseInt(0 + textFieldCropWidth3.getText().replaceAll("\\D", "")));
                 rs.updateInt("CROPHEIGHT",
-                        Integer.parseInt(0 + textFieldCropHeight3.getText().replaceAll("[^0-9]", "")));
+                        Integer.parseInt(0 + textFieldCropHeight3.getText().replaceAll("\\D", "")));
                 rs.updateRow();
 
                 rs.absolute(4);
@@ -3228,21 +3144,21 @@ class WeighBridge {
                         comboBoxResolution4.getSelectedItem() != null ?
                                 comboBoxResolution4.getSelectedItem().toString() :
                                 "");
-                rs.updateInt("CROPX", Integer.parseInt(0 + textFieldCropX4.getText().replaceAll("[^0-9]", "")));
-                rs.updateInt("CROPY", Integer.parseInt(0 + textFieldCropY4.getText().replaceAll("[^0-9]", "")));
+                rs.updateInt("CROPX", Integer.parseInt(0 + textFieldCropX4.getText().replaceAll("\\D", "")));
+                rs.updateInt("CROPY", Integer.parseInt(0 + textFieldCropY4.getText().replaceAll("\\D", "")));
                 rs.updateInt("CROPWIDTH",
-                        Integer.parseInt(0 + textFieldCropWidth4.getText().replaceAll("[^0-9]", "")));
+                        Integer.parseInt(0 + textFieldCropWidth4.getText().replaceAll("\\D", "")));
                 rs.updateInt("CROPHEIGHT",
-                        Integer.parseInt(0 + textFieldCropHeight4.getText().replaceAll("[^0-9]", "")));
+                        Integer.parseInt(0 + textFieldCropHeight4.getText().replaceAll("\\D", "")));
                 rs.updateRow();
 
                 rs.absolute(5);
-                rs.updateInt("CROPX", Integer.parseInt(0 + textFieldCropX11.getText().replaceAll("[^0-9]", "")));
-                rs.updateInt("CROPY", Integer.parseInt(0 + textFieldCropY11.getText().replaceAll("[^0-9]", "")));
+                rs.updateInt("CROPX", Integer.parseInt(0 + textFieldCropX11.getText().replaceAll("\\D", "")));
+                rs.updateInt("CROPY", Integer.parseInt(0 + textFieldCropY11.getText().replaceAll("\\D", "")));
                 rs.updateInt("CROPWIDTH",
-                        Integer.parseInt(0 + textFieldCropWidth11.getText().replaceAll("[^0-9]", "")));
+                        Integer.parseInt(0 + textFieldCropWidth11.getText().replaceAll("\\D", "")));
                 rs.updateInt("CROPHEIGHT",
-                        Integer.parseInt(0 + textFieldCropHeight11.getText().replaceAll("[^0-9]", "")));
+                        Integer.parseInt(0 + textFieldCropHeight11.getText().replaceAll("\\D", "")));
                 rs.updateRow();
 
             } catch (SQLException ignored) {
@@ -3656,9 +3572,13 @@ class WeighBridge {
             fileChooser.setSelectedFile(new File("report.xlsx"));
             if (fileChooser.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
-                String fname = fileToSave.getAbsolutePath();
+                String name = fileToSave.getAbsolutePath();
                 try {
-                    toExcel(fname);
+                    if (Objects.equals(comboBoxReport.getSelectedItem(), "Mani & Co")) {
+                        toExcelManiAndCo(name);
+                    } else {
+                        toExcel(name);
+                    }
                 } catch (IOException ignored) {
                     JOptionPane.showMessageDialog(null, "Plz Close the Excel file\nLINE :3027", "FILE ERROR",
                             JOptionPane.ERROR_MESSAGE);
@@ -3764,7 +3684,7 @@ class WeighBridge {
         btnInsertRow.setFocusable(false);
         btnInsertRow.setBounds(765, 550, 137, 25);
         panelReport.add(btnInsertRow);
-        
+
         btnDeleteRow = new JButton("Delete row");
         btnDeleteRow.addActionListener(l -> {
             try {
@@ -3789,7 +3709,7 @@ class WeighBridge {
         btnDeleteRow.setFocusable(false);
         btnDeleteRow.setBounds(617, 550, 137, 25);
         panelReport.add(btnDeleteRow);
-        
+
         btnImportFromExcel = new JButton("Import from Excel");
         btnImportFromExcel.addActionListener(l -> {
             JFrame jFrame = new JFrame();
@@ -3819,7 +3739,7 @@ class WeighBridge {
         btnImportFromExcel.setFocusable(false);
         btnImportFromExcel.setBounds(429, 550, 180, 25);
         panelReport.add(btnImportFromExcel);
-        
+
         btnMassPrint = new JButton("Mass Print");
         btnMassPrint.addActionListener(l -> {
             if (JOptionPane.showConfirmDialog(null, "Do you want to Print ?", "Print", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
@@ -3907,12 +3827,12 @@ class WeighBridge {
 
         JLabel lblPrinter = new JLabel("Printer");
         lblPrinter.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblPrinter.setBounds(845, 64, 100, 25);
+        lblPrinter.setBounds(845, 50, 100, 25);
         panelSettings.add(lblPrinter);
 
         JLabel lblNoOfCopies = new JLabel("No Of Copies");
         lblNoOfCopies.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblNoOfCopies.setBounds(845, 119, 114, 25);
+        lblNoOfCopies.setBounds(845, 84, 114, 25);
         panelSettings.add(lblNoOfCopies);
 
         JScrollPane scrollPane_1 = new JScrollPane();
@@ -3929,7 +3849,7 @@ class WeighBridge {
                 "Cost"
         }) {
             private static final long serialVersionUID = 1L;
-            final boolean[] columnEditables = new boolean[]{
+            final boolean[] columnEditable = new boolean[]{
                     false,
                     true,
                     true
@@ -3937,7 +3857,7 @@ class WeighBridge {
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return columnEditables[column];
+                return columnEditable[column];
             }
         });
         tableMaterial.getColumnModel().getColumn(0).setResizable(false);
@@ -4225,7 +4145,7 @@ class WeighBridge {
         comboBoxPrinter.setFocusable(false);
         comboBoxPrinter.setModel(new DefaultComboBoxModel<>(printers));
         comboBoxPrinter.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        comboBoxPrinter.setBounds(969, 61, 276, 30);
+        comboBoxPrinter.setBounds(969, 47, 276, 30);
         panelSettings.add(comboBoxPrinter);
 
         textFieldNoOfCopies = new JTextField();
@@ -4234,7 +4154,7 @@ class WeighBridge {
         textFieldNoOfCopies.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldNoOfCopies.setDisabledTextColor(Color.BLACK);
         textFieldNoOfCopies.setColumns(10);
-        textFieldNoOfCopies.setBounds(969, 116, 76, 30);
+        textFieldNoOfCopies.setBounds(969, 81, 76, 30);
         panelSettings.add(textFieldNoOfCopies);
 
         JButton btnUpdate = new JButton("Update");
@@ -4269,7 +4189,7 @@ class WeighBridge {
             if (isCorrect) {
                 String response = JOptionPane.showInputDialog(null, "Please Enter the Starting Sl No ?", "Sl No",
                         JOptionPane.QUESTION_MESSAGE);
-                if (response == null || Integer.parseInt(0 + response.replaceAll("[^0-9]", "")) == 0)
+                if (response == null || Integer.parseInt(0 + response.replaceAll("\\D", "")) == 0)
                     JOptionPane.showMessageDialog(null, "Reset Failed ", "Value Entered is not correct",
                             JOptionPane.ERROR_MESSAGE);
                 else {
@@ -4284,7 +4204,7 @@ class WeighBridge {
                         stmts.executeUpdate();
                         ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
                         rs.absolute(1);
-                        rs.updateInt("SLNO", Integer.parseInt(response.replaceAll("[^0-9]", "")));
+                        rs.updateInt("SLNO", Integer.parseInt(response.replaceAll("\\D", "")));
                         rs.updateRow();
                     } catch (SQLException ignored) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2836",
@@ -4391,7 +4311,7 @@ class WeighBridge {
         chckbxExcludeCustomer.addChangeListener(e -> {
             comboBoxCustomerName.setEnabled(!chckbxExcludeCustomer.isSelected());
             comboBoxCustomerName.setVisible(!chckbxExcludeCustomer.isSelected());
-            lblCustmerName.setVisible(!chckbxExcludeCustomer.isSelected());
+            lblCustomerName.setVisible(!chckbxExcludeCustomer.isSelected());
             clear();
         });
         chckbxExcludeCustomer.setFont(new Font("Times New Roman", Font.ITALIC, 15));
@@ -4399,7 +4319,7 @@ class WeighBridge {
         chckbxExcludeCustomer.setBounds(25, 190, 145, 25);
         panelSettings.add(chckbxExcludeCustomer);
 
-        chckbxExcludeDrivers = new JCheckBox("Exclude Trasporter");
+        chckbxExcludeDrivers = new JCheckBox("Exclude Transporter");
         chckbxExcludeDrivers.setEnabled(false);
         chckbxExcludeDrivers.setFocusable(false);
         chckbxExcludeDrivers.addChangeListener(e -> {
@@ -4425,10 +4345,10 @@ class WeighBridge {
         panelSettings.add(chckbxCamera);
 
         comboBoxPrintOptionForWeight = new JComboBox<>();
-        comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{"Standard", "Pre Print", "Pre Print 2", "Pre Print 3", "Plain Paper", "Camera", "Plain Camera", "Sri Pathy", "No Of Bags", "Ice Water", "EMJAY"}));
+        comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{"Standard", "Pre Print", "Pre Print 2", "Pre Print 3", "Plain Paper", "Camera", "Plain Camera", "Sri Pathy", "No Of Bags", "Ice Water", "EMJAY", "Mani & Co"}));
         comboBoxPrintOptionForWeight.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         comboBoxPrintOptionForWeight.setFocusable(false);
-        comboBoxPrintOptionForWeight.setBounds(1055, 116, 190, 30);
+        comboBoxPrintOptionForWeight.setBounds(1055, 81, 190, 30);
         panelSettings.add(comboBoxPrintOptionForWeight);
 
         chckbxSms = new JCheckBox("SMS");
@@ -4678,7 +4598,7 @@ class WeighBridge {
         chckbxIceWater.addChangeListener(e -> {
             if (chckbxIceWater.isSelected()) {
                 lblDriversName.setText("Party's City");
-                lblCustmerName.setText("Party's Name");
+                lblCustomerName.setText("Party's Name");
                 lblBagDeduction.setText("Ice/Water Less");
                 lblCharges.setText("Rate");
                 lblNoOfBags.setText("Freight Charges");
@@ -4696,7 +4616,7 @@ class WeighBridge {
                 chckbxCharges.setSelected(false);
             } else {
                 lblDriversName.setText("Transporter's Name");
-                lblCustmerName.setText("Customer's Name");
+                lblCustomerName.setText("Customer's Name");
                 lblBagDeduction.setText("Bag Deduction");
                 lblCharges.setText("Charges");
                 lblNoOfBags.setText("No Of Bags");
@@ -4725,10 +4645,10 @@ class WeighBridge {
         chckbxPrinterCopyDialog.setFont(new Font("Times New Roman", Font.ITALIC, 15));
         chckbxPrinterCopyDialog.setEnabled(false);
         chckbxPrinterCopyDialog.setBackground(new Color(0, 255, 127));
-        chckbxPrinterCopyDialog.setBounds(845, 148, 180, 25);
+        chckbxPrinterCopyDialog.setBounds(845, 115, 180, 25);
         chckbxPrinterCopyDialog.addChangeListener(e -> textFieldNoOfCopies.setEnabled(!chckbxPrinterCopyDialog.isSelected()));
         panelSettings.add(chckbxPrinterCopyDialog);
-        
+
         JButton btnRefreshWeight = new JButton("Refresh Weight");
         btnRefreshWeight.addActionListener(l -> {
             if (comPort != null) {
@@ -4742,6 +4662,18 @@ class WeighBridge {
         btnRefreshWeight.setFocusable(false);
         btnRefreshWeight.setBounds(1060, 273, 165, 25);
         panelSettings.add(btnRefreshWeight);
+
+        JLabel lblReport = new JLabel("Report");
+        lblReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblReport.setBounds(845, 145, 100, 25);
+        panelSettings.add(lblReport);
+
+        comboBoxReport = new JComboBox<>();
+        comboBoxReport.setModel(new DefaultComboBoxModel<>(new String[]{"Standard", "Mani & Co"}));
+        comboBoxReport.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        comboBoxReport.setFocusable(false);
+        comboBoxReport.setBounds(969, 142, 276, 30);
+        panelSettings.add(comboBoxReport);
 
         JPanel panel = new JPanel();
         panel.setBackground(new Color(0, 255, 127));
@@ -4919,6 +4851,26 @@ class WeighBridge {
         lbleveryhrs.setBounds(1021, 163, 179, 25);
         panel.add(lbleveryhrs);
 
+        textFieldTitle3 = new JTextField();
+        textFieldTitle3.setToolTipText("Only 30 letters");
+        textFieldTitle3.setText(null);
+        textFieldTitle3.setHorizontalAlignment(SwingConstants.CENTER);
+        textFieldTitle3.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldTitle3.setDisabledTextColor(Color.BLACK);
+        textFieldTitle3.setColumns(10);
+        textFieldTitle3.setBounds(131, 385, 209, 30);
+        panel.add(textFieldTitle3);
+
+        JLabel lblTitle = new JLabel("Title 3");
+        lblTitle.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblTitle.setBounds(40, 385, 75, 25);
+        panel.add(lblTitle);
+
+        JLabel lblManiCo = new JLabel("Mani & Co Settings");
+        lblManiCo.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
+        lblManiCo.setBounds(40, 349, 230, 25);
+        panel.add(lblManiCo);
+
         JButton button = new JButton("Minimize");
         button.addActionListener(l -> babulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
         button.setFont(new Font("Times New Roman", Font.BOLD, 20));
@@ -4953,6 +4905,9 @@ class WeighBridge {
                 printIceWater();
             } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "EMJAY")) {
                 printEmjay();
+                break;
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Mani & Co")) {
+                printManiAndCo();
                 break;
             } else {
                 printPlainWeight();
@@ -5004,7 +4959,7 @@ class WeighBridge {
                     temp = "SELECT * FROM WEIGHING WHERE NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
                     break;
                 case "Serialwise Report":
-                    serialNo = Integer.parseInt(0 + textFieldDetail.getText().replaceAll("[^0-9]", ""));
+                    serialNo = Integer.parseInt(0 + textFieldDetail.getText().replaceAll("\\D", ""));
                     temp = "SELECT * FROM WEIGHING WHERE SLNO >= " + serialNo;
                     break;
                 case "Vehiclewise Report":
@@ -5425,7 +5380,7 @@ class WeighBridge {
         }
         if (chckbxExcludeDrivers.isSelected() ||
                 !textFieldDriverName.getEditor().getItem().toString().trim().equals("")) {
-            driver = String.format(format2, "Transpoter's Name", textFieldDriverName.getEditor().getItem());
+            driver = String.format(format2, "Transporter's Name", textFieldDriverName.getEditor().getItem());
         }
         String[] initString = {
                 "\n" + StringUtils.center(title1.getText(), 39) + "\n",
@@ -5444,7 +5399,7 @@ class WeighBridge {
                         textFieldTareDateTime.getText()),
                 String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "),
                         chckbxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" :
-                        "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
+                                "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
                 chckbxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? "" :
                         String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n",
                 "-----------------------------------------------------------------\n",
@@ -5547,7 +5502,7 @@ class WeighBridge {
                 String.format(format1, "Ice/Water Less", StringUtils.leftPad(textFieldBagDeduction.getText(), 7, " "), textFieldNetDateTime.getText()),
                 String.format(format1, "Final Wt", StringUtils.leftPad(textFieldFinalWt.getText(), 7, " "), ""),
                 String.format(format3, "Rate", textFieldCharges.getText()),
-                String.format(format3, "Total Amount", (int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.0-9]", "")))),
+                String.format(format3, "Total Amount", (int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", "")))),
                 String.format(format3, "Freight Charges", textFieldNoOfBags.getText()),
                 String.format(format3, "Final Amount", textFieldFinalAmount.getText()),
                 String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n\n",
@@ -5671,6 +5626,96 @@ class WeighBridge {
                 graphics.drawString(" Date  : ", margin, len);
                 graphics.drawString(" Time  : ", margin + spacing, len);
                 graphics.drawString("Second Weight : ", margin + spacing + spacing, len);
+
+                graphics.drawString("Net Weight    : ", margin + spacing + spacing, len += space + space);
+                graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                graphics.drawString("                " + StringUtils.leftPad(textFieldNetWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
+
+                graphics.drawLine(margin, len - 18, 574, len - 18);
+                graphics.drawLine(margin, len + 10, 574, len + 10);
+
+                graphics.setFont(new Font("Courier New", Font.BOLD, 13));
+                graphics.drawString(" Department", margin, len += space + space + space);
+                graphics.drawString(StringUtils.leftPad(textFieldFooter.getText(), 70, " "), margin, len);
+                graphics.drawLine(margin, len + 10, 574, len + 10);
+
+                len += space + space + space;
+            }
+            return Printable.PAGE_EXISTS;
+
+        }, pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
+    private void printManiAndCo() {
+        PrinterJob pj = PrinterJob.getPrinterJob();
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 8d * 72d;
+        double height = 12d * 72d;
+        double widthmargin = 0d * 72d;
+        double heightmargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+
+        pBook.append((graphics, pageFormat, pageIndex) -> {
+            int margin = 30;
+            int len = 20;
+            int space = 20;
+
+            for (int i = 0; i < 2; i++) {
+                int spacing = 400;
+                String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
+
+                graphics.setFont(new Font("Courier New", Font.BOLD, 15));
+                graphics.drawString(StringUtils.center(title1.getText(), 60), margin, len += space);
+
+                graphics.setFont(new Font("Courier New", Font.PLAIN, 13));
+                graphics.drawString(StringUtils.center(title2.getText(), 71), margin, len += space);
+
+                graphics.setFont(new Font("Courier New", Font.ITALIC, 13));
+                graphics.drawString(StringUtils.center(textFieldTitle3.getText(), 71), margin, len += space);
+
+                graphics.setFont(new Font("Courier New", Font.BOLD, 13));
+                graphics.drawString(StringUtils.center("WEIGHMENT SLIP", 71), margin, len += space + 5);
+                graphics.drawLine(margin, len - 18, 574, len - 18);
+                graphics.drawLine(margin, len + 10, 574, len + 10);
+
+                graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
+                graphics.drawString(" Sl. No          : " + textFieldSlNo.getText(), margin, len += space + space);
+                graphics.drawString(" Date  : " + temp[0].replaceAll("-", "/"), margin + spacing, len);
+                graphics.drawString(" Vehicle No      : " + textFieldVehicleNo.getText(), margin, len += space);
+                graphics.drawString(" Time  : " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
+                graphics.drawString(" Material Name   : " + comboBoxMaterial.getEditor().getItem(), margin, len += space);
+
+                spacing = 170;
+                temp = (textFieldGrossDateTime.getText() + " . . ").split(" ");
+                graphics.drawString(" Date  : ", margin, len += space + space + space);
+                graphics.drawLine(margin, len - 18, 574, len - 18);
+                graphics.drawString(" Time  : ", margin + spacing, len);
+                graphics.drawString("Laden Weight  : ", margin + spacing + spacing, len);
+
+                graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len);
+                graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
+                graphics.drawString("                " + StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
+
+                temp = (textFieldTareDateTime.getText() + " . . ").split(" ");
+                graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len += space);
+                graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
+                graphics.drawString("                " + StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
+
+                graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
+                graphics.drawString(" Date  : ", margin, len);
+                graphics.drawString(" Time  : ", margin + spacing, len);
+                graphics.drawString("Unladen Weight: ", margin + spacing + spacing, len);
 
                 graphics.drawString("Net Weight    : ", margin + spacing + spacing, len += space + space);
                 graphics.setFont(new Font("Courier New", Font.BOLD, 12));
@@ -6095,10 +6140,10 @@ class WeighBridge {
                     BufferedImage printImage = ImageIO
                             .read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
                     BufferedImage cropImage = printImage.getSubimage(
-                            Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("[^0-9]", "")),
-                            Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("[^0-9]", "")),
-                            Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("[^0-9]", "")),
-                            Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("[^0-9]", "")));
+                            Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")),
+                            Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")),
+                            Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")),
+                            Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                     graphics.drawImage(cropImage, 250, 125, 300,
                             (int) (300.00 / cropImage.getWidth() * cropImage.getHeight()), null);
                 } catch (IOException | NullPointerException ignored) {
@@ -6202,10 +6247,10 @@ class WeighBridge {
                     BufferedImage printImage = ImageIO
                             .read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
                     BufferedImage cropImage = printImage.getSubimage(
-                            Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("[^0-9]", "")),
-                            Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("[^0-9]", "")),
-                            Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("[^0-9]", "")),
-                            Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("[^0-9]", "")));
+                            Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")),
+                            Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")),
+                            Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")),
+                            Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                     graphics.drawImage(cropImage, 250, 125, 300,
                             (int) (300.00 / cropImage.getWidth() * cropImage.getHeight()), null);
                 } catch (IOException | NullPointerException ignored) {
@@ -6466,7 +6511,7 @@ class WeighBridge {
         }
         if (chckbxExcludeDrivers.isSelected() ||
                 !textFieldDriverName.getEditor().getItem().toString().trim().equals("")) {
-            driver = String.format(format2, "Transpoter's Name", textFieldDriverName.getEditor().getItem());
+            driver = String.format(format2, "Transporter's Name", textFieldDriverName.getEditor().getItem());
         }
         String[] initString = {
                 "\n" + StringUtils.center(title1.getText(), 39) + "\n",
@@ -6688,7 +6733,7 @@ class WeighBridge {
         String format = " %1$-17s %2$-11s %3$-4s %4$-12s %5$-9s %6$-9s %7$-8s %8$-8s %9$-8s %10$-8s %11$-10s %12$s\n";
         String temp = "\n";
         for (int i = 0; i < model.getRowCount(); i++) {
-            int test = (int) (Integer.parseInt(0 + ("" + model.getValueAt(i, 15)).replaceAll("[^.0-9]", "")) * Double.parseDouble(0 + ("" + model.getValueAt(i, 9)).replaceAll("[^.0-9]", "")));
+            int test = (int) (Integer.parseInt(0 + ("" + model.getValueAt(i, 15)).replaceAll("[^.\\d]", "")) * Double.parseDouble(0 + ("" + model.getValueAt(i, 9)).replaceAll("[^.\\d]", "")));
             temp = temp.concat(String.format(format,
                     model.getValueAt(i, 4) != null ? model.getValueAt(i, 4).toString() : "",
                     model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "",
@@ -6813,7 +6858,7 @@ class WeighBridge {
                             dateAndTimeFormatdatep.format(datePicker2.getDate());
             }
         }
-        return null;
+        return "Report";
     }
 
     private void toExcel(String excelFilePath) throws IOException {
@@ -6826,7 +6871,7 @@ class WeighBridge {
         String safeName = WorkbookUtil.createSafeSheetName("Weighing - " + Objects.requireNonNull(comboBox.getSelectedItem()));
         Sheet sheet = workbook.createSheet(safeName);
         int rowNum = 0;
-        Row row = sheet.createRow(rowNum);
+        Row row = sheet.createRow(rowNum++);
         CreationHelper creationHelper = workbook.getCreationHelper();
         CellStyle cellStyleStringCenter = sheet.getWorkbook().createCellStyle();
         cellStyleStringCenter.setAlignment(HorizontalAlignment.CENTER);
@@ -6834,18 +6879,15 @@ class WeighBridge {
         cell = row.createCell(0);
         cell.setCellValue(title1.getText());
         cell.setCellStyle(cellStyleStringCenter);
-        rowNum++;
-        row = sheet.createRow(rowNum);
+        row = sheet.createRow(rowNum++);
         cell = row.createCell(0);
         cell.setCellValue(title2.getText());
         cell.setCellStyle(cellStyleStringCenter);
-        rowNum++;
-        row = sheet.createRow(rowNum);
+        row = sheet.createRow(rowNum++);
         cell = row.createCell(0);
         cell.setCellValue(getTitle());
         cell.setCellStyle(cellStyleStringCenter);
-        rowNum++;
-        row = sheet.createRow(rowNum);
+        row = sheet.createRow(rowNum++);
         int j = 0;
         if (chckbxSelectSlNo.isSelected()) {
             cell = row.createCell(j++);
@@ -6959,8 +7001,7 @@ class WeighBridge {
         int tareWt = -1;
         int netWt = -1;
         for (int i = 0; i < model.getRowCount(); i++) {
-            rowNum++;
-            row = sheet.createRow(rowNum);
+            row = sheet.createRow(rowNum++);
             int c = 0;
             j = 1;
             if (chckbxSelectSlNo.isSelected()) {
@@ -7074,27 +7115,24 @@ class WeighBridge {
                 cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
             }
         }
-        rowNum++;
         String getColumn = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         row = sheet.createRow(rowNum);
+
         if (charge != -1) {
             cell = row.createCell(charge);
-            cell.setCellFormula(
-                    "SUM(" + getColumn.charAt(charge) + "3:" + getColumn.charAt(charge) + "" + rowNum + ")");
+            cell.setCellFormula("SUM(" + getColumn.charAt(charge) + "4:" + getColumn.charAt(charge) + "" + rowNum + ")");
         }
         if (grossWt != -1) {
             cell = row.createCell(grossWt);
-            cell.setCellFormula(
-                    "SUM(" + getColumn.charAt(grossWt) + "3:" + getColumn.charAt(grossWt) + "" + rowNum + ")");
+            cell.setCellFormula("SUM(" + getColumn.charAt(grossWt) + "4:" + getColumn.charAt(grossWt) + "" + rowNum + ")");
         }
         if (tareWt != -1) {
             cell = row.createCell(tareWt);
-            cell.setCellFormula(
-                    "SUM(" + getColumn.charAt(tareWt) + "3:" + getColumn.charAt(tareWt) + "" + rowNum + ")");
+            cell.setCellFormula("SUM(" + getColumn.charAt(tareWt) + "4:" + getColumn.charAt(tareWt) + "" + rowNum + ")");
         }
         if (netWt != -1) {
             cell = row.createCell(netWt);
-            cell.setCellFormula("SUM(" + getColumn.charAt(netWt) + "3:" + getColumn.charAt(netWt) + "" + rowNum + ")");
+            cell.setCellFormula("SUM(" + getColumn.charAt(netWt) + "4:" + getColumn.charAt(netWt) + "" + rowNum + ")");
         }
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, sheet.getRow(3).getLastCellNum() - 1));
         sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, sheet.getRow(3).getLastCellNum() - 1));
@@ -7116,13 +7154,163 @@ class WeighBridge {
         workbook.close();
     }
 
+    private void toExcelManiAndCo(String excelFilePath) throws IOException {
+        Workbook workbook;
+        if (excelFilePath.endsWith("xls")) {
+            workbook = new HSSFWorkbook();
+        } else {
+            workbook = new XSSFWorkbook();
+        }
+        String safeName = WorkbookUtil.createSafeSheetName("Weighing - " + Objects.requireNonNull(comboBox.getSelectedItem()));
+        Sheet sheet = workbook.createSheet(safeName);
+        int rowNum = 0;
+        Row row = sheet.createRow(rowNum++);
+        CellStyle cellStyleStringCenter = sheet.getWorkbook().createCellStyle();
+        cellStyleStringCenter.setAlignment(HorizontalAlignment.CENTER);
+        Cell cell;
+        cell = row.createCell(0);
+        cell.setCellValue(title1.getText());
+        cell.setCellStyle(cellStyleStringCenter);
+        row = sheet.createRow(rowNum++);
+        cell = row.createCell(0);
+        cell.setCellValue(title2.getText());
+        cell.setCellStyle(cellStyleStringCenter);
+        row = sheet.createRow(rowNum++);
+        cell = row.createCell(0);
+        cell.setCellValue(textFieldTitle3.getText());
+        cell.setCellStyle(cellStyleStringCenter);
+        row = sheet.createRow(rowNum++);
+        cell = row.createCell(0);
+        cell.setCellValue(getTitle());
+        cell.setCellStyle(cellStyleStringCenter);
+        row = sheet.createRow(rowNum++);
+        cell = row.createCell(0);
+        cell.setCellValue("Date");
+        cell.setCellStyle(cellStyleStringCenter);
+        cell = row.createCell(1);
+        cell.setCellValue("Sl.No");
+        cell.setCellStyle(cellStyleStringCenter);
+        cell = row.createCell(2);
+        cell.setCellValue("Material");
+        cell.setCellStyle(cellStyleStringCenter);
+        cell = row.createCell(3);
+        cell.setCellValue("Vehicle No");
+        cell.setCellStyle(cellStyleStringCenter);
+        cell = row.createCell(4);
+        cell.setCellValue("Laden");
+        cell.setCellStyle(cellStyleStringCenter);
+        cell = row.createCell(6);
+        cell.setCellValue("Unladen");
+        cell.setCellStyle(cellStyleStringCenter);
+        cell = row.createCell(8);
+        cell.setCellValue("Nett weight");
+        cell.setCellStyle(cellStyleStringCenter);
+        row = sheet.createRow(rowNum++);
+        cell = row.createCell(4);
+        cell.setCellValue("Time");
+        cell.setCellStyle(cellStyleStringCenter);
+        cell = row.createCell(5);
+        cell.setCellValue("Weight");
+        cell.setCellStyle(cellStyleStringCenter);
+        cell = row.createCell(6);
+        cell.setCellValue("Time");
+        cell.setCellStyle(cellStyleStringCenter);
+        cell = row.createCell(7);
+        cell.setCellValue("Weight");
+        cell.setCellStyle(cellStyleStringCenter);
+        TableModel model = tableReport.getModel();
+
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        DateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+
+        for (int i = 0; i < model.getRowCount(); i++) {
+            row = sheet.createRow(rowNum++);
+
+            cell = row.createCell(0);
+            try {
+                cell.setCellValue(model.getValueAt(i, 16) != null ? dateFormat.format(new Date(dateAndTimeFormat.parse(model.getValueAt(i, 16).toString()).getTime())) : "");
+            } catch (ParseException ignored) {
+            }
+
+            cell = row.createCell(1);
+            cell.setCellValue(Integer.parseInt(0 + model.getValueAt(i, 1).toString()));
+
+            cell = row.createCell(2);
+            cell.setCellValue(model.getValueAt(i, 7) != null ? model.getValueAt(i, 7).toString() : "");
+
+            cell = row.createCell(3);
+            cell.setCellValue(model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "");
+
+            cell = row.createCell(4);
+            try {
+                cell.setCellValue(model.getValueAt(i, 11) != null ? timeFormat.format(new Date(dateAndTimeFormat.parse(model.getValueAt(i, 11).toString()).getTime())) : "");
+            } catch (ParseException ignored) {
+            }
+
+            cell = row.createCell(5);
+            cell.setCellValue(Integer.parseInt(model.getValueAt(i, 10).toString()));
+            
+            cell = row.createCell(6);
+            try {
+                cell.setCellValue(model.getValueAt(i, 13) != null ? timeFormat.format(new Date(dateAndTimeFormat.parse(model.getValueAt(i, 13).toString()).getTime())) : "");
+            } catch (ParseException ignored) {
+            }
+
+            cell = row.createCell(7);
+            cell.setCellValue(Integer.parseInt(model.getValueAt(i, 12).toString()));
+
+            cell = row.createCell(8);
+            cell.setCellValue(Integer.parseInt(0 + model.getValueAt(i, 15).toString()));
+
+        }
+        String getColumn = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        row = sheet.createRow(rowNum);
+
+        cell = row.createCell(5);
+        cell.setCellFormula("SUM(" + getColumn.charAt(5) + "6:" + getColumn.charAt(5) + "" + rowNum + ")");
+
+        cell = row.createCell(7);
+        cell.setCellFormula("SUM(" + getColumn.charAt(7) + "6:" + getColumn.charAt(7) + "" + rowNum + ")");
+
+        cell = row.createCell(8);
+        cell.setCellFormula("SUM(" + getColumn.charAt(8) + "6:" + getColumn.charAt(8) + "" + rowNum + ")");
+
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 8));
+        sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 8));
+        sheet.addMergedRegion(new CellRangeAddress(2, 2, 0, 8));
+        sheet.addMergedRegion(new CellRangeAddress(3, 3, 0, 8));
+
+        for (short i = 0; i < 10; ) {
+            sheet.autoSizeColumn(i++);
+        }
+        sheet.addMergedRegion(new CellRangeAddress(4, 5, 0, 0));
+        sheet.addMergedRegion(new CellRangeAddress(4, 5, 1, 1));
+        sheet.addMergedRegion(new CellRangeAddress(4, 5, 2, 2));
+        sheet.addMergedRegion(new CellRangeAddress(4, 5, 3, 3));
+        sheet.addMergedRegion(new CellRangeAddress(4, 5, 8, 8));
+        sheet.addMergedRegion(new CellRangeAddress(4, 4, 4, 5));
+        sheet.addMergedRegion(new CellRangeAddress(4, 4, 6, 7));
+
+        FileOutputStream fileOut;
+        if (excelFilePath.endsWith("xls")) {
+            fileOut = new FileOutputStream(excelFilePath);
+        } else if (excelFilePath.endsWith("xlsx")) {
+            fileOut = new FileOutputStream(excelFilePath);
+        } else {
+            fileOut = new FileOutputStream(excelFilePath + ".xlsx");
+        }
+        workbook.write(fileOut);
+        fileOut.close();
+        workbook.close();
+    }
+
     private List<Integer> fromExcel(File excelFilePath) throws IOException {
         Workbook workbook;
-        FileInputStream filein = new FileInputStream(excelFilePath);
+        FileInputStream file = new FileInputStream(excelFilePath);
         if (excelFilePath.getName().endsWith("xls")) {
-            workbook = new HSSFWorkbook(filein);
+            workbook = new HSSFWorkbook(file);
         } else {
-            workbook = new XSSFWorkbook(filein);
+            workbook = new XSSFWorkbook(file);
         }
         Sheet sheet = workbook.getSheetAt(0);
         List<Integer> failedSlNo = new ArrayList<>();
@@ -7148,8 +7336,8 @@ class WeighBridge {
                 }
 
                 rs.updateInt("SLNO", slNo);
-                rs.updateString("DCNO", row.getCell(++ colNum) != null ? row.getCell(colNum).toString().trim() : "");
-                if (row.getCell(++ colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
+                rs.updateString("DCNO", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                if (row.getCell(++colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
                     if (row.getCell(colNum).getCellType() == CellType.STRING) {
                         rs.updateDate("DCNODATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
                     } else {
@@ -7159,15 +7347,15 @@ class WeighBridge {
                     rs.updateDate("DCNODATE", null);
                 }
 
-                rs.updateString("CUSTOMERNAME", row.getCell(++ colNum) != null ? row.getCell(colNum).toString().trim() : "");
-                rs.updateString("DRIVERNAME", row.getCell(++ colNum) != null ? row.getCell(colNum).toString().trim() : "");
-                rs.updateString("VEHICLENO", row.getCell(++ colNum) != null ? row.getCell(colNum).toString().trim() : "");
-                rs.updateString("MATERIAL", row.getCell(++ colNum) != null ? row.getCell(colNum).toString().trim() : "");
-                rs.updateInt("NOOFBAGS", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                rs.updateDouble("CHARGES", row.getCell(++ colNum) != null ? row.getCell(colNum).getNumericCellValue() : 0);
+                rs.updateString("CUSTOMERNAME", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                rs.updateString("DRIVERNAME", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                rs.updateString("VEHICLENO", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                rs.updateString("MATERIAL", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                rs.updateInt("NOOFBAGS", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                rs.updateDouble("CHARGES", row.getCell(++colNum) != null ? row.getCell(colNum).getNumericCellValue() : 0);
 
-                rs.updateInt("GROSSWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                if (row.getCell(++ colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
+                rs.updateInt("GROSSWT", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                if (row.getCell(++colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
                     if (row.getCell(colNum).getCellType() == CellType.STRING) {
                         rs.updateDate("GROSSDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
                         rs.updateTime("GROSSTIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
@@ -7180,8 +7368,8 @@ class WeighBridge {
                     rs.updateTime("GROSSTIME", null);
                 }
 
-                rs.updateInt("TAREWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                if (row.getCell(++ colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
+                rs.updateInt("TAREWT", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                if (row.getCell(++colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
                     if (row.getCell(colNum).getCellType() == CellType.STRING) {
                         rs.updateDate("TAREDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
                         rs.updateTime("TARETIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
@@ -7194,10 +7382,10 @@ class WeighBridge {
                     rs.updateTime("TARETIME", null);
                 }
 
-                rs.updateInt("BAGDEDUCTION",row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                rs.updateInt("BAGDEDUCTION", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
 
-                rs.updateInt("NETWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                if (row.getCell(++ colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
+                rs.updateInt("NETWT", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                if (row.getCell(++colNum) != null && !"".equals(row.getCell(colNum).toString().trim())) {
                     if (row.getCell(colNum).getCellType() == CellType.STRING) {
                         rs.updateDate("NETDATE", new java.sql.Date(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
                         rs.updateTime("NETTIME", new Time(dateAndTimeFormat.parse(row.getCell(colNum).toString().trim()).getTime()));
@@ -7209,8 +7397,8 @@ class WeighBridge {
                     rs.updateDate("NETDATE", null);
                     rs.updateTime("NETTIME", null);
                 }
-                rs.updateInt("FINALWT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
-                rs.updateInt("FINALAMOUNT", row.getCell(++ colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                rs.updateInt("FINALWT", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
+                rs.updateInt("FINALAMOUNT", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
                 rs.updateString("REMARKS", row.getCell(colNum) != null ? row.getCell(colNum).toString().trim().trim() : "");
                 rs.updateBoolean("MANUAL", true);
                 if (!update) {
@@ -7218,12 +7406,13 @@ class WeighBridge {
                 } else {
                     rs.updateRow();
                 }
-            } catch (IllegalStateException | NumberFormatException | SQLException | ParseException | NullPointerException ignored) {
+            } catch (IllegalStateException | NumberFormatException | SQLException | ParseException |
+                     NullPointerException ignored) {
                 failedSlNo.add(rowNum + 1);
             }
         }
         workbook.close();
-        filein.close();
+        file.close();
         return failedSlNo;
     }
 
@@ -7290,10 +7479,10 @@ class WeighBridge {
 
                 @Override
                 public void serialEvent(SerialPortEvent event) {
-                    if(temp[4].equals("t")) {
-                        lblWeight.setText("" + Integer.parseInt("0" + new StringBuilder(new String(event.getReceivedData())).reverse().toString().replaceAll("[^0-9" + temp[3] + "]", "").split(temp[3])[0]));
+                    if (temp[4].equals("t")) {
+                        lblWeight.setText("" + Integer.parseInt("0" + new StringBuilder(new String(event.getReceivedData())).reverse().toString().replaceAll("[^\\d" + temp[3] + "]", "").split(temp[3])[0]));
                     } else {
-                        lblWeight.setText("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^0-9" + temp[3] + "]", "").split(temp[3])[0]));
+                        lblWeight.setText("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^\\d" + temp[3] + "]", "").split(temp[3])[0]));
                     }
                 }
             });
@@ -7354,16 +7543,17 @@ class WeighBridge {
                     panelCameras.add(panelCamera);
                     lock = true;
                 }
-            } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException | WebcamException | NullPointerException |
-                    ClassCastException ignored) {
+            } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException | WebcamException |
+                     NullPointerException |
+                     ClassCastException ignored) {
                 JOptionPane.showMessageDialog(null,
-                        "CAMERA ERROR\nCamera has beed removed are resolution missmatch\nLINE :1547", "CAMERA ERROR",
+                        "CAMERA ERROR\nCamera has been removed are resolution mismatch\nLINE :1547", "CAMERA ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
         return panelCamera;
     }
 
-    private void webcamdispose() {
+    private void webcamDispose() {
         if (webcam[1] != null) {
             Runnable stuffToDo = new Thread(() -> webcam[1].close());
             ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -7482,7 +7672,7 @@ class WeighBridge {
             serialPortSms.closePort();
         } else {
             JOptionPane.showMessageDialog(null,
-                    "SMS ERROR\nSMS Funtion not working please check the connection 0or check the number entered",
+                    "SMS ERROR\nSMS Function not working please check the connection 0or check the number entered",
                     "SMS ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -7506,7 +7696,7 @@ class WeighBridge {
             comPort.removeDataListener();
             comPort.closePort();
         }
-        webcamdispose();
+        webcamDispose();
         System.exit(0);
     }
 
@@ -7581,7 +7771,7 @@ class WeighBridge {
                 }
             }
         } else {
-            webcamdispose();
+            webcamDispose();
             tabbedPane.setEnabledAt(1, false);
             tabbedPane.setTitleAt(1, "");
             btnClick.setEnabled(false);
@@ -7972,7 +8162,7 @@ class WeighBridge {
                         displayResult(result);
                         lastNumber = result;
                     } catch (DivideByZeroException ignored) {
-                        displayError("Cannot divide by sero.");
+                        displayError("Cannot divide by zero.");
                     }
                 } else {
                     lastNumber = numberInDisplay;
@@ -7989,7 +8179,7 @@ class WeighBridge {
                     result = processLastOperator();
                     displayResult(result);
                 } catch (DivideByZeroException ignored) {
-                    displayError("Cannot divide by sero.");
+                    displayError("Cannot divide by zero.");
                 }
                 lastOperator = "0";
             }
@@ -8176,7 +8366,8 @@ class WeighBridge {
                             label = "Edit";
                             ((TableReport) tableReport.getModel()).removeEditableRow(row);
                         }
-                    } catch (SQLException | ParseException | NumberFormatException | NullPointerException | ClassCastException ignored) {
+                    } catch (SQLException | ParseException | NumberFormatException | NullPointerException |
+                             ClassCastException ignored) {
                         JOptionPane.showMessageDialog(null, "DATA ERROR\nCHECK THE VALUES ENTERED IN ALL FIELDS\nLINE :7037", "DATA ERROR",
                                 JOptionPane.ERROR_MESSAGE);
                     }
