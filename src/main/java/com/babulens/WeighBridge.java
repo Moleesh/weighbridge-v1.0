@@ -4345,7 +4345,7 @@ class WeighBridge {
         panelSettings.add(chckbxCamera);
 
         comboBoxPrintOptionForWeight = new JComboBox<>();
-        comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{"Standard", "Pre Print", "Pre Print 2", "Pre Print 3", "Plain Paper", "Camera", "Plain Camera", "Sri Pathy", "No Of Bags", "Ice Water", "EMJAY", "Mani & Co"}));
+        comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{"Standard", "Pre Print", "Pre Print 2", "Pre Print 3", "Plain Paper", "Plain Paper A4", "Camera", "Plain Camera", "Sri Pathy", "No Of Bags", "Ice Water", "EMJAY", "Mani & Co"}));
         comboBoxPrintOptionForWeight.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         comboBoxPrintOptionForWeight.setFocusable(false);
         comboBoxPrintOptionForWeight.setBounds(1055, 81, 190, 30);
@@ -4909,6 +4909,8 @@ class WeighBridge {
             } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Mani & Co")) {
                 printManiAndCo();
                 break;
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Plain Paper A4")) {
+                printPlainWeightA4();
             } else {
                 printPlainWeight();
             }
@@ -5341,6 +5343,31 @@ class WeighBridge {
                 textFieldBagDeduction.setEnabled(true);
             }
         }
+    }
+
+    private void printPlainWeightA4() {
+        JTextPane textPane = createTextPane1();
+        textPane.setBackground(Color.white);
+        PrinterJob pj = PrinterJob.getPrinterJob();
+
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 8d * 72d;
+        double height = 11d * 72d;
+        double widthmargin = .50d * 72d;
+        double heightmargin = .25d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+        pBook.append(textPane.getPrintable(null, null), pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+
     }
 
     private void printPlainWeight() {
@@ -7249,7 +7276,7 @@ class WeighBridge {
 
             cell = row.createCell(5);
             cell.setCellValue(Integer.parseInt(model.getValueAt(i, 10).toString()));
-            
+
             cell = row.createCell(6);
             try {
                 cell.setCellValue(model.getValueAt(i, 13) != null ? timeFormat.format(new Date(dateAndTimeFormat.parse(model.getValueAt(i, 13).toString()).getTime())) : "");
