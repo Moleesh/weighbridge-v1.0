@@ -1,6 +1,7 @@
 package com.babulens;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 import com.fazecast.jSerialComm.SerialPortMessageListener;
 import com.github.lgooddatepicker.components.DatePickerSettings;
@@ -1987,9 +1988,9 @@ class WeighBridge {
                 }
 
                 while (chckbxSms.isSelected()) {
-                    String temp = JOptionPane.showInputDialog(null, "Please Enter the Phone No ?");
-                    if (temp != null)
-                        sentSMS(temp);
+                    String mobileNumber = JOptionPane.showInputDialog(null, "Please Enter the Phone No ?", "SMS", JOptionPane.INFORMATION_MESSAGE);
+                    if (mobileNumber != null)
+                        sentSMS(mobileNumber);
                     else
                         break;
                 }
@@ -7673,7 +7674,8 @@ class WeighBridge {
                 "\nVehicle No : " + textFieldVehicleNo.getText() + "\nMaterial : " +
                 comboBoxMaterial.getEditor().getItem() + "\nGross Wt : " + textFieldGrossWt.getText() + " Kg" +
                 "\nTare Wt : " + textFieldTareWt.getText() + " Kg" + "\nNet Wt : " + textFieldNetWt.getText() + " Kg" +
-                "\nFrom " + textFieldTitle1.getText();
+                "\nFrom " + textFieldTitle1.getText() + "\r";
+
         SerialPort serialPortSms = null;
         for (SerialPort serialPort : SerialPort.getCommPorts()) {
             if (serialPort.getSystemPortName().equals(textFieldSMSPortName.getText())) {
@@ -7685,18 +7687,58 @@ class WeighBridge {
             serialPortSms.setComPortParameters(Integer.parseInt(textFieldSMSBaudRate.getText()),
                     8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
             serialPortSms.openPort();
-            byte[] sendData = ("AT+CMGS=\"" + mobileNo + "\"\r").getBytes();
+
+            List<byte[]> sendData = new ArrayList<>();
+            sendData.add(("AT\r").getBytes());
+            sendData.add(("AT+CMGF=1\r").getBytes());
+            sendData.add(("AT+CMGS=\"" + mobileNo + "\"\r").getBytes());
+            sendData.add((smsMessage.getBytes()));
+            sendData.add(new byte[]{0x1A});
+
+            serialPortSms.writeBytes(sendData.get(0), sendData.get(0).length);
 
             try {
-                serialPortSms.writeBytes(sendData, sendData.length + 2);
-                Thread.sleep(500);
-                sendData = smsMessage.getBytes();
-                serialPortSms.writeBytes(sendData, sendData.length + 2);
-                Thread.sleep(500);
-                serialPortSms.writeBytes(new byte[]{0x1A}, 30);
+                SerialPort finalSerialPortSms = serialPortSms;
+                serialPortSms.addDataListener(new SerialPortDataListener() {
+                    int i = 0;
+
+                    @Override
+                    public int getListeningEvents() {
+                        return SerialPort.LISTENING_EVENT_DATA_RECEIVED;
+                    }
+
+                    @Override
+                    public void serialEvent(SerialPortEvent event) {
+                        switch (i) {
+                            case 0:
+                            case 1:
+                                if (event.getReceivedData()[0] == 75) {
+                                    break;
+                                }
+                                return;
+                            case 2:
+                            case 3:
+                                if (event.getReceivedData()[0] == 62) {
+                                    break;
+                                }
+                                return;
+                            case 4:
+                                if (event.getReceivedData()[0] == 75) {
+                                    //noinspection InstantiatingAThreadWithDefaultRunMethod
+                                    new Thread().interrupt();
+                                }
+                                return;
+                        }
+                        i++;
+                        finalSerialPortSms.writeBytes(sendData.get(i), sendData.get(i).length);
+                    }
+                });
+                Thread.sleep(1000);
+                serialPortSms.writeBytes(sendData.get(4), sendData.get(4).length);
             } catch (InterruptedException ignored) {
+            } finally {
+                serialPortSms.closePort();
             }
-            serialPortSms.closePort();
         } else {
             JOptionPane.showMessageDialog(null,
                     "SMS ERROR\nSMS Function not working please check the connection 0or check the number entered",
