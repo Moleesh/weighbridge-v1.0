@@ -25,7 +25,6 @@ import org.jdesktop.swingx.JXDatePicker;
 
 import javax.imageio.ImageIO;
 import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
 import javax.swing.Timer;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -38,6 +37,7 @@ import java.awt.Font;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.RasterFormatException;
 import java.awt.print.*;
 import java.io.*;
 import java.net.MalformedURLException;
@@ -268,19 +268,19 @@ class WeighBridge {
      */
     private WeighBridge() {
         try {
-            printServices = PrintServiceLookup.lookupPrintServices(null, null);
+            printServices = PrinterJob.lookupPrintServices();
             printers = new Vector<>();
-            boolean ExecuteQuery = false;
-            for (PrintService printer : printServices)
+            for (PrintService printer : printServices) {
                 printers.add(printer.getName());
-            if (!new File("weighdata.mv.db").exists()) {
-                ExecuteQuery = true;
             }
             try {
-                dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
-                if (ExecuteQuery) {
+                if (new File("weighdata.mv.db").exists()) {
+                    dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
+                } else {
+                    dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
                     ScriptRunner scriptExecutor = new ScriptRunner(dbConnection, true, false);
                     scriptExecutor.runScript(new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResource("data.sql")).openStream())));
+
                 }
             } catch (SQLException | NullPointerException | IOException ignored) {
                 JOptionPane.showMessageDialog(null,
@@ -1987,12 +1987,11 @@ class WeighBridge {
                     print();
                 }
 
-                while (chckbxSms.isSelected()) {
+                if (chckbxSms.isSelected()) {
                     String mobileNumber = JOptionPane.showInputDialog(null, "Please Enter the Phone No ?", "SMS", JOptionPane.INFORMATION_MESSAGE);
-                    if (mobileNumber != null)
+                    if (mobileNumber != null) {
                         sentSMS(mobileNumber);
-                    else
-                        break;
+                    }
                 }
                 clear();
             } catch (NullPointerException ignored) {
@@ -6111,70 +6110,34 @@ class WeighBridge {
             }
 
             public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
-                String format = "%1$-5s%2$-20s  ";
-
+                int xCoordinate = 164;
                 String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
-                String initString = "\n\n" + StringUtils.center("", 62);
-                graphics.setFont(new Font("Courier New", Font.BOLD, 15));
 
-                Coordinates coordinates = drawString(graphics, initString, 0, 0);
-                initString = StringUtils.center("", 73);
-                graphics.setFont(new Font("Courier New", Font.BOLD + Font.ITALIC, 13));
-                coordinates = drawString(graphics, initString, 0, coordinates.y);
-
-                initString = StringUtils.center("", 79) + "\n";
-                graphics.setFont(new Font("Courier New", Font.BOLD + Font.ITALIC, 12));
-                coordinates = drawString(graphics, initString, 0, coordinates.y);
-
-                initString = String.format(format, "", "") + textFieldSlNo.getText() + "\n\n" +
-                        String.format(format, "", "") + temp[0] + "\n\n" + String.format(format, "", "") + temp[1] +
-                        "\n\n" + String.format(format, "", "") + textFieldVehicleNo.getText() + "\n\n" +
-                        String.format(format, "", "") + comboBoxMaterial.getEditor().getItem() + "\n\n" +
-                        String.format(format, "", "") + comboBoxCustomerName.getEditor().getItem() + "\n\n" +
-                        String.format(format, "", "") + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()) + "\n\n";
                 graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-                coordinates = drawString(graphics, initString, 0, coordinates.y);
+                Coordinates coordinates = drawString(graphics, textFieldSlNo.getText() + "\n\n" + temp[0] + "\n\n"
+                        + temp[1] + "\n\n" + textFieldVehicleNo.getText() + "\n\n" + comboBoxMaterial.getEditor().getItem()
+                        + "\n\n" + comboBoxCustomerName.getEditor().getItem() + "\n\n" +
+                        (textFieldCharges.getText().equals("0") ? " " : textFieldCharges.getText()), xCoordinate, 115);
 
-                initString = String.format(format, "", "");
-                graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-                int yTemp = coordinates.y;
-                coordinates = drawString(graphics, initString, 0, coordinates.y);
-                int y = coordinates.y;
-
-                initString = StringUtils.rightPad(textFieldGrossWt.getText(), 7) + "Kg";
                 graphics.setFont(new Font("Courier New", Font.BOLD, 12));
-                drawString(graphics, initString, coordinates.x, yTemp);
+                coordinates = drawString(graphics, StringUtils.rightPad(textFieldGrossWt.getText(), 7) + "Kg", xCoordinate, coordinates.y);
 
-                initString = String.format(format, "", "");
-                graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-                yTemp = y;
-                coordinates = drawString(graphics, initString, 0, y);
-                y = coordinates.y;
-
-                initString = StringUtils.rightPad(textFieldTareWt.getText(), 7) + "Kg";
                 graphics.setFont(new Font("Courier New", Font.BOLD, 12));
-                drawString(graphics, initString, coordinates.x, yTemp);
+                coordinates = drawString(graphics, StringUtils.rightPad(textFieldTareWt.getText(), 7) + "Kg", xCoordinate, coordinates.y - 4);
 
-                initString = String.format(format, "", "");
-                graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-                yTemp = y;
-                coordinates = drawString(graphics, initString, 0, y);
-
-                initString = StringUtils.rightPad(textFieldNetWt.getText(), 7) + "Kg";
                 graphics.setFont(new Font("Courier New", Font.BOLD, 12));
-                drawString(graphics, initString, coordinates.x, yTemp);
+                drawString(graphics, StringUtils.rightPad(textFieldNetWt.getText(), 7) + "Kg", xCoordinate, coordinates.y - 4);
 
                 try {
-                    BufferedImage printImage = ImageIO
-                            .read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
+                    BufferedImage printImage = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
                     BufferedImage cropImage = printImage.getSubimage(
                             Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")),
                             Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")),
                             Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")),
                             Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
-                    graphics.drawImage(cropImage, 250, 125, 300,
+                    graphics.drawImage(cropImage, 250, 100, 300,
                             (int) (300.00 / cropImage.getWidth() * cropImage.getHeight()), null);
-                } catch (IOException | NullPointerException ignored) {
+                } catch (IOException | RasterFormatException | NullPointerException ignored) {
                 }
 
                 return PAGE_EXISTS;
