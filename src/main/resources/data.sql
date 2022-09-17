@@ -2,55 +2,58 @@
 DROP TABLE IF EXISTS WEIGHING;
 CREATE TABLE IF NOT EXISTS WEIGHING
 (
-    SLNO         INTEGER NOT NULL,
-    DCNO         VARCHAR(20),
-    DCNODATE     DATE,
-    CUSTOMERNAME VARCHAR(100),
-    DRIVERNAME   VARCHAR(100),
-    VEHICLENO    VARCHAR(100),
-    MATERIAL     VARCHAR(100),
-    NOOFBAGS     INTEGER,
-    CHARGES      DOUBLE,
-    GROSSWT      INTEGER,
-    GROSSDATE    DATE,
-    GROSSTIME    TIME,
-    TAREWT       INTEGER,
-    TAREDATE     DATE,
-    TARETIME     TIME,
-    BAGDEDUCTION INTEGER,
-    NETWT        INTEGER,
-    NETDATE      DATE,
-    NETTIME      TIME,
-    FINALWT      INTEGER,
-    FINALAMOUNT  INTEGER,
-    REMARKS      VARCHAR(100),
-    MANUAL       BOOLEAN,
+    SLNO                     INTEGER NOT NULL,
+    DCNO                     VARCHAR(20),
+    DCNODATE                 DATE,
+    CUSTOMERNAME             VARCHAR(100),
+    DRIVERNAME               VARCHAR(100),
+    VEHICLENO                VARCHAR(100),
+    PLACE                    VARCHAR(100),
+    PHONE_NUMBER             VARCHAR(100),
+    MATERIAL                 VARCHAR(100),
+    NOOFBAGS                 INTEGER,
+    CHARGES                  DOUBLE,
+    GROSSWT                  INTEGER,
+    GROSSDATE                DATE,
+    GROSSTIME                TIME,
+    TAREWT                   INTEGER,
+    TAREDATE                 DATE,
+    TARETIME                 TIME,
+    DEDUCTION_OR_PER_COST    INTEGER,
+    ROUND_OFF                INTEGER,
+    NETWT                    INTEGER,
+    NETDATE                  DATE,
+    NETTIME                  TIME,
+    FINALWT                  INTEGER,
+    FINALAMOUNT              INTEGER,
+    REMARKS                  VARCHAR(100),
+    MANUAL                   BOOLEAN,
     PRIMARY KEY (SLNO)
 );
 DROP TABLE IF EXISTS VEHICLETARES;
 CREATE TABLE IF NOT EXISTS VEHICLETARES
 (
-    SQNO         INTEGER NOT NULL,
-    CUSTOMERNAME VARCHAR(100),
-    VEHICLENO    VARCHAR(100),
-    TAREWT       INTEGER,
-    TAREDATE     DATE,
-    TARETIME     TIME,
+    SQNO                     INTEGER NOT NULL,
+    CUSTOMERNAME             VARCHAR(100),
+    VEHICLENO                VARCHAR(100),
+    TAREWT                   INTEGER,
+    TAREDATE                 DATE,
+    TARETIME                 TIME,
     PRIMARY KEY (SQNO)
 );
 DROP TABLE IF EXISTS TRANSPORTER;
 CREATE TABLE IF NOT EXISTS TRANSPORTER
 (
-    TRANSPORTER VARCHAR(100) NOT NULL,
+    TRANSPORTER              VARCHAR(100) NOT NULL,
     PRIMARY KEY (TRANSPORTER)
 );
 DROP TABLE IF EXISTS SETUP;
 CREATE TABLE IF NOT EXISTS SETUP
 (
-    ID        VARCHAR(1) NOT NULL,
-    UID       VARCHAR(100),
-    ENDDATE   DATETIME,
-    LASTLOGIN DATETIME,
+    ID                       VARCHAR(1) NOT NULL,
+    UID                      VARCHAR(100),
+    ENDDATE                  DATETIME,
+    LASTLOGIN                DATETIME,
     PRIMARY KEY (ID)
 );
 DROP TABLE IF EXISTS SETTINGS;
@@ -72,12 +75,15 @@ CREATE TABLE IF NOT EXISTS SETTINGS
     REPORT                 VARCHAR(100),
     EXCLUDEDRIVER          BOOLEAN,
     EXCLUDEREMARKS         BOOLEAN,
+    EXCLUDE_PLACE_AND_PHONE_NUMBER         BOOLEAN,
     EXCLUDEBAGS            BOOLEAN,
     EXCLUDEDCNO            BOOLEAN,
-    MANUALCHARGE           BOOLEAN,
     AUTOCHARGES            BOOLEAN,
     MATERIALSL             BOOLEAN,
     ICEWATER               BOOLEAN,
+    ROUND_OFF              BOOLEAN,
+    TARE_TOKEN             BOOLEAN,
+    EXIT_PASS              BOOLEAN,
     SMS                    BOOLEAN,
     CAMERA                 BOOLEAN,
     SMSBAUDRATE            INTEGER,
@@ -91,6 +97,7 @@ CREATE TABLE IF NOT EXISTS SETTINGS
     SITEAT                 VARCHAR(100),
     TARENOSLNO             BOOLEAN,
     BAGWEIGHT              DOUBLE,
+    ROUND_OFF_DECIMALS     INTEGER,
     NEED_LOGIN             BOOLEAN,
     NEED_PRINT_COPY_DIALOG BOOLEAN,
     SHOW_STATUS            BOOLEAN,
@@ -109,31 +116,31 @@ CREATE TABLE IF NOT EXISTS SETTINGS
 DROP TABLE IF EXISTS MATERIALS;
 CREATE TABLE IF NOT EXISTS MATERIALS
 (
-    SQNO     INTEGER NOT NULL,
-    MATERIAL VARCHAR(100),
-    COST     FLOAT,
+    SQNO                         INTEGER NOT NULL,
+    MATERIAL                     VARCHAR(100),
+    COST                         FLOAT,
     PRIMARY KEY (SQNO)
 );
 DROP TABLE IF EXISTS CUSTOMER;
 CREATE TABLE IF NOT EXISTS CUSTOMER
 (
-    SQNO             INTEGER NOT NULL,
-    CUSTOMER         VARCHAR(100),
-    CUSTOMERADDRESS  VARCHAR(100),
-    CUSTOMERADDRESS1 VARCHAR(100),
+    SQNO                         INTEGER NOT NULL,
+    CUSTOMER                     VARCHAR(100),
+    CUSTOMERADDRESS              VARCHAR(100),
+    CUSTOMERADDRESS1             VARCHAR(100),
     PRIMARY KEY (SQNO)
 );
 DROP TABLE IF EXISTS CAMERA;
 CREATE TABLE IF NOT EXISTS CAMERA
 (
-    CAMERA     INT NOT NULL,
-    ENABLE     BOOLEAN,
-    NAME       VARCHAR(100),
-    RESOLUTION VARCHAR(100),
-    CROPX      INT,
-    CROPY      INT,
-    CROPWIDTH  INT,
-    CROPHEIGHT INT,
+    CAMERA                      INT NOT NULL,
+    ENABLE                      BOOLEAN,
+    NAME                        VARCHAR(100),
+    RESOLUTION                  VARCHAR(100),
+    CROPX                       INT,
+    CROPY                       INT,
+    CROPWIDTH                   INT,
+    CROPHEIGHT                  INT,
     PRIMARY KEY (CAMERA)
 );
 -- TABLE INSERTION;
@@ -141,8 +148,8 @@ INSERT INTO SETUP
 VALUES ('2', NULL, NULL, NULL);
 INSERT INTO SETTINGS
 VALUES (1, 1, 1200, 'COM0;8;0;10;~~~;f', 'BABULENS', 'NAGERCOIL', '', 'FOOTER', '',
-        TRUE, FALSE, 1, 'Standard', 'Standard', TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, 9600,
-        'COM0', '', '', '', '', '', '', '', FALSE, 0.0, FALSE, FALSE, FALSE, TRUE,
+        TRUE, FALSE, 1, 'Standard', 'Standard', TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+         9600, 'COM0', '', '', '', '', '', '', '', FALSE, 0.0, 0, FALSE, FALSE, FALSE, TRUE,
         '147085', '147085aA', '147085', '147085', '147085', '147085', '147085', '147085', '123');
 INSERT INTO CAMERA
 VALUES (1, 'TRUE', 'WEBCAM TEMP', '770 * 433', 0, 0, 770, 433);
