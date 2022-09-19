@@ -1294,7 +1294,7 @@ class WeighBridge {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL =" + comboBoxMaterial.getEditor().getItem().toString());
                     if (rs.next()) {
-                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")).replaceAll(".0$", ""));
+                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
                     } else {
                         textFieldDeductionOrPerCost.setText("0");
                     }
@@ -1336,10 +1336,6 @@ class WeighBridge {
                 textFieldFinalWt.setText(Integer.toString(Integer.parseInt(textFieldNetWt.getText()) - Integer.parseInt(0 + textFieldDeductionOrPerCost.getText().replaceAll("\\D", ""))));
                 textFieldFinalAmount.setText(Integer.toString((int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", ""))) - Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
             }
-            btnTotal.setEnabled(false);
-            btnGetGross.setEnabled(false);
-            btnGetTare.setEnabled(false);
-            btnGetDcDetails.setEnabled(false);
             comboBoxCustomerName.setEnabled(false);
             textFieldDriverName.setEnabled(false);
             rdbtnGross.setEnabled(false);
@@ -1347,17 +1343,22 @@ class WeighBridge {
             rdbtnTare.setEnabled(false);
             btnGetGrossSl.setEnabled(false);
             comboBoxVehicleNo.setEnabled(false);
-            textFieldNoOfBags.setEnabled(false);
-            textFieldDeductionOrPerCost.setEnabled(false);
             comboBoxMaterial.setEnabled(false);
+            textFieldNoOfBags.setEnabled(false);
             textFieldCharges.setEnabled(false);
-            chckbxAutoChargecheck.setEnabled(false);
+            textFieldDeductionOrPerCost.setEnabled(false);
+            btnSave.setEnabled(true);
             textFieldPlace.setEnabled(false);
             textFieldPhoneNo.setEnabled(false);
-            btnSave.setEnabled(true);
+            btnGetDcDetails.setEnabled(false);
             btnGetWeight.setEnabled(false);
+            btnGetGross.setEnabled(false);
+            btnGetTare.setEnabled(false);
+            chckbxAutoChargecheck.setEnabled(false);
+            btnTotal.setEnabled(false);
             btnMinusGross.setEnabled(false);
             btnPlusTare.setEnabled(false);
+            textPaneRemarks.setEnabled(false);
             chckbxCredit.setEnabled(false);
             btnSave.requestFocus();
         });
@@ -1413,11 +1414,11 @@ class WeighBridge {
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")).replaceAll(".0$", ""));
+                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                     textFieldTareWt.setText(Integer.toString(rs.getInt(Objects.requireNonNull(jComboBox.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
                     textFieldTareDateTime.setText(rs.getDate(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") + " " + rs.getTime(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "TIME"));
                     if (chckbxTareNoSlno.isSelected()) {
-                        textFieldCharges.setText(decimalFormat.format(rs.getDouble("CHARGES")).replaceAll(".0$", ""));
+                        textFieldCharges.setText(decimalFormat.format(rs.getDouble("CHARGES")));
                     }
                     chckbxCredit.setSelected(rs.getBoolean("CREDIT"));
                     if (textFieldTareDateTime.getText().equals("null null")) {
@@ -1492,11 +1493,11 @@ class WeighBridge {
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")).replaceAll(".0$", ""));
+                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                     textFieldGrossWt.setText(Integer.toString(rs.getInt(Objects.requireNonNull(jComboBox.getSelectedItem()).toString().replace("Sl.no", "").trim() + "WT")));
                     textFieldGrossDateTime.setText(rs.getDate(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") + " " + rs.getTime(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "TIME"));
                     if (chckbxTareNoSlno.isSelected()) {
-                        textFieldCharges.setText(decimalFormat.format(rs.getDouble("CHARGES")).replaceAll(".0$", ""));
+                        textFieldCharges.setText(decimalFormat.format(rs.getDouble("CHARGES")));
                     }
                     chckbxCredit.setSelected(rs.getBoolean("CREDIT"));
                     if (textFieldGrossDateTime.getText().equals("null null")) {
@@ -1635,7 +1636,7 @@ class WeighBridge {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL =" + comboBoxMaterial.getEditor().getItem().toString());
                     if (rs.next()) {
-                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")).replaceAll(".0$", ""));
+                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
                     } else {
                         textFieldDeductionOrPerCost.setText("0");
                     }
@@ -1664,11 +1665,11 @@ class WeighBridge {
                 }
             } else {
                 String[] temp = ("0" + textFieldCharges.getText() + ".0").replaceAll("[^.\\d]", "").split("\\.");
-                textFieldCharges.setText(decimalFormat.format(Double.parseDouble(temp[0] + "." + temp[1])).replaceAll(".0$", ""));
+                textFieldCharges.setText(decimalFormat.format(Double.parseDouble(temp[0] + "." + temp[1])));
             }
             if (chckbxRoundOff.isSelected()) {
-                textFieldRoundOff.setText(decimalFormat.format((Double.parseDouble(0 + textFieldCharges.getText()) % Math.pow(10, Double.parseDouble(textFieldRoundOffDecimals.getText().replaceAll("\\D", "")))) * -1).replaceAll(".0$", "").replaceAll("-0", "0"));
-                textFieldCharges.setText(decimalFormat.format((Double.parseDouble(0 + textFieldCharges.getText()) + Double.parseDouble(textFieldRoundOff.getText()))).replaceAll(".0$", ""));
+                textFieldRoundOff.setText(decimalFormat.format(-1 * Double.parseDouble(0 + textFieldCharges.getText()) % Math.pow(10, Double.parseDouble(textFieldRoundOffDecimals.getText().replaceAll("\\D", "")))).replaceAll("-0", "0"));
+                textFieldCharges.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCharges.getText()) + Double.parseDouble(textFieldRoundOff.getText())));
             }
 
             textFieldNoOfBags.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
@@ -2229,7 +2230,7 @@ class WeighBridge {
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")).replaceAll(".0$", ""));
+                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                     textFieldGrossWt.setText(Integer.toString(rs.getInt("TAREWT")));
                     if (textFieldGrossWt.getText().equals("0")) {
                         textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
@@ -2311,7 +2312,7 @@ class WeighBridge {
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")).replaceAll(".0$", ""));
+                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                     textFieldTareWt.setText(Integer.toString(rs.getInt("GROSSWT")));
                     if (textFieldTareWt.getText().equals("0")) {
                         textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
@@ -2534,7 +2535,7 @@ class WeighBridge {
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                                         textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")).replaceAll(".0$", ""));
+                                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                                         textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
                                         if (textFieldGrossDateTime.getText().equals("null null")) {
                                             textFieldGrossDateTime.setText("");
@@ -2566,7 +2567,7 @@ class WeighBridge {
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                                         textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")).replaceAll(".0$", ""));
+                                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                                         textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
                                         textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
                                         if (textFieldGrossDateTime.getText().equals("null null")) {
@@ -2599,7 +2600,7 @@ class WeighBridge {
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                                         textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")).replaceAll(".0$", ""));
+                                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                                         textFieldTareDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
                                         if (textFieldTareDateTime.getText().equals("null null")) {
                                             textFieldTareDateTime.setText("");
@@ -5315,14 +5316,14 @@ class WeighBridge {
                             /*08*/    rs.getString("PHONE_NUMBER"),
                             /*09*/    rs.getString("MATERIAL"),
                             /*10*/    rs.getInt("NOOFBAGS"),
-                            /*11*/    ("" + rs.getDouble("CHARGES")).replaceAll(".0$", ""),
+                            /*11*/    decimalFormat.format(rs.getDouble("CHARGES")),
                             /*12*/    rs.getBoolean("CREDIT"),
                             /*13*/    rs.getInt("GROSSWT"),
                             /*14*/    gross,
                             /*15*/    rs.getInt("TAREWT"),
                             /*16*/    tare,
-                            /*17*/    ("" + rs.getDouble("DEDUCTION_OR_PER_COST")).replaceAll(".0$", ""),
-                            /*18*/    ("" + rs.getDouble("ROUND_OFF")).replaceAll(".0$", ""),
+                            /*17*/    decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")),
+                            /*18*/    decimalFormat.format(rs.getDouble("ROUND_OFF")),
                             /*19*/    rs.getInt("NETWT"),
                             /*20*/    net,
                             /*21*/    rs.getInt("FINALWT"),
@@ -5435,7 +5436,7 @@ class WeighBridge {
                 textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                 comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
                 textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                textFieldCharges.setText(decimalFormat.format(rs.getDouble("CHARGES")).replaceAll(".0$", ""));
+                textFieldCharges.setText(decimalFormat.format(rs.getDouble("CHARGES")));
                 chckbxCredit.setSelected(rs.getBoolean("CREDIT"));
                 textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
                 textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
@@ -5452,8 +5453,8 @@ class WeighBridge {
                 } else {
                     textFieldTareDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
                 }
-                textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")).replaceAll(".0$", ""));
-                textFieldRoundOff.setText(decimalFormat.format(rs.getDouble("ROUND_OFF")).replaceAll(".0$", ""));
+                textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
+                textFieldRoundOff.setText(decimalFormat.format(rs.getDouble("ROUND_OFF")));
                 textFieldNetWt.setText(Integer.toString(rs.getInt("NETWT")));
                 textFieldNetDateTime.setText(rs.getDate("NETDATE") + " " + rs.getTime("NETTIME"));
                 textFieldFinalWt.setText(Integer.toString(rs.getInt("FINALWT")));
@@ -5622,6 +5623,7 @@ class WeighBridge {
             textFieldDcNo.setText("");
             textFieldDcDate.setText("");
             btnGetDcDetails.setEnabled(true);
+            chckbxCredit.setSelected(false);
             if (chckbxManualEntry.isSelected()) {
                 btnGetGross.setEnabled(true);
                 btnGetTare.setEnabled(true);
@@ -8856,14 +8858,14 @@ class WeighBridge {
                                     rs.getString("PHONE_NUMBER"),
                                     rs.getString("MATERIAL"),
                                     rs.getInt("NOOFBAGS"),
-                                    ("" + rs.getDouble("CHARGES")).replaceAll(".0$", ""),
+                                    decimalFormat.format(rs.getDouble("CHARGES")),
                                     rs.getBoolean("CREDIT"),
                                     rs.getInt("GROSSWT"),
                                     gross,
                                     rs.getInt("TAREWT"),
                                     tare,
-                                    ("" + rs.getDouble("DEDUCTION_OR_PER_COST")).replaceAll(".0$", ""),
-                                    ("" + rs.getDouble("ROUND_OFF")).replaceAll(".0$", ""),
+                                    decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")),
+                                    decimalFormat.format(rs.getDouble("ROUND_OFF")),
                                     rs.getInt("NETWT"),
                                     net,
                                     rs.getInt("FINALWT"),
