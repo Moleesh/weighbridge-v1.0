@@ -164,7 +164,7 @@ class WeighBridge {
     private JComboBox<String> comboBoxCustomerName;
     private JCheckBox chckbxExcludeCustomer;
     private JCheckBox chckbxExcludeDrivers;
-    private JComboBox<String> textFieldDriverName;
+    private JComboBox<String> comboBoxTransporterName;
     private JTextField textFieldDcNo;
     private JTextField textFieldDcDate;
     private JButton btnGetDcDetails;
@@ -271,6 +271,8 @@ class WeighBridge {
     private JCheckBox chckbxCredit;
     private JCheckBox chckbxExcludeCredit;
     static DecimalFormat decimalFormat = new DecimalFormat("0");
+    static Set<String> vehicleNo = new HashSet<>();
+    static Set<String> transport = new HashSet<>();
 
     /**
      * Create the application.
@@ -742,19 +744,27 @@ class WeighBridge {
                 comboBoxCustomerName.addItem(rs.getString("CUSTOMER"));
             }
             rs = stmt.executeQuery("SELECT * FROM TRANSPORTER");
-            textFieldDriverName.removeAllItems();
+            comboBoxTransporterName.removeAllItems();
+            transport.clear();
             while (rs.next()) {
-                textFieldDriverName.addItem(rs.getString("TRANSPORTER"));
+                if (transport.add(rs.getString("TRANSPORTER"))) {
+                    comboBoxTransporterName.addItem(rs.getString("TRANSPORTER"));
+                }
             }
             rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
             model = (DefaultTableModel) tableVehicleTare.getModel();
             model.setRowCount(0);
+            vehicleNo.clear();
+            comboBoxVehicleNo.removeAll();
             while (rs.next()) {
                 model.addRow(new Object[]{
                         rs.getString("VEHICLENO"), rs.getInt("TAREWT"),
                         dateAndTimeFormat.format(new Date(dateAndTimeFormatSql
                                 .parse(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME")).getTime()))
                 });
+                if (vehicleNo.add(rs.getString("VEHICLENO"))) {
+                    comboBoxVehicleNo.addItem(rs.getString("VEHICLENO"));
+                }
             }
             rs = stmt.executeQuery("SELECT * FROM MATERIALS ORDER BY SQNO");
             model = (DefaultTableModel) tableMaterial.getModel();
@@ -770,7 +780,7 @@ class WeighBridge {
             }
             comboBoxMaterialReport.getEditor().setItem("");
             comboBoxCustomerName.getEditor().setItem("");
-            textFieldDriverName.getEditor().setItem("");
+            comboBoxTransporterName.getEditor().setItem("");
             comboBoxVehicleNo.getEditor().setItem("");
             comboBoxMaterial.getEditor().setItem("");
         } catch (SQLException | ParseException ignored) {
@@ -1314,7 +1324,7 @@ class WeighBridge {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL ='" + comboBoxMaterial.getEditor().getItem() + "'");
-                    if (rs.next()) {
+                    if (rs.next() && !chckbxCredit.isSelected()) {
                         textFieldCharges.setText("" + (int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText())));
                     } else {
                         textFieldCharges.setText("0");
@@ -1337,7 +1347,7 @@ class WeighBridge {
                 textFieldFinalAmount.setText(Integer.toString((int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", ""))) - Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
             }
             comboBoxCustomerName.setEnabled(false);
-            textFieldDriverName.setEnabled(false);
+            comboBoxTransporterName.setEnabled(false);
             rdbtnGross.setEnabled(false);
             btnGetTareSl.setEnabled(false);
             rdbtnTare.setEnabled(false);
@@ -1409,7 +1419,7 @@ class WeighBridge {
                     textFieldDcNo.setText(rs.getString("DCNO"));
                     textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                     comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                    textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
+                    comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                     comboBoxVehicleNo.getEditor().setItem(rs.getString("VEHICLENO"));
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
@@ -1488,7 +1498,7 @@ class WeighBridge {
                     textFieldDcNo.setText(rs.getString("DCNO"));
                     textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                     comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                    textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
+                    comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                     comboBoxVehicleNo.getEditor().setItem(rs.getString("VEHICLENO"));
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
@@ -1656,7 +1666,7 @@ class WeighBridge {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL ='" + comboBoxMaterial.getEditor().getItem() + "'");
-                    if (rs.next()) {
+                    if (rs.next() && !chckbxCredit.isSelected()) {
                         textFieldCharges.setText("" + (int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText())));
                     } else {
                         textFieldCharges.setText("0");
@@ -1680,7 +1690,7 @@ class WeighBridge {
             }
             textFieldNetDateTime.setText(textFieldDateTime.getText());
             comboBoxCustomerName.setEnabled(false);
-            textFieldDriverName.setEnabled(false);
+            comboBoxTransporterName.setEnabled(false);
             rdbtnGross.setEnabled(false);
             btnGetTareSl.setEnabled(false);
             rdbtnTare.setEnabled(false);
@@ -1782,7 +1792,7 @@ class WeighBridge {
                     temp = "";
                 }
                 rs.updateString("CUSTOMERNAME", temp);
-                temp = ("" + textFieldDriverName.getSelectedItem()).toUpperCase();
+                temp = ("" + comboBoxTransporterName.getSelectedItem()).toUpperCase();
                 if (temp.equals("NULL")) {
                     temp = "";
                 }
@@ -1826,6 +1836,9 @@ class WeighBridge {
                     rs.updateInt("SLNO", Integer.parseInt(textFieldSlNo.getText()) + 1);
                 }
                 rs.updateRow();
+                if (transport.add(rs.getString("VEHICLENO"))) {
+                    comboBoxVehicleNo.addItem(rs.getString("VEHICLENO"));
+                }
                 if (rdbtnTare.isSelected()) {
                     stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     rs = stmt.executeQuery("SELECT * FROM VEHICLETARES WHERE VEHICLENO LIKE '" +
@@ -1863,15 +1876,17 @@ class WeighBridge {
                 return;
             }
             try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 ResultSet rs = stmt.executeQuery("SELECT * FROM TRANSPORTER ");
                 rs.moveToInsertRow();
-                String temp = ("" + textFieldDriverName.getSelectedItem()).toUpperCase();
+                String temp = ("" + comboBoxTransporterName.getSelectedItem()).toUpperCase();
                 if (temp.equals("NULL")) {
                     temp = "";
                 }
                 rs.updateString("TRANSPORTER", temp);
+                if (transport.add(temp)) {
+                    comboBoxTransporterName.addItem(temp);
+                }
                 rs.insertRow();
             } catch (SQLException ignored) {
             }
@@ -2011,17 +2026,17 @@ class WeighBridge {
         lblCustomerName.setBounds(50, 190, 175, 25);
         panelWeighing.add(lblCustomerName);
 
-        textFieldDriverName = new JComboBox<>();
-        textFieldDriverName.addActionListener(l -> {
+        comboBoxTransporterName = new JComboBox<>();
+        comboBoxTransporterName.addActionListener(l -> {
             if (l.getActionCommand().equals("comboBoxEdited")) {
                 requestFocus("DriverName");
             }
         });
-        textFieldDriverName.setFont(new Font("Times New Roman", Font.PLAIN, 18));
-        textFieldDriverName.setEditable(true);
-        AutoCompleteDecorator.decorate(textFieldDriverName);
-        textFieldDriverName.setBounds(775, 190, 175, 25);
-        panelWeighing.add(textFieldDriverName);
+        comboBoxTransporterName.setFont(new Font("Times New Roman", Font.PLAIN, 18));
+        comboBoxTransporterName.setEditable(true);
+        AutoCompleteDecorator.decorate(comboBoxTransporterName);
+        comboBoxTransporterName.setBounds(775, 190, 175, 25);
+        panelWeighing.add(comboBoxTransporterName);
 
         JLabel lblDriversName = new JLabel("Transporter's Name");
         lblDriversName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -2225,7 +2240,7 @@ class WeighBridge {
                     textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" :
                             "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                     comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                    textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
+                    comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                     comboBoxVehicleNo.getEditor().setItem(rs.getString("VEHICLENO"));
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
@@ -2307,7 +2322,7 @@ class WeighBridge {
                     textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" :
                             "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                     comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                    textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
+                    comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                     comboBoxVehicleNo.getEditor().setItem(rs.getString("VEHICLENO"));
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
@@ -2531,7 +2546,7 @@ class WeighBridge {
                                         textFieldDcNo.setText(rs.getString("DCNO"));
                                         textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                                         comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                                        textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
+                                        comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                                         textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
@@ -2563,7 +2578,7 @@ class WeighBridge {
                                         textFieldDcNo.setText(rs.getString("DCNO"));
                                         textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                                         comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                                        textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
+                                        comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                                         textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
@@ -2595,7 +2610,7 @@ class WeighBridge {
                                         textFieldDcNo.setText(rs.getString("DCNO"));
                                         textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                                         comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                                        textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
+                                        comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                                         comboBoxVehicleNo.getEditor().setItem(rs.getString("VEHICLENO"));
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
@@ -4477,8 +4492,8 @@ class WeighBridge {
         chckbxExcludeDrivers.setEnabled(false);
         chckbxExcludeDrivers.setFocusable(false);
         chckbxExcludeDrivers.addChangeListener(e -> {
-            textFieldDriverName.setEnabled(!chckbxExcludeDrivers.isSelected());
-            textFieldDriverName.setVisible(!chckbxExcludeDrivers.isSelected());
+            comboBoxTransporterName.setEnabled(!chckbxExcludeDrivers.isSelected());
+            comboBoxTransporterName.setVisible(!chckbxExcludeDrivers.isSelected());
             lblDriversName.setVisible(!chckbxExcludeDrivers.isSelected());
             clear();
         });
@@ -4601,11 +4616,8 @@ class WeighBridge {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                             ResultSet.CONCUR_UPDATABLE);
                     stmt.executeUpdate("truncate table TRANSPORTER");
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM TRANSPORTER");
-                    textFieldDriverName.removeAllItems();
-                    while (rs.next()) {
-                        textFieldDriverName.addItem(rs.getString("TRANSPORTER"));
-                    }
+                    comboBoxTransporterName.removeAllItems();
+                    transport.clear();
                 } catch (SQLException ignored) {
                 }
             }
@@ -5430,7 +5442,7 @@ class WeighBridge {
                 textFieldDcNo.setText(rs.getString("DCNO"));
                 textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                 comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                textFieldDriverName.setSelectedItem(rs.getString("DRIVERNAME"));
+                comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                 comboBoxVehicleNo.getEditor().setItem(rs.getString("VEHICLENO"));
                 textFieldPlace.setText(rs.getString("PLACE"));
                 textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
@@ -5483,7 +5495,7 @@ class WeighBridge {
                 btnPlusTare.setEnabled(false);
                 textPaneRemarks.setEnabled(false);
                 comboBoxCustomerName.setEnabled(false);
-                textFieldDriverName.setEnabled(false);
+                comboBoxTransporterName.setEnabled(false);
                 textFieldNoOfBags.setEnabled(false);
                 textFieldDeductionOrPerCost.setEnabled(false);
                 textFieldPlace.setEnabled(false);
@@ -5509,8 +5521,8 @@ class WeighBridge {
                     break;
                 }
             case "CustomerName":
-                if (textFieldDriverName.isEnabled() && textFieldDriverName.isVisible()) {
-                    textFieldDriverName.requestFocus();
+                if (comboBoxTransporterName.isEnabled() && comboBoxTransporterName.isVisible()) {
+                    comboBoxTransporterName.requestFocus();
                     break;
                 }
             case "DriverName":
@@ -5569,19 +5581,6 @@ class WeighBridge {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2862", "SQL ERROR",
                         JOptionPane.ERROR_MESSAGE);
             }
-
-            try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery("SELECT * FROM TRANSPORTER");
-                textFieldDriverName.removeAllItems();
-                while (rs.next()) {
-                    textFieldDriverName.addItem(rs.getString("TRANSPORTER"));
-                }
-            } catch (SQLException ignored) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2862", "SQL ERROR",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-
             rdbtnGross.setEnabled(true);
             rdbtnGross.setSelected(true);
             btnGetTareSl.setEnabled(true);
@@ -5614,7 +5613,7 @@ class WeighBridge {
             btnPrint.setEnabled(false);
             btnGetWeight.setEnabled(true);
             comboBoxCustomerName.setEnabled(!chckbxExcludeCustomer.isSelected());
-            textFieldDriverName.setEnabled(!chckbxExcludeDrivers.isSelected());
+            comboBoxTransporterName.setEnabled(!chckbxExcludeDrivers.isSelected());
             textFieldCharges.setEnabled(!chckbxExcludeCharges.isSelected());
             textPaneRemarks.setEnabled(true);
             chckbxAutoChargecheck.setEnabled(true);
@@ -5632,7 +5631,7 @@ class WeighBridge {
                 textFieldDeductionOrPerCost.setEnabled(true);
             }
             comboBoxCustomerName.getEditor().setItem("");
-            textFieldDriverName.getEditor().setItem("");
+            comboBoxTransporterName.getEditor().setItem("");
             comboBoxVehicleNo.getEditor().setItem("");
             comboBoxMaterial.getEditor().setItem("");
             requestFocus("");
@@ -5700,8 +5699,8 @@ class WeighBridge {
             dc = String.format(format, "Dc. No", textFieldDcNo.getText(), "Dc. Date", textFieldDcDate.getText());
         }
         if (chckbxExcludeDrivers.isSelected() ||
-                !textFieldDriverName.getEditor().getItem().toString().trim().equals("")) {
-            driver = String.format(format2, "Transporter's Name", textFieldDriverName.getEditor().getItem());
+                !comboBoxTransporterName.getEditor().getItem().toString().trim().equals("")) {
+            driver = String.format(format2, "Transporter's Name", comboBoxTransporterName.getEditor().getItem());
         }
         String[] initString = {
                 "\n" + StringUtils.center(title1.getText(), 39) + "\n",
@@ -5814,7 +5813,7 @@ class WeighBridge {
                 StringUtils.center(title2.getText(), 65) + "\n",
                 "----------------------------------------------------------------------\n", // 65
                 String.format(format, "Ticket No", textFieldSlNo.getText()),
-                String.format(format2, "Party Name", comboBoxCustomerName.getEditor().getItem(), "Part City", textFieldDriverName.getEditor().getItem()),
+                String.format(format2, "Party Name", comboBoxCustomerName.getEditor().getItem(), "Part City", comboBoxTransporterName.getEditor().getItem()),
                 String.format(format2, "Vehicle No", comboBoxVehicleNo.getEditor().getItem(), "Material", comboBoxMaterial.getEditor().getItem()),
                 "----------------------------------------------------------------------\n",
                 String.format(format1, "Gross Wt", StringUtils.leftPad(textFieldGrossWt.getText(), 7, " "), textFieldGrossDateTime.getText()),
@@ -6858,8 +6857,8 @@ class WeighBridge {
             dc = String.format(format, "Dc. No", textFieldDcNo.getText(), "Dc. Date", textFieldDcDate.getText());
         }
         if (chckbxExcludeDrivers.isSelected() ||
-                !textFieldDriverName.getEditor().getItem().toString().trim().equals("")) {
-            driver = String.format(format2, "Transporter's Name", textFieldDriverName.getEditor().getItem());
+                !comboBoxTransporterName.getEditor().getItem().toString().trim().equals("")) {
+            driver = String.format(format2, "Transporter's Name", comboBoxTransporterName.getEditor().getItem());
         }
         String[] initString = {
                 "\n" + StringUtils.center(title1.getText(), 39) + "\n",
