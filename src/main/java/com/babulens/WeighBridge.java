@@ -273,6 +273,8 @@ class WeighBridge {
     static DecimalFormat decimalFormat = new DecimalFormat("0");
     static Set<String> vehicleNo = new HashSet<>();
     static Set<String> transport = new HashSet<>();
+    private JButton btnPrintToken;
+    private JButton btnPrintExitPass;
 
     /**
      * Create the application.
@@ -1892,6 +1894,8 @@ class WeighBridge {
             }
             btnSave.setEnabled(false);
             btnPrint.setEnabled(true);
+            btnPrintToken.setEnabled(true);
+            btnPrintExitPass.setEnabled(true);
             btnPrint.requestFocus();
         });
         btnSave.setEnabled(false);
@@ -1961,7 +1965,7 @@ class WeighBridge {
                                     "Print Exit Pass",
                                     "Cancel"
                             }, null) == JOptionPane.YES_OPTION) {
-                        printStandardToken();
+                        printStandardExitPass();
                     }
                 }
                 if (chckbxSms.isSelected()) {
@@ -1978,7 +1982,7 @@ class WeighBridge {
         });
         btnPrint.setEnabled(false);
         btnPrint.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnPrint.setBounds(445, 515, 150, 25);
+        btnPrint.setBounds(415, 515, 150, 25);
         panelWeighing.add(btnPrint);
 
         btnReprint = new JButton("RePrint");
@@ -1997,7 +2001,7 @@ class WeighBridge {
         btnClear.setFocusable(false);
         btnClear.addActionListener(l -> clear());
         btnClear.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnClear.setBounds(445, 565, 150, 25);
+        btnClear.setBounds(415, 565, 150, 25);
         panelWeighing.add(btnClear);
         try {
             JLabel contact = new JLabel(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/contact.bmp")))));
@@ -2649,6 +2653,20 @@ class WeighBridge {
         chckbxCredit.setBackground(new Color(0, 255, 127));
         chckbxCredit.setBounds(146, 393, 75, 20);
         panelWeighing.add(chckbxCredit);
+
+        btnPrintToken = new JButton("Print Token");
+        btnPrintToken.addActionListener(e -> printStandardToken());
+        btnPrintToken.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnPrintToken.setEnabled(false);
+        btnPrintToken.setBounds(586, 515, 165, 25);
+        panelWeighing.add(btnPrintToken);
+
+        btnPrintExitPass = new JButton("Print Exit Pass");
+        btnPrintToken.addActionListener(e -> printStandardExitPass());
+        btnPrintExitPass.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnPrintExitPass.setEnabled(false);
+        btnPrintExitPass.setBounds(586, 565, 165, 25);
+        panelWeighing.add(btnPrintExitPass);
 
         panelCameras = new JPanel();
         panelCameras.setBackground(new Color(0, 255, 127));
@@ -5033,6 +5051,7 @@ class WeighBridge {
 
         chckbxTareToken = new JCheckBox("Tare Token");
         chckbxTareToken.addChangeListener(e -> {
+            btnPrintToken.setVisible(chckbxTareToken.isSelected());
             if (chckbxTareToken.isSelected()) {
                 rdbtnTare.setText("Token");
             } else {
@@ -5046,6 +5065,7 @@ class WeighBridge {
         panelSettings2.add(chckbxTareToken);
 
         chckbxExitPass = new JCheckBox("Exit Pass");
+        chckbxTareToken.addChangeListener(e -> btnPrintExitPass.setVisible(chckbxTareToken.isSelected()));
         chckbxExitPass.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         chckbxExitPass.setFocusable(false);
         chckbxExitPass.setBackground(new Color(0, 255, 127));
@@ -5487,6 +5507,8 @@ class WeighBridge {
                 btnGetWeight.setEnabled(false);
                 btnSave.setEnabled(false);
                 btnPrint.setEnabled(true);
+                btnPrintToken.setEnabled(true);
+                btnPrintExitPass.setEnabled(true);
                 btnGetDcDetails.setEnabled(false);
                 btnGetGross.setEnabled(false);
                 btnGetTare.setEnabled(false);
@@ -5611,6 +5633,8 @@ class WeighBridge {
             chckbxCredit.setEnabled(true);
             btnSave.setEnabled(false);
             btnPrint.setEnabled(false);
+            btnPrintToken.setEnabled(false);
+            btnPrintExitPass.setEnabled(false);
             btnGetWeight.setEnabled(true);
             comboBoxCustomerName.setEnabled(!chckbxExcludeCustomer.isSelected());
             comboBoxTransporterName.setEnabled(!chckbxExcludeDrivers.isSelected());
@@ -6555,56 +6579,85 @@ class WeighBridge {
         PrinterJob pj = PrinterJob.getPrinterJob();
         PageFormat pf = new PageFormat();
         Paper paper = pf.getPaper();
-        double width = 3d * 72d;
-        double height = 6d * 72d;
+        double width = 2.8d * 72d;
+        double height = 3.1d * 72d;
         double widthmargin = 0d * 72d;
         double heightmargin = 0d * 72d;
         paper.setSize(width, height);
         paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
         pf.setPaper(paper);
         Book pBook = new Book();
-        pBook.append(new Printable() {
-            private void drawString(Graphics graphics, String text, int y, int x, int size) {
-                for (String line : text.split("\n")) {
-                    y += graphics.getFontMetrics().getHeight() - 1;
-                    String temp = line;
-                    if (size > 0) {
-                        temp = StringUtils.center(temp, size);
-                    }
-                    graphics.drawString(temp, 23 + x, y);
-                }
-            }
+        pBook.append((graphics, pageFormat, pageIndex) -> {
+            int y = 10, space = 20;
+            graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+            graphics.drawString(StringUtils.center("MATERIAL TOKEN", 29), 0, y);
+            graphics.drawString(StringUtils.center(title1.getText(), 29), 0, y += space);
+            graphics.drawString(StringUtils.center(chckbxCredit.isSelected() ? "CREDIT" : "CASH", 29), 0, y += space);
+            graphics.drawString("    " + textFieldSlNo.getText(), 0, y += space);
+            graphics.drawString("     " + comboBoxCustomerName.getEditor().getItem(), 0, y += space);
+            graphics.drawString("       " + textFieldPlace.getText(), 0, y += space);
+            graphics.drawString("       " + textFieldPhoneNo.getText(), 0, y += space);
+            graphics.drawString("            " + comboBoxVehicleNo.getEditor().getItem(), 0, y += space);
+            graphics.drawString("          " + comboBoxMaterial.getEditor().getItem(), 0, y += space);
+            graphics.drawString("          " + textFieldTareWt.getText(), 0, y + space);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics.drawString("No:", 0, y = 70);
+            graphics.drawString("M/s:", 0, y += space);
+            graphics.drawString("Place:", 0, y += space);
+            graphics.drawString("Phone:", 0, y += space);
+            graphics.drawString("Vehicle No:", 0, y += space);
+            graphics.drawString("Material:", 0, y += space);
+            graphics.drawString("Tare Wt.:", 0, y + space);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 9));
+            graphics.drawString("                " + textFieldTareDateTime.getText(), 0, 70);
 
-            public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
-                String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
-                graphics.setFont(new Font("Courier New", Font.BOLD, 12));
-                drawString(graphics, StringUtils.center(title1.getText(), 22), 20, 0, 0);
-                graphics.setFont(new Font("Courier New", Font.ITALIC, 10));
-                drawString(graphics, WordUtils.wrap(title2.getText(), 27), 48, 0, 27);
-                graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
-                graphics.drawString(StringUtils.center("Entry Token", 26), 23, 84);
-                graphics.setFont(new Font("Courier New", Font.BOLD, 9));
-                drawString(graphics, "Slip No       : " + textFieldSlNo.getText(), 90, 0, 0);
-                drawString(graphics, "Date          : " + temp[0], 110, 0, 0);
-                drawString(graphics, "Time          : " + temp[1], 130, 0, 0);
-                drawString(graphics, "Vehicle No    : " + comboBoxVehicleNo.getEditor().getItem(), 150, 0, 0);
-                drawString(graphics, "Material      : " + comboBoxMaterial.getEditor().getItem(), 170, 0, 0);
-                drawString(graphics, "Customer Name : ", 190, 0, 0);
-                drawString(graphics, "Charges       : " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), 230, 0, 0);
-                drawString(graphics, "Gross Wt      : ", 250, 0, 0);
-                drawString(graphics, "Tare Wt       : ", 270, 0, 0);
-                drawString(graphics, "Net Wt        : ", 290, 0, 0);
-                drawString(graphics, WordUtils.wrap(comboBoxCustomerName.getEditor().getItem().toString(), 17), 190, 77, 0);
-                graphics.setFont(new Font("Courier New", Font.BOLD, 12));
-                drawString(graphics, StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", 248, 77, 0);
-                drawString(graphics, StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", 268, 77, 0);
-                drawString(graphics, StringUtils.leftPad(textFieldNetWt.getText(), 7) + " Kg", 288, 77, 0);
-                graphics.drawLine(17, 305, 193, 305);
-                graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
-                drawString(graphics, StringUtils.center("Thanks you visit again...", 26), 310, 0, 0);
+            return Printable.PAGE_EXISTS;
+        }, pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+    }
 
-                return PAGE_EXISTS;
-            }
+    private void printStandardExitPass() {
+        PrinterJob pj = PrinterJob.getPrinterJob();
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 2.8d * 72d;
+        double height = 3.1d * 72d;
+        double widthmargin = 0d * 72d;
+        double heightmargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+        pBook.append((graphics, pageFormat, pageIndex) -> {
+            int y = 10, space = 20;
+            graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+            graphics.drawString(StringUtils.center("GATE PASS", 29), 0, y);
+            graphics.drawString(StringUtils.center(title1.getText(), 29), 0, y += space);
+            graphics.drawString(StringUtils.center(chckbxCredit.isSelected() ? "CREDIT" : "CASH", 29), 0, y += space);
+            graphics.drawString("    " + textFieldSlNo.getText(), 0, y += space);
+            graphics.drawString("     " + comboBoxCustomerName.getEditor().getItem(), 0, y += space);
+            graphics.drawString("       " + textFieldPlace.getText(), 0, y += space);
+            graphics.drawString("       " + textFieldPhoneNo.getText(), 0, y += space);
+            graphics.drawString("            " + comboBoxVehicleNo.getEditor().getItem(), 0, y += space);
+            graphics.drawString("          " + comboBoxMaterial.getEditor().getItem(), 0, y += space);
+            graphics.drawString("         " + textFieldNetWt.getText(), 0, y + space);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics.drawString("No:", 0, y = 70);
+            graphics.drawString("M/s:", 0, y += space);
+            graphics.drawString("Place:", 0, y += space);
+            graphics.drawString("Phone:", 0, y += space);
+            graphics.drawString("Vehicle No:", 0, y += space);
+            graphics.drawString("Material:", 0, y += space);
+            graphics.drawString("Net Wt.:", 0, y + space);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 9));
+            graphics.drawString("                " + textFieldNetDateTime.getText(), 0, 70);
+
+            return Printable.PAGE_EXISTS;
         }, pf);
         pj.setPageable(pBook);
         try {
