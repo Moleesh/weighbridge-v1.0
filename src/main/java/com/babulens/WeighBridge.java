@@ -4532,7 +4532,7 @@ class WeighBridge {
         panelSettings1.add(chckbxCamera);
 
         comboBoxPrintOptionForWeight = new JComboBox<>();
-        comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{"Standard", "Pre Print", "Pre Print 2", "Pre Print 3", "Plain Paper", "Plain Paper A4", "Camera", "Plain Camera", "Sri Pathy", "No Of Bags", "Ice Water", "EMJAY", "Mani & Co"}));
+        comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{"Camera", "EMJAY", "Ice Water", "Mani & Co", "No Of Bags", "Plain Camera", "Plain Paper", "Plain Paper A4", "Pre Print", "Pre Print 2", "Pre Print 3", "Quotation", "Sri Pathy", "Standard"}));
         comboBoxPrintOptionForWeight.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         comboBoxPrintOptionForWeight.setFocusable(false);
         comboBoxPrintOptionForWeight.setBounds(1055, 81, 190, 30);
@@ -4767,7 +4767,7 @@ class WeighBridge {
         panelSettings1.add(lblReport);
 
         comboBoxReport = new JComboBox<>();
-        comboBoxReport.setModel(new DefaultComboBoxModel<>(new String[]{"Standard", "Mani & Co"}));
+        comboBoxReport.setModel(new DefaultComboBoxModel<>(new String[]{"Mani & Co", "Standard"}));
         comboBoxReport.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         comboBoxReport.setFocusable(false);
         comboBoxReport.setBounds(969, 142, 276, 30);
@@ -5160,6 +5160,8 @@ class WeighBridge {
                 break;
             } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Plain Paper A4")) {
                 printPlainWeightA4();
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Quotation")) {
+                printQuotation();
             } else {
                 printPlainWeight();
             }
@@ -6566,6 +6568,68 @@ class WeighBridge {
 
                 return PAGE_EXISTS;
             }
+        }, pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
+    private void printQuotation() {
+        PrinterJob pj = PrinterJob.getPrinterJob();
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 2.8d * 72d;
+        double height = 5d * 72d;
+        double widthmargin = 0d * 72d;
+        double heightmargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+        pBook.append((graphics, pageFormat, pageIndex) -> {
+            int y = 10, space = 20;
+            graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+            graphics.drawString(StringUtils.center("QUOTATION", 29), 0, y);
+            graphics.drawString(StringUtils.center(title1.getText(), 29), 0, y += space);
+            graphics.drawString(StringUtils.center(chckbxCredit.isSelected() ? "CREDIT" : "CASH", 29), 0, y += space);
+            graphics.drawString("    " + textFieldSlNo.getText(), 0, y += space);
+            graphics.drawString("     " + comboBoxCustomerName.getEditor().getItem(), 0, y += space);
+            graphics.drawString("       " + textFieldPlace.getText(), 0, y += space);
+            graphics.drawString("       " + textFieldPhoneNo.getText(), 0, y += space);
+            graphics.drawString("            " + comboBoxVehicleNo.getEditor().getItem(), 0, y += space);
+            graphics.drawString("          " + comboBoxMaterial.getEditor().getItem(), 0, y += space);
+            graphics.drawString(StringUtils.leftPad(textFieldTareWt.getText(), 27), 0, y += 30);
+            graphics.drawString(StringUtils.leftPad(textFieldGrossWt.getText(), 27), 0, y += space);
+            graphics.drawString(StringUtils.leftPad(textFieldNetWt.getText(), 27), 0, y += 30);
+            if (!chckbxCredit.isSelected()) {
+                graphics.drawString(StringUtils.leftPad(textFieldDeductionOrPerCost.getText(), 27), 0, y += space);
+                graphics.drawString(StringUtils.leftPad(textFieldRoundOff.getText(), 27), 0, y += space);
+                graphics.drawString(StringUtils.leftPad(textFieldCharges.getText(), 27), 0, y + space);
+            }
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics.drawString("No:", 0, y = 70);
+            graphics.drawString("M/s:", 0, y += space);
+            graphics.drawString("Place:", 0, y += space);
+            graphics.drawString("Phone:", 0, y += space);
+            graphics.drawString("Vehicle No:", 0, y += space);
+            graphics.drawString("Material:", 0, y += space);
+            graphics.drawString("Tare Wt.", 0, y += 30);
+            graphics.drawString("Gross Wt.", 0, y += space);
+            graphics.drawString("Net Wt.", 0, y += 30);
+            if (!chckbxCredit.isSelected()) {
+                graphics.drawString("Rate", 0, y += space);
+                graphics.drawString("R.Off", 0, y += space);
+                graphics.drawString("Total", 0, y += space);
+            }
+            graphics.drawString(StringUtils.leftPad("Driver Sign", 27), 0, y + 30);
+
+            graphics.setFont(new Font("Courier New", Font.BOLD, 9));
+            graphics.drawString("                " + textFieldTareDateTime.getText(), 0, 70);
+
+            return Printable.PAGE_EXISTS;
         }, pf);
         pj.setPageable(pBook);
         try {
