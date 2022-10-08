@@ -1054,7 +1054,7 @@ class WeighBridge {
                 if (chckbxRoundOff.isSelected()) {
                     try {
                         Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                        ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL =" + comboBoxMaterial.getEditor().getItem().toString());
+                        ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
                         if (rs.next()) {
                             textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
                         } else {
@@ -1091,7 +1091,7 @@ class WeighBridge {
                 if (chckbxRoundOff.isSelected()) {
                     try {
                         Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                        ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL =" + comboBoxMaterial.getEditor().getItem().toString());
+                        ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
                         if (rs.next()) {
                             textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
                         } else {
@@ -1322,7 +1322,7 @@ class WeighBridge {
             } else if (chckbxRoundOff.isSelected()) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL =" + comboBoxMaterial.getEditor().getItem().toString());
+                    ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
                     if (rs.next()) {
                         textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
                     } else {
@@ -1343,7 +1343,7 @@ class WeighBridge {
             if (chckbxAutoChargecheck.isSelected()) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL ='" + comboBoxMaterial.getEditor().getItem() + "'");
+                    ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem() + "'");
                     if (rs.next() && !chckbxCredit.isSelected()) {
                         textFieldCharges.setText("" + (int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText())));
                     } else {
@@ -1664,7 +1664,7 @@ class WeighBridge {
             } else if (chckbxRoundOff.isSelected()) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL =" + comboBoxMaterial.getEditor().getItem().toString());
+                    ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
                     if (rs.next()) {
                         textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
                     } else {
@@ -1685,7 +1685,7 @@ class WeighBridge {
             if (chckbxAutoChargecheck.isSelected()) {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL ='" + comboBoxMaterial.getEditor().getItem() + "'");
+                    ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem() + "'");
                     if (rs.next() && !chckbxCredit.isSelected()) {
                         textFieldCharges.setText("" + (int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText())));
                     } else {
