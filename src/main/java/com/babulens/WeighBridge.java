@@ -273,8 +273,10 @@ class WeighBridge {
     static DecimalFormat decimalFormat = new DecimalFormat("0");
     static Set<String> vehicleNoSet = new HashSet<>();
     static Set<String> transportSet = new HashSet<>();
+    static Set<String> customerSet = new HashSet<>();
     private JButton btnPrintToken;
     private JButton btnPrintExitPass;
+    private JTable tableTransporter;
 
     /**
      * Create the application.
@@ -737,19 +739,26 @@ class WeighBridge {
             rs = stmt.executeQuery("SELECT * FROM CUSTOMER");
             DefaultTableModel model = (DefaultTableModel) tableCustomer.getModel();
             model.setRowCount(0);
+            customerSet.clear();
             comboBoxCustomerName.removeAllItems();
             while (rs.next()) {
-                model.addRow(new Object[]{
-                        rs.getString("CUSTOMER"), rs.getString("CUSTOMERADDRESS"),
-                        rs.getString("CUSTOMERADDRESS1")
-                });
-                comboBoxCustomerName.addItem(rs.getString("CUSTOMER"));
+                if (customerSet.add(rs.getString("CUSTOMER"))) {
+                    model.addRow(new Object[]{
+                            rs.getString("CUSTOMER"),
+                    });
+                    comboBoxCustomerName.addItem(rs.getString("CUSTOMER"));
+                }
             }
             rs = stmt.executeQuery("SELECT * FROM TRANSPORTER");
+            model = (DefaultTableModel) tableTransporter.getModel();
+            model.setRowCount(0);
             comboBoxTransporterName.removeAllItems();
             transportSet.clear();
             while (rs.next()) {
                 if (transportSet.add(rs.getString("TRANSPORTER"))) {
+                    model.addRow(new Object[]{
+                            rs.getString("TRANSPORTER"),
+                    });
                     comboBoxTransporterName.addItem(rs.getString("TRANSPORTER"));
                 }
             }
@@ -760,9 +769,11 @@ class WeighBridge {
             comboBoxVehicleNo.removeAllItems();
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getString("VEHICLENO"), rs.getInt("TAREWT"),
-                        dateAndTimeFormat.format(new Date(dateAndTimeFormatSql
-                                .parse(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME")).getTime()))
+                        rs.getString("VEHICLENO"),
+                        rs.getString("PLACE"),
+                        rs.getString("PHONE_NUMBER"),
+                        rs.getInt("TAREWT"),
+                        dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME")).getTime()))
                 });
                 if (vehicleNoSet.add(rs.getString("VEHICLENO"))) {
                     comboBoxVehicleNo.addItem(rs.getString("VEHICLENO"));
@@ -846,9 +857,15 @@ class WeighBridge {
             for (int i = 1; i <= model.getRowCount(); i++) {
                 rs.moveToInsertRow();
                 rs.updateString("CUSTOMER", (String) model.getValueAt(i - 1, 0));
-                rs.updateString("CUSTOMERADDRESS", (String) model.getValueAt(i - 1, 1));
-                rs.updateString("CUSTOMERADDRESS1", (String) model.getValueAt(i - 1, 2));
-                rs.updateInt("SQNO", i);
+                rs.insertRow();
+            }
+            pstmt = dbConnection.prepareStatement("TRUNCATE TABLE TRANSPORTER");
+            pstmt.executeUpdate();
+            rs = stmt.executeQuery("SELECT * FROM TRANSPORTER");
+            model = (DefaultTableModel) tableTransporter.getModel();
+            for (int i = 1; i <= model.getRowCount(); i++) {
+                rs.moveToInsertRow();
+                rs.updateString("TRANSPORTER", (String) model.getValueAt(i - 1, 0));
                 rs.insertRow();
             }
             pstmt = dbConnection.prepareStatement("TRUNCATE TABLE VEHICLETARES");
@@ -858,8 +875,10 @@ class WeighBridge {
             for (int i = 1; i <= model.getRowCount(); i++) {
                 rs.moveToInsertRow();
                 rs.updateString("VEHICLENO", (String) model.getValueAt(i - 1, 0));
-                rs.updateInt("TAREWT", Integer.parseInt(("0" + model.getValueAt(i - 1, 1)).replaceAll("\\D", "")));
-                Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 2));
+                rs.updateString("PLACE", (String) model.getValueAt(i - 1, 1));
+                rs.updateString("PHONE_NUMBER", (String) model.getValueAt(i - 1, 2));
+                rs.updateInt("TAREWT", Integer.parseInt(("0" + model.getValueAt(i - 1, 3)).replaceAll("\\D", "")));
+                Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 4));
                 rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                 rs.updateTime("TARETIME", new java.sql.Time(date.getTime()));
                 rs.updateInt("SQNO", i);
@@ -1038,6 +1057,12 @@ class WeighBridge {
         comboBoxCustomerName = new JComboBox<>();
         comboBoxCustomerName.setEditable(true);
         AutoCompleteDecorator.decorate(comboBoxCustomerName);
+        comboBoxCustomerName.getEditor().getEditorComponent().addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                comboBoxCustomerName.setSelectedItem(((String) comboBoxCustomerName.getEditor().getItem()).toUpperCase().trim());
+            }
+        });
         comboBoxCustomerName.addActionListener(l -> {
             if (l.getActionCommand().equals("comboBoxEdited")) {
                 requestFocus("CustomerName");
@@ -1869,6 +1894,8 @@ class WeighBridge {
                         Date date = dateAndTimeFormat.parse(textFieldTareDateTime.getText());
                         rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                         rs.updateTime("TARETIME", new Time(date.getTime()));
+                        rs.updateString("PLACE", textFieldPlace.getText());
+                        rs.updateString("PHONE_NUMBER", textFieldPhoneNo.getText());
                         rs.updateRow();
                     } else {
                         rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
@@ -1883,6 +1910,8 @@ class WeighBridge {
                         Date date = dateAndTimeFormat.parse(textFieldTareDateTime.getText());
                         rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                         rs.updateTime("TARETIME", new Time(date.getTime()));
+                        rs.updateString("PLACE", textFieldPlace.getText());
+                        rs.updateString("PHONE_NUMBER", textFieldPhoneNo.getText());
                         rs.updateInt("SQNO", sqNo + 1);
                         rs.insertRow();
                     }
@@ -1900,13 +1929,22 @@ class WeighBridge {
                 Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 ResultSet rs = stmt.executeQuery("SELECT * FROM TRANSPORTER ");
                 rs.moveToInsertRow();
-                String temp = ("" + comboBoxTransporterName.getSelectedItem()).toUpperCase();
-                if (temp.equals("NULL")) {
-                    temp = "";
-                }
+                String temp = (String) comboBoxTransporterName.getSelectedItem();
                 rs.updateString("TRANSPORTER", temp);
                 if (transportSet.add(temp)) {
                     comboBoxTransporterName.addItem(temp);
+                }
+                rs.insertRow();
+            } catch (SQLException ignored) {
+            }
+            try {
+                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                ResultSet rs = stmt.executeQuery("SELECT * FROM CUSTOMER ");
+                rs.moveToInsertRow();
+                String temp = (String) comboBoxCustomerName.getSelectedItem();
+                rs.updateString("CUSTOMER", temp);
+                if (customerSet.add(temp)) {
+                    comboBoxCustomerName.addItem(temp);
                 }
                 rs.insertRow();
             } catch (SQLException ignored) {
@@ -2050,6 +2088,12 @@ class WeighBridge {
         panelWeighing.add(lblCustomerName);
 
         comboBoxTransporterName = new JComboBox<>();
+        comboBoxTransporterName.getEditor().getEditorComponent().addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                comboBoxTransporterName.setSelectedItem(((String) comboBoxTransporterName.getEditor().getItem()).toUpperCase().trim());
+            }
+        });
         comboBoxTransporterName.addActionListener(l -> {
             if (l.getActionCommand().equals("comboBoxEdited")) {
                 requestFocus("DriverName");
@@ -2536,6 +2580,15 @@ class WeighBridge {
             @Override
             public void focusLost(FocusEvent e) {
                 comboBoxVehicleNo.setSelectedItem(((String) comboBoxVehicleNo.getEditor().getItem()).toUpperCase().replaceAll(" ", ""));
+                try {
+                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    ResultSet rs = stmt.executeQuery("SELECT * FROM VEHICLETARES WHERE VEHICLENO LIKE '" + comboBoxVehicleNo.getEditor().getItem() + "'");
+                    if (rs.next()) {
+                        textFieldPlace.setText(rs.getString("PLACE"));
+                        textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
+                    }
+                } catch (SQLException ignored) {
+                }
             }
         });
         comboBoxVehicleNo.addActionListener(l -> {
@@ -2555,6 +2608,8 @@ class WeighBridge {
                                         textFieldTareDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
                                     }
                                     textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
+                                    textFieldPlace.setText(rs.getString("PLACE"));
+                                    textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                                 }
                             }
                         } catch (SQLException | ParseException ignored) {
@@ -3969,18 +4024,18 @@ class WeighBridge {
         panelSettings1.setLayout(null);
 
         JLabel lblMaterials = new JLabel("Materials");
-        lblMaterials.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblMaterials.setFont(new Font("Times New Roman", Font.ITALIC, 18));
         lblMaterials.setBounds(10, 319, 111, 25);
         panelSettings1.add(lblMaterials);
 
         JLabel lblVehicleTares = new JLabel("Vehicle Tares");
-        lblVehicleTares.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblVehicleTares.setFont(new Font("Times New Roman", Font.ITALIC, 18));
         lblVehicleTares.setBounds(320, 319, 175, 25);
         panelSettings1.add(lblVehicleTares);
 
         JLabel lblCustomer = new JLabel("Customer");
-        lblCustomer.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblCustomer.setBounds(780, 327, 111, 25);
+        lblCustomer.setFont(new Font("Times New Roman", Font.ITALIC, 18));
+        lblCustomer.setBounds(877, 325, 111, 25);
         panelSettings1.add(lblCustomer);
 
         JLabel lblGeneralSettings = new JLabel("General Settings");
@@ -4079,7 +4134,7 @@ class WeighBridge {
         });
         btnAddMaterialRow.setFocusable(false);
         btnAddMaterialRow.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        btnAddMaterialRow.setBounds(221, 319, 41, 38);
+        btnAddMaterialRow.setBounds(229, 319, 41, 38);
         panelSettings1.add(btnAddMaterialRow);
 
         JButton btnDeleteMaterialRow = new JButton("-");
@@ -4098,7 +4153,7 @@ class WeighBridge {
         panelSettings1.add(btnDeleteMaterialRow);
 
         JScrollPane scrollPane_2 = new JScrollPane();
-        scrollPane_2.setBounds(320, 355, 450, 250);
+        scrollPane_2.setBounds(320, 355, 547, 250);
         panelSettings1.add(scrollPane_2);
 
         tableVehicleTare = new JTable();
@@ -4108,14 +4163,18 @@ class WeighBridge {
         tableVehicleTare.setModel(new DefaultTableModel(new Object[][]{},
                 new String[]{
                         "Vehicle No",
+                        "Place",
+                        "Phone No",
                         "Tare Wt",
                         "Tare Date & Time "
                 }) {
             private static final long serialVersionUID = 1L;
             final Class<?>[] columnTypes = new Class[]{
-                    Object.class, Integer.class, Object.class
+                    Object.class, Object.class, Object.class, Integer.class, Object.class
             };
             final boolean[] columnEditables = new boolean[]{
+                    false,
+                    false,
                     false,
                     false,
                     false
@@ -4140,11 +4199,11 @@ class WeighBridge {
         });
         btnDeleteVehicleRow.setFocusable(false);
         btnDeleteVehicleRow.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        btnDeleteVehicleRow.setBounds(729, 319, 41, 38);
+        btnDeleteVehicleRow.setBounds(826, 319, 41, 38);
         panelSettings1.add(btnDeleteVehicleRow);
 
         JScrollPane scrollPane_3 = new JScrollPane();
-        scrollPane_3.setBounds(780, 355, 465, 250);
+        scrollPane_3.setBounds(877, 355, 179, 250);
         panelSettings1.add(scrollPane_3);
 
         tableCustomer = new JTable();
@@ -4154,8 +4213,6 @@ class WeighBridge {
         tableCustomer.setModel(new DefaultTableModel(new Object[][]{},
                 new String[]{
                         "Customer Name",
-                        "Customer Address",
-                        "Customer Address1"
                 }));
         tableCustomer.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         scrollPane_3.setViewportView(tableCustomer);
@@ -4167,7 +4224,7 @@ class WeighBridge {
         });
         btnAddCustomer.setFont(new Font("Times New Roman", Font.BOLD, 15));
         btnAddCustomer.setFocusable(false);
-        btnAddCustomer.setBounds(1156, 319, 41, 38);
+        btnAddCustomer.setBounds(975, 319, 41, 38);
         panelSettings1.add(btnAddCustomer);
 
         JButton btnDeleteCustomer = new JButton("-");
@@ -4178,7 +4235,7 @@ class WeighBridge {
         });
         btnDeleteCustomer.setFont(new Font("Times New Roman", Font.BOLD, 15));
         btnDeleteCustomer.setFocusable(false);
-        btnDeleteCustomer.setBounds(1204, 319, 41, 38);
+        btnDeleteCustomer.setBounds(1015, 319, 41, 38);
         panelSettings1.add(btnDeleteCustomer);
 
         textFieldTitle1 = new JTextField();
@@ -4823,6 +4880,45 @@ class WeighBridge {
         chckbxExcludeCredit.setBackground(new Color(0, 255, 127));
         chckbxExcludeCredit.setBounds(170, 209, 139, 25);
         panelSettings1.add(chckbxExcludeCredit);
+
+        JLabel lblTransporter = new JLabel("Transporter");
+        lblTransporter.setFont(new Font("Times New Roman", Font.ITALIC, 18));
+        lblTransporter.setBounds(1066, 327, 111, 25);
+        panelSettings1.add(lblTransporter);
+
+        JScrollPane scrollPane_3_1 = new JScrollPane();
+        scrollPane_3_1.setBounds(1066, 355, 179, 250);
+        panelSettings1.add(scrollPane_3_1);
+
+        tableTransporter = new JTable();
+        tableTransporter.putClientProperty("terminateEditOnFocusLost", true);
+        tableTransporter.setModel(new DefaultTableModel(new Object[][]{},
+                new String[]{
+                        "Transporter Name",
+                }));
+        tableTransporter.setFont(new Font("Times New Roman", Font.PLAIN, 15));
+        scrollPane_3_1.setViewportView(tableTransporter);
+
+        JButton btnDeleteTransporter = new JButton("-");
+        btnDeleteTransporter.addActionListener(l -> {
+            if (tableTransporter.getSelectedRow() != -1) {
+                ((DefaultTableModel) tableTransporter.getModel()).removeRow(tableTransporter.getSelectedRow());
+            }
+        });
+        btnDeleteTransporter.setFont(new Font("Times New Roman", Font.BOLD, 15));
+        btnDeleteTransporter.setFocusable(false);
+        btnDeleteTransporter.setBounds(1204, 319, 41, 38);
+        panelSettings1.add(btnDeleteTransporter);
+
+        JButton btnAddTransporter = new JButton("+");
+        btnAddTransporter.addActionListener(l -> {
+            DefaultTableModel model = (DefaultTableModel) tableTransporter.getModel();
+            model.addRow(new Object[]{});
+        });
+        btnAddTransporter.setFont(new Font("Times New Roman", Font.BOLD, 15));
+        btnAddTransporter.setFocusable(false);
+        btnAddTransporter.setBounds(1164, 319, 41, 38);
+        panelSettings1.add(btnAddTransporter);
 
         JPanel panelSettings2 = new JPanel();
         panelSettings2.setBackground(new Color(0, 255, 127));
@@ -5551,11 +5647,11 @@ class WeighBridge {
                 chckbxCredit.setEnabled(false);
                 btnPrint.requestFocus();
             } else {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nRECORD NOT FOUND\nLINE :1085", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "SQL ERROR\nRECORD NOT FOUND", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                 btnReprint.requestFocus();
             }
         } catch (SQLException | ParseException ignored) {
-            JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :1085", "SQL ERROR",
+            JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED", "SQL ERROR",
                     JOptionPane.ERROR_MESSAGE);
             btnReprint.requestFocus();
         }
