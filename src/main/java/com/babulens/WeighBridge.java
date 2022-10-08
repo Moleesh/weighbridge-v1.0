@@ -1048,6 +1048,24 @@ class WeighBridge {
         panelWeighing.add(comboBoxCustomerName);
 
         comboBoxMaterial = new JComboBox<>();
+        comboBoxMaterial.getEditor().getEditorComponent().addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (chckbxRoundOff.isSelected()) {
+                    try {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL =" + comboBoxMaterial.getEditor().getItem().toString());
+                        if (rs.next()) {
+                            textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
+                        } else {
+                            textFieldDeductionOrPerCost.setText("0");
+                        }
+                    } catch (SQLException ignored) {
+                    }
+                }
+                comboBoxMaterial.setSelectedItem(Objects.requireNonNull(comboBoxMaterial.getSelectedItem()).toString().toUpperCase());
+            }
+        });
         comboBoxMaterial.addActionListener(l -> {
             if (l.getActionCommand().equals("comboBoxEdited")) {
                 if (chckbxMaterialSl.isSelected()) {
@@ -2249,6 +2267,7 @@ class WeighBridge {
                     comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
+                    chckbxCredit.setSelected(rs.getBoolean("CREDIT"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
                     textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                     textFieldGrossWt.setText(Integer.toString(rs.getInt("TAREWT")));
@@ -2331,6 +2350,7 @@ class WeighBridge {
                     comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
+                    chckbxCredit.setSelected(rs.getBoolean("CREDIT"));
                     textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
                     textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                     textFieldTareWt.setText(Integer.toString(rs.getInt("GROSSWT")));
@@ -2512,7 +2532,7 @@ class WeighBridge {
         comboBoxVehicleNo = new JComboBox<>();
         comboBoxVehicleNo.setEditable(true);
         AutoCompleteDecorator.decorate(comboBoxVehicleNo);
-        comboBoxVehicleNo.addFocusListener(new FocusAdapter() {
+        comboBoxVehicleNo.getEditor().getEditorComponent().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 comboBoxVehicleNo.setSelectedItem(((String) comboBoxVehicleNo.getEditor().getItem()).toUpperCase().replaceAll(" ", ""));
@@ -2556,6 +2576,7 @@ class WeighBridge {
                                         comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
+                                        chckbxCredit.setSelected(rs.getBoolean("CREDIT"));
                                         textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
                                         textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                                         textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
@@ -2588,6 +2609,7 @@ class WeighBridge {
                                         comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
+                                        chckbxCredit.setSelected(rs.getBoolean("CREDIT"));
                                         textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
                                         textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                                         textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
@@ -2621,6 +2643,7 @@ class WeighBridge {
                                         comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
+                                        chckbxCredit.setSelected(rs.getBoolean("CREDIT"));
                                         textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
                                         textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                                         textFieldTareDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
