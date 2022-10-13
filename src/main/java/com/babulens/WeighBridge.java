@@ -1864,8 +1864,8 @@ class WeighBridge {
                     rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                     rs.updateTime("TARETIME", new Time(date.getTime()));
                 }
-                rs.updateDouble("DEDUCTION_OR_PER_COST", Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", "")));
-                rs.updateDouble("ROUND_OFF", Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^-.\\d]", "")));
+                rs.updateDouble("DEDUCTION_OR_PER_COST", Double.parseDouble(0 + textFieldDeductionOrPerCost.getText().replaceAll("[^.\\d]", "")));
+                rs.updateDouble("ROUND_OFF", Double.parseDouble(0 + textFieldRoundOff.getText().replaceAll("[^-.\\d]", "")));
                 rs.updateInt("NETWT", Integer.parseInt(0 + textFieldNetWt.getText()));
                 if (!textFieldNetDateTime.getText().equals("")) {
                     Date date = dateAndTimeFormat.parse(textFieldNetDateTime.getText());
@@ -6722,11 +6722,10 @@ class WeighBridge {
             graphics.drawString(StringUtils.leftPad(textFieldTareWt.getText(), 27), 0, y += 30);
             graphics.drawString(StringUtils.leftPad(textFieldGrossWt.getText(), 27), 0, y += space);
             graphics.drawString(StringUtils.leftPad(textFieldNetWt.getText(), 27), 0, y += 30);
-            if (!chckbxCredit.isSelected()) {
-                graphics.drawString(StringUtils.leftPad(textFieldDeductionOrPerCost.getText(), 27), 0, y += space);
-                graphics.drawString(StringUtils.leftPad(textFieldRoundOff.getText(), 27), 0, y += space);
-                graphics.drawString(StringUtils.leftPad(textFieldCharges.getText(), 27), 0, y + space);
-            }
+            graphics.drawString(StringUtils.leftPad(textFieldDeductionOrPerCost.getText(), 27), 0, y += space);
+            graphics.drawString(StringUtils.leftPad(textFieldRoundOff.getText(), 27), 0, y += space);
+            graphics.drawString(StringUtils.leftPad(textFieldCharges.getText(), 27), 0, y + space);
+
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
             graphics.drawString("No:", 0, y = 70);
             graphics.drawString("M/s:", 0, y += space);
@@ -6737,11 +6736,10 @@ class WeighBridge {
             graphics.drawString("Tare Wt.", 0, y += 30);
             graphics.drawString("Gross Wt.", 0, y += space);
             graphics.drawString("Net Wt.", 0, y += 30);
-            if (!chckbxCredit.isSelected()) {
-                graphics.drawString("Rate", 0, y += space);
-                graphics.drawString("R.Off", 0, y += space);
-                graphics.drawString("Total", 0, y += space);
-            }
+            graphics.drawString("Rate", 0, y += space);
+            graphics.drawString("R.Off", 0, y += space);
+            graphics.drawString("Total", 0, y += space);
+
             graphics.drawString(StringUtils.leftPad("Driver Sign", 27), 0, y + 30);
 
             graphics.setFont(new Font("Courier New", Font.BOLD, 9));
