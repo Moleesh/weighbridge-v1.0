@@ -1369,7 +1369,7 @@ class WeighBridge {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem() + "'");
-                    if (rs.next() && !chckbxCredit.isSelected()) {
+                    if (rs.next()) {
                         textFieldCharges.setText("" + (int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText())));
                     } else {
                         textFieldCharges.setText("0");
@@ -1711,7 +1711,7 @@ class WeighBridge {
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem() + "'");
-                    if (rs.next() && !chckbxCredit.isSelected()) {
+                    if (rs.next()) {
                         textFieldCharges.setText("" + (int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText())));
                     } else {
                         textFieldCharges.setText("0");
