@@ -1354,7 +1354,7 @@ class WeighBridge {
                         textFieldDeductionOrPerCost.setText("0");
                     }
                     if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldDeductionOrPerCost.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
-                        textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldDeductionOrPerCost.getText())));
+                        textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText())));
                     }
                 } catch (SQLException ignored) {
                 }
@@ -1696,7 +1696,7 @@ class WeighBridge {
                         textFieldDeductionOrPerCost.setText("0");
                     }
                     if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldDeductionOrPerCost.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
-                        textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldDeductionOrPerCost.getText())));
+                        textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText())));
                     }
                 } catch (SQLException ignored) {
                 }
@@ -4129,7 +4129,7 @@ class WeighBridge {
         btnAddMaterialRow.addActionListener(l -> {
             DefaultTableModel model = (DefaultTableModel) tableMaterial.getModel();
             model.addRow(new Object[]{
-                    model.getRowCount() + 1
+                    model.getRowCount() + 1, "", 0.0
             });
         });
         btnAddMaterialRow.setFocusable(false);
@@ -4211,16 +4211,14 @@ class WeighBridge {
         tableCustomer.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         tableCustomer.getTableHeader().setFont(new Font("Times New Roman", Font.ITALIC | Font.BOLD, 15));
         tableCustomer.setModel(new DefaultTableModel(new Object[][]{},
-                new String[]{
-                        "Customer Name",
-                }));
+                new String[]{"Customer Name"}));
         tableCustomer.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         scrollPane_3.setViewportView(tableCustomer);
 
         JButton btnAddCustomer = new JButton("+");
         btnAddCustomer.addActionListener(l -> {
             DefaultTableModel model = (DefaultTableModel) tableCustomer.getModel();
-            model.addRow(new Object[]{});
+            model.addRow(new Object[]{""});
         });
         btnAddCustomer.setFont(new Font("Times New Roman", Font.BOLD, 15));
         btnAddCustomer.setFocusable(false);
@@ -4913,7 +4911,7 @@ class WeighBridge {
         JButton btnAddTransporter = new JButton("+");
         btnAddTransporter.addActionListener(l -> {
             DefaultTableModel model = (DefaultTableModel) tableTransporter.getModel();
-            model.addRow(new Object[]{});
+            model.addRow(new Object[]{""});
         });
         btnAddTransporter.setFont(new Font("Times New Roman", Font.BOLD, 15));
         btnAddTransporter.setFocusable(false);
