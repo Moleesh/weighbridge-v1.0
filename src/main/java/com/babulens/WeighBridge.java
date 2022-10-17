@@ -1353,7 +1353,7 @@ class WeighBridge {
                     } else {
                         textFieldDeductionOrPerCost.setText("0");
                     }
-                    if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldDeductionOrPerCost.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
+                    if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
                         textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText())));
                     }
                 } catch (SQLException ignored) {
@@ -1695,7 +1695,7 @@ class WeighBridge {
                     } else {
                         textFieldDeductionOrPerCost.setText("0");
                     }
-                    if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldDeductionOrPerCost.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
+                    if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
                         textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText())));
                     }
                 } catch (SQLException ignored) {
