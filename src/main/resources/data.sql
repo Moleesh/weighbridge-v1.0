@@ -96,9 +96,12 @@ CREATE TABLE IF NOT EXISTS SETTINGS
     LINE2                  VARCHAR(100),
     LINE3                  VARCHAR(100),
     LINE4                  VARCHAR(100),
-    NAMEOFCONTRACTOR       VARCHAR(100),
-    DEPARTMENTNAME         VARCHAR(100),
-    SITEAT                 VARCHAR(100),
+    NAME_OF_WORK           VARCHAR(200),
+    NAME_OF_CONTRACTOR     VARCHAR(100),
+    DEPARTMENT_NAME        VARCHAR(100),
+    SITE_AT                VARCHAR(100),
+    AGREEMENT_NO           VARCHAR(100),
+    ESTIMATE_NO            VARCHAR(100),
     TARENOSLNO             BOOLEAN,
     BAGWEIGHT              DOUBLE,
     ROUND_OFF_DECIMALS     INTEGER,
@@ -150,7 +153,7 @@ VALUES ('2', NULL, NULL, NULL);
 INSERT INTO SETTINGS
 VALUES (1, 1, 1200, 'COM0;8;0;10;~~~;f', 'BABULENS', 'NAGERCOIL', '', 'FOOTER', '',
         TRUE, FALSE, 1, 'Standard', 'Standard', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-         9600, 'COM0', '', '', '', '', '', '', '', FALSE, 0.0, 0, FALSE, FALSE, FALSE, TRUE,
+         9600, 'COM0', '', '', '', '', '', '', '', '', '', '', FALSE, 0.0, 0, FALSE, FALSE, FALSE, TRUE,
         '147085', '147085aA', '147085', '147085', '147085', '147085', '147085', '147085', '123');
 INSERT INTO CAMERA
 VALUES (1, 'TRUE', 'WEBCAM TEMP', '770 * 433', 0, 0, 770, 433);

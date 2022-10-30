@@ -234,7 +234,7 @@ class WeighBridge {
     private JTextField textFieldLine2;
     private JTextField textFieldLine3;
     private JTextField textFieldSiteAt;
-    private JTextField textFieldDepartmentName;
+    private JTextField textFieldNameOfDepartment;
     private JTextField textFieldNameOfContractor;
     private JTextField textFieldLine4;
     private JCheckBox chckbxenableSettings2;
@@ -277,6 +277,9 @@ class WeighBridge {
     private JButton btnPrintToken;
     private JButton btnPrintExitPass;
     private JTable tableTransporter;
+    private JTextField textFieldNameOfWork;
+    private JTextField textFieldAgreementNo;
+    private JTextField textFieldEstimateNo;
 
     /**
      * Create the application.
@@ -723,9 +726,12 @@ class WeighBridge {
             textFieldLine2.setText(rs.getString("LINE2"));
             textFieldLine3.setText(rs.getString("LINE3"));
             textFieldLine4.setText(rs.getString("LINE4"));
-            textFieldNameOfContractor.setText(rs.getString("NAMEOFCONTRACTOR"));
-            textFieldDepartmentName.setText(rs.getString("DEPARTMENTNAME"));
-            textFieldSiteAt.setText(rs.getString("SITEAT"));
+            textFieldNameOfContractor.setText(rs.getString("NAME_OF_CONTRACTOR"));
+            textFieldNameOfWork.setText(rs.getString("NAME_OF_WORK"));
+            textFieldAgreementNo.setText(rs.getString("AGREEMENT_NO"));
+            textFieldEstimateNo.setText(rs.getString("ESTIMATE_NO"));
+            textFieldNameOfDepartment.setText(rs.getString("DEPARTMENT_NAME"));
+            textFieldSiteAt.setText(rs.getString("SITE_AT"));
             chckbxTareNoSlno.setSelected(rs.getBoolean("TARENOSLNO"));
             chckbxExcludeNoOfBags.setSelected(rs.getBoolean("EXCLUDEBAGS"));
             textFieldBagWeight.setText(decimalFormat.format(rs.getDouble("BAGWEIGHT")));
@@ -842,9 +848,12 @@ class WeighBridge {
             rs.updateString("LINE2", textFieldLine2.getText());
             rs.updateString("LINE3", textFieldLine3.getText());
             rs.updateString("LINE4", textFieldLine4.getText());
-            rs.updateString("NAMEOFCONTRACTOR", textFieldNameOfContractor.getText());
-            rs.updateString("DEPARTMENTNAME", textFieldDepartmentName.getText());
-            rs.updateString("SITEAT", textFieldSiteAt.getText());
+            rs.updateString("NAME_OF_CONTRACTOR", textFieldNameOfContractor.getText());
+            rs.updateString("NAME_OF_WORK", textFieldNameOfWork.getText());
+            rs.updateString("AGREEMENT_NO", textFieldAgreementNo.getText());
+            rs.updateString("ESTIMATE_NO", textFieldEstimateNo.getText());
+            rs.updateString("DEPARTMENT_NAME", textFieldNameOfDepartment.getText());
+            rs.updateString("SITE_AT", textFieldSiteAt.getText());
             rs.updateBoolean("TARENOSLNO", chckbxTareNoSlno.isSelected());
             rs.updateBoolean("EXCLUDEBAGS", chckbxExcludeNoOfBags.isSelected());
             rs.updateDouble("BAGWEIGHT", Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")));
@@ -4611,7 +4620,7 @@ class WeighBridge {
         panelSettings1.add(chckbxCamera);
 
         comboBoxPrintOptionForWeight = new JComboBox<>();
-        comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{"Camera", "EMJAY", "Ice Water", "Mani & Co", "No Of Bags", "Plain Camera", "Plain Paper", "Plain Paper A4", "Pre Print", "Pre Print 2", "Pre Print 3", "Quotation", "Sri Pathy", "Standard"}));
+        comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{"Camera", "EMJAY", "Ice Water", "Mani & Co", "Mani & Co 2", "No Of Bags", "Plain Camera", "Plain Paper", "Plain Paper A4", "Pre Print", "Pre Print 2", "Pre Print 3", "Quotation", "Sri Pathy", "Standard"}));
         comboBoxPrintOptionForWeight.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         comboBoxPrintOptionForWeight.setFocusable(false);
         comboBoxPrintOptionForWeight.setBounds(1055, 81, 190, 30);
@@ -4926,7 +4935,7 @@ class WeighBridge {
 
         JLabel lblLine1 = new JLabel("Line 1");
         lblLine1.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblLine1.setBounds(40, 52, 75, 25);
+        lblLine1.setBounds(40, 50, 75, 25);
         panelSettings2.add(lblLine1);
 
         textFieldLine1 = new JTextField();
@@ -4936,12 +4945,12 @@ class WeighBridge {
         textFieldLine1.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldLine1.setDisabledTextColor(Color.BLACK);
         textFieldLine1.setColumns(10);
-        textFieldLine1.setBounds(141, 52, 200, 30);
+        textFieldLine1.setBounds(141, 50, 200, 30);
         panelSettings2.add(textFieldLine1);
 
         JLabel lblLine2 = new JLabel("Line 2");
         lblLine2.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblLine2.setBounds(40, 87, 75, 25);
+        lblLine2.setBounds(40, 90, 75, 25);
         panelSettings2.add(lblLine2);
 
         textFieldLine2 = new JTextField();
@@ -4951,12 +4960,12 @@ class WeighBridge {
         textFieldLine2.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldLine2.setDisabledTextColor(Color.BLACK);
         textFieldLine2.setColumns(10);
-        textFieldLine2.setBounds(141, 87, 200, 30);
+        textFieldLine2.setBounds(141, 90, 200, 30);
         panelSettings2.add(textFieldLine2);
 
         JLabel lblLine3 = new JLabel("Line 3");
         lblLine3.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblLine3.setBounds(40, 122, 75, 25);
+        lblLine3.setBounds(40, 130, 75, 25);
         panelSettings2.add(lblLine3);
 
         textFieldLine3 = new JTextField();
@@ -4965,7 +4974,7 @@ class WeighBridge {
         textFieldLine3.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldLine3.setDisabledTextColor(Color.BLACK);
         textFieldLine3.setColumns(10);
-        textFieldLine3.setBounds(141, 122, 200, 30);
+        textFieldLine3.setBounds(141, 130, 200, 30);
         panelSettings2.add(textFieldLine3);
 
         textFieldSiteAt = new JTextField();
@@ -4974,18 +4983,18 @@ class WeighBridge {
         textFieldSiteAt.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldSiteAt.setDisabledTextColor(Color.BLACK);
         textFieldSiteAt.setColumns(10);
-        textFieldSiteAt.setBounds(576, 127, 200, 30);
+        textFieldSiteAt.setBounds(584, 250, 200, 30);
         panelSettings2.add(textFieldSiteAt);
 
-        textFieldDepartmentName = new JTextField();
-        textFieldDepartmentName.setToolTipText("");
-        textFieldDepartmentName.setText(null);
-        textFieldDepartmentName.setHorizontalAlignment(SwingConstants.CENTER);
-        textFieldDepartmentName.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldDepartmentName.setDisabledTextColor(Color.BLACK);
-        textFieldDepartmentName.setColumns(10);
-        textFieldDepartmentName.setBounds(576, 87, 200, 30);
-        panelSettings2.add(textFieldDepartmentName);
+        textFieldNameOfDepartment = new JTextField();
+        textFieldNameOfDepartment.setToolTipText("");
+        textFieldNameOfDepartment.setText(null);
+        textFieldNameOfDepartment.setHorizontalAlignment(SwingConstants.CENTER);
+        textFieldNameOfDepartment.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldNameOfDepartment.setDisabledTextColor(Color.BLACK);
+        textFieldNameOfDepartment.setColumns(10);
+        textFieldNameOfDepartment.setBounds(584, 90, 200, 30);
+        panelSettings2.add(textFieldNameOfDepartment);
 
         textFieldNameOfContractor = new JTextField();
         textFieldNameOfContractor.setToolTipText("");
@@ -4994,22 +5003,22 @@ class WeighBridge {
         textFieldNameOfContractor.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldNameOfContractor.setDisabledTextColor(Color.BLACK);
         textFieldNameOfContractor.setColumns(10);
-        textFieldNameOfContractor.setBounds(576, 47, 200, 30);
+        textFieldNameOfContractor.setBounds(584, 130, 200, 30);
         panelSettings2.add(textFieldNameOfContractor);
 
         JLabel lblNameOfContractor = new JLabel("Name Of Contractor");
         lblNameOfContractor.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblNameOfContractor.setBounds(385, 47, 193, 25);
+        lblNameOfContractor.setBounds(393, 130, 193, 25);
         panelSettings2.add(lblNameOfContractor);
 
-        JLabel lblDepartmentName = new JLabel("Department Name");
+        JLabel lblDepartmentName = new JLabel("Name Of Department");
         lblDepartmentName.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblDepartmentName.setBounds(385, 87, 179, 25);
+        lblDepartmentName.setBounds(395, 90, 179, 25);
         panelSettings2.add(lblDepartmentName);
 
         JLabel lblSiteAt = new JLabel("Site At");
         lblSiteAt.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblSiteAt.setBounds(385, 127, 179, 25);
+        lblSiteAt.setBounds(393, 250, 179, 25);
         panelSettings2.add(lblSiteAt);
 
         textFieldLine4 = new JTextField();
@@ -5018,17 +5027,17 @@ class WeighBridge {
         textFieldLine4.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldLine4.setDisabledTextColor(Color.BLACK);
         textFieldLine4.setColumns(10);
-        textFieldLine4.setBounds(141, 157, 200, 30);
+        textFieldLine4.setBounds(141, 170, 200, 30);
         panelSettings2.add(textFieldLine4);
 
         JLabel lblLine = new JLabel("Line 4");
         lblLine.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblLine.setBounds(40, 157, 75, 25);
+        lblLine.setBounds(40, 170, 75, 25);
         panelSettings2.add(lblLine);
 
-        JLabel lblSriPathySettings = new JLabel("Sri Pathy Settings");
+        JLabel lblSriPathySettings = new JLabel("Contractor Settings");
         lblSriPathySettings.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        lblSriPathySettings.setBounds(40, 10, 150, 25);
+        lblSriPathySettings.setBounds(40, 10, 227, 25);
         panelSettings2.add(lblSriPathySettings);
 
         chckbxTareNoSlno = new JCheckBox("Tare no SlNo");
@@ -5101,18 +5110,13 @@ class WeighBridge {
         textFieldTitle3.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldTitle3.setDisabledTextColor(Color.BLACK);
         textFieldTitle3.setColumns(10);
-        textFieldTitle3.setBounds(131, 233, 209, 30);
+        textFieldTitle3.setBounds(141, 210, 200, 30);
         panelSettings2.add(textFieldTitle3);
 
         JLabel lblTitle = new JLabel("Title 3");
         lblTitle.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblTitle.setBounds(40, 233, 75, 25);
+        lblTitle.setBounds(40, 210, 75, 25);
         panelSettings2.add(lblTitle);
-
-        JLabel lblManiCo = new JLabel("Mani & Co Settings");
-        lblManiCo.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        lblManiCo.setBounds(40, 197, 230, 25);
-        panelSettings2.add(lblManiCo);
 
         JLabel lblOptions = new JLabel("Options");
         lblOptions.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
@@ -5239,6 +5243,50 @@ class WeighBridge {
         textFieldRoundOffDecimals.setBounds(218, 357, 168, 30);
         panelSettings2.add(textFieldRoundOffDecimals);
 
+        JLabel lblNameOfWork = new JLabel("Name Of Work");
+        lblNameOfWork.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblNameOfWork.setBounds(393, 50, 193, 25);
+        panelSettings2.add(lblNameOfWork);
+
+        textFieldNameOfWork = new JTextField();
+        textFieldNameOfWork.setToolTipText("");
+        textFieldNameOfWork.setText(null);
+        textFieldNameOfWork.setHorizontalAlignment(SwingConstants.CENTER);
+        textFieldNameOfWork.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldNameOfWork.setDisabledTextColor(Color.BLACK);
+        textFieldNameOfWork.setColumns(10);
+        textFieldNameOfWork.setBounds(584, 50, 200, 30);
+        panelSettings2.add(textFieldNameOfWork);
+
+        JLabel lblAgreementNo = new JLabel("Agreement No");
+        lblAgreementNo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblAgreementNo.setBounds(393, 170, 193, 25);
+        panelSettings2.add(lblAgreementNo);
+
+        textFieldAgreementNo = new JTextField();
+        textFieldAgreementNo.setToolTipText("");
+        textFieldAgreementNo.setText(null);
+        textFieldAgreementNo.setHorizontalAlignment(SwingConstants.CENTER);
+        textFieldAgreementNo.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldAgreementNo.setDisabledTextColor(Color.BLACK);
+        textFieldAgreementNo.setColumns(10);
+        textFieldAgreementNo.setBounds(584, 170, 200, 30);
+        panelSettings2.add(textFieldAgreementNo);
+
+        JLabel lblEstimateNo = new JLabel("Estimate No");
+        lblEstimateNo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblEstimateNo.setBounds(393, 210, 179, 25);
+        panelSettings2.add(lblEstimateNo);
+
+        textFieldEstimateNo = new JTextField();
+        textFieldEstimateNo.setText(null);
+        textFieldEstimateNo.setHorizontalAlignment(SwingConstants.CENTER);
+        textFieldEstimateNo.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldEstimateNo.setDisabledTextColor(Color.BLACK);
+        textFieldEstimateNo.setColumns(10);
+        textFieldEstimateNo.setBounds(584, 210, 200, 30);
+        panelSettings2.add(textFieldEstimateNo);
+
         JButton button = new JButton("Minimize");
         button.addActionListener(l -> babulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
         button.setFont(new Font("Times New Roman", Font.BOLD, 20));
@@ -5275,6 +5323,9 @@ class WeighBridge {
                 break;
             } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Mani & Co")) {
                 printManiAndCo();
+                break;
+            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Mani & Co 2")) {
+                printManiAndCo2();
                 break;
             } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Plain Paper A4")) {
                 printPlainWeightA4();
@@ -6206,6 +6257,116 @@ class WeighBridge {
         }
     }
 
+    private void printManiAndCo2() {
+        PrinterJob pj = PrinterJob.getPrinterJob();
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 8d * 72d;
+        double height = 12d * 72d;
+        double widthmargin = 0d * 72d;
+        double heightmargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+
+        pBook.append((graphics, pageFormat, pageIndex) -> {
+            int margin = 30;
+            int printArea = 534;
+            int len = 20;
+            int space = 20;
+            int lineSpace = 10;
+
+            for (int i = 0; i < 2; i++) {
+                graphics.drawLine(margin - 5, len, margin - 5, len + 380);
+                graphics.drawLine(570, len, 570, len + 380);
+                graphics.drawLine(margin - 5, len, 570, len);
+                graphics.drawLine(margin - 5, len + 380, 570, len + 380);
+
+                graphics.setFont(new Font("Verdana", Font.BOLD | Font.ITALIC, 11));
+                String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
+                String text = "WEIGHMENT SLIP";
+                graphics.drawString(text,
+                        margin + (printArea - graphics.getFontMetrics().stringWidth(text)) / 2, len += space);
+                graphics.drawLine(margin - 5, len += lineSpace, 570, len);
+                graphics.setFont(new Font("Verdana", Font.PLAIN, 11));
+                graphics.drawString("Weighment Slip No", margin, len += space);
+                graphics.drawString(": " + textFieldSlNo.getText(), margin + 130, len);
+                graphics.drawString("Date     :  " + temp[0].replaceAll("-", " - "), 400, len);
+                graphics.drawLine(margin - 5, len += lineSpace, 570, len);
+
+                graphics.drawString("Name of Work", margin, len += space);
+                temp = (WordUtils.wrap(textFieldNameOfWork.getText().trim(), 60) + " \n ").split("\n");
+                graphics.drawString(": " + temp[0], margin + 130, len);
+                graphics.drawString("  " + temp[1], margin, len += space);
+                graphics.drawLine(margin - 5, len += lineSpace, 570, len);
+
+                graphics.drawString("Name of Department", margin, len += space);
+                graphics.drawString(": " + textFieldNameOfDepartment.getText(), margin + 130, len);
+                graphics.drawLine(margin - 5, len += lineSpace, 570, len);
+
+                graphics.drawString("Name of Contractor", margin, len += space);
+                graphics.drawString(": " + textFieldNameOfContractor.getText(), margin + 130, len);
+                graphics.drawLine(margin - 5, len += lineSpace, 570, len);
+
+                graphics.drawString("Agreement No", margin, len += space);
+                graphics.drawString(": " + textFieldAgreementNo.getText(), margin + 90, len);
+                graphics.drawString("Estimate No", 300, len);
+                graphics.drawString(": " + textFieldEstimateNo.getText(), 300 + 90, len);
+                graphics.drawLine(margin - 5, len += lineSpace, 570, len);
+
+                graphics.drawString("Vehicle No", margin, len += space);
+                graphics.drawString(": " + comboBoxVehicleNo.getEditor().getItem(), margin + 90, len);
+                graphics.drawString("Material Name", 300, len);
+                graphics.drawString(": " + comboBoxMaterial.getEditor().getItem(), 300 + 90, len);
+                graphics.drawLine(margin - 5, len += lineSpace, 570, len);
+
+                temp = (textFieldGrossDateTime.getText() + " . . ").split(" ");
+                graphics.drawString("Date    :", margin, len += space);
+                graphics.drawString("Time    :", 200, len);
+                graphics.drawString("Laden Weight", 350, len);
+                graphics.drawString(":", 350 + 100, len);
+                graphics.setFont(new Font("Verdana", Font.BOLD, 11));
+                graphics.drawString(temp[0].replaceAll("-", " - "), margin + 50, len);
+                graphics.drawString(temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), 200 + 50, len);
+                text = textFieldGrossWt.getText() + " Kg";
+                graphics.drawString(text, 350 + 100 + (100 - graphics.getFontMetrics().stringWidth(text)), len);
+
+                graphics.setFont(new Font("Verdana", Font.PLAIN, 11));
+                temp = (textFieldTareDateTime.getText() + " . . ").split(" ");
+                graphics.drawString("Date    :", margin, len += space);
+                graphics.drawString("Time    :", 200, len);
+                graphics.drawString("UnLaden Weight", 350, len);
+                graphics.drawString(":", 350 + 100, len);
+                graphics.setFont(new Font("Verdana", Font.BOLD, 11));
+                graphics.drawString(temp[0].replaceAll("-", " - "), margin + 40, len);
+                graphics.drawString(temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), 200 + 40, len);
+                text = textFieldTareWt.getText() + " Kg";
+                graphics.drawString(text, 350 + 100 + (100 - graphics.getFontMetrics().stringWidth(text)), len);
+                graphics.drawLine(margin - 5, len += lineSpace, 570, len);
+
+                graphics.drawString("Net Weight", 350, len += space);
+                graphics.drawString(":", 350 + 100, len);
+                text = textFieldNetWt.getText() + " Kg";
+                graphics.drawString(text, 350 + 100 + (100 - graphics.getFontMetrics().stringWidth(text)), len);
+                graphics.drawLine(margin - 5, len += lineSpace, 570, len);
+
+                graphics.drawString("Signature of the Weigh Bridge office            Signature of the Weigh Bridge office", margin + 15, len += 40);
+                graphics.drawString("In charge (Contractor)                                 In charge (Department)", margin + 55, len + space);
+
+                len = 425;
+            }
+            return Printable.PAGE_EXISTS;
+
+        }, pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
     private void printPreWeight() {
         JTextPane textPane = createTextPane5();
         textPane.setBackground(Color.white);
@@ -6984,7 +7145,7 @@ class WeighBridge {
                         StringUtils.center(textFieldLine2.getText(), 82) + "\n" +
                         StringUtils.center(textFieldLine3.getText(), 82) + "\n\n" + "           Name of Contractor : " +
                         textFieldNameOfContractor.getText() + "\n\n" +
-                        String.format(format1, "Department Name", textFieldDepartmentName.getText(), "Vehicle No",
+                        String.format(format1, "Department Name", textFieldNameOfDepartment.getText(), "Vehicle No",
                                 comboBoxVehicleNo.getEditor().getItem()) +
                         "\n" +
                         String.format(format1, "Site At", textFieldSiteAt.getText(), "Product",
@@ -7002,7 +7163,7 @@ class WeighBridge {
                         StringUtils.center(textFieldLine2.getText(), 82) + "\n" +
                         StringUtils.center(textFieldLine3.getText(), 82) + "\n\n" + "           Name of Contractor : " +
                         textFieldNameOfContractor.getText() + "\n\n" +
-                        String.format(format1, "Department Name", textFieldDepartmentName.getText(), "Vehicle No",
+                        String.format(format1, "Department Name", textFieldNameOfDepartment.getText(), "Vehicle No",
                                 comboBoxVehicleNo.getEditor().getItem()) +
                         "\n" +
                         String.format(format1, "Site At", textFieldSiteAt.getText(), "Product",
