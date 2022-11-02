@@ -50,6 +50,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 class WeighBridge {
     private static final String DB_CONNECTION = "jdbc:h2:./weighdata";
@@ -6285,20 +6286,23 @@ class WeighBridge {
 
                 graphics.setFont(new Font("Verdana", Font.BOLD | Font.ITALIC, 11));
                 String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
-                String text = "WEIGHMENT SLIP";
+                String text = "WEIGHBRIDGE SLIP";
                 graphics.drawString(text,
                         margin + (printArea - graphics.getFontMetrics().stringWidth(text)) / 2, len += space);
                 graphics.drawLine(margin - 5, len += lineSpace, 570, len);
                 graphics.setFont(new Font("Verdana", Font.PLAIN, 11));
-                graphics.drawString("Weighment Slip No", margin, len += space);
+                graphics.drawString("Weighbridge Slip No", margin, len += space);
                 graphics.drawString(": " + textFieldSlNo.getText(), margin + 130, len);
                 graphics.drawString("Date     :  " + temp[0].replaceAll("-", " - "), 400, len);
                 graphics.drawLine(margin - 5, len += lineSpace, 570, len);
 
                 graphics.drawString("Name of Work", margin, len += space);
-                temp = (WordUtils.wrap(textFieldNameOfWork.getText().trim(), 60) + " \n ").split("\n");
+                temp = (WordUtils.wrap(textFieldNameOfWork.getText().trim(), 62, "\n", true) + " \n ").split("\n");
                 graphics.drawString(": " + temp[0], margin + 130, len);
-                graphics.drawString("  " + temp[1], margin, len += space);
+                text = Arrays.stream(temp).skip(1).collect(Collectors.joining(""));
+                graphics.drawString(text,
+                        margin + (printArea - graphics.getFontMetrics().stringWidth(text)) / 2, len += space);
+//                graphics.drawString("  " +, margin + 50, len += space);
                 graphics.drawLine(margin - 5, len += lineSpace, 570, len);
 
                 graphics.drawString("Name of Department", margin, len += space);
@@ -6339,8 +6343,8 @@ class WeighBridge {
                 graphics.drawString("UnLaden Weight", 350, len);
                 graphics.drawString(":", 350 + 100, len);
                 graphics.setFont(new Font("Verdana", Font.BOLD, 11));
-                graphics.drawString(temp[0].replaceAll("-", " - "), margin + 40, len);
-                graphics.drawString(temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), 200 + 40, len);
+                graphics.drawString(temp[0].replaceAll("-", " - "), margin + 50, len);
+                graphics.drawString(temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), 200 + 50, len);
                 text = textFieldTareWt.getText() + " Kg";
                 graphics.drawString(text, 350 + 100 + (100 - graphics.getFontMetrics().stringWidth(text)), len);
                 graphics.drawLine(margin - 5, len += lineSpace, 570, len);
