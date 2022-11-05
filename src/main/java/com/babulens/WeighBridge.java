@@ -95,6 +95,7 @@ class WeighBridge {
     private final JCheckBox chckbxSelectRemarks = new JCheckBox("Remarks");
     private final JCheckBox chckbxSelectManual = new JCheckBox("Manual");
     private final Webcam[] webcam = new Webcam[5];
+    private boolean ranModifiedScript = true;
     private String TRIAL_LICENSE_PASSWORD = "147085";
     private String LICENSE_PASSWORD = "147085aA";
     private String UNLOCK_PASSWORD = "147085";
@@ -302,7 +303,6 @@ class WeighBridge {
                     dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
                     ScriptRunner scriptExecutor = new ScriptRunner(dbConnection, true, false);
                     scriptExecutor.runScript(new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResource("data.sql")).openStream())));
-
                 }
             } catch (SQLException | NullPointerException | IOException ignored) {
                 JOptionPane.showMessageDialog(null,
@@ -804,8 +804,18 @@ class WeighBridge {
             comboBoxVehicleNo.setSelectedItem("");
             comboBoxMaterial.setSelectedItem("");
         } catch (SQLException | ParseException ignored) {
-            JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :806", "SQL ERROR",
-                    JOptionPane.ERROR_MESSAGE);
+            if (ranModifiedScript) {
+                ranModifiedScript = false;
+                try {
+                    ScriptRunner scriptExecutor = new ScriptRunner(dbConnection, true, false);
+                    scriptExecutor.runScript(new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResource("update.sql")).openStream())));
+                    settings();
+                } catch (IOException | SQLException ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :806", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
