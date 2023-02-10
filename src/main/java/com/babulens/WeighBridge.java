@@ -56,6 +56,10 @@ class WeighBridge {
     private static final String DB_CONNECTION = "jdbc:h2:./weighdata";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "toor";
+    static DecimalFormat decimalFormat = new DecimalFormat("0");
+    static Set<String> vehicleNoSet = new HashSet<>();
+    static Set<String> transportSet = new HashSet<>();
+    static Set<String> customerSet = new HashSet<>();
     static private SerialPort comPort;
 
     static {
@@ -272,10 +276,6 @@ class WeighBridge {
     private JTextField textFieldRoundOffDecimals;
     private JCheckBox chckbxCredit;
     private JCheckBox chckbxExcludeCredit;
-    static DecimalFormat decimalFormat = new DecimalFormat("0");
-    static Set<String> vehicleNoSet = new HashSet<>();
-    static Set<String> transportSet = new HashSet<>();
-    static Set<String> customerSet = new HashSet<>();
     private JButton btnPrintToken;
     private JButton btnPrintExitPass;
     private JTable tableTransporter;
@@ -2400,6 +2400,11 @@ class WeighBridge {
         chckbxAutoChargecheck.setFocusable(false);
         chckbxAutoChargecheck.setBackground(new Color(0, 255, 127));
         chckbxAutoChargecheck.setBounds(415, 390, 57, 25);
+        chckbxAutoChargecheck.addChangeListener(e -> {
+            if (btnGetWeight.isEnabled()) {
+                textFieldCharges.setEnabled(!chckbxAutoChargecheck.isSelected());
+            }
+        });
         panelWeighing.add(chckbxAutoChargecheck);
 
         JLabel lblNoOfBags = new JLabel("No Of Bags");
@@ -2685,6 +2690,7 @@ class WeighBridge {
         panelWeighing.add(chckbxCredit);
 
         btnPrintToken = new JButton("Print Token");
+        btnPrintToken.setVisible(false);
         btnPrintToken.addActionListener(e -> printStandardToken());
         btnPrintToken.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnPrintToken.setEnabled(false);
@@ -2692,6 +2698,7 @@ class WeighBridge {
         panelWeighing.add(btnPrintToken);
 
         btnPrintExitPass = new JButton("Print Exit Pass");
+        btnPrintExitPass.setVisible(false);
         btnPrintExitPass.addActionListener(e -> printStandardExitPass());
         btnPrintExitPass.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnPrintExitPass.setEnabled(false);
@@ -3704,6 +3711,7 @@ class WeighBridge {
         tableReport.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         tableReport.getTableHeader().setFont(new Font("Times New Roman", Font.ITALIC | Font.BOLD, 15));
         tableReport.getTableHeader().setReorderingAllowed(false);
+        tableReport.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         scrollPane.setViewportView(tableReport);
 
         textFieldTotalCharges = new JTextField();
@@ -3931,6 +3939,30 @@ class WeighBridge {
         panelReport.add(btnMassPrint);
 
         JPanel panelSettings1 = new JPanel();
+        panelSettings1.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                try {
+                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    ResultSet rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
+                    DefaultTableModel model = (DefaultTableModel) tableVehicleTare.getModel();
+                    for (int i = 1; i <= model.getRowCount(); i++) {
+                        rs.moveToInsertRow();
+                        rs.updateString("VEHICLENO", (String) model.getValueAt(i - 1, 0));
+                        rs.updateString("PLACE", (String) model.getValueAt(i - 1, 1));
+                        rs.updateString("PHONE_NUMBER", (String) model.getValueAt(i - 1, 2));
+                        rs.updateInt("TAREWT", Integer.parseInt(("0" + model.getValueAt(i - 1, 3)).replaceAll("\\D", "")));
+                        Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 4));
+                        rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
+                        rs.updateTime("TARETIME", new java.sql.Time(date.getTime()));
+                        rs.updateInt("SQNO", i);
+                        rs.insertRow();
+                    }
+                } catch (SQLException | ParseException ignored) {
+                }
+
+            }
+        });
         panelSettings1.setBackground(new Color(0, 255, 127));
         tabbedPane.addTab("          Settings          ", null, panelSettings1, null);
         panelSettings1.setLayout(null);
@@ -4200,7 +4232,6 @@ class WeighBridge {
         chckbxExcludeCharges.setFocusable(false);
         chckbxExcludeCharges.setBackground(new Color(0, 255, 127));
         chckbxExcludeCharges.addChangeListener(e -> {
-            textFieldCharges.setEnabled(!chckbxExcludeCharges.isSelected());
             textFieldCharges.setVisible(!chckbxExcludeCharges.isSelected());
             lblCharges.setVisible(!chckbxExcludeCharges.isSelected());
             clear();
@@ -5107,7 +5138,7 @@ class WeighBridge {
         panelSettings2.add(chckbxTareToken);
 
         chckbxExitPass = new JCheckBox("Exit Pass");
-        chckbxTareToken.addChangeListener(e -> btnPrintExitPass.setVisible(chckbxTareToken.isSelected()));
+        chckbxExitPass.addChangeListener(e -> btnPrintExitPass.setVisible(chckbxExitPass.isSelected()));
         chckbxExitPass.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         chckbxExitPass.setFocusable(false);
         chckbxExitPass.setBackground(new Color(0, 255, 127));
@@ -5562,6 +5593,18 @@ class WeighBridge {
                 if (!(chckbxSelectManual.isSelected() && chckbxManualStatus.isSelected())) {
                     tableReport.removeColumn(tableReport.getColumn("Manual"));
                 }
+                for (int column = 0; column < tableReport.getColumnCount(); column++) {
+                    int width = 100;
+                    for (int row = 0; row < tableReport.getRowCount(); row++) {
+                        TableCellRenderer renderer = tableReport.getCellRenderer(row, column);
+                        Component comp = tableReport.prepareRenderer(renderer, row, column);
+                        width = Math.max(comp.getPreferredSize().width + 50, width);
+                    }
+                    if (width > 250) {
+                        width = 250;
+                    }
+                    tableReport.getColumnModel().getColumn(column).setPreferredWidth(width);
+                }
             } catch (SQLException ignored) {
                 JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2174", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
             }
@@ -5729,7 +5772,6 @@ class WeighBridge {
             comboBoxMaterial.setEnabled(true);
             textFieldNoOfBags.setEnabled(!chckbxExcludeNoOfBags.isSelected());
             textFieldNoOfBags.setText("");
-            textFieldCharges.setEnabled(!chckbxExcludeCharges.isSelected());
             textFieldCharges.setText("");
             textFieldDeductionOrPerCost.setText("0");
             textFieldGrossWt.setText("0");
@@ -5753,10 +5795,10 @@ class WeighBridge {
             btnGetWeight.setEnabled(true);
             comboBoxCustomerName.setEnabled(!chckbxExcludeCustomer.isSelected());
             comboBoxTransporterName.setEnabled(!chckbxExcludeDrivers.isSelected());
-            textFieldCharges.setEnabled(!chckbxExcludeCharges.isSelected());
             textPaneRemarks.setEnabled(true);
             chckbxAutoChargecheck.setEnabled(true);
             chckbxAutoChargecheck.setSelected(chckbxAutoCharges.isSelected());
+            textFieldCharges.setEnabled(!(chckbxExcludeCharges.isSelected() || chckbxAutoChargecheck.isSelected()));
             textPaneRemarks.setText("");
             textFieldDcNo.setText("");
             textFieldDcDate.setText("");
