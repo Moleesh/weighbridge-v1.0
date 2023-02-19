@@ -325,7 +325,7 @@ class WeighBridge {
                 try {
                     if (takeBackup) {
                         Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                        stmt.execute("BACKUP TO 'backup/backup_" + DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm").format(LocalDateTime.now()) + ".zip'");
+                        stmt.execute("BACKUP TO 'backup/backup_" + DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss").format(LocalDateTime.now()) + ".zip'");
                     }
                 } catch (SQLException ignored) {
                 }
@@ -4406,7 +4406,7 @@ class WeighBridge {
                 } else {
                     try {
                         Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                        PreparedStatement stmts = dbConnection.prepareStatement("CREATE TABLE WEIGHING_" + textFieldDateTime.getText().replace(" ", "_").replace("-", "_").replace(":", "_") + " AS SELECT * FROM WEIGHING");
+                        PreparedStatement stmts = dbConnection.prepareStatement("CREATE TABLE WEIGHING_" + DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss").format(LocalDateTime.now()) + " AS TABLE WEIGHING");
                         stmts.executeUpdate();
                         stmts = dbConnection.prepareStatement("TRUNCATE TABLE WEIGHING");
                         stmts.executeUpdate();
@@ -4558,6 +4558,7 @@ class WeighBridge {
                 "EMJAY",
                 "Ice Water",
                 "Mani & Co",
+                "Mani & Co 1",
                 "Mani & Co 2",
                 "No Of Bags",
                 "Plain Camera",
@@ -5248,42 +5249,54 @@ class WeighBridge {
 
     private void print() {
         for (int i = 0; i < noOfCopies; i++) {
-            if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Pre Print")) {
-                printPreWeight();
-                break;
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Pre Print 2")) {
-                printPreWeight2();
-                break;
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Pre Print 3")) {
-                printPreWeight3();
-                break;
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Camera")) {
-                printCameraWeight();
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Plain Camera")) {
-                printPlainCameraWeight();
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Sri Pathy")) {
-                printPlainSriPathyWeight();
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "No Of Bags")) {
-                printPlainNoOfBagsWeight();
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Standard")) {
-                printStandard();
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Ice Water")) {
-                printIceWater();
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "EMJAY")) {
-                printEmjay();
-                break;
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Mani & Co")) {
-                printManiAndCo();
-                break;
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Mani & Co 2")) {
-                printManiAndCo2();
-                break;
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Plain Paper A4")) {
-                printPlainWeightA4();
-            } else if (Objects.equals(comboBoxPrintOptionForWeight.getSelectedItem(), "Quotation")) {
-                printQuotation();
-            } else {
-                printPlainWeight();
+            switch (Objects.toString(comboBoxPrintOptionForWeight.getSelectedItem(), "")) {
+                case "Pre Print":
+                    printPreWeight();
+                    break;
+                case "Pre Print 2":
+                    printPreWeight2();
+                    break;
+                case "Pre Print 3":
+                    printPreWeight3();
+                    break;
+                case "Camera":
+                    printCameraWeight();
+                    continue;
+                case "Plain Camera":
+                    printPlainCameraWeight();
+                    continue;
+                case "Sri Pathy":
+                    printPlainSriPathyWeight();
+                    continue;
+                case "No Of Bags":
+                    printPlainNoOfBagsWeight();
+                    continue;
+                case "Standard":
+                    printStandard();
+                    continue;
+                case "Ice Water":
+                    printIceWater();
+                    continue;
+                case "EMJAY":
+                    printEmjay();
+                    break;
+                case "Mani & Co":
+                    printManiAndCo();
+                    break;
+                case "Mani & Co 1":
+                    printManiAndCo1();
+                    continue;
+                case "Mani & Co 2":
+                    printManiAndCo2();
+                    break;
+                case "Plain Paper A4":
+                    printPlainWeightA4();
+                    continue;
+                case "Quotation":
+                    printQuotation();
+                    continue;
+                default:
+                    printPlainWeight();
             }
         }
     }
@@ -6238,6 +6251,93 @@ class WeighBridge {
         }
     }
 
+    private void printManiAndCo1() {
+        PrinterJob pj = PrinterJob.getPrinterJob();
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 8d * 72d;
+        double height = 6d * 72d;
+        double widthmargin = 0d * 72d;
+        double heightmargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+
+        pBook.append((graphics, pageFormat, pageIndex) -> {
+                    int margin = 30;
+                    int len = 20;
+                    int space = 20;
+
+                    int spacing = 400;
+                    String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
+
+                    graphics.setFont(new Font("Courier New", Font.BOLD, 15));
+                    graphics.drawString(StringUtils.center(title1.getText(), 60), margin, len += space);
+
+                    graphics.setFont(new Font("Courier New", Font.PLAIN, 13));
+                    graphics.drawString(StringUtils.center(title2.getText(), 71), margin, len += space);
+
+                    graphics.setFont(new Font("Courier New", Font.ITALIC, 13));
+                    graphics.drawString(StringUtils.center(textFieldTitle3.getText(), 71), margin, len += space);
+
+                    graphics.setFont(new Font("Courier New", Font.BOLD, 13));
+                    graphics.drawString(StringUtils.center("WEIGHMENT SLIP", 71), margin, len += space + 5);
+                    graphics.drawLine(margin, len - 18, 574, len - 18);
+                    graphics.drawLine(margin, len + 10, 574, len + 10);
+
+                    graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
+                    graphics.drawString(" Sl. No          : " + textFieldSlNo.getText(), margin, len += space + space);
+                    graphics.drawString(" Date  : " + temp[0].replaceAll("-", "/"), margin + spacing, len);
+                    graphics.drawString(" Vehicle No      : " + comboBoxVehicleNo.getEditor().getItem(), margin, len += space);
+                    graphics.drawString(" Time  : " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
+                    graphics.drawString(" Material Name   : " + comboBoxMaterial.getEditor().getItem(), margin, len += space);
+
+                    spacing = 170;
+                    temp = (textFieldGrossDateTime.getText() + " . . ").split(" ");
+                    graphics.drawString(" Date  : ", margin, len += space + space + space);
+                    graphics.drawLine(margin, len - 18, 574, len - 18);
+                    graphics.drawString(" Time  : ", margin + spacing, len);
+                    graphics.drawString("Laden Weight  : ", margin + spacing + spacing, len);
+
+                    graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                    graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len);
+                    graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
+                    graphics.drawString("                " + StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
+
+                    temp = (textFieldTareDateTime.getText() + " . . ").split(" ");
+                    graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len += space);
+                    graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
+                    graphics.drawString("                " + StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
+
+                    graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
+                    graphics.drawString(" Date  : ", margin, len);
+                    graphics.drawString(" Time  : ", margin + spacing, len);
+                    graphics.drawString("Unladen Weight: ", margin + spacing + spacing, len);
+
+                    graphics.drawString("Net Weight    : ", margin + spacing + spacing, len += space + space);
+                    graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                    graphics.drawString("                " + StringUtils.leftPad(textFieldNetWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
+
+                    graphics.drawLine(margin, len - 18, 574, len - 18);
+                    graphics.drawLine(margin, len + 10, 574, len + 10);
+
+                    graphics.setFont(new Font("Courier New", Font.BOLD, 13));
+                    graphics.drawString(" Department", margin, len += space + space + space);
+                    graphics.drawString(StringUtils.leftPad(textFieldFooter.getText(), 70, " "), margin, len);
+                    graphics.drawLine(margin, len + 10, 574, len + 10);
+
+                    return Printable.PAGE_EXISTS;
+                },
+                pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
     private void printManiAndCo2() {
         PrinterJob pj = PrinterJob.getPrinterJob();
         PageFormat pf = new PageFormat();
@@ -6692,7 +6792,7 @@ class WeighBridge {
                                  BufferedImage printImage = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
                                  BufferedImage cropImage = printImage.getSubimage(
                                          Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
-                                 graphics.drawImage(cropImage, 250, 100, 300, (int) (300.00 / cropImage.getWidth() * cropImage.getHeight()), null);
+                                 graphics.drawImage(cropImage, 250, 115, 300, (int) (300.00 / cropImage.getWidth() * cropImage.getHeight()), null);
                              } catch (IOException | RasterFormatException | NullPointerException ignored) {
                              }
 
