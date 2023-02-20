@@ -6265,67 +6265,87 @@ class WeighBridge {
         Book pBook = new Book();
 
         pBook.append((graphics, pageFormat, pageIndex) -> {
-                    int margin = 30;
-                    int len = 20;
+                    int margin = 35;
+                    int printArea = 534;
+                    int len = 30;
                     int space = 20;
+                    int lineSpace = 10;
 
-                    int spacing = 400;
+                    graphics.drawLine(margin - 5, len, margin - 5, len + 380);
+                    graphics.drawLine(570, len, 570, len + 380);
+                    graphics.drawLine(margin - 5, len, 570, len);
+                    graphics.drawLine(margin - 5, len + 380, 570, len + 380);
+
+                    graphics.setFont(new Font("Verdana", Font.BOLD | Font.ITALIC, 11));
                     String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
+                    String text = "WEIGHBRIDGE SLIP";
+                    graphics.drawString(text, margin + (printArea - graphics.getFontMetrics().stringWidth(text)) / 2, len += space);
+                    graphics.drawLine(margin - 5, len += lineSpace, 570, len);
+                    graphics.setFont(new Font("Verdana", Font.PLAIN, 11));
+                    graphics.drawString("Weighbridge Slip No", margin, len += space);
+                    graphics.drawString(": " + textFieldSlNo.getText(), margin + 130, len);
+                    graphics.drawString("Date     :  " + temp[0].replaceAll("-", " - "), 400, len);
+                    graphics.drawLine(margin - 5, len += lineSpace, 570, len);
 
-                    graphics.setFont(new Font("Courier New", Font.BOLD, 15));
-                    graphics.drawString(StringUtils.center(title1.getText(), 60), margin, len += space);
+                    graphics.drawString("Name of Work", margin, len += space);
+                    temp = (WordUtils.wrap(textFieldNameOfWork.getText().trim(), 62, "\n", true) + " \n ").split("\n");
+                    graphics.drawString(": " + temp[0], margin + 130, len);
+                    text = Arrays.stream(temp).skip(1).collect(Collectors.joining(""));
+                    graphics.drawString(text, margin + (printArea - graphics.getFontMetrics().stringWidth(text)) / 2, len += space);
+                    graphics.drawLine(margin - 5, len += lineSpace, 570, len);
 
-                    graphics.setFont(new Font("Courier New", Font.PLAIN, 13));
-                    graphics.drawString(StringUtils.center(title2.getText(), 71), margin, len += space);
+                    graphics.drawString("Name of Department", margin, len += space);
+                    graphics.drawString(": " + textFieldNameOfDepartment.getText(), margin + 130, len);
+                    graphics.drawLine(margin - 5, len += lineSpace, 570, len);
 
-                    graphics.setFont(new Font("Courier New", Font.ITALIC, 13));
-                    graphics.drawString(StringUtils.center(textFieldTitle3.getText(), 71), margin, len += space);
+                    graphics.drawString("Name of Contractor", margin, len += space);
+                    graphics.drawString(": " + textFieldNameOfContractor.getText(), margin + 130, len);
+                    graphics.drawLine(margin - 5, len += lineSpace, 570, len);
 
-                    graphics.setFont(new Font("Courier New", Font.BOLD, 13));
-                    graphics.drawString(StringUtils.center("WEIGHMENT SLIP", 71), margin, len += space + 5);
-                    graphics.drawLine(margin, len - 18, 574, len - 18);
-                    graphics.drawLine(margin, len + 10, 574, len + 10);
+                    graphics.drawString("Agreement No", margin, len += space);
+                    graphics.drawString(": " + textFieldAgreementNo.getText(), margin + 90, len);
+                    graphics.drawString("Estimate No", 300, len);
+                    graphics.drawString(": " + textFieldEstimateNo.getText(), 300 + 90, len);
+                    graphics.drawLine(margin - 5, len += lineSpace, 570, len);
 
-                    graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
-                    graphics.drawString(" Sl. No          : " + textFieldSlNo.getText(), margin, len += space + space);
-                    graphics.drawString(" Date  : " + temp[0].replaceAll("-", "/"), margin + spacing, len);
-                    graphics.drawString(" Vehicle No      : " + comboBoxVehicleNo.getEditor().getItem(), margin, len += space);
-                    graphics.drawString(" Time  : " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
-                    graphics.drawString(" Material Name   : " + comboBoxMaterial.getEditor().getItem(), margin, len += space);
+                    graphics.drawString("Vehicle No", margin, len += space);
+                    graphics.drawString(": " + comboBoxVehicleNo.getEditor().getItem(), margin + 90, len);
+                    graphics.drawString("Material Name", 300, len);
+                    graphics.drawString(": " + comboBoxMaterial.getEditor().getItem(), 300 + 90, len);
+                    graphics.drawLine(margin - 5, len += lineSpace, 570, len);
 
-                    spacing = 170;
                     temp = (textFieldGrossDateTime.getText() + " . . ").split(" ");
-                    graphics.drawString(" Date  : ", margin, len += space + space + space);
-                    graphics.drawLine(margin, len - 18, 574, len - 18);
-                    graphics.drawString(" Time  : ", margin + spacing, len);
-                    graphics.drawString("Laden Weight  : ", margin + spacing + spacing, len);
+                    graphics.drawString("Date    :", margin, len += space);
+                    graphics.drawString("Time    :", 200, len);
+                    graphics.drawString("Laden Weight", 350, len);
+                    graphics.drawString(":", 350 + 100, len);
+                    graphics.setFont(new Font("Verdana", Font.BOLD, 11));
+                    graphics.drawString(temp[0].replaceAll("-", " - "), margin + 50, len);
+                    graphics.drawString(temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), 200 + 50, len);
+                    text = textFieldGrossWt.getText() + " Kg";
+                    graphics.drawString(text, 350 + 100 + (100 - graphics.getFontMetrics().stringWidth(text)), len);
 
-                    graphics.setFont(new Font("Courier New", Font.BOLD, 12));
-                    graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len);
-                    graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
-                    graphics.drawString("                " + StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
-
+                    graphics.setFont(new Font("Verdana", Font.PLAIN, 11));
                     temp = (textFieldTareDateTime.getText() + " . . ").split(" ");
-                    graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len += space);
-                    graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
-                    graphics.drawString("                " + StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
+                    graphics.drawString("Date    :", margin, len += space);
+                    graphics.drawString("Time    :", 200, len);
+                    graphics.drawString("UnLaden Weight", 350, len);
+                    graphics.drawString(":", 350 + 100, len);
+                    graphics.setFont(new Font("Verdana", Font.BOLD, 11));
+                    graphics.drawString(temp[0].replaceAll("-", " - "), margin + 50, len);
+                    graphics.drawString(temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), 200 + 50, len);
+                    text = textFieldTareWt.getText() + " Kg";
+                    graphics.drawString(text, 350 + 100 + (100 - graphics.getFontMetrics().stringWidth(text)), len);
+                    graphics.drawLine(margin - 5, len += lineSpace, 570, len);
 
-                    graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
-                    graphics.drawString(" Date  : ", margin, len);
-                    graphics.drawString(" Time  : ", margin + spacing, len);
-                    graphics.drawString("Unladen Weight: ", margin + spacing + spacing, len);
+                    graphics.drawString("Net Weight", 350, len += space);
+                    graphics.drawString(":", 350 + 100, len);
+                    text = textFieldNetWt.getText() + " Kg";
+                    graphics.drawString(text, 350 + 100 + (100 - graphics.getFontMetrics().stringWidth(text)), len);
+                    graphics.drawLine(margin - 5, len += lineSpace, 570, len);
 
-                    graphics.drawString("Net Weight    : ", margin + spacing + spacing, len += space + space);
-                    graphics.setFont(new Font("Courier New", Font.BOLD, 12));
-                    graphics.drawString("                " + StringUtils.leftPad(textFieldNetWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
-
-                    graphics.drawLine(margin, len - 18, 574, len - 18);
-                    graphics.drawLine(margin, len + 10, 574, len + 10);
-
-                    graphics.setFont(new Font("Courier New", Font.BOLD, 13));
-                    graphics.drawString(" Department", margin, len += space + space + space);
-                    graphics.drawString(StringUtils.leftPad(textFieldFooter.getText(), 70, " "), margin, len);
-                    graphics.drawLine(margin, len + 10, 574, len + 10);
+                    graphics.drawString("Signature of the Weigh Bridge office            Signature of the Weigh Bridge office", margin + 15, len += 40);
+                    graphics.drawString("In charge (Contractor)                                 In charge (Department)", margin + 55, len + space);
 
                     return Printable.PAGE_EXISTS;
                 },
@@ -6352,9 +6372,9 @@ class WeighBridge {
         Book pBook = new Book();
 
         pBook.append((graphics, pageFormat, pageIndex) -> {
-                    int margin = 30;
+                    int margin = 35;
                     int printArea = 534;
-                    int len = 20;
+                    int len = 30;
                     int space = 20;
                     int lineSpace = 10;
 
