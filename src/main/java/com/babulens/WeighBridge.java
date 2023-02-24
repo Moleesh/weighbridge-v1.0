@@ -7380,6 +7380,7 @@ class WeighBridge {
         pf.setPaper(paper);
         Book pBook = new Book();
         pBook.append(textPane.getPrintable(null, null), pf, 99);
+        System.out.println(textPane.getWidth());
         pj.setPageable(pBook);
         try {
             pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
