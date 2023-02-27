@@ -3946,21 +3946,18 @@ class WeighBridge {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
                     DefaultTableModel model = (DefaultTableModel) tableVehicleTare.getModel();
-                    for (int i = 1; i <= model.getRowCount(); i++) {
-                        rs.moveToInsertRow();
-                        rs.updateString("VEHICLENO", (String) model.getValueAt(i - 1, 0));
-                        rs.updateString("PLACE", (String) model.getValueAt(i - 1, 1));
-                        rs.updateString("PHONE_NUMBER", (String) model.getValueAt(i - 1, 2));
-                        rs.updateInt("TAREWT", Integer.parseInt(("0" + model.getValueAt(i - 1, 3)).replaceAll("\\D", "")));
-                        Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 4));
-                        rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
-                        rs.updateTime("TARETIME", new java.sql.Time(date.getTime()));
-                        rs.updateInt("SQNO", i);
-                        rs.insertRow();
+                    model.setRowCount(0);
+                    while (rs.next()) {
+                        model.addRow(new Object[]{
+                                rs.getString("VEHICLENO"),
+                                rs.getString("PLACE"),
+                                rs.getString("PHONE_NUMBER"),
+                                rs.getInt("TAREWT"),
+                                dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME")).getTime()))
+                        });
                     }
                 } catch (SQLException | ParseException ignored) {
                 }
-
             }
         });
         panelSettings1.setBackground(new Color(0, 255, 127));
