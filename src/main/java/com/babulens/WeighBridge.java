@@ -4553,6 +4553,7 @@ class WeighBridge {
         comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{
                 "Camera",
                 "EMJAY",
+                "EMJAY 1",
                 "Ice Water",
                 "Mani & Co",
                 "Mani & Co 1",
@@ -5276,6 +5277,9 @@ class WeighBridge {
                     continue;
                 case "EMJAY":
                     printEmjay();
+                    break;
+                case "EMJAY 1":
+                    printEmjay1();
                     break;
                 case "Mani & Co":
                     printManiAndCo();
@@ -6130,6 +6134,94 @@ class WeighBridge {
                         graphics.drawString(" Date  : ", margin, len);
                         graphics.drawString(" Time  : ", margin + spacing, len);
                         graphics.drawString("Second Weight : ", margin + spacing + spacing, len);
+
+                        graphics.drawString("Net Weight    : ", margin + spacing + spacing, len += space + space);
+                        graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                        graphics.drawString("                " + StringUtils.leftPad(textFieldNetWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
+
+                        graphics.drawLine(margin, len - 18, 574, len - 18);
+                        graphics.drawLine(margin, len + 10, 574, len + 10);
+
+                        graphics.setFont(new Font("Courier New", Font.BOLD, 13));
+                        graphics.drawString(" Department", margin, len += space + space + space);
+                        graphics.drawString(StringUtils.leftPad(textFieldFooter.getText(), 70, " "), margin, len);
+                        graphics.drawLine(margin, len + 10, 574, len + 10);
+
+                        len += space + space + space;
+                    }
+                    return Printable.PAGE_EXISTS;
+
+                },
+                pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
+    private void printEmjay1() {
+        PrinterJob pj = PrinterJob.getPrinterJob();
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 8d * 72d;
+        double height = 12d * 72d;
+        double widthmargin = 0d * 72d;
+        double heightmargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+
+        pBook.append((graphics, pageFormat, pageIndex) -> {
+                    int margin = 30;
+                    int len = 40;
+                    int space = 20;
+
+                    for (int i = 0; i < 2; i++) {
+                        int spacing = 400;
+                        String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
+
+                        graphics.setFont(new Font("Courier New", Font.BOLD, 15));
+                        graphics.drawString(StringUtils.center(title1.getText(), 60), margin, len += space);
+
+                        graphics.setFont(new Font("Courier New", Font.ITALIC, 13));
+                        graphics.drawString(StringUtils.center(title2.getText(), 71), margin, len += space);
+
+                        graphics.setFont(new Font("Courier New", Font.BOLD, 13));
+                        graphics.drawString(StringUtils.center("WEIGHMENT SLIP", 71), margin, len += space + 5);
+                        graphics.drawLine(margin, len - 18, 574, len - 18);
+                        graphics.drawLine(margin, len + 10, 574, len + 10);
+
+                        graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
+                        graphics.drawString(" CHIT No         : " + textFieldSlNo.getText(), margin, len += space + space);
+                        graphics.drawString(" Date  : " + temp[0].replaceAll("-", "/"), margin + spacing, len);
+                        graphics.drawString(" Vehicle No      : " + comboBoxVehicleNo.getEditor().getItem(), margin, len += space);
+                        graphics.drawString(" Time  : " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
+                        graphics.drawString(" Material Name   : " + comboBoxMaterial.getEditor().getItem(), margin, len += space);
+
+                        spacing = 170;
+                        temp = (textFieldGrossDateTime.getText() + " . . ").split(" ");
+                        graphics.drawString(" Date  : ", margin, len += space + space + space);
+                        graphics.drawLine(margin, len - 18, 574, len - 18);
+                        graphics.drawString(" Time  : ", margin + spacing, len);
+                        graphics.drawString("Gross Weight  : ", margin + spacing + spacing, len);
+
+                        graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                        graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len);
+                        graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
+                        graphics.drawString("                " + StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
+
+                        temp = (textFieldTareDateTime.getText() + " . . ").split(" ");
+                        graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len += space);
+                        graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
+                        graphics.drawString("                " + StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
+
+                        graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
+                        graphics.drawString(" Date  : ", margin, len);
+                        graphics.drawString(" Time  : ", margin + spacing, len);
+                        graphics.drawString("Tare Weight   : ", margin + spacing + spacing, len);
 
                         graphics.drawString("Net Weight    : ", margin + spacing + spacing, len += space + space);
                         graphics.setFont(new Font("Courier New", Font.BOLD, 12));
