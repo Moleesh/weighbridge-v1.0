@@ -53,7 +53,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 class WeighBridge {
-    private static final String DB_CONNECTION = "jdbc:h2:./weighdata";
+    private static final String DB_CONNECTION = "jdbc:h2:./weighdata;DEFRAG_ALWAYS=TRUE";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "toor";
     static DecimalFormat decimalFormat = new DecimalFormat("0");
