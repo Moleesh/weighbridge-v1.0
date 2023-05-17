@@ -3930,7 +3930,7 @@ class WeighBridge {
                     rePrint(model.getValueAt(i, 1).toString());
                     print();
 
-                    if (i % 50 == 0 && !(JOptionPane.showConfirmDialog(null, "Do you want to continue print from (" + i + 1 + ") ?", "Continue Print", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)) {
+                    if (i % 50 == 0 && !(JOptionPane.showConfirmDialog(null, "Do you want to continue print from (" + model.getValueAt(i, 1) + ") ?", "Continue Print", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)) {
                         break;
                     }
                 }
