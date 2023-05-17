@@ -877,7 +877,7 @@ class WeighBridge {
                 rs.updateString("PLACE", (String) model.getValueAt(i - 1, 1));
                 rs.updateString("PHONE_NUMBER", (String) model.getValueAt(i - 1, 2));
                 rs.updateInt("TAREWT", Integer.parseInt(("0" + model.getValueAt(i - 1, 3)).replaceAll("\\D", "")));
-                Date date = dateAndTimeFormat.parse("" + model.getValueAt(i - 1, 4));
+                Date date = dateAndTimeFormat.parse(String.valueOf(model.getValueAt(i - 1, 4)));
                 rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                 rs.updateTime("TARETIME", new java.sql.Time(date.getTime()));
                 rs.updateInt("SQNO", i);
@@ -1363,7 +1363,7 @@ class WeighBridge {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem() + "'");
                     if (rs.next()) {
-                        textFieldCharges.setText("" + (int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText())));
+                        textFieldCharges.setText(String.valueOf((int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText()))));
                     } else {
                         textFieldCharges.setText("0");
                     }
@@ -1454,7 +1454,7 @@ class WeighBridge {
                         textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
                     }
                     textFieldDcNo.setText(rs.getString("DCNO"));
-                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                     comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                     comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                     comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
@@ -1533,7 +1533,7 @@ class WeighBridge {
                         textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
                     }
                     textFieldDcNo.setText(rs.getString("DCNO"));
-                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                     comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                     comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                     comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
@@ -1703,7 +1703,7 @@ class WeighBridge {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem() + "'");
                     if (rs.next()) {
-                        textFieldCharges.setText("" + (int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText())));
+                        textFieldCharges.setText(String.valueOf((int) (rs.getDouble("COST") * Double.parseDouble(textFieldNetWt.getText()))));
                     } else {
                         textFieldCharges.setText("0");
                     }
@@ -1816,12 +1816,12 @@ class WeighBridge {
                     Date date = dateAndTimeFormatdate.parse(textFieldDcDate.getText());
                     rs.updateDate("DCNODATE", new java.sql.Date(date.getTime()));
                 }
-                String temp = ("" + comboBoxCustomerName.getSelectedItem()).toUpperCase();
+                String temp = (String.valueOf(comboBoxCustomerName.getSelectedItem())).toUpperCase();
                 if (temp.equals("NULL")) {
                     temp = "";
                 }
                 rs.updateString("CUSTOMERNAME", temp);
-                temp = ("" + comboBoxTransporterName.getSelectedItem()).toUpperCase();
+                temp = (String.valueOf(comboBoxTransporterName.getSelectedItem())).toUpperCase();
                 if (temp.equals("NULL")) {
                     temp = "";
                 }
@@ -2271,7 +2271,7 @@ class WeighBridge {
                     ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + result);
                     rs.next();
                     textFieldDcNo.setText(rs.getString("DCNO"));
-                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                     comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                     comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                     comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
@@ -2348,7 +2348,7 @@ class WeighBridge {
                     ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + result);
                     rs.next();
                     textFieldDcNo.setText(rs.getString("DCNO"));
-                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                     comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                     comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                     comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
@@ -2585,7 +2585,7 @@ class WeighBridge {
                                 if (rs.getInt("TAREWT") == 0) {
                                     if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the last gross Weight ?", "Gross Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                                         textFieldDcNo.setText(rs.getString("DCNO"));
-                                        textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+                                        textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                                         comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                                         comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                                         textFieldPlace.setText(rs.getString("PLACE"));
@@ -2617,7 +2617,7 @@ class WeighBridge {
                                 if (rs.getInt("TAREWT") == 0) {
                                     if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the last gross Weight ?", "Gross Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                                         textFieldDcNo.setText(rs.getString("DCNO"));
-                                        textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+                                        textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                                         comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                                         comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                                         textFieldPlace.setText(rs.getString("PLACE"));
@@ -2649,7 +2649,7 @@ class WeighBridge {
                                     if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the last tare Weight ?", "Tare Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                                         textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
                                         textFieldDcNo.setText(rs.getString("DCNO"));
-                                        textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+                                        textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                                         comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                                         comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                                         comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
@@ -3925,9 +3925,14 @@ class WeighBridge {
                 noOfCopies = Integer.parseInt(textFieldNoOfCopies.getText());
                 getReport();
                 TableModel model = tableReport.getModel();
+
                 for (int i = 0; i < model.getRowCount(); i++) {
                     rePrint(model.getValueAt(i, 1).toString());
                     print();
+
+                    if (i % 50 == 0 && !(JOptionPane.showConfirmDialog(null, "Do you want to continue print ?", "Continue Print", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)) {
+                        break;
+                    }
                 }
                 clear();
             }
@@ -5379,7 +5384,7 @@ class WeighBridge {
                     dateTemp12 = datePicker2.getDate();
                     date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
                     vehicleNo = textFieldDetail.getText();
-                    material = "" + comboBoxMaterialReport.getSelectedItem();
+                    material = String.valueOf(comboBoxMaterialReport.getSelectedItem());
                     if ("null".contains(material.trim())) {
                         material = "";
                     } else {
@@ -5435,39 +5440,39 @@ class WeighBridge {
                             gross,
                             tare,
                             net;
-                    date = "" + rs.getDate("GROSSDATE");
+                    date = String.valueOf(rs.getDate("GROSSDATE"));
                     if (date.equals("null")) {
                         date = "";
                     } else {
                         date = dateAndTimeFormatdate.format(rs.getDate("GROSSDATE"));
                     }
-                    time = "" + rs.getTime("GROSSTIME");
+                    time = String.valueOf(rs.getTime("GROSSTIME"));
                     if (time.equals("null")) {
                         time = "";
                     } else {
                         time = dateAndTimeFormattime.format(rs.getTime("GROSSTIME"));
                     }
                     gross = date + " " + time;
-                    date = "" + rs.getDate("TAREDATE");
+                    date = String.valueOf(rs.getDate("TAREDATE"));
                     if (date.equals("null")) {
                         date = "";
                     } else {
                         date = dateAndTimeFormatdate.format(rs.getDate("TAREDATE"));
                     }
-                    time = "" + rs.getTime("TARETIME");
+                    time = String.valueOf(rs.getTime("TARETIME"));
                     if (time.equals("null")) {
                         time = "";
                     } else {
                         time = dateAndTimeFormattime.format(rs.getTime("TARETIME"));
                     }
                     tare = date + " " + time;
-                    date = "" + rs.getDate("NETDATE");
+                    date = String.valueOf(rs.getDate("NETDATE"));
                     if (date.equals("null")) {
                         date = "";
                     } else {
                         date = dateAndTimeFormatdate.format(rs.getDate("NETDATE"));
                     }
-                    time = "" + rs.getTime("NETTIME");
+                    time = String.valueOf(rs.getTime("NETTIME"));
                     if (time.equals("null")) {
                         time = "";
                     } else {
@@ -5483,7 +5488,7 @@ class WeighBridge {
                             /*02*/
                             rs.getString("DCNO"),
                             /*03*/
-                            ("" + rs.getDate("DCNODATE")).equals("null") ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")),
+                            (String.valueOf(rs.getDate("DCNODATE"))).equals("null") ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")),
                             /*04*/
                             rs.getString("CUSTOMERNAME"),
                             /*05*/
@@ -5635,7 +5640,7 @@ class WeighBridge {
             if (rs.next()) {
                 textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
                 textFieldDcNo.setText(rs.getString("DCNO"));
-                textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : "" + dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
+                textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")));
                 comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                 comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                 comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
@@ -7587,8 +7592,8 @@ class WeighBridge {
         String format = " %1$-17s %2$-11s %3$-4s %4$-12s %5$-9s %6$-9s %7$-8s %8$-8s %9$-8s %10$-8s %11$-10s %12$s\n";
         String temp = "\n";
         for (int i = 0; i < model.getRowCount(); i++) {
-            int test = (int) (Integer.parseInt(0 + ("" + model.getValueAt(i, 19)).replaceAll("[^.\\d]", "")) * Double.parseDouble(0 + ("" + model.getValueAt(i, 12)).replaceAll("[^.\\d]", "")));
-            temp = temp.concat(String.format(format, model.getValueAt(i, 4) != null ? model.getValueAt(i, 4).toString() : "", model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "", StringUtils.leftPad(model.getValueAt(i, 1) != null ? model.getValueAt(i, 1).toString() : "", 4, " "), model.getValueAt(i, 5) != null ? model.getValueAt(i, 5).toString() : "", StringUtils.center(model.getValueAt(i, 9) != null ? model.getValueAt(i, 9).toString() : "", 9), StringUtils.leftPad(model.getValueAt(i, 19) != null ? model.getValueAt(i, 19).toString() : "", 8, " "), StringUtils.leftPad(model.getValueAt(i, 17) != null ? model.getValueAt(i, 17).toString() : "", 8, " "), StringUtils.leftPad(model.getValueAt(i, 11) != null ? model.getValueAt(i, 11).toString() : "", 8, " "), StringUtils.leftPad("" + test, 8, " "), StringUtils.leftPad(model.getValueAt(i, 10) != null ? model.getValueAt(i, 10).toString() : "", 8, " "), StringUtils.leftPad(model.getValueAt(i, 22) != null ? model.getValueAt(i, 22).toString() : "", 8, " "), model.getValueAt(i, 23) != null ? model.getValueAt(i, 23).toString().replaceAll(".{24}(?=.)", "$0\n                                                                                                                    ") : ""));
+            int test = (int) (Integer.parseInt(0 + (String.valueOf(model.getValueAt(i, 19))).replaceAll("[^.\\d]", "")) * Double.parseDouble(0 + (String.valueOf(model.getValueAt(i, 12))).replaceAll("[^.\\d]", "")));
+            temp = temp.concat(String.format(format, model.getValueAt(i, 4) != null ? model.getValueAt(i, 4).toString() : "", model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "", StringUtils.leftPad(model.getValueAt(i, 1) != null ? model.getValueAt(i, 1).toString() : "", 4, " "), model.getValueAt(i, 5) != null ? model.getValueAt(i, 5).toString() : "", StringUtils.center(model.getValueAt(i, 9) != null ? model.getValueAt(i, 9).toString() : "", 9), StringUtils.leftPad(model.getValueAt(i, 19) != null ? model.getValueAt(i, 19).toString() : "", 8, " "), StringUtils.leftPad(model.getValueAt(i, 17) != null ? model.getValueAt(i, 17).toString() : "", 8, " "), StringUtils.leftPad(model.getValueAt(i, 11) != null ? model.getValueAt(i, 11).toString() : "", 8, " "), StringUtils.leftPad(String.valueOf(test), 8, " "), StringUtils.leftPad(model.getValueAt(i, 10) != null ? model.getValueAt(i, 10).toString() : "", 8, " "), StringUtils.leftPad(model.getValueAt(i, 22) != null ? model.getValueAt(i, 22).toString() : "", 8, " "), model.getValueAt(i, 23) != null ? model.getValueAt(i, 23).toString().replaceAll(".{24}(?=.)", "$0\n                                                                                                                    ") : ""));
         }
 
         String[] initString = {
@@ -7989,31 +7994,31 @@ class WeighBridge {
 
         if (charge != -1) {
             cell = row.createCell(charge);
-            cell.setCellFormula("SUM(" + getColumn.charAt(charge) + "4:" + getColumn.charAt(charge) + "" + rowNum + ")");
+            cell.setCellFormula("SUM(" + getColumn.charAt(charge) + "4:" + getColumn.charAt(charge) + rowNum + ")");
         }
         if (grossWt != -1) {
             cell = row.createCell(grossWt);
-            cell.setCellFormula("SUM(" + getColumn.charAt(grossWt) + "4:" + getColumn.charAt(grossWt) + "" + rowNum + ")");
+            cell.setCellFormula("SUM(" + getColumn.charAt(grossWt) + "4:" + getColumn.charAt(grossWt) + rowNum + ")");
         }
         if (tareWt != -1) {
             cell = row.createCell(tareWt);
-            cell.setCellFormula("SUM(" + getColumn.charAt(tareWt) + "4:" + getColumn.charAt(tareWt) + "" + rowNum + ")");
+            cell.setCellFormula("SUM(" + getColumn.charAt(tareWt) + "4:" + getColumn.charAt(tareWt) + rowNum + ")");
         }
         if (roundOff != -1) {
             cell = row.createCell(roundOff);
-            cell.setCellFormula("SUM(" + getColumn.charAt(roundOff) + "4:" + getColumn.charAt(roundOff) + "" + rowNum + ")");
+            cell.setCellFormula("SUM(" + getColumn.charAt(roundOff) + "4:" + getColumn.charAt(roundOff) + rowNum + ")");
         }
         if (netWt != -1) {
             cell = row.createCell(netWt);
-            cell.setCellFormula("SUM(" + getColumn.charAt(netWt) + "4:" + getColumn.charAt(netWt) + "" + rowNum + ")");
+            cell.setCellFormula("SUM(" + getColumn.charAt(netWt) + "4:" + getColumn.charAt(netWt) + rowNum + ")");
         }
         if (finalWt != -1) {
             cell = row.createCell(finalWt);
-            cell.setCellFormula("SUM(" + getColumn.charAt(finalWt) + "4:" + getColumn.charAt(finalWt) + "" + rowNum + ")");
+            cell.setCellFormula("SUM(" + getColumn.charAt(finalWt) + "4:" + getColumn.charAt(finalWt) + rowNum + ")");
         }
         if (finalAmount != -1) {
             cell = row.createCell(finalAmount);
-            cell.setCellFormula("SUM(" + getColumn.charAt(finalAmount) + "4:" + getColumn.charAt(finalAmount) + "" + rowNum + ")");
+            cell.setCellFormula("SUM(" + getColumn.charAt(finalAmount) + "4:" + getColumn.charAt(finalAmount) + rowNum + ")");
         }
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, sheet.getRow(3).getLastCellNum() - 1));
         sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, sheet.getRow(3).getLastCellNum() - 1));
@@ -8148,13 +8153,13 @@ class WeighBridge {
         row = sheet.createRow(rowNum);
 
         cell = row.createCell(5);
-        cell.setCellFormula("SUM(" + getColumn.charAt(5) + "6:" + getColumn.charAt(5) + "" + rowNum + ")");
+        cell.setCellFormula("SUM(" + getColumn.charAt(5) + "6:" + getColumn.charAt(5) + rowNum + ")");
 
         cell = row.createCell(7);
-        cell.setCellFormula("SUM(" + getColumn.charAt(7) + "6:" + getColumn.charAt(7) + "" + rowNum + ")");
+        cell.setCellFormula("SUM(" + getColumn.charAt(7) + "6:" + getColumn.charAt(7) + rowNum + ")");
 
         cell = row.createCell(8);
-        cell.setCellFormula("SUM(" + getColumn.charAt(8) + "6:" + getColumn.charAt(8) + "" + rowNum + ")");
+        cell.setCellFormula("SUM(" + getColumn.charAt(8) + "6:" + getColumn.charAt(8) + rowNum + ")");
 
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 8));
         sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 8));
@@ -8361,9 +8366,9 @@ class WeighBridge {
                 @Override
                 public void serialEvent(SerialPortEvent event) {
                     if (temp[4].equals("t")) {
-                        lblWeight.setText("" + Integer.parseInt("0" + new StringBuilder(new String(event.getReceivedData())).reverse().toString().replaceAll("[^\\d" + temp[3] + "]", "").split(temp[3])[0]));
+                        lblWeight.setText(String.valueOf(Integer.parseInt("0" + new StringBuilder(new String(event.getReceivedData())).reverse().toString().replaceAll("[^\\d" + temp[3] + "]", "").split(temp[3])[0])));
                     } else {
-                        lblWeight.setText("" + Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^\\d" + temp[3] + "]", "").split(temp[3])[0]));
+                        lblWeight.setText(String.valueOf(Integer.parseInt("0" + new String(event.getReceivedData()).replaceAll("[^\\d" + temp[3] + "]", "").split(temp[3])[0])));
                     }
                 }
             });
@@ -9198,8 +9203,8 @@ class WeighBridge {
                             int col = 1;
                             rs.updateString("DCNO", (String) model.getValueAt(row, ++col));
 
-                            if (!("" + model.getValueAt(row, ++col)).trim().equals("")) {
-                                Date date = dateAndTimeFormatdate.parse("" + model.getValueAt(row, col));
+                            if (!(String.valueOf(model.getValueAt(row, ++col))).trim().equals("")) {
+                                Date date = dateAndTimeFormatdate.parse(String.valueOf(model.getValueAt(row, col)));
                                 rs.updateDate("DCNODATE", new java.sql.Date(date.getTime()));
                             } else {
                                 rs.updateDate("DCNODATE", null);
@@ -9214,10 +9219,10 @@ class WeighBridge {
                             rs.updateInt("NOOFBAGS", Integer.parseInt("0" + model.getValueAt(row, ++col)));
                             rs.updateDouble("CHARGES", Double.parseDouble("0" + model.getValueAt(row, ++col)));
                             rs.updateBoolean("CREDIT", model.getValueAt(row, ++col).toString().equalsIgnoreCase("true"));
-                            rs.updateInt("GROSSWT", Integer.parseInt("" + model.getValueAt(row, ++col)));
+                            rs.updateInt("GROSSWT", Integer.parseInt(String.valueOf(model.getValueAt(row, ++col))));
 
-                            if (!("" + model.getValueAt(row, ++col)).trim().equals("")) {
-                                Date date = dateAndTimeFormat.parse("" + model.getValueAt(row, col));
+                            if (!(String.valueOf(model.getValueAt(row, ++col))).trim().equals("")) {
+                                Date date = dateAndTimeFormat.parse(String.valueOf(model.getValueAt(row, col)));
                                 rs.updateDate("GROSSDATE", new java.sql.Date(date.getTime()));
                                 rs.updateTime("GROSSTIME", new Time(date.getTime()));
                             } else {
@@ -9225,10 +9230,10 @@ class WeighBridge {
                                 rs.updateTime("GROSSTIME", null);
                             }
 
-                            rs.updateInt("TAREWT", Integer.parseInt("" + model.getValueAt(row, ++col)));
+                            rs.updateInt("TAREWT", Integer.parseInt(String.valueOf(model.getValueAt(row, ++col))));
 
-                            if (!("" + model.getValueAt(row, ++col)).trim().equals("")) {
-                                Date date = dateAndTimeFormat.parse("" + model.getValueAt(row, col));
+                            if (!(String.valueOf(model.getValueAt(row, ++col))).trim().equals("")) {
+                                Date date = dateAndTimeFormat.parse(String.valueOf(model.getValueAt(row, col)));
                                 rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                                 rs.updateTime("TARETIME", new Time(date.getTime()));
                             } else {
@@ -9238,8 +9243,8 @@ class WeighBridge {
                             rs.updateDouble("DEDUCTION_OR_PER_COST", Double.parseDouble("0" + model.getValueAt(row, ++col)));
                             rs.updateDouble("ROUND_OFF", Double.parseDouble("0" + model.getValueAt(row, ++col)));
                             rs.updateInt("NETWT", Integer.parseInt("0" + model.getValueAt(row, ++col)));
-                            if (!("" + model.getValueAt(row, ++col)).trim().equals("")) {
-                                Date date = dateAndTimeFormat.parse("" + model.getValueAt(row, col));
+                            if (!(String.valueOf(model.getValueAt(row, ++col))).trim().equals("")) {
+                                Date date = dateAndTimeFormat.parse(String.valueOf(model.getValueAt(row, col)));
                                 rs.updateDate("NETDATE", new java.sql.Date(date.getTime()));
                                 rs.updateTime("NETTIME", new Time(date.getTime()));
                             } else {
@@ -9250,7 +9255,7 @@ class WeighBridge {
                             rs.updateInt("FINALWT", Integer.parseInt("0" + model.getValueAt(row, ++col)));
                             rs.updateInt("FINALAMOUNT", Integer.parseInt("0" + model.getValueAt(row, ++col)));
 
-                            rs.updateString("REMARKS", model.getValueAt(row, ++col) != null ? "" + model.getValueAt(row, col) : "");
+                            rs.updateString("REMARKS", model.getValueAt(row, ++col) != null ? String.valueOf(model.getValueAt(row, col)) : "");
                             rs.updateBoolean("MANUAL", true);
                             rs.updateRow();
 
@@ -9259,39 +9264,39 @@ class WeighBridge {
                                     gross,
                                     tare,
                                     net;
-                            date = "" + rs.getDate("GROSSDATE");
+                            date = String.valueOf(rs.getDate("GROSSDATE"));
                             if (date.equals("null")) {
                                 date = "";
                             } else {
                                 date = dateAndTimeFormatdate.format(rs.getDate("GROSSDATE"));
                             }
-                            time = "" + rs.getTime("GROSSTIME");
+                            time = String.valueOf(rs.getTime("GROSSTIME"));
                             if (time.equals("null")) {
                                 time = "";
                             } else {
                                 time = dateAndTimeFormattime.format(rs.getTime("GROSSTIME"));
                             }
                             gross = date + " " + time;
-                            date = "" + rs.getDate("TAREDATE");
+                            date = String.valueOf(rs.getDate("TAREDATE"));
                             if (date.equals("null")) {
                                 date = "";
                             } else {
                                 date = dateAndTimeFormatdate.format(rs.getDate("TAREDATE"));
                             }
-                            time = "" + rs.getTime("TARETIME");
+                            time = String.valueOf(rs.getTime("TARETIME"));
                             if (time.equals("null")) {
                                 time = "";
                             } else {
                                 time = dateAndTimeFormattime.format(rs.getTime("TARETIME"));
                             }
                             tare = date + " " + time;
-                            date = "" + rs.getDate("NETDATE");
+                            date = String.valueOf(rs.getDate("NETDATE"));
                             if (date.equals("null")) {
                                 date = "";
                             } else {
                                 date = dateAndTimeFormatdate.format(rs.getDate("NETDATE"));
                             }
-                            time = "" + rs.getTime("NETTIME");
+                            time = String.valueOf(rs.getTime("NETTIME"));
                             if (time.equals("null")) {
                                 time = "";
                             } else {
@@ -9301,7 +9306,7 @@ class WeighBridge {
                             col = 1;
                             for (Object cell : new Object[]{
                                     rs.getString("DCNO"),
-                                    ("" + rs.getDate("DCNODATE")).equals("null") ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")),
+                                    (String.valueOf(rs.getDate("DCNODATE"))).equals("null") ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")),
                                     rs.getString("CUSTOMERNAME"),
                                     rs.getString("DRIVERNAME"),
                                     rs.getString("VEHICLENO"),
