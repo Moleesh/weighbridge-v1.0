@@ -7474,7 +7474,6 @@ class WeighBridge {
         pf.setPaper(paper);
         Book pBook = new Book();
         pBook.append(textPane.getPrintable(null, null), pf, 99);
-        System.out.println(textPane.getWidth());
         pj.setPageable(pBook);
         try {
             pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
@@ -7525,7 +7524,7 @@ class WeighBridge {
 
         JTextPane textPane = new JTextPane();
         StyledDocument doc = textPane.getStyledDocument();
-        addStylesToprintReportWeight(doc);
+        addStylesPrintReportWeight(doc);
 
         try {
             for (int i = 0; i < initString.length; i++) {
@@ -7536,7 +7535,7 @@ class WeighBridge {
         return textPane;
     }
 
-    private void addStylesToprintReportWeight(StyledDocument doc) {
+    private void addStylesPrintReportWeight(StyledDocument doc) {
         Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
         Style regular = doc.addStyle("regular", def);
