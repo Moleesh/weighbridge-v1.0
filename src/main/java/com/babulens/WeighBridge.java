@@ -923,7 +923,7 @@ class WeighBridge {
             settings();
         } catch (SQLException | ParseException ignored) {
             if (runUpdateSQL()) {
-                settings();
+                updateSettings();
             }
         }
     }
