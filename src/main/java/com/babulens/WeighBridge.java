@@ -53,7 +53,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 class WeighBridge {
-    private static final String DB_CONNECTION = "jdbc:h2:./weighdata;DEFRAG_ALWAYS=TRUE";
+    private static final String DB_CONNECTION = "jdbc:h2:./weighdata;DEFRAG_ALWAYS=TRUE;TRACE_LEVEL_FILE=2";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "toor";
     static DecimalFormat decimalFormat = new DecimalFormat("0");
@@ -783,19 +783,25 @@ class WeighBridge {
             comboBoxVehicleNo.setSelectedItem("");
             comboBoxMaterial.setSelectedItem("");
         } catch (SQLException | ParseException ignored) {
-            if (ranModifiedScript) {
-                ranModifiedScript = false;
-                try {
-                    ScriptRunner scriptExecutor = new ScriptRunner(dbConnection, true, false);
-                    scriptExecutor.runScript(new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResource("update.sql")).openStream())));
-                    settings();
-                } catch (IOException | SQLException ex) {
-                    ex.printStackTrace();
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :806", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+            if (runUpdateSQL()) {
+                settings();
             }
         }
+    }
+
+    private boolean runUpdateSQL() {
+        if (ranModifiedScript) {
+            ranModifiedScript = false;
+            try {
+                ScriptRunner scriptExecutor = new ScriptRunner(dbConnection, true, false);
+                scriptExecutor.runScript(new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResource("update.sql")).openStream())));
+                return true;
+            } catch (IOException | SQLException ignored) {
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "DB Corrupted Contact System Admin", "DB ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        return false;
     }
 
     private void updateSettings() {
@@ -852,24 +858,41 @@ class WeighBridge {
             PreparedStatement pstmt = dbConnection.prepareStatement("TRUNCATE TABLE CUSTOMER");
             pstmt.executeUpdate();
             rs = stmt.executeQuery("SELECT * FROM CUSTOMER");
+            if (tableCustomer.isEditing()) {
+                tableCustomer.getCellEditor().stopCellEditing();
+            }
             DefaultTableModel model = (DefaultTableModel) tableCustomer.getModel();
-            for (int i = 1; i <= model.getRowCount(); i++) {
-                rs.moveToInsertRow();
-                rs.updateString("CUSTOMER", (String) model.getValueAt(i - 1, 0));
-                rs.insertRow();
+            customerSet.clear();
+            for (int i = 0; i < model.getRowCount(); i++) {
+                String temp = (String) model.getValueAt(i, 0);
+                if (!temp.isEmpty() && customerSet.add(temp)) {
+                    rs.moveToInsertRow();
+                    rs.updateString("CUSTOMER", temp);
+                    rs.insertRow();
+                }
             }
             pstmt = dbConnection.prepareStatement("TRUNCATE TABLE TRANSPORTER");
             pstmt.executeUpdate();
             rs = stmt.executeQuery("SELECT * FROM TRANSPORTER");
+            if (tableTransporter.isEditing()) {
+                tableTransporter.getCellEditor().stopCellEditing();
+            }
             model = (DefaultTableModel) tableTransporter.getModel();
-            for (int i = 1; i <= model.getRowCount(); i++) {
-                rs.moveToInsertRow();
-                rs.updateString("TRANSPORTER", (String) model.getValueAt(i - 1, 0));
-                rs.insertRow();
+            transportSet.clear();
+            for (int i = 0; i < model.getRowCount(); i++) {
+                String temp = (String) model.getValueAt(i, 0);
+                if (!temp.isEmpty() && transportSet.add(temp)) {
+                    rs.moveToInsertRow();
+                    rs.updateString("TRANSPORTER", temp);
+                    rs.insertRow();
+                }
             }
             pstmt = dbConnection.prepareStatement("TRUNCATE TABLE VEHICLETARES");
             pstmt.executeUpdate();
             rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
+            if (tableVehicleTare.isEditing()) {
+                tableVehicleTare.getCellEditor().stopCellEditing();
+            }
             model = (DefaultTableModel) tableVehicleTare.getModel();
             for (int i = 1; i <= model.getRowCount(); i++) {
                 rs.moveToInsertRow();
@@ -886,6 +909,9 @@ class WeighBridge {
             pstmt = dbConnection.prepareStatement("TRUNCATE TABLE MATERIALS");
             pstmt.executeUpdate();
             rs = stmt.executeQuery("SELECT * FROM MATERIALS");
+            if (tableMaterial.isEditing()) {
+                tableMaterial.getCellEditor().stopCellEditing();
+            }
             model = (DefaultTableModel) tableMaterial.getModel();
             for (int i = 1; i <= model.getRowCount(); i++) {
                 rs.moveToInsertRow();
@@ -896,7 +922,9 @@ class WeighBridge {
             }
             settings();
         } catch (SQLException | ParseException ignored) {
-            JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :477", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+            if (runUpdateSQL()) {
+                settings();
+            }
         }
     }
 
@@ -1911,10 +1939,10 @@ class WeighBridge {
                 rs.moveToInsertRow();
                 String temp = (String) comboBoxTransporterName.getSelectedItem();
                 rs.updateString("TRANSPORTER", temp);
-                if (transportSet.add(temp)) {
+                if (temp != null && !temp.isEmpty() && transportSet.add(temp)) {
                     comboBoxTransporterName.addItem(temp);
+                    rs.insertRow();
                 }
-                rs.insertRow();
             } catch (SQLException ignored) {
             }
             try {
@@ -1923,10 +1951,10 @@ class WeighBridge {
                 rs.moveToInsertRow();
                 String temp = (String) comboBoxCustomerName.getSelectedItem();
                 rs.updateString("CUSTOMER", temp);
-                if (customerSet.add(temp)) {
+                if (temp != null && !temp.isEmpty() && customerSet.add(temp)) {
                     comboBoxCustomerName.addItem(temp);
+                    rs.insertRow();
                 }
-                rs.insertRow();
             } catch (SQLException ignored) {
             }
             btnSave.setEnabled(false);
