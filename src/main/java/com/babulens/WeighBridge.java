@@ -4602,6 +4602,7 @@ class WeighBridge {
                 "Pre Print",
                 "Pre Print 2",
                 "Pre Print 3",
+                "Pre Print 4",
                 "Quotation",
                 "Quotation KJJ",
                 "Sri Pathy",
@@ -5287,13 +5288,16 @@ class WeighBridge {
         for (int i = 0; i < noOfCopies; i++) {
             switch (Objects.toString(comboBoxPrintOptionForWeight.getSelectedItem(), "")) {
                 case "Pre Print":
-                    printPreWeight();
+                    printPreWeight(createTextPanePreWeight());
                     break;
                 case "Pre Print 2":
-                    printPreWeight2();
+                    printPreWeight(createTextPanePreWeight2());
                     break;
                 case "Pre Print 3":
-                    printPreWeight3();
+                    printPreWeight(createTextPanePreWeight3());
+                    break;
+                case "Pre Print 4":
+                    printPreWeight(createTextPanePreWeight4());
                     break;
                 case "Camera":
                     printCameraWeight();
@@ -5875,7 +5879,7 @@ class WeighBridge {
     }
 
     private void printPlainWeightA4() {
-        JTextPane textPane = createTextPane1();
+        JTextPane textPane = createTextPanePlainWeight();
         textPane.setBackground(Color.white);
         PrinterJob pj = PrinterJob.getPrinterJob();
 
@@ -5900,7 +5904,7 @@ class WeighBridge {
     }
 
     private void printPlainWeight() {
-        JTextPane textPane = createTextPane1();
+        JTextPane textPane = createTextPanePlainWeight();
         textPane.setBackground(Color.white);
         PrinterJob pj = PrinterJob.getPrinterJob();
 
@@ -5924,7 +5928,7 @@ class WeighBridge {
 
     }
 
-    private JTextPane createTextPane1() {
+    private JTextPane createTextPanePlainWeight() {
         String format = " %1$-13s: %2$-15s%3$-12s: %4$-20s\n";
         String format1 = "     %1$-9s: %2$-7s Kg               %3$-20s\n";
         String format2 = " %1$-18s: %2$-30s\n";
@@ -5973,7 +5977,7 @@ class WeighBridge {
         };
         JTextPane textPane = new JTextPane();
         StyledDocument doc = textPane.getStyledDocument();
-        addStylesToDocument1(doc);
+        addStylesToDocumentPlainWeight(doc);
 
         try {
             for (int i = 0; i < initString.length; i++) {
@@ -5984,7 +5988,7 @@ class WeighBridge {
         return textPane;
     }
 
-    private void addStylesToDocument1(StyledDocument doc) {
+    private void addStylesToDocumentPlainWeight(StyledDocument doc) {
         Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
         Style regular = doc.addStyle("regular", def);
@@ -6081,7 +6085,7 @@ class WeighBridge {
         };
         JTextPane textPane = new JTextPane();
         StyledDocument doc = textPane.getStyledDocument();
-        addStylesToDocumentIceWater(doc);
+        addStylesToDocumentPlainWeight(doc);
 
         try {
             for (int i = 0; i < initString.length; i++) {
@@ -6090,28 +6094,6 @@ class WeighBridge {
         } catch (BadLocationException ignored) {
         }
         return textPane;
-    }
-
-    private void addStylesToDocumentIceWater(StyledDocument doc) {
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-
-        Style regular = doc.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "Courier New");
-
-        Style s = doc.addStyle("1", regular);
-        StyleConstants.setBold(s, true);
-        StyleConstants.setFontSize(s, 20);
-
-        s = doc.addStyle("2", regular);
-        StyleConstants.setItalic(s, true);
-        StyleConstants.setFontSize(s, 12);
-
-        s = doc.addStyle("3", regular);
-        StyleConstants.setFontSize(s, 12);
-
-        s = doc.addStyle("4", regular);
-        StyleConstants.setItalic(s, true);
-        StyleConstants.setFontSize(s, 12);
     }
 
     private void printEmjay() {
@@ -6599,16 +6581,15 @@ class WeighBridge {
         }
     }
 
-    private void printPreWeight() {
-        JTextPane textPane = createTextPane5();
+    private void printPreWeight(JTextPane textPane) {
         textPane.setBackground(Color.white);
         PrinterJob pj = PrinterJob.getPrinterJob();
         PageFormat pf = new PageFormat();
         Paper paper = pf.getPaper();
-        double width = 8d * 72d;
+        double width = 8.5d * 72d;
         double height = 6d * 72d;
-        double widthmargin = 0d * 72d;
-        double heightmargin = 1.25d * 72d;
+        double widthmargin = 0;
+        double heightmargin = 1.26d * 72d;
         paper.setSize(width, height);
         paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
         pf.setPaper(paper);
@@ -6620,11 +6601,10 @@ class WeighBridge {
             pj.print();
         } catch (PrinterException ignored) {
         }
-
     }
 
-    private JTextPane createTextPane5() {
-        String format = "%1$-6s%2$-30s%3$-30s%4$-12s";
+    private JTextPane createTextPanePreWeight() {
+        String format = "%1$-7s%2$-30s%3$-30s%4$-12s";
         String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
         String[] initString = {
                 String.format(format, "", temp[0], temp[0], temp[0]),
@@ -6661,15 +6641,15 @@ class WeighBridge {
                 "1",
                 "2",
                 "1",
-                "3",
+                "4",
                 "1",
-                "3",
+                "4",
                 "1",
 
         };
         JTextPane textPane = new JTextPane();
         StyledDocument doc = textPane.getStyledDocument();
-        addStylesToDocument4(doc);
+        addStylesToDocumentPreWeight(doc);
 
         try {
             for (int i = 0; i < initString.length; i++) {
@@ -6680,7 +6660,7 @@ class WeighBridge {
         return textPane;
     }
 
-    private void addStylesToDocument4(StyledDocument doc) {
+    private void addStylesToDocumentPreWeight(StyledDocument doc) {
         Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
         Style regular = doc.addStyle("regular", def);
@@ -6694,35 +6674,79 @@ class WeighBridge {
         StyleConstants.setFontSize(s, 8);
 
         s = doc.addStyle("3", regular);
+        StyleConstants.setBold(s, true);
+        StyleConstants.setFontSize(s, 8);
+
+        s = doc.addStyle("4", regular);
         StyleConstants.setFontSize(s, 14);
+
+        s = doc.addStyle("5", regular);
+        StyleConstants.setBold(s, true);
+        StyleConstants.setItalic(s, true);
+        StyleConstants.setFontSize(s, 12);
+
+        s = doc.addStyle("6", regular);
+        StyleConstants.setFontSize(s, 21);
     }
 
-    private void printPreWeight3() {
-        JTextPane textPane = createTextPane8();
-        textPane.setBackground(Color.white);
-        PrinterJob pj = PrinterJob.getPrinterJob();
-        PageFormat pf = new PageFormat();
-        Paper paper = pf.getPaper();
-        double width = 8d * 72d;
-        double height = 6d * 72d;
-        double widthmargin = 0d * 72d;
-        double heightmargin = 1.25d * 72d;
-        paper.setSize(width, height);
-        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
-        pf.setPaper(paper);
-        Book pBook = new Book();
-        pBook.append(textPane.getPrintable(null, null), pf);
-        pj.setPageable(pBook);
+    private JTextPane createTextPanePreWeight2() {
+        String format = "%1$-7s%2$-30s%3$-30s%4$-12s";
+        String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
+        String[] initString = {
+                String.format(format, "", textFieldSlNo.getText(), textFieldSlNo.getText(), textFieldSlNo.getText()),
+                "\n\n",
+                String.format(format, "", comboBoxVehicleNo.getEditor().getItem(), comboBoxVehicleNo.getEditor().getItem(), comboBoxVehicleNo.getEditor().getItem()),
+                "\n\n",
+                String.format(format, "", temp[0], temp[0], temp[0]),
+                "\n\n",
+                String.format(format, "", temp[1] + " " + temp[2], temp[1] + " " + temp[2], temp[1] + " " + temp[2]),
+                "\n\n",
+                String.format(format, "", comboBoxMaterial.getEditor().getItem(), comboBoxMaterial.getEditor().getItem(), comboBoxMaterial.getEditor().getItem()),
+                "\n\n",
+                String.format(
+                        format, "", (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
+                "\n\n",
+                String.format(format, "", textFieldGrossWt.getText() + " Kg", textFieldGrossWt.getText() + " Kg", textFieldGrossWt.getText() + " Kg"),
+                "\n\n",
+                String.format(format, "", textFieldTareWt.getText() + " Kg", textFieldTareWt.getText() + " Kg", textFieldTareWt.getText() + " Kg"),
+                "\n\n",
+                String.format(format, "", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg")
+        };
+
+        String[] initStyles = {
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "3",
+                "1",
+                "3",
+                "1",
+        };
+        JTextPane textPane = new JTextPane();
+        StyledDocument doc = textPane.getStyledDocument();
+        addStylesToDocumentPreWeight(doc);
+
         try {
-            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
-            pj.print();
-        } catch (PrinterException ignored) {
+            for (int i = 0; i < initString.length; i++) {
+                doc.insertString(doc.getLength(), initString[i], doc.getStyle(initStyles[i]));
+            }
+        } catch (BadLocationException ignored) {
         }
-
+        return textPane;
     }
 
-    private JTextPane createTextPane8() {
-        String format = "%1$-6s%2$-30s%3$-30s%4$-12s";
+    private JTextPane createTextPanePreWeight3() {
+        String format = "%1$-7s%2$-30s%3$-30s%4$-12s";
         String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
         String[] initString = {
                 String.format(format, "", textFieldSlNo.getText(), textFieldSlNo.getText(), textFieldSlNo.getText()),
@@ -6771,7 +6795,7 @@ class WeighBridge {
         };
         JTextPane textPane = new JTextPane();
         StyledDocument doc = textPane.getStyledDocument();
-        addStylesToDocument8(doc);
+        addStylesToDocumentPreWeight(doc);
 
         try {
             for (int i = 0; i < initString.length; i++) {
@@ -6782,95 +6806,56 @@ class WeighBridge {
         return textPane;
     }
 
-    private void addStylesToDocument8(StyledDocument doc) {
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-
-        Style regular = doc.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "Courier New");
-
-        Style s = doc.addStyle("1", regular);
-        StyleConstants.setBold(s, true);
-        StyleConstants.setFontSize(s, 12);
-
-        s = doc.addStyle("2", regular);
-        StyleConstants.setFontSize(s, 8);
-
-        s = doc.addStyle("3", regular);
-        StyleConstants.setBold(s, true);
-        StyleConstants.setFontSize(s, 8);
-    }
-
-    private void printPreWeight2() {
-        JTextPane textPane = createTextPane7();
-        textPane.setBackground(Color.white);
-        PrinterJob pj = PrinterJob.getPrinterJob();
-        PageFormat pf = new PageFormat();
-        Paper paper = pf.getPaper();
-        double width = 8d * 72d;
-        double height = 6d * 72d;
-        double widthmargin = 0d * 72d;
-        double heightmargin = 1.25d * 72d;
-        paper.setSize(width, height);
-        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
-        pf.setPaper(paper);
-        Book pBook = new Book();
-        pBook.append(textPane.getPrintable(null, null), pf);
-        pj.setPageable(pBook);
-        try {
-            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
-            pj.print();
-        } catch (PrinterException ignored) {
-        }
-
-    }
-
-    private JTextPane createTextPane7() {
-        String format = "%1$-6s%2$-30s%3$-30s%4$-12s";
+    private JTextPane createTextPanePreWeight4() {
+        String format = "%1$-7s%2$-30s%3$-30s%4$-12s";
         String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
         String[] initString = {
-                String.format(format, "", textFieldSlNo.getText(), textFieldSlNo.getText(), textFieldSlNo.getText()),
-                "\n\n",
-                String.format(format, "", comboBoxVehicleNo.getEditor().getItem(), comboBoxVehicleNo.getEditor().getItem(), comboBoxVehicleNo.getEditor().getItem()),
-                "\n\n",
                 String.format(format, "", temp[0], temp[0], temp[0]),
-                "\n\n",
+                "\n",
                 String.format(format, "", temp[1] + " " + temp[2], temp[1] + " " + temp[2], temp[1] + " " + temp[2]),
-                "\n\n",
+                "\n",
+                String.format(format, "", textFieldSlNo.getText(), textFieldSlNo.getText(), textFieldSlNo.getText()),
+                "\n",
                 String.format(format, "", comboBoxMaterial.getEditor().getItem(), comboBoxMaterial.getEditor().getItem(), comboBoxMaterial.getEditor().getItem()),
-                "\n\n",
-                String.format(
-                        format, "", (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
-                "\n\n",
+                "\n",
+                String.format(format, "", comboBoxVehicleNo.getEditor().getItem(), comboBoxVehicleNo.getEditor().getItem(), comboBoxVehicleNo.getEditor().getItem()),
+                "\n",
+                String.format(format, "", comboBoxCustomerName.getEditor().getItem(), comboBoxCustomerName.getEditor().getItem(), comboBoxCustomerName.getEditor().getItem()),
+                "\n",
                 String.format(format, "", textFieldGrossWt.getText() + " Kg", textFieldGrossWt.getText() + " Kg", textFieldGrossWt.getText() + " Kg"),
-                "\n\n",
+                "\n",
                 String.format(format, "", textFieldTareWt.getText() + " Kg", textFieldTareWt.getText() + " Kg", textFieldTareWt.getText() + " Kg"),
-                "\n\n",
-                String.format(format, "", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg")
+                "\n",
+                String.format(format, "", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg"),
+                "\n",
+                String.format(format, "", comboBoxTransporterName.getEditor().getItem(), comboBoxTransporterName.getEditor().getItem(), comboBoxTransporterName.getEditor().getItem()),
         };
 
         String[] initStyles = {
                 "1",
-                "2",
+                "6",
                 "1",
-                "2",
+                "6",
                 "1",
-                "2",
+                "6",
                 "1",
-                "2",
+                "6",
                 "1",
-                "2",
+                "6",
                 "1",
-                "2",
-                "1",
-                "3",
-                "1",
-                "3",
+                "6",
+                "5",
+                "6",
+                "5",
+                "6",
+                "5",
+                "6",
                 "1",
 
         };
         JTextPane textPane = new JTextPane();
         StyledDocument doc = textPane.getStyledDocument();
-        addStylesToDocument7(doc);
+        addStylesToDocumentPreWeight(doc);
 
         try {
             for (int i = 0; i < initString.length; i++) {
@@ -6879,24 +6864,6 @@ class WeighBridge {
         } catch (BadLocationException ignored) {
         }
         return textPane;
-    }
-
-    private void addStylesToDocument7(StyledDocument doc) {
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-
-        Style regular = doc.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "Courier New");
-
-        Style s = doc.addStyle("1", regular);
-        StyleConstants.setBold(s, true);
-        StyleConstants.setFontSize(s, 12);
-
-        s = doc.addStyle("2", regular);
-        StyleConstants.setFontSize(s, 8);
-
-        s = doc.addStyle("3", regular);
-        StyleConstants.setBold(s, true);
-        StyleConstants.setFontSize(s, 8);
     }
 
     private void printCameraWeight() {
@@ -7157,7 +7124,7 @@ class WeighBridge {
                     graphics.drawString(StringUtils.leftPad("Driver Sign", 27), 0, y + 30);
 
                     graphics.setFont(new Font("Courier New", Font.BOLD, 9));
-                    graphics.drawString("                " + textFieldNetDateTime.getText(), 0, 70);
+                    graphics.drawString("                          " + (textFieldNetDateTime.getText() + " . ").split(" ")[0], 0, 70);
 
                     return Printable.PAGE_EXISTS;
                 },
@@ -7439,7 +7406,7 @@ class WeighBridge {
     }
 
     private void printPlainNoOfBagsWeight() {
-        JTextPane textPane = createTextPane6();
+        JTextPane textPane = createTextPanePlainNoOfBagsWeight();
         textPane.setBackground(Color.white);
         PrinterJob pj = PrinterJob.getPrinterJob();
 
@@ -7460,10 +7427,9 @@ class WeighBridge {
             pj.print();
         } catch (PrinterException ignored) {
         }
-
     }
 
-    private JTextPane createTextPane6() {
+    private JTextPane createTextPanePlainNoOfBagsWeight() {
         String format = " %1$-13s%2$-17s%3$-12s: %4$-20s\n";
         String format1 = "     %1$-14s: %2$-7s Kg          %3$-20s\n";
         String format2 = " %1$-18s: %2$-30s\n";
@@ -7516,7 +7482,7 @@ class WeighBridge {
         };
         JTextPane textPane = new JTextPane();
         StyledDocument doc = textPane.getStyledDocument();
-        addStylesToDocument6(doc);
+        addStylesToDocumentPlainWeight(doc);
 
         try {
             for (int i = 0; i < initString.length; i++) {
@@ -7525,28 +7491,6 @@ class WeighBridge {
         } catch (BadLocationException ignored) {
         }
         return textPane;
-    }
-
-    private void addStylesToDocument6(StyledDocument doc) {
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-
-        Style regular = doc.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "Courier New");
-
-        Style s = doc.addStyle("1", regular);
-        StyleConstants.setBold(s, true);
-        StyleConstants.setFontSize(s, 20);
-
-        s = doc.addStyle("2", regular);
-        StyleConstants.setItalic(s, true);
-        StyleConstants.setFontSize(s, 12);
-
-        s = doc.addStyle("3", regular);
-        StyleConstants.setFontSize(s, 12);
-
-        s = doc.addStyle("4", regular);
-        StyleConstants.setItalic(s, true);
-        StyleConstants.setFontSize(s, 12);
     }
 
     private void printReportWeight() {
