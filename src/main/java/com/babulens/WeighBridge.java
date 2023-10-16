@@ -1068,11 +1068,13 @@ class WeighBridge {
         panelWeighing.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentHidden(ComponentEvent e) {
-                settings();
+                if (afterStart) {
+                    settings();
+                }
             }
         });
         panelWeighing.setBackground(new Color(0, 255, 127));
-        tabbedPane.addTab("          Weighing          ", null, panelWeighing, null);
+        tabbedPane.addTab("          Weighing          ", panelWeighing);
         panelWeighing.setLayout(null);
 
         lblWeight = new JLabel("-1");
@@ -2666,7 +2668,7 @@ class WeighBridge {
 
         panelCameras = new JPanel();
         panelCameras.setBackground(new Color(0, 255, 127));
-        tabbedPane.addTab("          Cameras          ", null, panelCameras, null);
+        tabbedPane.addTab("          Cameras          ", panelCameras);
         panelCameras.setLayout(null);
 
         checkBoxCamera1 = new JCheckBox("");
@@ -3378,7 +3380,7 @@ class WeighBridge {
 
         JPanel panelReport = new JPanel();
         panelReport.setBackground(new Color(0, 255, 127));
-        tabbedPane.addTab("           Report           ", null, panelReport, null);
+        tabbedPane.addTab("           Report           ", panelReport);
         panelReport.setLayout(null);
 
         rdbtnWeighing = new JRadioButton("Weighing Report (max 1000 rows)");
@@ -3823,7 +3825,7 @@ class WeighBridge {
             }
         });
         panelSettings1.setBackground(new Color(0, 255, 127));
-        tabbedPane.addTab("          Settings          ", null, panelSettings1, null);
+        tabbedPane.addTab("          Settings          ", panelSettings1);
         panelSettings1.setLayout(null);
 
         JLabel lblMaterials = new JLabel("Materials");
@@ -4770,7 +4772,7 @@ class WeighBridge {
 
         JPanel panelSettings2 = new JPanel();
         panelSettings2.setBackground(new Color(0, 255, 127));
-        tabbedPane.addTab("", null, panelSettings2, null);
+        tabbedPane.addTab("", panelSettings2);
         tabbedPane.setEnabledAt(4, false);
         panelSettings2.setLayout(null);
 
@@ -8045,6 +8047,7 @@ class WeighBridge {
         for (short i = sheet.getRow(3).getFirstCellNum(), end = sheet.getRow(3).getLastCellNum(); i < end; i++) {
             sheet.autoSizeColumn(i);
         }
+
         FileOutputStream fileOut;
         if (excelFilePath.endsWith("xls")) {
             fileOut = new FileOutputStream(excelFilePath);
@@ -8053,6 +8056,7 @@ class WeighBridge {
         } else {
             fileOut = new FileOutputStream(excelFilePath + ".xlsx");
         }
+
         workbook.write(fileOut);
         fileOut.close();
         workbook.close();
