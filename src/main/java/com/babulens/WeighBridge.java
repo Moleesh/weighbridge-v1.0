@@ -4428,6 +4428,7 @@ class WeighBridge {
                 "Plain Camera",
                 "Plain Paper",
                 "Plain Paper A4",
+                "Plain Paper A4 without header",
                 "Pre Print",
                 "Pre Print 2",
                 "Pre Print 3",
@@ -5270,6 +5271,9 @@ class WeighBridge {
                 case "Plain Paper A4":
                     printPlainWeightA4();
                     continue;
+                case "Plain Paper A4 without header":
+                    printPlainWeightA4WithoutHeader();
+                    continue;
                 case "Quotation":
                     printQuotation();
                     continue;
@@ -5866,6 +5870,90 @@ class WeighBridge {
         } catch (PrinterException ignored) {
         }
 
+    }
+
+    private void printPlainWeightA4WithoutHeader() {
+        JTextPane textPane = createTextPanePlainWeightA4WithoutHeadert();
+        textPane.setBackground(Color.white);
+        PrinterJob pj = PrinterJob.getPrinterJob();
+
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 8.5d * 72d;
+        double height = 11d * 72d;
+        double widthmargin = 72d;
+        double heightmargin = .5d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+        pBook.append(textPane.getPrintable(null, null), pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+
+    }
+
+    private JTextPane createTextPanePlainWeightA4WithoutHeadert() {
+        String format = " %1$-13s: %2$-15s%3$-12s: %4$-20s\n";
+        String format1 = "     %1$-9s: %2$-7s Kg               %3$-20s\n";
+        String format2 = " %1$-18s: %2$-30s\n";
+        String format3 = "     %1$-9s: %2$s";
+        String dc = "";
+        String driver = "";
+        if (!(textFieldDcNo.getText().trim().isEmpty() && textFieldDcDate.getText().trim().isEmpty())) {
+            dc = String.format(format, "Dc. No", textFieldDcNo.getText(), "Dc. Date", textFieldDcDate.getText());
+        }
+        if (chckbxExcludeDrivers.isSelected() || !comboBoxTransporterName.getEditor().getItem().toString().trim().isEmpty()) {
+            driver = String.format(format2, "Transporter's Name", comboBoxTransporterName.getEditor().getItem());
+        }
+        String[] initString = {
+                "\n\n\n\n\n",
+                "-----------------------------------------------------------------\n",
+                String.format(format, "Sl.No", textFieldSlNo.getText(), "Date & Time", textFieldNetDateTime.getText()),
+                dc,
+                String.format(format2, "Customer's Name", comboBoxCustomerName.getEditor().getItem()),
+                driver,
+                String.format(format, "Vehicle No", comboBoxVehicleNo.getEditor().getItem(), "Material", comboBoxMaterial.getEditor().getItem()),
+                "-----------------------------------------------------------------\n",
+                String.format(format1, "Gross Wt", StringUtils.leftPad(textFieldGrossWt.getText(), 7, " "), textFieldGrossDateTime.getText()),
+                String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "), textFieldTareDateTime.getText()),
+                String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "), chckbxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" : "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
+                chckbxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? "" : String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n",
+                "-----------------------------------------------------------------\n",
+                StringUtils.rightPad(textFieldFooter.getText(), 50, " ") + "Signature"
+        };
+        String[] initStyles = {
+                "1",
+                "2",
+                "3",
+                "3",
+                "3",
+                "3",
+                "3",
+                "3",
+                "3",
+                "3",
+                "3",
+                "3",
+                "3",
+                "3",
+                "4"
+        };
+        JTextPane textPane = new JTextPane();
+        StyledDocument doc = textPane.getStyledDocument();
+        addStylesToDocumentPlainWeight(doc);
+
+        try {
+            for (int i = 0; i < initString.length; i++) {
+                doc.insertString(doc.getLength(), initString[i], doc.getStyle(initStyles[i]));
+            }
+        } catch (BadLocationException ignored) {
+        }
+        return textPane;
     }
 
     private void printPlainWeight() {
