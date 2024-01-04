@@ -3394,6 +3394,7 @@ class WeighBridge {
             comboBoxReportType.addItem("Vehiclewise Report");
             comboBoxReportType.addItem("Materialwise Report");
             comboBoxReportType.addItem("Customerwise Report");
+            comboBoxReportType.addItem("Customer - Materialwise Report");
             comboBoxReportType.addItem("Transporterwise Report");
             comboBoxReportType.addItem("Operatorwise Report");
         });
@@ -3458,6 +3459,13 @@ class WeighBridge {
                             datePicker1.setEnabled(true);
                             datePicker2.setEnabled(true);
                             textFieldReportTextBox.setEnabled(true);
+                            comboBoxMaterialName.setEnabled(false);
+                            break;
+                        case "Customer - Materialwise Report":
+                            lblReportTextBox.setText("Customer Name");
+                            datePicker1.setEnabled(true);
+                            datePicker2.setEnabled(true);
+                            textFieldReportTextBox.setEnabled(true);
                             comboBoxMaterialName.setEnabled(true);
                             break;
                         case "Transporterwise Report":
@@ -3487,6 +3495,7 @@ class WeighBridge {
                 "Vehiclewise Report",
                 "Materialwise Report",
                 "Customerwise Report",
+                "Customer - Materialwise Report",
                 "Transporterwise Report",
                 "Operatorwise Report"
         }));
@@ -5344,7 +5353,7 @@ class WeighBridge {
                     date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
                     dateTemp12 = datePicker2.getDate();
                     date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    temp = "SELECT * FROM WEIGHING WHERE upper(VEHICLENO) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                    temp = "SELECT * FROM WEIGHING WHERE UPPER(VEHICLENO) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
                     break;
                 case "Materialwise Report":
                     dateTemp12 = datePicker1.getDate();
@@ -5355,7 +5364,19 @@ class WeighBridge {
                     if (material == null) {
                         material = "";
                     }
-                    temp = "SELECT * FROM WEIGHING WHERE upper(MATERIAL) LIKE UPPER('%" + material + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                    temp = "SELECT * FROM WEIGHING WHERE UPPER(MATERIAL) LIKE UPPER('%" + material + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                    break;
+                case "Customer - Materialwise Report":
+                    dateTemp12 = datePicker1.getDate();
+                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    dateTemp12 = datePicker2.getDate();
+                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
+                    textField = textFieldReportTextBox.getText();
+                    material = (String) comboBoxMaterialName.getSelectedItem();
+                    if (material == null) {
+                        material = "";
+                    }
+                    temp = "SELECT * FROM WEIGHING WHERE UPPER(CUSTOMERNAME) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "' AND UPPER(MATERIAL) LIKE UPPER('%" + material + "%')";
                     break;
                 case "Customerwise Report":
                     dateTemp12 = datePicker1.getDate();
@@ -5363,13 +5384,7 @@ class WeighBridge {
                     dateTemp12 = datePicker2.getDate();
                     date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
                     textField = textFieldReportTextBox.getText();
-                    material = String.valueOf(comboBoxMaterialName.getSelectedItem());
-                    if ("null".contains(material.trim())) {
-                        material = "";
-                    } else {
-                        material = "AND MATERIAL LIKE '" + material + "'";
-                    }
-                    temp = "SELECT * FROM WEIGHING WHERE upper(CUSTOMERNAME) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'" + material;
+                    temp = "SELECT * FROM WEIGHING WHERE UPPER(CUSTOMERNAME) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
                     break;
                 case "Transporterwise Report":
                     dateTemp12 = datePicker1.getDate();
@@ -5377,7 +5392,7 @@ class WeighBridge {
                     dateTemp12 = datePicker2.getDate();
                     date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
                     textField = textFieldReportTextBox.getText();
-                    temp = "SELECT * FROM WEIGHING WHERE upper(DRIVERNAME) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                    temp = "SELECT * FROM WEIGHING WHERE UPPER(DRIVERNAME) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
                     break;
                 case "Operatorwise Report":
                     dateTemp12 = datePicker1.getDate();
@@ -5385,7 +5400,7 @@ class WeighBridge {
                     dateTemp12 = datePicker2.getDate();
                     date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
                     textField = textFieldReportTextBox.getText();
-                    temp = "SELECT * FROM WEIGHING WHERE upper(OPERATOR) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                    temp = "SELECT * FROM WEIGHING WHERE UPPER(OPERATOR) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
                     break;
             }
             try {
@@ -5873,7 +5888,7 @@ class WeighBridge {
     }
 
     private void printPlainWeightA4WithoutHeader() {
-        JTextPane textPane = createTextPanePlainWeightA4WithoutHeadert();
+        JTextPane textPane = createTextPanePlainWeightA4WithoutHeader();
         textPane.setBackground(Color.white);
         PrinterJob pj = PrinterJob.getPrinterJob();
 
@@ -5897,9 +5912,11 @@ class WeighBridge {
 
     }
 
-    private JTextPane createTextPanePlainWeightA4WithoutHeadert() {
+    private JTextPane createTextPanePlainWeightA4WithoutHeader() {
         String format = " %1$-13s: %2$-15s%3$-12s: %4$-20s\n";
-        String format1 = "     %1$-9s: %2$-7s Kg               %3$-20s\n";
+        String format11 = "     %1$-9s: ";
+        String format12 = "%2$-7s Kg";
+        String format13 = "               %3$-20s\n";
         String format2 = " %1$-18s: %2$-30s\n";
         String format3 = "     %1$-9s: %2$s";
         String dc = "";
@@ -5911,7 +5928,7 @@ class WeighBridge {
             driver = String.format(format2, "Transporter's Name", comboBoxTransporterName.getEditor().getItem());
         }
         String[] initString = {
-                "\n\n\n\n\n",
+                "\n\n\n\n",
                 "-----------------------------------------------------------------\n",
                 String.format(format, "Sl.No", textFieldSlNo.getText(), "Date & Time", textFieldNetDateTime.getText()),
                 dc,
@@ -5919,9 +5936,15 @@ class WeighBridge {
                 driver,
                 String.format(format, "Vehicle No", comboBoxVehicleNo.getEditor().getItem(), "Material", comboBoxMaterial.getEditor().getItem()),
                 "-----------------------------------------------------------------\n",
-                String.format(format1, "Gross Wt", StringUtils.leftPad(textFieldGrossWt.getText(), 7, " "), textFieldGrossDateTime.getText()),
-                String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "), textFieldTareDateTime.getText()),
-                String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "), chckbxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" : "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
+                String.format(format11, "Gross Wt", StringUtils.leftPad(textFieldGrossWt.getText(), 7, " "), textFieldGrossDateTime.getText()),
+                String.format(format12, "Gross Wt", StringUtils.leftPad(textFieldGrossWt.getText(), 7, " "), textFieldGrossDateTime.getText()),
+                String.format(format13, "Gross Wt", StringUtils.leftPad(textFieldGrossWt.getText(), 7, " "), textFieldGrossDateTime.getText()),
+                String.format(format11, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "), textFieldTareDateTime.getText()),
+                String.format(format12, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "), textFieldTareDateTime.getText()),
+                String.format(format13, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "), textFieldTareDateTime.getText()),
+                String.format(format11, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "), chckbxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" : "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
+                String.format(format12, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "), chckbxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" : "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
+                String.format(format13, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "), chckbxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" : "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
                 chckbxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? "" : String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n",
                 "-----------------------------------------------------------------\n",
                 StringUtils.rightPad(textFieldFooter.getText(), 50, " ") + "Signature"
@@ -5936,8 +5959,13 @@ class WeighBridge {
                 "3",
                 "3",
                 "3",
+                "5",
                 "3",
                 "3",
+                "5",
+                "3",
+                "3",
+                "5",
                 "3",
                 "3",
                 "3",
@@ -6060,6 +6088,10 @@ class WeighBridge {
 
         s = doc.addStyle("4", regular);
         StyleConstants.setItalic(s, true);
+        StyleConstants.setFontSize(s, 12);
+
+        s = doc.addStyle("5", regular);
+        StyleConstants.setBold(s, true);
         StyleConstants.setFontSize(s, 12);
     }
 
@@ -7770,6 +7802,8 @@ class WeighBridge {
                     return "Materialwise Report (" + comboBoxMaterialName.getSelectedItem() + ") - " + dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " + dateAndTimeFormatdatep.format(datePicker2.getDate());
                 case "Customerwise Report":
                     return "Customerwise Report (" + textFieldReportTextBox.getText() + ") - " + dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " + dateAndTimeFormatdatep.format(datePicker2.getDate());
+                case "Customer - Materialwise Report":
+                    return "Report (" + textFieldReportTextBox.getText() + " " + comboBoxMaterialName.getSelectedItem() + ") - " + dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " + dateAndTimeFormatdatep.format(datePicker2.getDate());
                 case "Transporterwise Report":
                     return "Transporterwise Report (" + textFieldReportTextBox.getText() + ") - " + dateAndTimeFormatdatep.format(datePicker1.getDate()) + " to " + dateAndTimeFormatdatep.format(datePicker2.getDate());
                 case "Operatorwise Report":
