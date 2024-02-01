@@ -7607,7 +7607,7 @@ class WeighBridge {
         String format = " %1$-5s %2$-19s %3$-15s %4$-15s %5$-8s %6$-8s %7$-8s\n";
         String temp = "\n";
         for (int i = 0; i < model.getRowCount(); i++) {
-            temp = temp.concat(String.format(format, StringUtils.center(model.getValueAt(i, 1) != null ? model.getValueAt(i, 1).toString() : "", 5), StringUtils.center(model.getValueAt(i, 20) != null ? model.getValueAt(i, 20).toString() : "", 10), StringUtils.center(model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "", 15), StringUtils.center(model.getValueAt(i, 9) != null ? model.getValueAt(i, 9).toString() : "", 15), StringUtils.leftPad(model.getValueAt(i, 13) != null ? model.getValueAt(i, 13).toString() : "", 8, " "), StringUtils.leftPad(model.getValueAt(i, 15) != null ? model.getValueAt(i, 15).toString() : "", 8, " "), StringUtils.leftPad(model.getValueAt(i, 19) != null ? model.getValueAt(i, 19).toString() : "", 8, " ")));
+            temp = temp.concat(String.format(format, StringUtils.center(model.getValueAt(i, 1) != null ? model.getValueAt(i, 1).toString() : "", 5), StringUtils.center(model.getValueAt(i, 22) != null ? model.getValueAt(i, 22).toString() : "", 10), StringUtils.center(model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "", 15), StringUtils.center(model.getValueAt(i, 11) != null ? model.getValueAt(i, 11).toString() : "", 15), StringUtils.leftPad(model.getValueAt(i, 15) != null ? model.getValueAt(i, 15).toString() : "", 8, " "), StringUtils.leftPad(model.getValueAt(i, 17) != null ? model.getValueAt(i, 17).toString() : "", 8, " "), StringUtils.leftPad(model.getValueAt(i, 21) != null ? model.getValueAt(i, 21).toString() : "", 8, " ")));
             temp = temp.concat("\n");
         }
 
