@@ -459,8 +459,8 @@ class WeighBridge {
                 case "2":
                     rs.updateString("ID", "0");
                     rs.updateString("UID", getUUID());
-                    rs.updateTimestamp("ENDDATE", new java.sql.Timestamp(new Date().getTime() + 10 * (long) 8.64e+7));
-                    rs.updateTimestamp("ENDDATE", new java.sql.Timestamp(new Date().getTime()));
+                    rs.updateTimestamp("ENDDATE", new Timestamp(new Date().getTime() + 10 * (long) 8.64e+7));
+                    rs.updateTimestamp("ENDDATE", new Timestamp(new Date().getTime()));
                     rs.updateRow();
                     startup(rs);
                     break;
@@ -977,7 +977,7 @@ class WeighBridge {
                 rs.updateInt("TAREWT", Integer.parseInt(("0" + model.getValueAt(i - 1, 3)).replaceAll("\\D", "")));
                 Date date = dateAndTimeFormat.parse(String.valueOf(model.getValueAt(i - 1, 4)));
                 rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
-                rs.updateTime("TARETIME", new java.sql.Time(date.getTime()));
+                rs.updateTime("TARETIME", new Time(date.getTime()));
                 rs.updateInt("SQNO", i);
                 rs.insertRow();
             }
@@ -4427,6 +4427,7 @@ class WeighBridge {
         comboBoxPrintOptionForWeight = new JComboBox<>();
         comboBoxPrintOptionForWeight.setModel(new DefaultComboBoxModel<>(new String[]{
                 "Camera",
+                "Camera * 2",
                 "EMJAY",
                 "EMJAY 1",
                 "Ice Water",
@@ -4435,6 +4436,7 @@ class WeighBridge {
                 "Mani & Co 2",
                 "No Of Bags",
                 "Plain Camera",
+                "Plain Camera * 2",
                 "Plain Paper",
                 "Plain Paper A4",
                 "Plain Paper A4 without header",
@@ -5247,8 +5249,14 @@ class WeighBridge {
                 case "Camera":
                     printCameraWeight();
                     continue;
+                case "Camera * 2":
+                    printCameraWeight2();
+                    continue;
                 case "Plain Camera":
                     printPlainCameraWeight();
+                    continue;
+                case "Plain Camera * 2":
+                    printPlainCameraWeight2();
                     continue;
                 case "Sri Pathy":
                     printPlainSriPathyWeight();
@@ -7010,6 +7018,79 @@ class WeighBridge {
         }
     }
 
+    private void printCameraWeight2() {
+        PrinterJob pj = PrinterJob.getPrinterJob();
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 8d * 72d;
+        double height = 6d * 72d;
+        double widthmargin = 0d * 72d;
+        double heightmargin = .25d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+        pBook.append(new Printable() {
+
+                         private Coordinates drawString(Graphics g, String text, int x, int y) {
+                             int length = 0;
+                             for (String line : text.split("\n")) {
+                                 g.drawString(line, x, y += g.getFontMetrics().getHeight() - 1);
+                                 length = g.getFontMetrics().stringWidth(line);
+                             }
+                             return new Coordinates(length, y + g.getFontMetrics().getHeight() - 1);
+                         }
+
+                         public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
+                             int xCoordinate = 164;
+                             String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
+
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+                             Coordinates coordinates = drawString(graphics, textFieldSlNo.getText() + "\n\n" + temp[0] + "\n\n" + temp[1] + "\n\n" + comboBoxVehicleNo.getEditor().getItem() + "\n\n" + comboBoxMaterial.getEditor().getItem() + "\n\n" + comboBoxCustomerName.getEditor().getItem() + "\n\n" + (textFieldCharges.getText().equals("0") ? " " : textFieldCharges.getText()), xCoordinate, 115);
+
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                             coordinates = drawString(graphics, StringUtils.rightPad(textFieldGrossWt.getText(), 7) + "Kg", xCoordinate, coordinates.y);
+
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                             coordinates = drawString(graphics, StringUtils.rightPad(textFieldTareWt.getText(), 7) + "Kg", xCoordinate, coordinates.y - 4);
+
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                             drawString(graphics, StringUtils.rightPad(textFieldNetWt.getText(), 7) + "Kg", xCoordinate, coordinates.y - 4);
+
+                             try {
+                                 BufferedImage cropImage1 = null, cropImage2 = null;
+
+                                 try {
+                                     BufferedImage printImage1 = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
+                                     cropImage1 = printImage1.getSubimage(
+                                             Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
+                                 } catch (IOException ignored) {
+                                 }
+
+                                 try {
+                                     BufferedImage printImage2 = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_2.jpg"));
+                                     cropImage2 = printImage2.getSubimage(
+                                             Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
+                                 } catch (IOException ignored) {
+                                 }
+
+                                 BufferedImage printImage = joinBufferedImage(cropImage1, cropImage2);
+                                 graphics.drawImage(printImage, 250, 115, 300, (int) (300.00 / printImage.getWidth() * printImage.getHeight()), null);
+                             } catch (NullPointerException ignored) {
+                             }
+
+                             return PAGE_EXISTS;
+                         }
+                     },
+                pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
     private void printPlainCameraWeight() {
         PrinterJob pj = PrinterJob.getPrinterJob();
         PageFormat pf = new PageFormat();
@@ -7092,6 +7173,116 @@ class WeighBridge {
                                          Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                                  graphics.drawImage(cropImage, 250, 125, 300, (int) (300.00 / cropImage.getWidth() * cropImage.getHeight()), null);
                              } catch (IOException | NullPointerException ignored) {
+                             }
+
+                             return PAGE_EXISTS;
+                         }
+                     },
+                pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
+    private void printPlainCameraWeight2() {
+        PrinterJob pj = PrinterJob.getPrinterJob();
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 8d * 72d;
+        double height = 6d * 72d;
+        double widthmargin = 0d * 72d;
+        double heightmargin = .25d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthmargin, heightmargin, width - (2 * widthmargin), height - (2 * heightmargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+        pBook.append(new Printable() {
+
+                         private Coordinates drawString(Graphics g, String text, int x, int y) {
+                             int length = 0;
+                             for (String line : text.split("\n")) {
+                                 g.drawString(line, x + 10, y += g.getFontMetrics().getHeight() - 1);
+                                 length = g.getFontMetrics().stringWidth(line);
+                             }
+                             return new Coordinates(length, y + g.getFontMetrics().getHeight() - 1);
+                         }
+
+                         public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
+                             String format = "%1$-5s%2$-20s: ";
+
+                             String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
+                             String initString = "\n\n" + StringUtils.center(title1.getText(), 62);
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 15));
+
+                             Coordinates coordinates = drawString(graphics, initString, 0, 0);
+                             initString = StringUtils.center(title2.getText(), 73);
+                             graphics.setFont(new Font("Courier New", Font.BOLD + Font.ITALIC, 13));
+                             coordinates = drawString(graphics, initString, 0, coordinates.y);
+
+                             initString = StringUtils.center("WEIGHMENT RECEIPT", 79) + "\n";
+                             graphics.setFont(new Font("Courier New", Font.BOLD + Font.ITALIC, 12));
+                             coordinates = drawString(graphics, initString, 0, coordinates.y);
+
+                             initString = String.format(format, "", "Sl.No") + textFieldSlNo.getText() + "\n\n" + String.format(format, "", "Date") + temp[0] + "\n\n" + String.format(format, "", "Time") + temp[1] + " " + temp[2] + "\n\n" + String.format(format, "", "Vehicle No") + comboBoxVehicleNo.getEditor().getItem() + "\n\n" + String.format(format, "", "Material") + comboBoxMaterial.getEditor().getItem() + "\n\n" + String.format(format, "", "Customer/Supplier") + comboBoxCustomerName.getEditor().getItem() + "\n\n" + (chckbxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" : String.format(format, "", "Charges") + "Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()) + "\n\n");
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+                             coordinates = drawString(graphics, initString, 0, coordinates.y);
+
+                             initString = String.format(format, "", "Gross Wt");
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+                             int yTemp = coordinates.y;
+                             coordinates = drawString(graphics, initString, 0, coordinates.y);
+                             int y = coordinates.y;
+
+                             initString = StringUtils.rightPad(textFieldGrossWt.getText(), 7) + "Kg";
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                             drawString(graphics, initString, coordinates.x, yTemp);
+
+                             initString = String.format(format, "", "Tare Wt");
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+                             yTemp = y;
+                             coordinates = drawString(graphics, initString, 0, y);
+                             y = coordinates.y;
+
+                             initString = StringUtils.rightPad(textFieldTareWt.getText(), 7) + "Kg";
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                             drawString(graphics, initString, coordinates.x, yTemp);
+
+                             initString = String.format(format, "", "Net Wt");
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+                             yTemp = y;
+                             coordinates = drawString(graphics, initString, 0, y);
+
+                             initString = StringUtils.rightPad(textFieldNetWt.getText(), 7) + "Kg";
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                             coordinates = drawString(graphics, initString, coordinates.x, yTemp);
+
+                             initString = "\n\n\n" + "     " + StringUtils.rightPad(textFieldFooter.getText(), 60, " ") + "Authorised Signature";
+                             graphics.setFont(new Font("Courier New", Font.BOLD + Font.ITALIC, 10));
+                             drawString(graphics, initString, 0, coordinates.y);
+
+                             try {
+                                 BufferedImage cropImage1 = null, cropImage2 = null;
+
+                                 try {
+                                     BufferedImage printImage1 = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
+                                     cropImage1 = printImage1.getSubimage(
+                                             Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
+                                 } catch (IOException ignored) {
+                                 }
+
+                                 try {
+                                     BufferedImage printImage2 = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_2.jpg"));
+                                     cropImage2 = printImage2.getSubimage(
+                                             Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
+                                 } catch (IOException ignored) {
+                                 }
+
+                                 BufferedImage printImage = joinBufferedImage(cropImage1, cropImage2);
+                                 graphics.drawImage(printImage, 250, 125, 300, (int) (300.00 / printImage.getWidth() * printImage.getHeight()), null);
+                             } catch (NullPointerException ignored) {
                              }
 
                              return PAGE_EXISTS;
@@ -8564,6 +8755,10 @@ class WeighBridge {
                     if (!webcam[i].isOpen()) {
                         webcam[i].setViewSize((Dimension) Objects.requireNonNull(comboBoxResolution.getSelectedItem()));
                     }
+                    try {
+                        webcam[i].open(true);
+                    } catch (WebcamException ignored) {
+                    }
                     panelCamera = new WebcamPanel(webcam[i]);
                     panelCamera.setBounds(x, y, (int) (((double) 240 / ((Dimension) Objects.requireNonNull(comboBoxResolution.getSelectedItem())).height * ((Dimension) comboBoxResolution.getSelectedItem()).width)), 240);
                     panelCameras.add(panelCamera);
@@ -8742,7 +8937,7 @@ class WeighBridge {
             Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             ResultSet rs = stmt.executeQuery("SELECT * FROM setup");
             rs.absolute(1);
-            rs.updateTimestamp("LASTLOGIN", new java.sql.Timestamp(new Date().getTime()));
+            rs.updateTimestamp("LASTLOGIN", new Timestamp(new Date().getTime()));
             rs.updateRow();
         } catch (SQLException ignored) {
             JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :7720", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
@@ -9108,6 +9303,31 @@ class WeighBridge {
         if (n == 0) {
             getReport();
         }
+    }
+
+    public BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2) {
+        if (img1 == null) {
+            return img2;
+        }
+
+        if (img2 == null) {
+            return img1;
+        }
+
+        int offset = 2;
+        int width = Math.max(img1.getWidth(), img2.getWidth());
+        int height = img1.getHeight() + img2.getHeight() + offset;
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = newImage.createGraphics();
+        Color oldColor = g2.getColor();
+        g2.setPaint(Color.WHITE);
+        g2.fillRect(0, 0, width, height);
+        g2.setColor(oldColor);
+        g2.drawImage(img1, null, 0, 0);
+        g2.drawImage(img2, null, 0, img1.getHeight() + offset);
+        g2.dispose();
+
+        return newImage;
     }
 
     static class IpCam extends IpCamDriver {
