@@ -33,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WeighBridge-1.0-${{ matrix.architecture }}
-          path: WeighBridge-1.0
+          path: WeighBridge 1.0
