@@ -12,7 +12,7 @@ jobs:
       matrix:
         os: [windows-latest]
         architecture: [x64]
-        java-version: ['8', '17']
+        java-version: ['8']
 
     steps:
       # Checkout the repository
