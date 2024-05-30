@@ -32,5 +32,5 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: WeighBridge-1.0-${{ matrix.architecture }}
+          name: WeighBridge 1.0 ${{ matrix.architecture }}
           path: WeighBridge 1.0
