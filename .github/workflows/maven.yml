@@ -6,22 +6,24 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}-${{ matrix.architecture }}
 
     strategy:
       matrix:
+        os: [windows-latest, windows-7]
         architecture: [x64, x86]
+        java-version: ['8', '17']
 
     steps:
       # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      # Set up JDK 8
-      - name: Set up JDK 8
+      # Set up JDK
+      - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v4
         with:
-          java-version: '8'
+          java-version: ${{ matrix.java-version }}
           distribution: 'adopt'
       
       # Build the project using Maven
@@ -32,5 +34,5 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: WeighBridge 1.0 ${{ matrix.architecture }}
+          name: WeighBridge 1.0 ${{ matrix.os }} ${{ matrix.architecture }} jdk${{ matrix.java-version }}
           path: WeighBridge 1.0
