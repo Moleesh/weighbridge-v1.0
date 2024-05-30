@@ -8,6 +8,10 @@ jobs:
   build:
     runs-on: windows-latest
 
+    strategy:
+      matrix:
+        architecture: [x64, x86]
+
     steps:
       # Checkout the repository
       - name: Checkout repository
@@ -28,5 +32,5 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: WeighBridge 1.0
-          path: WeighBridge 1.0
+          name: WeighBridge-1.0-${{ matrix.architecture }}
+          path: WeighBridge-1.0
