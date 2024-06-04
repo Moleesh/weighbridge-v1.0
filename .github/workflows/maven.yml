@@ -6,12 +6,10 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}-${{ matrix.architecture }}
+    runs-on: windows-latest
 
     strategy:
       matrix:
-        os: [windows-latest]
-        architecture: [x64]
         java-version: ['8']
 
     steps:
@@ -34,5 +32,5 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: WeighBridge 1.0 ${{ matrix.os }} ${{ matrix.architecture }} jdk${{ matrix.java-version }}
+          name: WeighBridge 1.0
           path: WeighBridge 1.0
