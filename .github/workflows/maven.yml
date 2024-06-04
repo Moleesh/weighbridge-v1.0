@@ -6,7 +6,8 @@ on:
 
 jobs:
   build:
-    runs-on: windows-7 x32
+    runs-on: self-hosted
+    runs-on: [self-hosted, windows-7-x32]
 
     strategy:
       matrix:
@@ -22,7 +23,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: 'adopt'
+          distribution: 'adoptium'
       
       # Build the project using Maven
       - name: Build with Maven
@@ -32,5 +33,5 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: WeighBridge 1.0 jdk${{ matrix.java-version }}
-          path: WeighBridge 1.0
+          name: WeighBridge-1.0-jdk${{ matrix.java-version }}
+          path: target/*.jar
