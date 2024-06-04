@@ -6,8 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
-    runs-on: [self-hosted, windows-7-x32]
+    runs-on: windows-latest
 
     strategy:
       matrix:
