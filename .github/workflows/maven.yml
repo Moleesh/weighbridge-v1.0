@@ -6,11 +6,11 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-7 x32
 
     strategy:
       matrix:
-        java-version: ['8', '17']
+        java-version: ['8']
 
     steps:
       # Checkout the repository
