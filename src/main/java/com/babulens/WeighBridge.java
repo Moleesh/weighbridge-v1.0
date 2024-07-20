@@ -1,5 +1,8 @@
 package com.babulens;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
@@ -7,7 +10,11 @@ import com.fazecast.jSerialComm.SerialPortMessageListener;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.components.DateTimePicker;
 import com.github.lgooddatepicker.components.TimePickerSettings;
-import com.github.sarxos.webcam.*;
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamCompositeDriver;
+import com.github.sarxos.webcam.WebcamException;
+import com.github.sarxos.webcam.WebcamPanel;
+import com.github.sarxos.webcam.WebcamPicker;
 import com.github.sarxos.webcam.ds.buildin.WebcamDefaultDriver;
 import com.github.sarxos.webcam.ds.ipcam.IpCamDevice;
 import com.github.sarxos.webcam.ds.ipcam.IpCamDriver;
@@ -15,42 +22,152 @@ import com.github.sarxos.webcam.ds.ipcam.IpCamMode;
 import com.github.sarxos.webcam.ds.ipcam.IpCamStorage;
 import com.ibatis.common.jdbc.ScriptRunner;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.WordUtils;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.printing.PDFPageable;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import javax.imageio.ImageIO;
 import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
-import javax.swing.*;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
-import javax.swing.text.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.NumberFormatter;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
-import java.awt.print.*;
-import java.io.*;
+import java.awt.print.Book;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.sql.*;
-import java.text.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.Vector;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class WeighBridge {
     private static final String DB_CONNECTION = "jdbc:h2:./weighdata;DEFRAG_ALWAYS=TRUE;TRACE_LEVEL_FILE=2";
@@ -109,6 +226,7 @@ class WeighBridge {
     private String UNLOCK_PASSWORD = "147085";
     private String CAMERA_PASSWORD = "147085";
     private String SMS_PASSWORD = "147085";
+    private String INVOICE_PASSWORD = "147085";
     private String MANUAL_ENTRY_PASSWORD = "147085";
     private String EDIT_ENABLE_PASSWORD = "147085";
     private String RESET_PASSWORD = "147085";
@@ -122,6 +240,7 @@ class WeighBridge {
     private boolean lock = false;
     private PrintService[] printServices;
     private Vector<String> printers;
+    private Vector<String> invoiceProperties;
     private Calculator calc;
     private JFrame babulensWeighbridgeDesigned;
     private JTextField textFieldCharges;
@@ -293,6 +412,16 @@ class WeighBridge {
     private JComboBox<String> comboBoxOperator;
     private JLabel lblOperatorName;
     private JLabel lblReportComboBox;
+    private JCheckBox chckbxInvoice;
+    private JComboBox<String> comboBoxInvoiceProperty;
+    private int invoiceNo;
+    private JPanel panelInvoice;
+    private JPanel panelInvoiceLeft;
+    private JPanel panelInvoiceRight;
+    private Map<String, JComponent> invoiceFields;
+    private JButton btnGetTotal;
+    private JButton btnInvoiceSave;
+    private JButton btnInvoicePrint;
 
     /**
      * Create the application.
@@ -306,6 +435,15 @@ class WeighBridge {
             printers = new Vector<>();
             for (PrintService printer : printServices) {
                 printers.add(printer.getName());
+            }
+            invoiceProperties = new Vector<>();
+            try (Stream<Path> paths = Files.walk(Paths.get("Reports"))) {
+                invoiceProperties.addAll(paths
+                        .filter(Files::isRegularFile)
+                        .filter(path -> path.toString().endsWith(".property"))
+                        .map(path -> path.getFileName().toString())
+                        .collect(Collectors.toList()));
+            } catch (IOException ignored) {
             }
             try {
                 if (new File("weighdata.mv.db").exists()) {
@@ -673,6 +811,7 @@ class WeighBridge {
             ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
             rs.absolute(1);
             textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
+            invoiceNo = rs.getInt("INVOICE_NO");
             textFieldTitle1.setText(rs.getString("TITLE1"));
             title1.setText(rs.getString("TITLE1"));
             textFieldTitle2.setText(rs.getString("TITLE2"));
@@ -684,6 +823,7 @@ class WeighBridge {
             textFieldNoOfCopies.setText(Integer.toString(rs.getInt("COPIES")));
             noOfCopies = Integer.parseInt(textFieldNoOfCopies.getText());
             comboBoxPrintOptionForWeight.getModel().setSelectedItem(rs.getString("PRINTOPTIONFORWEIGHT"));
+            comboBoxInvoiceProperty.getModel().setSelectedItem(rs.getString("INVOICE_PROPERTY"));
             comboBoxReport.getModel().setSelectedItem(rs.getString("REPORT"));
             chckbxExcludeCharges.setSelected(rs.getBoolean("EXCLUDECHARGES"));
             chckbxExcludeDrivers.setSelected(rs.getBoolean("EXCLUDEDRIVER"));
@@ -709,12 +849,14 @@ class WeighBridge {
             UNLOCK_PASSWORD = rs.getString("UNLOCK_PASSWORD");
             CAMERA_PASSWORD = rs.getString("CAMERA_PASSWORD");
             SMS_PASSWORD = rs.getString("SMS_PASSWORD");
+            INVOICE_PASSWORD = rs.getString("INVOICE_PASSWORD");
             MANUAL_ENTRY_PASSWORD = rs.getString("MANUAL_ENTRY_PASSWORD");
             EDIT_ENABLE_PASSWORD = rs.getString("EDIT_ENABLE_PASSWORD");
             RESET_PASSWORD = rs.getString("RESET_PASSWORD");
             LOGIN_PASSWORD = rs.getString("LOGIN_PASSWORD");
             chckbxCamera.setSelected(rs.getBoolean("CAMERA"));
             chckbxSms.setSelected(rs.getBoolean("SMS"));
+            chckbxInvoice.setSelected(rs.getBoolean("SHOW_INVOICE"));
             textFieldSMSBaudRate.setText(Integer.toString(rs.getInt("SMSBAUDRATE")));
             textFieldSMSPortName.setText(rs.getString("SMSPORTNAME"));
             textFieldLine1.setText(rs.getString("LINE1"));
@@ -823,11 +965,218 @@ class WeighBridge {
                 comboBoxMaterialName.addItem(rs.getString("MATERIAL"));
             }
             clear();
+            refreshInvoice();
         } catch (SQLException | ParseException ignored) {
             if (runUpdateSQL()) {
                 settings();
             }
         }
+    }
+
+    private ObjectNode getInvoiceData() {
+        ObjectNode invoiceData = new ObjectMapper().createObjectNode();
+        invoiceFields.forEach((key, component) -> {
+            if (component instanceof JTextField) {
+                invoiceData.put(key, ((JTextField) component).getText());
+            }
+        });
+
+        return invoiceData;
+    }
+
+    private void saveInvoice(ActionEvent... ae) {
+        try {
+            Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            ResultSet rs = stmt.executeQuery("SELECT * FROM INVOICES");
+            rs.moveToInsertRow();
+            rs.updateInt("INVOICE_NO", invoiceNo);
+            rs.updateString("INVOICE_DATA", getInvoiceData().toString());
+            rs.insertRow();
+            rs = stmt.executeQuery("SELECT * FROM SETTINGS");
+            rs.absolute(1);
+            rs.updateInt("INVOICE_NO", ++invoiceNo);
+            rs.updateRow();
+        } catch (SQLException ignored) {
+            if (runUpdateSQL()) {
+                saveInvoice();
+            } else {
+                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :5656", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+            return;
+        }
+        btnInvoiceSave.setEnabled(false);
+        btnInvoicePrint.setEnabled(true);
+        btnInvoicePrint.requestFocus();
+    }
+
+    private void printInvoice(ActionEvent... ae) {
+        ObjectNode invoiceData = getInvoiceData();
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            JsonNode invoiceProperty = new ObjectMapper().readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
+            String htmlContent = new String(Files.readAllBytes(Paths.get("Reports/html/" + invoiceProperty.path("html").asText(""))));
+
+            Iterator<Map.Entry<String, JsonNode>> fieldsIterator = invoiceData.fields();
+            while (fieldsIterator.hasNext()) {
+                Map.Entry<String, JsonNode> entry = fieldsIterator.next();
+                String key = entry.getKey();
+                String value = StringEscapeUtils.escapeHtml4(entry.getValue().asText());
+                htmlContent = htmlContent.replaceAll("\\$\\{" + key + "}", value);
+            }
+            ITextRenderer iTextRenderer = new ITextRenderer();
+            iTextRenderer.setDocumentFromString(htmlContent);
+            iTextRenderer.layout();
+            iTextRenderer.createPDF(byteArrayOutputStream);
+            iTextRenderer.finishPDF();
+
+            PDDocument document = Loader.loadPDF(byteArrayOutputStream.toByteArray());
+            while (document.getNumberOfPages() > 1) {
+                document.removePage(document.getNumberOfPages() - 1);
+            }
+            PrinterJob job = PrinterJob.getPrinterJob();
+            job.setPageable(new PDFPageable(document));
+            job.setPrintService(PrintServiceLookup.lookupDefaultPrintService());
+            job.print();
+            document.close();
+        } catch (Exception ignored) {
+        }
+        clearInvoice();
+    }
+
+    private void clearInvoice(ActionEvent... ae) {
+        invoiceFields.forEach((key, component) -> {
+            if (component instanceof JTextField) {
+                ((JTextField) component).setText("");
+            }
+            component.setEnabled(true);
+        });
+        btnGetTotal.setEnabled(true);
+        btnInvoiceSave.setEnabled(false);
+        btnInvoicePrint.setEnabled(false);
+    }
+
+    private void refreshInvoice() {
+        if (chckbxInvoice.isSelected()) {
+            try {
+                panelInvoiceLeft.removeAll();
+                panelInvoiceRight.removeAll();
+                invoiceFields = new HashMap<>();
+
+                JsonNode invoiceProperty = new ObjectMapper().readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
+                addInvoiceFields(invoiceProperty.get("leftFields"), panelInvoiceLeft);
+                addInvoiceFields(invoiceProperty.get("rightFields"), panelInvoiceRight);
+                addInvoiceFields(invoiceProperty.get("hiddenFields"));
+
+                panelInvoice.repaint();
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    private void addInvoiceFields(JsonNode fields) {
+        if (fields != null && fields.isArray()) {
+            for (JsonNode field : fields) {
+                getInvoiceField(field);
+            }
+        }
+    }
+
+    private void addInvoiceFields(JsonNode fields, JPanel panelToAdd) {
+        if (fields != null && fields.isArray()) {
+            for (JsonNode field : fields) {
+                panelToAdd.add(Box.createRigidArea(new Dimension(0, 20)));
+                JPanel panel = new JPanel();
+                panel.setMaximumSize(new Dimension(400, 25));
+                panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+                panel.setBackground(new Color(0, 255, 127));
+
+                JLabel label = new JLabel(field.path("name").asText(""));
+                label.setPreferredSize(new Dimension(150, 25));
+                label.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+                panel.add(label);
+                panel.add(getInvoiceField(field));
+
+                panelToAdd.add(panel);
+            }
+        }
+
+        panelToAdd.add(Box.createHorizontalGlue());
+    }
+
+    private JComponent getInvoiceField(JsonNode field) {
+        JComponent component;
+
+        switch (field.path("type").asText("")) {
+            case "blank": {
+                component = new JLabel();
+                break;
+            }
+            case "invoiceNo": {
+                JTextField jTextField = new JTextField(field.path("invoicePrefix").asText("") + invoiceNo);
+                jTextField.setColumns(10);
+                jTextField.setEnabled(false);
+                jTextField.setDisabledTextColor(Color.BLACK);
+                jTextField.setHorizontalAlignment(SwingConstants.CENTER);
+                jTextField.addPropertyChangeListener(l -> {
+                    if (Objects.equals(jTextField.getText(), "")) {
+                        jTextField.setText(field.path("invoicePrefix").asText("") + invoiceNo);
+                    }
+                    if (jTextField.isEnabled()) {
+                        jTextField.setEnabled(false);
+                    }
+                });
+                component = jTextField;
+                break;
+            }
+            case "invoiceDate": {
+                JTextField jTextField = new JTextField(new SimpleDateFormat(field.path("dateFormat").asText("dd-MM-yyyy")).format(new Date()));
+                jTextField.setColumns(10);
+                jTextField.setEnabled(false);
+                jTextField.setDisabledTextColor(Color.BLACK);
+                jTextField.setHorizontalAlignment(SwingConstants.CENTER);
+                jTextField.addPropertyChangeListener(l -> {
+                    if (Objects.equals(jTextField.getText(), "")) {
+                        jTextField.setText(new SimpleDateFormat(field.path("dateFormat").asText("dd-MM-yyyy")).format(new Date()));
+                    }
+                    if (jTextField.isEnabled()) {
+                        jTextField.setEnabled(false);
+                    }
+                });
+                component = jTextField;
+                break;
+            }
+            case "disabled": {
+                JTextField jTextField = new JTextField();
+                jTextField.setColumns(10);
+                jTextField.setEnabled(false);
+                jTextField.setDisabledTextColor(Color.BLACK);
+                jTextField.setHorizontalAlignment(SwingConstants.RIGHT);
+                jTextField.addPropertyChangeListener(l -> {
+                    if (jTextField.isEnabled()) {
+                        jTextField.setEnabled(false);
+                    }
+                });
+                component = jTextField;
+                break;
+            }
+            case "number": {
+                JTextField jTextField = new JTextField();
+                jTextField.setColumns(10);
+                jTextField.setDisabledTextColor(Color.BLACK);
+                jTextField.setHorizontalAlignment(SwingConstants.RIGHT);
+                component = jTextField;
+                break;
+            }
+            default: {
+                JTextField jTextField = new JTextField();
+                jTextField.setColumns(10);
+                jTextField.setHorizontalAlignment(SwingConstants.CENTER);
+                component = jTextField;
+            }
+        }
+
+        component.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        invoiceFields.put(field.path("key").asText(""), component);
+        return component;
     }
 
     private boolean runUpdateSQL() {
@@ -856,6 +1205,7 @@ class WeighBridge {
             rs.updateString("FOOTER", textFieldFooter.getText());
             rs.updateBoolean("EXCLUDECUSTOMERS", chckbxExcludeCustomer.isSelected());
             rs.updateString("PRINTOPTIONFORWEIGHT", (String) comboBoxPrintOptionForWeight.getSelectedItem());
+            rs.updateString("INVOICE_PROPERTY", (String) comboBoxInvoiceProperty.getSelectedItem());
             rs.updateString("REPORT", (String) comboBoxReport.getSelectedItem());
             rs.updateInt("BAUDRATE", Integer.parseInt(0 + textFieldBaudRate.getText().replaceAll("\\D", "")));
             rs.updateString("PORTNAME", textFieldPortName.getText());
@@ -879,6 +1229,7 @@ class WeighBridge {
             rs.updateBoolean("SHOW_STATUS", chckbxManualStatus.isSelected());
             rs.updateBoolean("TAKE_BACKUP", chckbxTakeBackup.isSelected());
             rs.updateBoolean("SMS", chckbxSms.isSelected());
+            rs.updateBoolean("SHOW_INVOICE", chckbxInvoice.isSelected());
             rs.updateBoolean("CAMERA", chckbxCamera.isSelected());
             rs.updateInt("SMSBAUDRATE", Integer.parseInt(0 + textFieldSMSBaudRate.getText().replaceAll("\\D", "")));
             rs.updateString("SMSPORTNAME", textFieldSMSPortName.getText().toUpperCase());
@@ -1029,7 +1380,7 @@ class WeighBridge {
 
         JLabel title = new JLabel("BABULENS WEIGHBRIDGE");
         title.setForeground(new Color(0, 0, 255));
-        title.setBounds(10, 11, 300, 30);
+        title.setBounds(10, 11, 325, 30);
         title.setFont(new Font("Algerian", Font.ITALIC, 25));
         babulensWeighbridgeDesigned.getContentPane().add(title);
 
@@ -3378,6 +3729,137 @@ class WeighBridge {
         textFieldCropHeight11.setBounds(469, 281, 50, 25);
         panelCameras.add(textFieldCropHeight11);
 
+        panelInvoice = new JPanel();
+        panelInvoice.setBackground(new Color(0, 255, 127));
+        tabbedPane.addTab("", panelInvoice);
+        tabbedPane.setEnabledAt(2, true);
+        panelInvoice.setLayout(null);
+
+        panelInvoiceLeft = new JPanel();
+        panelInvoiceLeft.setBounds(45, 39, 400, 480);
+        panelInvoiceLeft.setBackground(new Color(0, 255, 127));
+        panelInvoiceLeft.setLayout(new BoxLayout(panelInvoiceLeft, BoxLayout.Y_AXIS));
+        panelInvoice.add(panelInvoiceLeft);
+
+        panelInvoiceRight = new JPanel();
+        panelInvoiceRight.setBounds(460, 40, 400, 480);
+        panelInvoiceRight.setBackground(new Color(0, 255, 127));
+        panelInvoiceRight.setLayout(new BoxLayout(panelInvoiceRight, BoxLayout.Y_AXIS));
+        panelInvoice.add(panelInvoiceRight);
+
+        JPanel panelFooter = new JPanel();
+        panelFooter.setBounds(45, 539, 500, 60);
+        panelFooter.setBackground(new Color(0, 255, 127));
+        panelFooter.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        panelInvoice.add(panelFooter);
+
+        btnGetTotal = new JButton("Get Total");
+        btnGetTotal.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnGetTotal.addActionListener(l -> {
+            invoiceFields.forEach((key, component) -> component.setEnabled(false));
+            DecimalFormat decimalFormat = new DecimalFormat("##,##,##0.00");
+            double quantity = 0;
+            double rate = 0;
+            try {
+                String[] temp = ("0" + ((JTextField) invoiceFields.get("quantity")).getText() + ".0").replaceAll("[^.\\d]", "").split("\\.");
+                quantity = Double.parseDouble(temp[0] + "." + temp[1]);
+                ((JTextField) invoiceFields.get("quantity")).setText(String.valueOf(decimalFormat.format(quantity)));
+            } catch (Exception ignored) {
+            }
+            try {
+                String[] temp = ("0" + ((JTextField) invoiceFields.get("rate")).getText() + ".0").replaceAll("[^.\\d]", "").split("\\.");
+                rate = Double.parseDouble(temp[0] + "." + temp[1]);
+                ((JTextField) invoiceFields.get("rate")).setText(decimalFormat.format(rate));
+            } catch (Exception ignored) {
+            }
+            double amount = quantity * rate;
+            try {
+                ((JTextField) invoiceFields.get("amount")).setText(decimalFormat.format(amount));
+            } catch (Exception ignored) {
+            }
+            double cgst = amount * .025;
+            try {
+                ((JTextField) invoiceFields.get("cgst")).setText(decimalFormat.format(cgst));
+            } catch (Exception ignored) {
+            }
+            double sgst = amount * .025;
+            try {
+                ((JTextField) invoiceFields.get("sgst")).setText(decimalFormat.format(sgst));
+            } catch (Exception ignored) {
+            }
+            double igst = amount * .05;
+            try {
+                ((JTextField) invoiceFields.get("igst")).setText(decimalFormat.format(igst));
+            } catch (Exception ignored) {
+            }
+            double total = amount + cgst + sgst + igst;
+            double roundOff = total - Math.floor(total);
+            try {
+                ((JTextField) invoiceFields.get("roundOff")).setText(decimalFormat.format(roundOff));
+            } catch (Exception ignored) {
+            }
+            total = amount + cgst + sgst + igst - roundOff;
+            try {
+                ((JTextField) invoiceFields.get("total")).setText(decimalFormat.format(total));
+            } catch (Exception ignored) {
+            }
+            double taxAmount = cgst + sgst + igst;
+            try {
+                ((JTextField) invoiceFields.get("taxAmount")).setText(decimalFormat.format(taxAmount));
+            } catch (Exception ignored) {
+            }
+            try {
+                ((JTextField) invoiceFields.get("taxInWords")).setText(ConvertNumberToWord.format(taxAmount));
+            } catch (Exception ignored) {
+            }
+            try {
+                ((JTextField) invoiceFields.get("totalInWords")).setText(ConvertNumberToWord.format(total));
+            } catch (Exception ignored) {
+            }
+            btnGetTotal.setEnabled(false);
+            btnInvoiceSave.setEnabled(true);
+        });
+        btnGetTotal.setPreferredSize(new Dimension(150, 25));
+        panelFooter.add(btnGetTotal);
+
+        btnInvoiceSave = new JButton("Save");
+        btnInvoiceSave.addActionListener(this::saveInvoice);
+        btnInvoiceSave.setEnabled(false);
+        btnInvoiceSave.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnInvoiceSave.setPreferredSize(new Dimension(150, 25));
+        panelFooter.add(btnInvoiceSave);
+
+        btnInvoicePrint = new JButton("Print");
+        btnInvoicePrint.addActionListener(this::printInvoice);
+        btnInvoicePrint.setEnabled(false);
+        btnInvoicePrint.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnInvoicePrint.setPreferredSize(new Dimension(150, 25));
+        panelFooter.add(btnInvoicePrint);
+
+        panelFooter.add(Box.createRigidArea(new Dimension(500, 10)));
+        panelFooter.add(Box.createRigidArea(new Dimension(150, 25)));
+
+        JButton btnInvoiceRePrint = new JButton("Re Print");
+        btnInvoiceRePrint.setFocusable(false);
+        btnInvoiceRePrint.setEnabled(false);
+        btnInvoiceRePrint.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnInvoiceRePrint.setPreferredSize(new Dimension(150, 25));
+        panelFooter.add(btnInvoiceRePrint);
+
+        JButton btnInvoiceClear = new JButton("Clear");
+        btnInvoiceClear.setFocusable(false);
+        btnInvoiceClear.addActionListener(this::clearInvoice);
+        btnInvoiceClear.setPreferredSize(new Dimension(150, 25));
+        btnInvoiceClear.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        panelFooter.add(btnInvoiceClear);
+
+        try {
+            JLabel contact = new JLabel(new ImageIcon(ImageIO.read(Objects.requireNonNull(getClass().getResource("/contact.bmp")))));
+            contact.setBounds(945, 505, 300, 100);
+            panelInvoice.add(contact);
+        } catch (Exception ignored) {
+        }
+
         JPanel panelReport = new JPanel();
         panelReport.setBackground(new Color(0, 255, 127));
         tabbedPane.addTab("           Report           ", panelReport);
@@ -4172,7 +4654,7 @@ class WeighBridge {
         chckbxManualEntry.setBackground(new Color(0, 255, 127));
         chckbxManualEntry.setEnabled(false);
         chckbxManualEntry.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        chckbxManualEntry.setBounds(638, 125, 200, 25);
+        chckbxManualEntry.setBounds(638, 147, 200, 25);
         panelSettings1.add(chckbxManualEntry);
 
         chckbxEditEnable = new JCheckBox("Edit Enable");
@@ -4222,7 +4704,7 @@ class WeighBridge {
         chckbxEditEnable.setBackground(new Color(0, 255, 127));
         chckbxEditEnable.setEnabled(false);
         chckbxEditEnable.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        chckbxEditEnable.setBounds(638, 150, 200, 25);
+        chckbxEditEnable.setBounds(638, 172, 200, 25);
         panelSettings1.add(chckbxEditEnable);
 
         comboBoxPrinter = new JComboBox<>();
@@ -4245,7 +4727,7 @@ class WeighBridge {
         btnUpdate.setFocusable(false);
         btnUpdate.addActionListener(this::updateSettings);
         btnUpdate.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnUpdate.setBounds(664, 228, 150, 25);
+        btnUpdate.setBounds(580, 240, 150, 25);
         panelSettings1.add(btnUpdate);
 
         JButton btnResetWeights = new JButton("Reset Sl No");
@@ -4299,10 +4781,10 @@ class WeighBridge {
         btnRefresh.setFocusable(false);
         btnRefresh.addActionListener(this::settings);
         btnRefresh.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnRefresh.setBounds(865, 228, 150, 25);
+        btnRefresh.setBounds(740, 240, 150, 25);
         panelSettings1.add(btnRefresh);
         btnResetWeights.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnResetWeights.setBounds(865, 273, 150, 25);
+        btnResetWeights.setBounds(740, 270, 150, 25);
         panelSettings1.add(btnResetWeights);
 
         JButton btnUnlock = new JButton("Unlock");
@@ -4333,6 +4815,7 @@ class WeighBridge {
                     chckbxEditEnable.setEnabled(true);
                     chckbxCamera.setEnabled(true);
                     chckbxSms.setEnabled(true);
+                    chckbxInvoice.setEnabled(true);
                     chckbxExcludeCustomer.setEnabled(true);
                     chckbxExcludeCharges.setEnabled(true);
                     chckbxExcludeDrivers.setEnabled(true);
@@ -4361,6 +4844,7 @@ class WeighBridge {
                 chckbxEditEnable.setEnabled(false);
                 chckbxCamera.setEnabled(false);
                 chckbxSms.setEnabled(false);
+                chckbxInvoice.setEnabled(false);
                 chckbxExcludeCustomer.setEnabled(false);
                 chckbxExcludeCharges.setEnabled(false);
                 chckbxExcludeDrivers.setEnabled(false);
@@ -4382,7 +4866,7 @@ class WeighBridge {
             }
         });
         btnUnlock.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnUnlock.setBounds(664, 273, 150, 25);
+        btnUnlock.setBounds(580, 270, 150, 25);
         panelSettings1.add(btnUnlock);
 
         chckbxExcludeCustomer = new JCheckBox("Exclude Customer");
@@ -4457,6 +4941,7 @@ class WeighBridge {
         chckbxSms = new JCheckBox("SMS");
         chckbxSms.addActionListener(l -> {
             if (chckbxSms.isSelected()) {
+                chckbxSms.setSelected(false);
                 JPasswordField password = new JPasswordField(10);
                 password.addActionListener(li -> JOptionPane.getRootFrame().dispose());
                 JPanel panel = new JPanel();
@@ -4475,9 +4960,7 @@ class WeighBridge {
                 } else {
                     isCorrect = Arrays.equals(temp, correctPassword);
                 }
-                if (!isCorrect) {
-                    chckbxSms.setSelected(false);
-                }
+                chckbxSms.setSelected(isCorrect);
             }
         });
         chckbxSms.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -4524,7 +5007,6 @@ class WeighBridge {
 
         JButton btnResetTrasporter = new JButton("Reset Tares");
         btnResetTrasporter.addActionListener(l -> {
-
             JPasswordField password = new JPasswordField(10);
             password.addActionListener(li -> JOptionPane.getRootFrame().dispose());
             JPanel panel = new JPanel();
@@ -4556,7 +5038,7 @@ class WeighBridge {
         });
         btnResetTrasporter.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnResetTrasporter.setFocusable(false);
-        btnResetTrasporter.setBounds(1060, 228, 165, 25);
+        btnResetTrasporter.setBounds(1085, 270, 150, 25);
         panelSettings1.add(btnResetTrasporter);
 
         chckbxExcludeRemarks = new JCheckBox("Exclude Remarks");
@@ -4609,11 +5091,11 @@ class WeighBridge {
         chckbxenableSettings2.setEnabled(false);
         chckbxenableSettings2.addChangeListener(e -> {
             if (chckbxenableSettings2.isSelected()) {
-                tabbedPane.setEnabledAt(4, true);
-                tabbedPane.setTitleAt(4, "          Settings 2          ");
+                tabbedPane.setEnabledAt(5, true);
+                tabbedPane.setTitleAt(5, "          Settings 2          ");
             } else {
-                tabbedPane.setEnabledAt(4, false);
-                tabbedPane.setTitleAt(4, "");
+                tabbedPane.setEnabledAt(5, false);
+                tabbedPane.setTitleAt(5, "");
             }
         });
         chckbxenableSettings2.setBackground(new Color(0, 255, 127));
@@ -4671,7 +5153,7 @@ class WeighBridge {
         });
         btnRefreshWeight.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnRefreshWeight.setFocusable(false);
-        btnRefreshWeight.setBounds(1060, 273, 165, 25);
+        btnRefreshWeight.setBounds(900, 240, 175, 25);
         panelSettings1.add(btnRefreshWeight);
 
         JLabel lblReport = new JLabel("Report");
@@ -4782,10 +5264,102 @@ class WeighBridge {
         comboBoxOperator.setBounds(969, 140, 276, 30);
         panelSettings1.add(comboBoxOperator);
 
+        chckbxInvoice = new JCheckBox("Invoice");
+        chckbxInvoice.addActionListener(l -> {
+            if (chckbxInvoice.isSelected()) {
+                chckbxInvoice.setSelected(false);
+                JPasswordField password = new JPasswordField(10);
+                password.addActionListener(li -> JOptionPane.getRootFrame().dispose());
+                JPanel panel = new JPanel();
+                String[] ConnectOptionNames = {
+                        "Enter",
+                        "Cancel"
+                };
+                panel.add(new JLabel("Please Enter the Invoice Password ? "));
+                panel.add(password);
+                JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
+                char[] temp = password.getPassword();
+                boolean isCorrect;
+                char[] correctPassword = INVOICE_PASSWORD.toCharArray();
+                if (temp.length != correctPassword.length) {
+                    isCorrect = false;
+                } else {
+                    isCorrect = Arrays.equals(temp, correctPassword);
+                }
+                chckbxInvoice.setSelected(isCorrect);
+            }
+        });
+        chckbxInvoice.addChangeListener(e -> {
+            if (chckbxInvoice.isSelected()) {
+                tabbedPane.setEnabledAt(2, true);
+                tabbedPane.setTitleAt(2, "         Invoice         ");
+            } else {
+                tabbedPane.setEnabledAt(2, false);
+                tabbedPane.setTitleAt(2, "");
+            }
+        });
+        chckbxInvoice.setEnabled(false);
+        chckbxInvoice.setActionCommand("Invoice");
+        chckbxInvoice.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        chckbxInvoice.setFocusable(false);
+        chckbxInvoice.setBackground(new Color(0, 255, 127));
+        chckbxInvoice.setBounds(638, 100, 200, 25);
+        panelSettings1.add(chckbxInvoice);
+
+        JButton btnResetInvoiceNo = new JButton("Reset Invoice No");
+        btnResetInvoiceNo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnResetInvoiceNo.setFocusable(false);
+        btnResetInvoiceNo.setBounds(900, 270, 175, 25);
+        btnResetInvoiceNo.addActionListener(l -> {
+            JPasswordField password = new JPasswordField(10);
+            password.addActionListener(li -> JOptionPane.getRootFrame().dispose());
+            JPanel panel = new JPanel();
+            String[] ConnectOptionNames = {
+                    "Enter",
+                    "Cancel"
+            };
+            panel.add(new JLabel("Please the Password ? "));
+            panel.add(password);
+            JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
+            char[] temp = password.getPassword();
+            boolean isCorrect;
+            char[] correctPassword = RESET_PASSWORD.toCharArray();
+            if (temp.length != correctPassword.length) {
+                isCorrect = false;
+            } else {
+                isCorrect = Arrays.equals(temp, correctPassword);
+            }
+            if (isCorrect) {
+                String response = JOptionPane.showInputDialog(null, "Please Enter the Starting Invoice No ?", "Invoice No", JOptionPane.QUESTION_MESSAGE);
+                if (response == null || Integer.parseInt(0 + response.replaceAll("\\D", "")) == 0) {
+                    JOptionPane.showMessageDialog(null, "Reset Failed ", "Value Entered is not correct", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    try {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        PreparedStatement stmts = dbConnection.prepareStatement("CREATE TABLE INVOICES_" + DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss").format(LocalDateTime.now()) + " AS TABLE INVOICES");
+                        stmts.executeUpdate();
+                        stmts = dbConnection.prepareStatement("TRUNCATE TABLE INVOICES");
+                        stmts.executeUpdate();
+                        ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
+                        rs.absolute(1);
+                        rs.updateInt("INVOICE_NO", Integer.parseInt(response.replaceAll("\\D", "")));
+                        rs.updateRow();
+                    } catch (SQLException ignored) {
+                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2836", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+                    settings();
+                    JOptionPane.showMessageDialog(null, "Reset Successful ", "Reset Successful", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Wrong Password ", "Value Entered the Correct Password", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        panelSettings1.add(btnResetInvoiceNo);
+
         JPanel panelSettings2 = new JPanel();
         panelSettings2.setBackground(new Color(0, 255, 127));
         tabbedPane.addTab("", panelSettings2);
-        tabbedPane.setEnabledAt(4, false);
+        tabbedPane.setEnabledAt(5, false);
         panelSettings2.setLayout(null);
 
         JLabel lblLine1 = new JLabel("Line 1");
@@ -5222,6 +5796,18 @@ class WeighBridge {
         ));
         tableVehicleTypes.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         scrollPaneVehicleType.setViewportView(tableVehicleTypes);
+
+        JLabel lblInvoiceProperty = new JLabel("Invoice Property");
+        lblInvoiceProperty.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblInvoiceProperty.setBounds(40, 391, 173, 25);
+        panelSettings2.add(lblInvoiceProperty);
+
+        comboBoxInvoiceProperty = new JComboBox<>();
+        comboBoxInvoiceProperty.setModel(new DefaultComboBoxModel<>(invoiceProperties));
+        comboBoxInvoiceProperty.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        comboBoxInvoiceProperty.setFocusable(false);
+        comboBoxInvoiceProperty.setBounds(215, 391, 168, 30);
+        panelSettings2.add(comboBoxInvoiceProperty);
 
         JButton button = new JButton("Minimize");
         button.addActionListener(l -> babulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
@@ -9212,7 +9798,6 @@ class WeighBridge {
                     btnClick.setVisible(false);
                     butttonUpdateCamera.setEnabled(true);
                     buttonUnLockCamera.setEnabled(true);
-
                 } else {
                     chckbxCamera.setSelected(false);
                 }
@@ -9801,6 +10386,51 @@ class WeighBridge {
         public void addEditableRow(int row) {
             this.editableRow.add(row);
         }
+    }
+
+    static class ConvertNumberToWord {
+
+        private static final String[] units = {
+                "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+        };
+        private static final String[] tens = {
+                "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+        };
+
+        public static String format(double number) {
+            if (number == 0) {
+                return "Zero";
+            }
+            if (number < 0) {
+                return "Minus " + format(Math.abs(number));
+            }
+            if (number < 20) {
+                return units[(int) number];
+            }
+            if (number < 100) {
+                return tens[(int) (number / 10)] + ((number % 10 != 0) ? " " : "") + units[(int) (number % 10)];
+            }
+            if (number < 1000) {
+                return units[(int) (number / 100)] + " Hundred" + ((number % 100 != 0) ? " " : "") + format(number % 100);
+            }
+            if (number < 100000) {
+                return format(number / 1000) + " Thousand" + ((number % 1000 != 0) ? " " : "") + format(number % 1000);
+            }
+            if (number < 10000000) {
+                return format(number / 100000) + " Lakh" + ((number % 100000 != 0) ? " " : "") + format(number % 100000);
+            }
+            if (number < 1000000000) {
+                return format(number / 10000000) + " Crore" + ((number % 10000000 != 0) ? " " : "") + format(number % 10000000);
+            }
+            if (number < 100000000000d) {
+                return format(number / 1000000000) + " Arab" + ((number % 1000000000 != 0) ? " " : "") + format(number % 1000000000);
+            }
+            if (number < 10000000000000d) {
+                return format(number / 100000000000d) + " Kharab" + ((number % 100000000000d != 0) ? " " : "") + format(number % 100000000000d);
+            }
+            return "Number out of range";
+        }
+
     }
 
     class TableRenderer extends DefaultCellEditor {

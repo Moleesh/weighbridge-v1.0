@@ -1,0 +1,91 @@
+{
+	"html": "K.K.M Blue Metal.html",
+	"hiddenFields": [
+		{
+			"key": "taxAmount"
+		},
+		{
+			"key": "taxInWords"
+		},
+		{
+			"key": "totalInWords"
+		}
+	],
+	"leftFields": [
+		{
+			"key": "invoiceNo",
+			"name": "Invoice No",
+			"type": "invoiceNo",
+			"invoicePrefix": "TB"
+		},
+		{
+			"key": "invoiceDate",
+			"name": "Invoice Date",
+			"type": "invoiceDate",
+			"dateFormat": "d-MMM-yy"
+		},
+		{
+			"key": "buyer",
+			"name": "Buyer"
+		},
+		{
+			"key": "buyerAddress",
+			"name": "Address"
+		},
+		{
+			"key": "vehicleNo",
+			"name": "Vehicle No"
+		},
+		{
+			"key": "destination",
+			"name": "Destination"
+		},
+		{
+			"key": "material",
+			"name": "Material"
+		},
+		{
+			"key": "quantity",
+			"name": "Quantity (ton)"
+		},
+		{
+			"key": "rate",
+			"name": "Rate"
+		}
+	],
+	"rightFields": [
+		{
+			"type": "blank"
+		},
+		{
+			"key": "amount",
+			"name": "Amount",
+			"type": "disabled"
+		},
+		{
+			"key": "cgst",
+			"name": "cgst",
+			"type": "disabled"
+		},
+		{
+			"key": "sgst",
+			"name": "sgst",
+			"type": "disabled"
+		},
+		{
+			"key": "igst",
+			"name": "igst",
+			"type": "disabled"
+		},
+		{
+			"key": "roundOff",
+			"name": "RoundOff (-)",
+			"type": "disabled"
+		},
+		{
+			"key": "total",
+			"name": "Total",
+			"type": "disabled"
+		}
+	]
+}
