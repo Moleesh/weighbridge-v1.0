@@ -1,5 +1,5 @@
 {
-	"html": "K.K.M Blue Metal.html",
+	"html": "K.K.M Blue Metal",
 	"hiddenFields": [
 		{
 			"key": "taxAmount"
@@ -9,7 +9,22 @@
 		},
 		{
 			"key": "totalInWords"
-		}
+		},
+		{
+			"key": "cgstPercent",
+			"value": ".025"
+		},
+		{
+			"key": "sgstPercent",
+			"value": ".025"
+		},
+		{
+			"key": "igstPercent",
+			"value": ".05"
+		},
+        {
+            "key": "isLocal"
+        }
 	],
 	"leftFields": [
 		{
