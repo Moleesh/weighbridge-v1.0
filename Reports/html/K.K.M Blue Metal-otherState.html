@@ -183,7 +183,11 @@
             <td>Delivery Note Date<strong></strong></td>
         </tr>
         <tr>
-            <td colspan="2" rowspan="3">Buyer (Bill to)<strong>${buyer}</strong>${buyerAddress}</td>
+            <td colspan="2" rowspan="3">Buyer (Bill to)
+                <strong>${buyer}</strong>
+                ${buyerAddress}
+                <div>State Name : Kerala, Code : 32</div>
+            </td>
             <td>Dispatched through<strong></strong></td>
             <td>Destination<strong>${destination}</strong></td>
         </tr>
@@ -273,7 +277,7 @@
             <td class="right"><strong>${taxAmount}</strong></td>
         </tr>
         <tr>
-            <td class="total-amount" colspan="6">Tax Amount (in words) : <strong class="inline">INR ${taxInWords}
+            <td class="total-amount" colspan="5">Tax Amount (in words) : <strong class="inline">INR ${taxInWords}
                 Only</strong></td>
         </tr>
         <tr>
@@ -282,7 +286,7 @@
                 <div>We declare that this invoice shows the actual price of the</div>
                 <div>goods described and that all particulars are true and correct.</div>
             </td>
-            <td class="signature right" colspan="4"><strong>for K.K.M Blue Metal
+            <td class="signature right" colspan="3"><strong>for K.K.M Blue Metal
             </strong><strong></strong>Authorised Signatory
             </td>
         </tr>
