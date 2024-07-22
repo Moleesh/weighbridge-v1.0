@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        java-version: ['8']
+        java-version: ['22']
 
     steps:
       # Checkout the repository

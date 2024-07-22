@@ -214,7 +214,7 @@
         <tr class="billing-row body-font">
             <td><strong>1</strong></td>
             <td><strong class="spacing">${material}</strong><strong class="italic float-right">Output
-                Cgst</strong><strong class="italic float-right">Output Sgst</strong>
+                Igst</strong>
                 <div class="italic">Less :<strong class="inline left">Roundoff</strong></div>
             </td>
             <td>25171010</td>
@@ -224,7 +224,7 @@
             <td class="right">ton</td>
             <td class="right"></td>
             <td class="right"><strong
-                    class="spacing">${amount}</strong><strong>${cgst}</strong><strong>${sgst}</strong><strong
+                    class="spacing">${amount}</strong><strong>${igst}</strong><strong
                     class="inline">(-) ${roundOff}</strong></td>
         </tr>
         <tr class="right">
@@ -248,14 +248,11 @@
         <thead>
         <tr>
             <th rowspan="2" style="width:250px">HSN/SAC</th>
-            <th rowspan="2" style="width:80px">Taxable Value</th>
+            <th rowspan="2" style="width:80px">Integrated Value</th>
             <th colspan="2">Central Tax</th>
-            <th colspan="2">State Tax</th>
             <th rowspan="2" style="width:80px">Total Tax Amount</th>
         </tr>
         <tr>
-            <th style="width:80px">Rate</th>
-            <th style="width:80px">Amount</th>
             <th style="width:80px">Rate</th>
             <th style="width:80px">Amount</th>
         </tr>
@@ -264,27 +261,23 @@
         <tr>
             <td>25171010</td>
             <td class="right">${amount}</td>
-            <td class="right">2.50%</td>
-            <td class="right">${cgst}</td>
-            <td class="right">2.50%</td>
-            <td class="right">${sgst}</td>
+            <td class="right">5.00%</td>
+            <td class="right">${igst}</td>
             <td class="right">${taxAmount}</td>
         </tr>
         <tr>
             <td><strong>Total</strong></td>
             <td class="right"><strong>${amount}</strong></td>
             <td></td>
-            <td class="right"><strong>${cgst}</strong></td>
-            <td></td>
-            <td class="right"><strong>${sgst}</strong></td>
+            <td class="right"><strong>${igst}</strong></td>
             <td class="right"><strong>${taxAmount}</strong></td>
         </tr>
         <tr>
-            <td class="total-amount" colspan="7">Tax Amount (in words) : <strong class="inline">INR ${taxInWords}
+            <td class="total-amount" colspan="6">Tax Amount (in words) : <strong class="inline">INR ${taxInWords}
                 Only</strong></td>
         </tr>
         <tr>
-            <td class="declaration" colspan="3">
+            <td class="declaration" colspan="2">
                 <div class="underline">Declaration</div>
                 <div>We declare that this invoice shows the actual price of the</div>
                 <div>goods described and that all particulars are true and correct.</div>
