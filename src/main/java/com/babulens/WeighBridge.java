@@ -1,5 +1,6 @@
 package com.babulens;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -3849,6 +3850,7 @@ class WeighBridge {
             btnInvoiceSave.setEnabled(true);
             rdbtnLocal.setEnabled(false);
             rdbtnOtherStates.setEnabled(false);
+            btnInvoiceSave.requestFocus();
         });
         btnGetTotal.setPreferredSize(new Dimension(150, 25));
         panelFooter.add(btnGetTotal);
@@ -3872,7 +3874,36 @@ class WeighBridge {
 
         JButton btnInvoiceRePrint = new JButton("Re Print");
         btnInvoiceRePrint.setFocusable(false);
-        btnInvoiceRePrint.setEnabled(false);
+        btnInvoiceRePrint.addActionListener(_ -> {
+            String response = JOptionPane.showInputDialog(null, "Please Enter the Invoice No to Reprint ?", "Reprint", JOptionPane.QUESTION_MESSAGE);
+            if (response != null) {
+                try {
+                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    ResultSet rs = stmt.executeQuery("SELECT * FROM INVOICES WHERE INVOICE_NO = " + response);
+                    if (rs.next()) {
+                        JsonNode invoiceData = new ObjectMapper().readTree(rs.getString("INVOICE_DATA"));
+                        boolean isLocal = invoiceData.path("isLocal").asBoolean(false);
+                        rdbtnLocal.setSelected(isLocal);
+                        rdbtnOtherStates.setSelected(!isLocal);
+                        invoiceFields.forEach((key, component) -> {
+                            if (component instanceof JTextField) {
+                                ((JTextField) component).setText(invoiceData.path(key).asText(""));
+                            }
+                        });
+                        btnGetTotal.setEnabled(false);
+                        btnInvoicePrint.setEnabled(true);
+                        btnInvoiceSave.setEnabled(false);
+                        btnInvoicePrint.requestFocus();
+                        return;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "SQL ERROR\nRECORD NOT FOUND", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (SQLException | JsonProcessingException ignored) {
+                    JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+                btnInvoiceRePrint.requestFocus();
+            }
+        });
         btnInvoiceRePrint.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnInvoiceRePrint.setPreferredSize(new Dimension(150, 25));
         panelFooter.add(btnInvoiceRePrint);
