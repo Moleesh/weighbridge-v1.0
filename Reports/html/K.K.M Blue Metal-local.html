@@ -108,6 +108,9 @@
 
         .amount-chargeable {
             position: relative;
+        }
+		
+		.amount-chargeable td {
             padding: 8px;
         }
 
@@ -115,7 +118,7 @@
             text-align: right;
             position: absolute;
             top: 8px;
-            right: 20px;
+            right: 8px;
             font-style: italic;
             font-size: 10pt
         }
@@ -243,9 +246,12 @@
             <td></td>
             <td><strong>₹ ${total}</strong></td>
         </tr>
-        <tr>
-            <td class="amount-chargeable" colspan="10">Tax Amount (in words)<span class="chargeable-note">E.
-                            &amp; O.E</span><strong>INR ${totalInWords} Only</strong></td>
+        <tr class="amount-chargeable">
+            <td colspan="9">
+				Tax Amount (in words)
+				<span class="chargeable-note">E.&amp; O.E</span>
+				<strong>INR ${totalInWords} Only</strong>
+			</td>
         </tr>
         </tbody>
     </table>

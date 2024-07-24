@@ -1073,6 +1073,7 @@ class WeighBridge {
                 addInvoiceFields(invoiceProperty.get("hiddenFields"));
 
                 panelInvoice.repaint();
+                clearInvoice();
             } catch (Exception ignored) {
             }
         }
@@ -3765,12 +3766,13 @@ class WeighBridge {
         btnGetTotal.addActionListener(_ -> {
             invoiceFields.forEach((_, component) -> component.setEnabled(false));
             DecimalFormat decimalFormat = new DecimalFormat("##,##,##0.00");
+            DecimalFormat quantityFormat = new DecimalFormat("##,##,##0.000");
             double quantity = 0;
             double rate = 0;
             try {
                 String[] temp = ("0" + ((JTextField) invoiceFields.get("quantity")).getText() + ".0").replaceAll("[^.\\d]", "").split("\\.");
                 quantity = Double.parseDouble(temp[0] + "." + temp[1]);
-                ((JTextField) invoiceFields.get("quantity")).setText(String.valueOf(decimalFormat.format(quantity)));
+                ((JTextField) invoiceFields.get("quantity")).setText(String.valueOf(quantityFormat.format(quantity)));
             } catch (Exception ignored) {
             }
             try {
@@ -3894,6 +3896,7 @@ class WeighBridge {
                         btnInvoicePrint.setEnabled(true);
                         btnInvoiceSave.setEnabled(false);
                         btnInvoicePrint.requestFocus();
+                        invoiceFields.forEach((_, component) -> component.setEnabled(false));
                         return;
                     } else {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nRECORD NOT FOUND", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
@@ -9975,7 +9978,7 @@ class WeighBridge {
         }
     }
 
-    public BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2) {
+    private BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2) {
         if (img1 == null) {
             return img2;
         }
@@ -10511,7 +10514,7 @@ class WeighBridge {
 
     }
 
-    class TableRenderer extends DefaultCellEditor {
+    private class TableRenderer extends DefaultCellEditor {
 
         @Serial
         private static final long serialVersionUID = 1L;
