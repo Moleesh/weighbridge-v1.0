@@ -7756,7 +7756,9 @@ class WeighBridge {
                                  }
 
                                  BufferedImage printImage = joinBufferedImage(cropImage1, cropImage2);
-                                 graphics.drawImage(printImage, 250, 115, 300, (int) (300.00 / printImage.getWidth() * printImage.getHeight()), null);
+                                 if (printImage != null) {
+                                     graphics.drawImage(printImage, 250, 115, 300, (int) (300.00 / printImage.getWidth() * printImage.getHeight()), null);
+                                 }
                              } catch (NullPointerException ignored) {
                              }
 
@@ -7962,7 +7964,9 @@ class WeighBridge {
                                  }
 
                                  BufferedImage printImage = joinBufferedImage(cropImage1, cropImage2);
-                                 graphics.drawImage(printImage, 250, 125, 300, (int) (300.00 / printImage.getWidth() * printImage.getHeight()), null);
+                                 if (printImage != null) {
+                                     graphics.drawImage(printImage, 250, 125, 300, (int) (300.00 / printImage.getWidth() * printImage.getHeight()), null);
+                                 }
                              } catch (NullPointerException ignored) {
                              }
 
