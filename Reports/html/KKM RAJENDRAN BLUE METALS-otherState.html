@@ -44,8 +44,12 @@
             vertical-align: top;
         }
 
+        .address {
+            font-size: 11pt;
+        }
+
         .header-table td {
-            width: 188px;
+            width: 176px;
         }
 
         .term-of-delivery {
@@ -53,7 +57,7 @@
         }
 
         strong {
-            height: 18px;
+            min-height: 18px;
             display: block;
         }
 
@@ -156,15 +160,17 @@
     <table class="header-table">
         <tbody>
         <tr>
-            <td colspan="2" rowspan="5"><strong>K.K.M Blue Metal</strong>
-                <div>190/8, Kasthurirengapuram Part 2 Village</div>
-                <div>Kasthuri Rengapurm,Tisayanvilai Taluk</div>
-                <div>Tirunelveli District - 627112</div>
-                <div>TAN NO : MRIS09825E</div>
-                <div>Head Off -NO-1385/43-A, Vellancode, Pathittavilai,</div>
-                <div>Kuzhithurai,Kanyakumari, 629151</div>
-                <div>GSTIN/UIN: 33AFQPR2835H1Z6</div>
+            <td colspan="2" rowspan="5" class="address"><strong>KKM RAJENDRAN BLUE METALS (OPC) PRIVATE LIMITED</strong>
+                <div>NO- 32/1/A, K K M MAHAL,</div>
+                <div>Keez Pammam, Marthandam, K.K. Disit, Pin-629165</div>
+                <div>Branch :</div>
+                <div>13/6, 13/7, Vadakkuriyanayagipuram,</div>
+                <div>Veeranarayanankulam,Vadakkuariyanayagipuram,</div>
+                <div>Part II,Cheranmadevi, Thirunelveli.</div>
+                <div>Pincode-627414</div>
+                <div>GSTIN/UIN: 33AAKCK7393R1ZK</div>
                 <div>State Name : Tamil Nadu, Code : 33</div>
+                <div>E-Mail : kkmpvt966@gmail.com</div>
             </td>
             <td>Invoice No.<strong>${invoiceNo}</strong></td>
             <td>Dated<strong>${invoiceDate}</strong></td>
@@ -186,11 +192,10 @@
             <td>Delivery Note Date<strong></strong></td>
         </tr>
         <tr>
-            <td colspan="2" rowspan="3">
-                Buyer (Bill to)
+            <td colspan="2" rowspan="3">Buyer (Bill to)
                 <strong>${buyer}</strong>
                 ${buyerAddress}
-                <div>State Name : Tamil Nadu, Code : 33</div>
+                <div>State Name : Kerala, Code : 32</div>
             </td>
             <td>Dispatched through<strong></strong></td>
             <td>Destination<strong>${destination}</strong></td>
@@ -222,7 +227,7 @@
         <tr class="billing-row body-font">
             <td><strong>1</strong></td>
             <td><strong class="spacing">${material}</strong><strong class="italic float-right">Output
-                Cgst</strong><strong class="italic float-right">Output Sgst</strong>
+                Igst</strong>
                 <div class="italic">Less :<strong class="inline left">Roundoff</strong></div>
             </td>
             <td>25171010</td>
@@ -232,7 +237,7 @@
             <td class="right">ton</td>
             <td class="right"></td>
             <td class="right"><strong
-                    class="spacing">${amount}</strong><strong>${cgst}</strong><strong>${sgst}</strong><strong
+                    class="spacing">${amount}</strong><strong>${igst}</strong><strong
                     class="inline">(-) ${roundOff}</strong></td>
         </tr>
         <tr class="right">
@@ -248,10 +253,10 @@
         </tr>
         <tr class="amount-chargeable">
             <td colspan="9">
-				Tax Amount (in words)
-				<span class="chargeable-note">E.&amp; O.E</span>
-				<strong>INR ${totalInWords} Only</strong>
-			</td>
+                Tax Amount (in words)
+                <span class="chargeable-note">E.&amp; O.E</span>
+                <strong>INR ${totalInWords} Only</strong>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -259,14 +264,11 @@
         <thead>
         <tr>
             <th rowspan="2" style="width:250px">HSN/SAC</th>
-            <th rowspan="2" style="width:80px">Taxable Value</th>
+            <th rowspan="2" style="width:80px">Integrated Value</th>
             <th colspan="2">Central Tax</th>
-            <th colspan="2">State Tax</th>
             <th rowspan="2" style="width:80px">Total Tax Amount</th>
         </tr>
         <tr>
-            <th style="width:80px">Rate</th>
-            <th style="width:80px">Amount</th>
             <th style="width:80px">Rate</th>
             <th style="width:80px">Amount</th>
         </tr>
@@ -275,33 +277,31 @@
         <tr>
             <td>25171010</td>
             <td class="right">${amount}</td>
-            <td class="right">2.50%</td>
-            <td class="right">${cgst}</td>
-            <td class="right">2.50%</td>
-            <td class="right">${sgst}</td>
+            <td class="right">5.00%</td>
+            <td class="right">${igst}</td>
             <td class="right">${taxAmount}</td>
         </tr>
         <tr>
             <td><strong>Total</strong></td>
             <td class="right"><strong>${amount}</strong></td>
             <td></td>
-            <td class="right"><strong>${cgst}</strong></td>
-            <td></td>
-            <td class="right"><strong>${sgst}</strong></td>
+            <td class="right"><strong>${igst}</strong></td>
             <td class="right"><strong>${taxAmount}</strong></td>
         </tr>
         <tr>
-            <td class="total-amount" colspan="7">Tax Amount (in words) : <strong class="inline">INR ${taxInWords}
+            <td class="total-amount" colspan="5">Tax Amount (in words) : <strong class="inline">INR ${taxInWords}
                 Only</strong></td>
         </tr>
         <tr>
-            <td class="declaration" colspan="3">
+            <td class="declaration" colspan="2">
                 <div class="underline">Declaration</div>
                 <div>We declare that this invoice shows the actual price of the</div>
                 <div>goods described and that all particulars are true and correct.</div>
             </td>
-            <td class="signature right" colspan="4"><strong>for K.K.M Blue Metal
-            </strong><strong></strong>Authorised Signatory
+            <td class="signature right" colspan="4">
+                <strong>for KKM RAJENDRAN BLUE METALS (OPC) PRIVATE LIMITED</strong>
+                <strong></strong>
+                Authorised Signatory
             </td>
         </tr>
         </tbody>

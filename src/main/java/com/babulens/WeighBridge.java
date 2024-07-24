@@ -1109,6 +1109,10 @@ class WeighBridge {
         panelToAdd.add(Box.createHorizontalGlue());
     }
 
+    private String getInvoicePrefix(JsonNode field) {
+        return field.path(rdbtnLocal.isSelected() ? "localPrefix" : "invoicePrefix").asText("");
+    }
+
     private JComponent getInvoiceField(JsonNode field) {
         JTextField jTextField;
 
@@ -1117,13 +1121,13 @@ class WeighBridge {
                 return new JLabel();
             }
             case "invoiceNo": {
-                jTextField = new JTextField(field.path("invoicePrefix").asText("") + invoiceNo);
+                jTextField = new JTextField(getInvoicePrefix(field) + invoiceNo + field.path("invoiceSuffix").asText(""));
                 jTextField.setEnabled(false);
                 jTextField.setDisabledTextColor(Color.BLACK);
                 jTextField.setHorizontalAlignment(SwingConstants.CENTER);
                 jTextField.addPropertyChangeListener(_ -> {
                     if (Objects.equals(jTextField.getText(), "")) {
-                        jTextField.setText(field.path("invoicePrefix").asText("") + invoiceNo);
+                        jTextField.setText(getInvoicePrefix(field) + invoiceNo + field.path("invoiceSuffix").asText(""));
                     }
                     if (jTextField.isEnabled()) {
                         jTextField.setEnabled(false);
@@ -3921,6 +3925,14 @@ class WeighBridge {
         rdbtnLocal = new JRadioButton("Local");
         rdbtnLocal.setSelected(true);
         rdbtnLocal.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        rdbtnLocal.addChangeListener(_ -> {
+            try {
+                JTextField invoiceNo = (JTextField) invoiceFields.get("invoiceNo");
+                invoiceNo.setText("");
+                invoiceNo.setEnabled(true);
+            } catch (Exception ignored) {
+            }
+        });
         rdbtnLocal.setFocusable(false);
         rdbtnLocal.setBackground(new Color(0, 255, 127));
         rdbtnLocal.setBounds(75, 7, 100, 25);
