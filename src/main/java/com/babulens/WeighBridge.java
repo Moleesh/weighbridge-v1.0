@@ -1140,7 +1140,7 @@ class WeighBridge {
                 comboBox.setEditable(true);
                 AutoCompleteDecorator.decorate(comboBox);
                 comboBox.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-                vehicleNoSet.forEach(comboBox::addItem);
+                vehicleTypeSet.forEach(comboBox::addItem);
                 jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
                 jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
                 invoiceFields.put("vehicleNo", jTextField);
