@@ -177,6 +177,7 @@ class WeighBridge {
     private static final String DB_PASSWORD = "toor";
     static DecimalFormat decimalFormat = new DecimalFormat("0");
     static Set<String> vehicleNoSet = new HashSet<>();
+    static Set<String> materialSet = new HashSet<>();
     static Set<String> transportSet = new HashSet<>();
     static Set<String> customerSet = new HashSet<>();
     static Set<String> vehicleTypeSet = new HashSet<>();
@@ -957,14 +958,17 @@ class WeighBridge {
             model.setRowCount(0);
             comboBoxMaterial.removeAllItems();
             comboBoxMaterialName.removeAllItems();
+            materialSet.clear();
             while (rs.next()) {
                 model.addRow(new Object[]{
                         rs.getInt("SQNO"),
                         rs.getString("MATERIAL"),
                         rs.getDouble("COST")
                 });
-                comboBoxMaterial.addItem(rs.getString("MATERIAL"));
-                comboBoxMaterialName.addItem(rs.getString("MATERIAL"));
+                if (materialSet.add(rs.getString("MATERIAL"))) {
+                    comboBoxMaterial.addItem(rs.getString("MATERIAL"));
+                    comboBoxMaterialName.addItem(rs.getString("MATERIAL"));
+                }
             }
             clear();
             refreshInvoice();
@@ -1119,6 +1123,39 @@ class WeighBridge {
         switch (field.path("type").asText("")) {
             case "blank": {
                 return new JLabel();
+            }
+            case "material": {
+                JComboBox<String> comboBox = new JComboBox<>();
+                comboBox.setEditable(true);
+                AutoCompleteDecorator.decorate(comboBox);
+                comboBox.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+                materialSet.forEach(comboBox::addItem);
+                jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
+                jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
+                invoiceFields.put("material", jTextField);
+                return comboBox;
+            }
+            case "vehicleNo": {
+                JComboBox<String> comboBox = new JComboBox<>();
+                comboBox.setEditable(true);
+                AutoCompleteDecorator.decorate(comboBox);
+                comboBox.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+                vehicleNoSet.forEach(comboBox::addItem);
+                jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
+                jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
+                invoiceFields.put("vehicleNo", jTextField);
+                return comboBox;
+            }
+            case "buyer": {
+                JComboBox<String> comboBox = new JComboBox<>();
+                comboBox.setEditable(true);
+                AutoCompleteDecorator.decorate(comboBox);
+                comboBox.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+                customerSet.forEach(comboBox::addItem);
+                jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
+                jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
+                invoiceFields.put("buyer", jTextField);
+                return comboBox;
             }
             case "invoiceNo": {
                 jTextField = new JTextField(getInvoicePrefix(field) + invoiceNo + field.path("invoiceSuffix").asText(""));

@@ -42,7 +42,8 @@
 		},
 		{
 			"key": "buyer",
-			"name": "Buyer"
+			"name": "Buyer",
+            "type": "buyer"
 		},
 		{
 			"key": "buyerAddress",
@@ -50,7 +51,8 @@
 		},
 		{
 			"key": "vehicleNo",
-			"name": "Vehicle No"
+			"name": "Vehicle No",
+            "type": "vehicleNo"
 		},
 		{
 			"key": "destination",
@@ -58,7 +60,8 @@
 		},
 		{
 			"key": "material",
-			"name": "Material"
+			"name": "Material",
+			"type": "material"
 		},
 		{
 			"key": "quantity",
