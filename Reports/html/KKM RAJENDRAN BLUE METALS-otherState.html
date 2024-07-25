@@ -14,7 +14,7 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            font-size: 12pt;
+            font-size: 10pt;
         }
 
         .container {
@@ -23,10 +23,15 @@
             padding: 20px;
         }
 
-        .header {
+        .title {
             text-align: center;
             font-weight: 700;
             margin-bottom: 4px;
+            font-size: 12pt;
+        }
+
+        .header {
+            font-size: 9pt;
         }
 
         .note-header {
@@ -44,21 +49,22 @@
             vertical-align: top;
         }
 
-        .address {
-            font-size: 11pt;
+        .address strong {
+            font-size: 9pt;
         }
 
         .header-table td {
-            width: 176px;
+            width: 188px;
         }
 
         .term-of-delivery {
-            height: 90px;
+            height: 60px;
         }
 
         strong {
             min-height: 18px;
             display: block;
+            font-size: 10pt;
         }
 
         table {
@@ -70,7 +76,6 @@
             border: 1px solid #000;
             padding: 4px;
             font-weight: 400;
-            font-size: 9pt;
             text-align: center;
         }
 
@@ -79,7 +84,7 @@
         }
 
         .billing-row {
-            height: 300px;
+            height: 380px;
         }
 
         .billing-row td {
@@ -115,7 +120,8 @@
         }
 
         .amount-chargeable td {
-            padding: 8px;
+            padding: 4px;
+            font-size: 9pt;
         }
 
         .chargeable-note {
@@ -148,6 +154,21 @@
         .footer {
             text-align: center;
             padding-top: 8px;
+            font-size: 9pt;
+        }
+
+        .total {
+            display: inline;
+            font-size: 12pt;
+        }
+
+        img {
+            width: 12px;
+            height: 12px;
+        }
+
+        .tax, .tax strong {
+            font-size: 9pt;
         }
     </style>
     <title></title>
@@ -155,7 +176,7 @@
 
 <body>
 <div class="container">
-    <div class="header">Tax Invoice</div>
+    <div class="title">Tax Invoice</div>
     <div class="note-header">(ORIGINAL FOR RECIPIENT)</div>
     <table class="header-table">
         <tbody>
@@ -172,40 +193,41 @@
                 <div>State Name : Tamil Nadu, Code : 33</div>
                 <div>E-Mail : kkmpvt966@gmail.com</div>
             </td>
-            <td>Invoice No.<strong>${invoiceNo}</strong></td>
+            <td class="header">Invoice No.<strong>${invoiceNo}</strong></td>
             <td>Dated<strong>${invoiceDate}</strong></td>
         </tr>
         <tr>
-            <td>Delivery Note<strong></strong></td>
+            <td class="header">Delivery Note<strong></strong></td>
             <td>Mode/Terms of Payment<strong></strong></td>
         </tr>
         <tr>
-            <td>Reference No. &amp; Date.<strong></strong></td>
+            <td class="header">Reference No. &amp; Date.<strong></strong></td>
             <td>Other References<strong></strong></td>
         </tr>
         <tr>
-            <td>Buyer's Order No.<strong></strong></td>
+            <td class="header">Buyer's Order No.<strong></strong></td>
             <td>Dated<strong></strong></td>
         </tr>
         <tr>
-            <td>Dispatch Doc No.<strong></strong></td>
+            <td class="header">Dispatch Doc No.<strong></strong></td>
             <td>Delivery Note Date<strong></strong></td>
         </tr>
         <tr>
-            <td colspan="2" rowspan="3">Buyer (Bill to)
+            <td colspan="2" rowspan="3">
+                Buyer (Bill to)
                 <strong>${buyer}</strong>
                 ${buyerAddress}
                 <div>State Name : Kerala, Code : 32</div>
             </td>
-            <td>Dispatched through<strong></strong></td>
+            <td class="header">Dispatched through<strong></strong></td>
             <td>Destination<strong>${destination}</strong></td>
         </tr>
         <tr>
-            <td>Bill of Lading/LR-RR No.<strong></strong></td>
+            <td class="header">Bill of Lading/LR-RR No.<strong></strong></td>
             <td>Motor Vehicle No.<strong>${vehicleNo}</strong></td>
         </tr>
         <tr>
-            <td class="term-of-delivery" colspan="2">Terms of Delivery</td>
+            <td class="term-of-delivery header" colspan="2">Terms of Delivery<strong></strong></td>
         </tr>
         </tbody>
     </table>
@@ -249,7 +271,10 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><strong>₹ ${total}</strong></td>
+            <td>
+                <img src="./Reports/html/rupee.png" alt="Rs." />
+                <strong class="total">${total}</strong>
+            </td>
         </tr>
         <tr class="amount-chargeable">
             <td colspan="9">
@@ -260,17 +285,17 @@
         </tr>
         </tbody>
     </table>
-    <table>
+    <table class="tax">
         <thead>
         <tr>
-            <th rowspan="2" style="width:250px">HSN/SAC</th>
+            <th rowspan="2" style="width:200px">HSN/SAC</th>
             <th rowspan="2" style="width:80px">Integrated Value</th>
             <th colspan="2">Central Tax</th>
-            <th rowspan="2" style="width:80px">Total Tax Amount</th>
+            <th rowspan="2" style="width:100px">Total Tax Amount</th>
         </tr>
         <tr>
-            <th style="width:80px">Rate</th>
-            <th style="width:80px">Amount</th>
+            <th style="width:90px">Rate</th>
+            <th style="width:90px">Amount</th>
         </tr>
         </thead>
         <tbody class="body-font">
@@ -298,7 +323,7 @@
                 <div>We declare that this invoice shows the actual price of the</div>
                 <div>goods described and that all particulars are true and correct.</div>
             </td>
-            <td class="signature right" colspan="4">
+            <td class="signature right" colspan="3">
                 <strong>for KKM RAJENDRAN BLUE METALS (OPC) PRIVATE LIMITED</strong>
                 <strong></strong>
                 Authorised Signatory

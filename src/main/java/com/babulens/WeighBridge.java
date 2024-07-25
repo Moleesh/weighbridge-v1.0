@@ -3901,6 +3901,8 @@ class WeighBridge {
                         btnInvoiceSave.setEnabled(false);
                         btnInvoicePrint.requestFocus();
                         invoiceFields.forEach((_, component) -> component.setEnabled(false));
+                        rdbtnLocal.setEnabled(false);
+                        rdbtnOtherStates.setEnabled(false);
                         return;
                     } else {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nRECORD NOT FOUND", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
