@@ -3928,11 +3928,6 @@ class WeighBridge {
                         boolean isLocal = invoiceData.path("isLocal").asBoolean(false);
                         rdbtnLocal.setSelected(isLocal);
                         rdbtnOtherStates.setSelected(!isLocal);
-                        invoiceFields.forEach((key, component) -> {
-                            if (component instanceof JTextField) {
-                                ((JTextField) component).setText(invoiceData.path(key).asText(""));
-                            }
-                        });
                         btnGetTotal.setEnabled(false);
                         btnInvoicePrint.setEnabled(true);
                         btnInvoiceSave.setEnabled(false);
@@ -3940,6 +3935,11 @@ class WeighBridge {
                         invoiceFields.forEach((_, component) -> component.setEnabled(false));
                         rdbtnLocal.setEnabled(false);
                         rdbtnOtherStates.setEnabled(false);
+                        invoiceFields.forEach((key, component) -> {
+                            if (component instanceof JTextField) {
+                                ((JTextField) component).setText(invoiceData.path(key).asText(""));
+                            }
+                        });
                         return;
                     } else {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nRECORD NOT FOUND", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
