@@ -7403,7 +7403,7 @@ class WeighBridge {
         PrinterJob pj = PrinterJob.getPrinterJob();
         PageFormat pf = new PageFormat();
         Paper paper = pf.getPaper();
-        double width = 9d * 72d;
+        double width = 10d * 72d;
         double height = 6d * 72d;
         double widthmargin = 0;
         double heightmargin = topMargin * 72d;
@@ -7684,7 +7684,7 @@ class WeighBridge {
     }
 
     private JTextPane createTextPanePreWeight5() {
-        String format = "%1$-11s%2$-30s%3$-30s%4$-12s";
+        String format = "%1$-12s%2$-32s%3$-32s%4$-12s";
         String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
         String[] initString = {
                 String.format(format, "", textFieldSlNo.getText(), textFieldSlNo.getText(), textFieldSlNo.getText()),
