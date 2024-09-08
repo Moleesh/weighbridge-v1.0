@@ -7684,7 +7684,7 @@ class WeighBridge {
     }
 
     private JTextPane createTextPanePreWeight5() {
-        String format = "%1$-12s%2$-32s%3$-32s%4$-12s";
+        String format = "%1$-9s%2$-32s%3$-31s%4$-12s";
         String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
         String[] initString = {
                 String.format(format, "", textFieldSlNo.getText(), textFieldSlNo.getText(), textFieldSlNo.getText()),
