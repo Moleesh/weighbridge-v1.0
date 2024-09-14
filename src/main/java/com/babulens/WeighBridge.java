@@ -190,6 +190,7 @@ class WeighBridge {
 
     private final ButtonGroup buttonGroupWeight = new ButtonGroup();
     private final ButtonGroup buttonGroupInvoice = new ButtonGroup();
+    private final ButtonGroup buttonGroupReport = new ButtonGroup();
     private final DateFormat dateAndTimeFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm a");
     private final DateFormat dateAndTimeFormatPrint = new SimpleDateFormat("dd-MM-yyyy HH:mm");
     private final DateFormat dateAndTimeFormatSql = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -918,6 +919,8 @@ class WeighBridge {
                 if (vehicleTypeSet.add(rs.getString("VEHICLE_TYPE"))) {
                     model.addRow(new Object[]{
                             rs.getString("VEHICLE_TYPE"),
+                            rs.getInt("TARE_COST"),
+                            rs.getInt("GROSS_COST"),
                     });
                     comboBoxVehicleType.addItem(rs.getString("VEHICLE_TYPE"));
                 }
@@ -1337,6 +1340,8 @@ class WeighBridge {
                 if (!temp.isEmpty() && vehicleTypeSet.add(temp)) {
                     rs.moveToInsertRow();
                     rs.updateString("VEHICLE_TYPE", temp);
+                    rs.updateInt("TARE_COST", Integer.parseInt(("0" + model.getValueAt(i, 1)).replaceAll("\\D", "")));
+                    rs.updateInt("GROSS_COST", Integer.parseInt(("0" + model.getValueAt(i, 2)).replaceAll("\\D", "")));
                     rs.insertRow();
                 }
             }
@@ -3999,6 +4004,7 @@ class WeighBridge {
         panelReport.setLayout(null);
 
         rdbtnWeighing = new JRadioButton("Weighing Report (max 1000 rows)");
+        buttonGroupReport.add(rdbtnWeighing);
         rdbtnWeighing.setBackground(new Color(0, 255, 127));
         rdbtnWeighing.addActionListener(_ -> {
             comboBoxReportType.removeAllItems();
@@ -4016,7 +4022,7 @@ class WeighBridge {
         rdbtnWeighing.setSelected(true);
         rdbtnWeighing.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         rdbtnWeighing.setFocusable(false);
-        rdbtnWeighing.setBounds(75, 25, 328, 25);
+        rdbtnWeighing.setBounds(44, 25, 328, 25);
         panelReport.add(rdbtnWeighing);
 
         JLabel lblPleaseSelectThe = new JLabel("Please Select the Type of Report");
@@ -4424,6 +4430,22 @@ class WeighBridge {
         btnMassPrint.setFocusable(false);
         btnMassPrint.setBounds(901, 579, 128, 25);
         panelReport.add(btnMassPrint);
+
+        JRadioButton rdbtnInvoiceReport = new JRadioButton("Invoice Report (max 1000 rows)");
+        buttonGroupReport.add(rdbtnInvoiceReport);
+        rdbtnInvoiceReport.addActionListener(_ -> {
+            comboBoxReportType.removeAllItems();
+            comboBoxReportType.addItem("Full Report");
+            comboBoxReportType.addItem("Daily Report");
+            comboBoxReportType.addItem("Datewise Report");
+            comboBoxReportType.addItem("Serialwise Report");
+        });
+        rdbtnInvoiceReport.setSelected(true);
+        rdbtnInvoiceReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        rdbtnInvoiceReport.setFocusable(false);
+        rdbtnInvoiceReport.setBackground(new Color(0, 255, 127));
+        rdbtnInvoiceReport.setBounds(44, 53, 328, 25);
+        panelReport.add(rdbtnInvoiceReport);
 
         JPanel panelSettings1 = new JPanel();
         panelSettings1.addComponentListener(new ComponentAdapter() {
@@ -5848,7 +5870,7 @@ class WeighBridge {
 
         JLabel lblOperators = new JLabel("Operators");
         lblOperators.setFont(new Font("Times New Roman", Font.ITALIC, 18));
-        lblOperators.setBounds(605, 327, 111, 25);
+        lblOperators.setBounds(708, 328, 111, 25);
         panelSettings2.add(lblOperators);
 
         JButton btnAddOperators = new JButton("+");
@@ -5860,7 +5882,7 @@ class WeighBridge {
         });
         btnAddOperators.setFont(new Font("Times New Roman", Font.BOLD, 15));
         btnAddOperators.setFocusable(false);
-        btnAddOperators.setBounds(703, 319, 41, 38);
+        btnAddOperators.setBounds(806, 320, 41, 38);
         panelSettings2.add(btnAddOperators);
 
         JButton btnDeleteOperators = new JButton("-");
@@ -5871,11 +5893,11 @@ class WeighBridge {
         });
         btnDeleteOperators.setFont(new Font("Times New Roman", Font.BOLD, 15));
         btnDeleteOperators.setFocusable(false);
-        btnDeleteOperators.setBounds(743, 319, 41, 38);
+        btnDeleteOperators.setBounds(846, 320, 41, 38);
         panelSettings2.add(btnDeleteOperators);
 
         JScrollPane scrollPaneOperators = new JScrollPane();
-        scrollPaneOperators.setBounds(605, 355, 179, 250);
+        scrollPaneOperators.setBounds(708, 356, 179, 250);
         panelSettings2.add(scrollPaneOperators);
 
         tableOperators = new JTable();
@@ -5898,27 +5920,27 @@ class WeighBridge {
         btnAddVehicleType.addActionListener(_ -> {
             DefaultTableModel model = (DefaultTableModel) tableVehicleTypes.getModel();
             model.addRow(new Object[]{
-                    ""
+                    "", 0, 0
             });
         });
         btnAddVehicleType.setFont(new Font("Times New Roman", Font.BOLD, 15));
         btnAddVehicleType.setFocusable(false);
-        btnAddVehicleType.setBounds(493, 320, 41, 38);
+        btnAddVehicleType.setBounds(600, 320, 41, 38);
         panelSettings2.add(btnAddVehicleType);
 
         JButton btnDeleteVehicleType = new JButton("-");
-        btnDeleteOperators.addActionListener(_ -> {
+        btnDeleteVehicleType.addActionListener(_ -> {
             if (tableVehicleTypes.getSelectedRow() != -1) {
                 ((DefaultTableModel) tableVehicleTypes.getModel()).removeRow(tableVehicleTypes.getSelectedRow());
             }
         });
         btnDeleteVehicleType.setFont(new Font("Times New Roman", Font.BOLD, 15));
         btnDeleteVehicleType.setFocusable(false);
-        btnDeleteVehicleType.setBounds(533, 320, 41, 38);
+        btnDeleteVehicleType.setBounds(640, 320, 41, 38);
         panelSettings2.add(btnDeleteVehicleType);
 
         JScrollPane scrollPaneVehicleType = new JScrollPane();
-        scrollPaneVehicleType.setBounds(395, 356, 179, 250);
+        scrollPaneVehicleType.setBounds(395, 356, 287, 250);
         panelSettings2.add(scrollPaneVehicleType);
 
         tableVehicleTypes = new JTable();
@@ -5926,7 +5948,7 @@ class WeighBridge {
                 new Object[][]{
                 },
                 new String[]{
-                        "Vehicle Type"
+                        "Vehicle Type", "Tare", "Gross"
                 }
         ));
         tableVehicleTypes.setFont(new Font("Times New Roman", Font.PLAIN, 15));
@@ -9928,6 +9950,8 @@ class WeighBridge {
             rs.moveToInsertRow();
             String temp = (String) comboBoxVehicleType.getSelectedItem();
             rs.updateString("VEHICLE_TYPE", temp);
+            rs.updateInt("TARE_COST", 0);
+            rs.updateInt("GROSS_COST", 0);
             if (temp != null && !temp.isEmpty() && vehicleTypeSet.add(temp)) {
                 comboBoxVehicleType.addItem(temp);
                 rs.insertRow();
