@@ -4440,7 +4440,6 @@ class WeighBridge {
             comboBoxReportType.addItem("Datewise Report");
             comboBoxReportType.addItem("Serialwise Report");
         });
-        rdbtnInvoiceReport.setSelected(true);
         rdbtnInvoiceReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         rdbtnInvoiceReport.setFocusable(false);
         rdbtnInvoiceReport.setBackground(new Color(0, 255, 127));
