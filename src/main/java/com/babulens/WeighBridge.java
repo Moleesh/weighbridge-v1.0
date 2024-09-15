@@ -181,6 +181,7 @@ class WeighBridge {
     static Set<String> transportSet = new HashSet<>();
     static Set<String> customerSet = new HashSet<>();
     static Set<String> vehicleTypeSet = new HashSet<>();
+    static Map<String, VehicleType> vehicleTypeMap = new HashMap<>();
     static Set<String> operatorSet = new HashSet<>();
     static private SerialPort comPort;
 
@@ -915,8 +916,11 @@ class WeighBridge {
             model.setRowCount(0);
             comboBoxVehicleType.removeAllItems();
             vehicleTypeSet.clear();
+            vehicleTypeMap.clear();
             while (rs.next()) {
-                if (vehicleTypeSet.add(rs.getString("VEHICLE_TYPE"))) {
+                String vehicleType = rs.getString("VEHICLE_TYPE");
+                if (vehicleTypeSet.add(vehicleType)) {
+                    vehicleTypeMap.put(vehicleType.toUpperCase(), new VehicleType(rs.getInt("TARE_COST"), rs.getInt("GROSS_COST")));
                     model.addRow(new Object[]{
                             rs.getString("VEHICLE_TYPE"),
                             rs.getInt("TARE_COST"),
@@ -1335,13 +1339,17 @@ class WeighBridge {
             }
             model = (DefaultTableModel) tableVehicleTypes.getModel();
             vehicleTypeSet.clear();
+            vehicleTypeMap.clear();
             for (int i = 0; i < model.getRowCount(); i++) {
-                String temp = (String) model.getValueAt(i, 0);
-                if (!temp.isEmpty() && vehicleTypeSet.add(temp)) {
+                String vehicleType = (String) model.getValueAt(i, 0);
+                if (!vehicleType.isEmpty() && vehicleTypeSet.add(vehicleType)) {
+                    int tare = Integer.parseInt(("0" + model.getValueAt(i, 1)).replaceAll("\\D", ""));
+                    int gross = Integer.parseInt(("0" + model.getValueAt(i, 2)).replaceAll("\\D", ""));
+                    vehicleTypeMap.put(vehicleType.toUpperCase(), new VehicleType(tare, gross));
                     rs.moveToInsertRow();
-                    rs.updateString("VEHICLE_TYPE", temp);
-                    rs.updateInt("TARE_COST", Integer.parseInt(("0" + model.getValueAt(i, 1)).replaceAll("\\D", "")));
-                    rs.updateInt("GROSS_COST", Integer.parseInt(("0" + model.getValueAt(i, 2)).replaceAll("\\D", "")));
+                    rs.updateString("VEHICLE_TYPE", vehicleType);
+                    rs.updateInt("TARE_COST", tare);
+                    rs.updateInt("GROSS_COST", gross);
                     rs.insertRow();
                 }
             }
@@ -1901,6 +1909,7 @@ class WeighBridge {
             rdbtnTare.setEnabled(false);
             btnGetGrossSl.setEnabled(false);
             comboBoxVehicleNo.setEnabled(false);
+            comboBoxVehicleType.setEnabled(false);
             comboBoxMaterial.setEnabled(false);
             textFieldNoOfBags.setEnabled(false);
             textFieldCharges.setEnabled(false);
@@ -2247,6 +2256,7 @@ class WeighBridge {
             rdbtnTare.setEnabled(false);
             btnGetGrossSl.setEnabled(false);
             comboBoxVehicleNo.setEnabled(false);
+            comboBoxVehicleType.setEnabled(false);
             comboBoxMaterial.setEnabled(false);
             textFieldNoOfBags.setEnabled(false);
             textFieldCharges.setEnabled(false);
@@ -3058,6 +3068,13 @@ class WeighBridge {
         });
         comboBoxVehicleType.addActionListener(l -> {
             if (l.getActionCommand().equals("comboBoxEdited")) {
+                String vehicleType = Objects.toString(comboBoxVehicleType.getSelectedItem(), "").toUpperCase();
+                if (vehicleTypeMap.containsKey(vehicleType)) {
+                    int rate = rdbtnGross.isSelected() ? vehicleTypeMap.get(vehicleType).grossCost() : vehicleTypeMap.get(vehicleType).tareCost();
+                    if (rate > 0) {
+                        textFieldCharges.setText(String.valueOf(rate));
+                    }
+                }
                 requestFocus("VehicleType");
             }
         });
@@ -5947,7 +5964,7 @@ class WeighBridge {
                 new Object[][]{
                 },
                 new String[]{
-                        "Vehicle Type", "Tare", "Gross"
+                        "Vehicle Type", "Tare Cost", "Gross Cost"
                 }
         ));
         tableVehicleTypes.setFont(new Font("Times New Roman", Font.PLAIN, 15));
@@ -6450,6 +6467,7 @@ class WeighBridge {
                 rdbtnTare.setEnabled(false);
                 btnGetGrossSl.setEnabled(false);
                 comboBoxVehicleNo.setEnabled(false);
+                comboBoxVehicleType.setEnabled(false);
                 comboBoxMaterial.setEnabled(false);
                 textFieldCharges.setEnabled(false);
                 btnGetWeight.setEnabled(false);
@@ -10650,6 +10668,9 @@ class WeighBridge {
             return "Number out of range";
         }
 
+    }
+
+    record VehicleType(int tareCost, int grossCost) {
     }
 
     private class TableRenderer extends DefaultCellEditor {
