@@ -273,6 +273,8 @@ class WeighBridge {
     private JButton btnSave;
     private JButton btnPrint;
     private JRadioButton rdbtnWeighing;
+    private JRadioButton rdbtnInvoice;
+    private JButton btnPrintReport;
     private JComboBox<String> comboBoxReportType;
     private JTextField textFieldReportTextBox;
     private JTable tableReport;
@@ -429,6 +431,7 @@ class WeighBridge {
     private JButton btnInvoicePrint;
     private JRadioButton rdbtnLocal;
     private JRadioButton rdbtnOtherStates;
+    private List<MyCheckBox> reportCheckBox;
 
     /**
      * Create the application.
@@ -1085,6 +1088,7 @@ class WeighBridge {
 
                 panelInvoice.repaint();
                 clearInvoice();
+                reportCheckBox = null;
             } catch (Exception ignored) {
             }
         }
@@ -4035,6 +4039,11 @@ class WeighBridge {
             comboBoxReportType.addItem("Customer - Materialwise Report");
             comboBoxReportType.addItem("Transporterwise Report");
             comboBoxReportType.addItem("Operatorwise Report");
+            btnInsertRow.setEnabled(true);
+            btnImportFromExcel.setEnabled(true);
+            btnDeleteRow.setEnabled(true);
+            btnMassPrint.setEnabled(true);
+            btnPrintReport.setEnabled(true);
         });
         rdbtnWeighing.setSelected(true);
         rdbtnWeighing.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -4050,76 +4059,74 @@ class WeighBridge {
         comboBoxReportType = new JComboBox<>();
         comboBoxReportType.addItemListener(_ -> {
             if (comboBoxReportType.getSelectedItem() != null) {
-                if (rdbtnWeighing.isSelected()) {
-                    switch (comboBoxReportType.getSelectedItem().toString()) {
-                        case "Full Report":
-                            datePicker1.setEnabled(false);
-                            datePicker2.setEnabled(false);
-                            textFieldReportTextBox.setEnabled(false);
-                            comboBoxMaterialName.setEnabled(false);
-                            break;
-                        case "Daily Report":
-                            datePicker1.setEnabled(true);
-                            datePicker2.setEnabled(false);
-                            textFieldReportTextBox.setEnabled(false);
-                            comboBoxMaterialName.setEnabled(false);
-                            break;
-                        case "Datewise Report":
-                            datePicker1.setEnabled(true);
-                            datePicker2.setEnabled(true);
-                            textFieldReportTextBox.setEnabled(false);
-                            comboBoxMaterialName.setEnabled(false);
-                            break;
-                        case "Serialwise Report":
-                            lblReportTextBox.setText("Serial No");
-                            datePicker1.setEnabled(false);
-                            datePicker2.setEnabled(false);
-                            textFieldReportTextBox.setEnabled(true);
-                            comboBoxMaterialName.setEnabled(false);
-                            break;
-                        case "Vehiclewise Report":
-                            lblReportTextBox.setText("Vehicle No");
-                            datePicker1.setEnabled(true);
-                            datePicker2.setEnabled(true);
-                            textFieldReportTextBox.setEnabled(true);
-                            comboBoxMaterialName.setEnabled(false);
-                            break;
-                        case "Materialwise Report":
-                            lblReportComboBox.setText("Material Name");
-                            datePicker1.setEnabled(true);
-                            datePicker2.setEnabled(true);
-                            textFieldReportTextBox.setEnabled(false);
-                            comboBoxMaterialName.setEnabled(true);
-                            break;
-                        case "Customerwise Report":
-                            lblReportTextBox.setText("Customer Name");
-                            datePicker1.setEnabled(true);
-                            datePicker2.setEnabled(true);
-                            textFieldReportTextBox.setEnabled(true);
-                            comboBoxMaterialName.setEnabled(false);
-                            break;
-                        case "Customer - Materialwise Report":
-                            lblReportTextBox.setText("Customer Name");
-                            datePicker1.setEnabled(true);
-                            datePicker2.setEnabled(true);
-                            textFieldReportTextBox.setEnabled(true);
-                            comboBoxMaterialName.setEnabled(true);
-                            break;
-                        case "Transporterwise Report":
-                            lblReportTextBox.setText("Transporter Name");
-                            datePicker1.setEnabled(true);
-                            datePicker2.setEnabled(true);
-                            textFieldReportTextBox.setEnabled(true);
-                            comboBoxMaterialName.setEnabled(false);
-                            break;
-                        case "Operatorwise Report":
-                            lblReportTextBox.setText("Operator");
-                            datePicker1.setEnabled(true);
-                            datePicker2.setEnabled(true);
-                            textFieldReportTextBox.setEnabled(false);
-                            comboBoxMaterialName.setEnabled(true);
-                            break;
-                    }
+                switch (comboBoxReportType.getSelectedItem().toString()) {
+                    case "Full Report":
+                        datePicker1.setEnabled(false);
+                        datePicker2.setEnabled(false);
+                        textFieldReportTextBox.setEnabled(false);
+                        comboBoxMaterialName.setEnabled(false);
+                        break;
+                    case "Daily Report":
+                        datePicker1.setEnabled(true);
+                        datePicker2.setEnabled(false);
+                        textFieldReportTextBox.setEnabled(false);
+                        comboBoxMaterialName.setEnabled(false);
+                        break;
+                    case "Datewise Report":
+                        datePicker1.setEnabled(true);
+                        datePicker2.setEnabled(true);
+                        textFieldReportTextBox.setEnabled(false);
+                        comboBoxMaterialName.setEnabled(false);
+                        break;
+                    case "Serialwise Report":
+                        lblReportTextBox.setText("Serial No");
+                        datePicker1.setEnabled(false);
+                        datePicker2.setEnabled(false);
+                        textFieldReportTextBox.setEnabled(true);
+                        comboBoxMaterialName.setEnabled(false);
+                        break;
+                    case "Vehiclewise Report":
+                        lblReportTextBox.setText("Vehicle No");
+                        datePicker1.setEnabled(true);
+                        datePicker2.setEnabled(true);
+                        textFieldReportTextBox.setEnabled(true);
+                        comboBoxMaterialName.setEnabled(false);
+                        break;
+                    case "Materialwise Report":
+                        lblReportComboBox.setText("Material Name");
+                        datePicker1.setEnabled(true);
+                        datePicker2.setEnabled(true);
+                        textFieldReportTextBox.setEnabled(false);
+                        comboBoxMaterialName.setEnabled(true);
+                        break;
+                    case "Customerwise Report":
+                        lblReportTextBox.setText("Customer Name");
+                        datePicker1.setEnabled(true);
+                        datePicker2.setEnabled(true);
+                        textFieldReportTextBox.setEnabled(true);
+                        comboBoxMaterialName.setEnabled(false);
+                        break;
+                    case "Customer - Materialwise Report":
+                        lblReportTextBox.setText("Customer Name");
+                        datePicker1.setEnabled(true);
+                        datePicker2.setEnabled(true);
+                        textFieldReportTextBox.setEnabled(true);
+                        comboBoxMaterialName.setEnabled(true);
+                        break;
+                    case "Transporterwise Report":
+                        lblReportTextBox.setText("Transporter Name");
+                        datePicker1.setEnabled(true);
+                        datePicker2.setEnabled(true);
+                        textFieldReportTextBox.setEnabled(true);
+                        comboBoxMaterialName.setEnabled(false);
+                        break;
+                    case "Operatorwise Report":
+                        lblReportTextBox.setText("Operator");
+                        datePicker1.setEnabled(true);
+                        datePicker2.setEnabled(true);
+                        textFieldReportTextBox.setEnabled(false);
+                        comboBoxMaterialName.setEnabled(true);
+                        break;
                 }
             }
         });
@@ -4260,10 +4267,14 @@ class WeighBridge {
                 File fileToSave = fileChooser.getSelectedFile();
                 String name = fileToSave.getAbsolutePath();
                 try {
-                    if (Objects.equals(comboBoxReport.getSelectedItem(), "Mani & Co")) {
-                        toExcelManiAndCo(name);
-                    } else {
-                        toExcel(name);
+                    if (rdbtnWeighing.isSelected()) {
+                        if (Objects.equals(comboBoxReport.getSelectedItem(), "Mani & Co")) {
+                            toExcelManiAndCo(name);
+                        } else {
+                            toWeighingExcel(name);
+                        }
+                    } else if (rdbtnInvoice.isSelected()) {
+                        toInvoiceExcel(name);
                     }
                 } catch (IOException ignored) {
                     JOptionPane.showMessageDialog(null, "Plz Close the Excel file\nLINE :3027", "FILE ERROR", JOptionPane.ERROR_MESSAGE);
@@ -4275,7 +4286,7 @@ class WeighBridge {
         btnExportToExcel.setBounds(1027, 550, 186, 25);
         panelReport.add(btnExportToExcel);
 
-        JButton btnPrintReport = new JButton("Print");
+        btnPrintReport = new JButton("Print");
         btnPrintReport.addActionListener(_ -> {
             if (rdbtnWeighing.isSelected()) {
                 if (chckbxIceWater.isSelected()) {
@@ -4284,6 +4295,9 @@ class WeighBridge {
                     printReportWeight();
                 }
             }
+//            else if (rdbtnInvoice.isSelected()) {
+//                printReportWeight();
+//            }
         });
         btnPrintReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         btnPrintReport.setFocusable(false);
@@ -4356,7 +4370,7 @@ class WeighBridge {
                         rs.insertRow();
                     }
                     if (reportOpened) {
-                        getReport();
+                        getWeighingReport();
                     }
                     refreshSlNo();
                 }
@@ -4380,7 +4394,7 @@ class WeighBridge {
                         stmt.executeUpdate("DELETE FROM WEIGHING WHERE SLNO = " + response);
                         stmt.executeUpdate("UPDATE WEIGHING SET SLNO = SLNO - 1 WHERE SLNO >= " + response);
                         if (reportOpened) {
-                            getReport();
+                            getWeighingReport();
                         }
                         refreshSlNo();
                     }
@@ -4411,7 +4425,7 @@ class WeighBridge {
                     }
                     refreshSlNo();
                     if (reportOpened) {
-                        getReport();
+                        getWeighingReport();
                     }
                 } catch (Exception ignored) {
                     JOptionPane.showMessageDialog(null, "Plz Close the Excel file\nLINE :3831", "FILE ERROR", JOptionPane.ERROR_MESSAGE);
@@ -4428,7 +4442,7 @@ class WeighBridge {
         btnMassPrint.addActionListener(_ -> {
             if (JOptionPane.showConfirmDialog(null, "Do you want to Print ?", "Print", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                 noOfCopies = Integer.parseInt(textFieldNoOfCopies.getText());
-                getReport();
+                getWeighingReport();
                 TableModel model = tableReport.getModel();
 
                 for (int i = 0; i < model.getRowCount(); i++) {
@@ -4448,20 +4462,26 @@ class WeighBridge {
         btnMassPrint.setBounds(901, 579, 128, 25);
         panelReport.add(btnMassPrint);
 
-        JRadioButton rdbtnInvoiceReport = new JRadioButton("Invoice Report (max 1000 rows)");
-        buttonGroupReport.add(rdbtnInvoiceReport);
-        rdbtnInvoiceReport.addActionListener(_ -> {
+        rdbtnInvoice = new JRadioButton("Invoice Report (max 1000 rows)");
+        buttonGroupReport.add(rdbtnInvoice);
+        rdbtnInvoice.addActionListener(_ -> {
             comboBoxReportType.removeAllItems();
             comboBoxReportType.addItem("Full Report");
+           /* todo
             comboBoxReportType.addItem("Daily Report");
             comboBoxReportType.addItem("Datewise Report");
-            comboBoxReportType.addItem("Serialwise Report");
+            comboBoxReportType.addItem("Serialwise Report");*/
+            btnInsertRow.setEnabled(false);
+            btnImportFromExcel.setEnabled(false);
+            btnDeleteRow.setEnabled(false);
+            btnMassPrint.setEnabled(false);
+            btnPrintReport.setEnabled(false);
         });
-        rdbtnInvoiceReport.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        rdbtnInvoiceReport.setFocusable(false);
-        rdbtnInvoiceReport.setBackground(new Color(0, 255, 127));
-        rdbtnInvoiceReport.setBounds(44, 53, 328, 25);
-        panelReport.add(rdbtnInvoiceReport);
+        rdbtnInvoice.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        rdbtnInvoice.setFocusable(false);
+        rdbtnInvoice.setBackground(new Color(0, 255, 127));
+        rdbtnInvoice.setBounds(44, 53, 328, 25);
+        panelReport.add(rdbtnInvoice);
 
         JPanel panelSettings1 = new JPanel();
         panelSettings1.addComponentListener(new ComponentAdapter() {
@@ -4853,8 +4873,8 @@ class WeighBridge {
                     isCorrect = Arrays.equals(temp, correctPassword);
                 }
                 if (isCorrect) {
-                    if (reportOpened) {
-                        getReport();
+                    if (reportOpened && rdbtnWeighing.isSelected()) {
+                        getWeighingReport();
                     }
                     btnInsertRow.setVisible(true);
                     btnImportFromExcel.setVisible(true);
@@ -5470,6 +5490,7 @@ class WeighBridge {
                 tabbedPane.setEnabledAt(2, false);
                 tabbedPane.setTitleAt(2, "");
             }
+            rdbtnInvoice.setVisible(chckbxInvoice.isSelected());
         });
         chckbxInvoice.setEnabled(false);
         chckbxInvoice.setActionCommand("Invoice");
@@ -6085,7 +6106,68 @@ class WeighBridge {
         }
     }
 
-    private void getReport() {
+    private void getInvoiceReport() {
+        String date1,
+                date2;
+        int charges = 0,
+                serialNo;
+        Date dateTemp;
+        String temp = switch (Objects.toString(comboBoxReportType.getSelectedItem(), "")) {
+            case "Daily Report" -> {
+                dateTemp = datePicker1.getDate();
+                date1 = (new java.sql.Date(dateTemp.getTime())).toString();
+                date2 = (new java.sql.Date(dateTemp.getTime())).toString();
+                yield "SELECT * FROM INVOICES WHERE DATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+            }
+            case "Datewise Report" -> {
+                dateTemp = datePicker1.getDate();
+                date1 = (new java.sql.Date(dateTemp.getTime())).toString();
+                dateTemp = datePicker2.getDate();
+                date2 = (new java.sql.Date(dateTemp.getTime())).toString();
+                yield "SELECT * FROM INVOICES WHERE DATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+            }
+            case "Serialwise Report" -> {
+                serialNo = Integer.parseInt(0 + textFieldReportTextBox.getText().replaceAll("\\D", ""));
+                yield "SELECT * FROM INVOICES WHERE INVOICE_NO >= " + serialNo;
+            }
+            default -> "SELECT * FROM INVOICES";
+        };
+        try {
+            List<MyCheckBox> filteredReportCheckBox = reportCheckBox.stream().filter(JCheckBox::isSelected).toList();
+            tableReport.setModel(new TableReport(
+                    new Object[][]{},
+                    filteredReportCheckBox.stream().map(JCheckBox::getText).toArray(String[]::new), false));
+            DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
+            Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            ResultSet rs = stmt.executeQuery(temp + " ORDER BY INVOICE_NO LIMIT 1000");
+            while (rs.next()) {
+                JsonNode invoiceData = new ObjectMapper().readTree(rs.getString("INVOICE_DATA"));
+                model.addRow(filteredReportCheckBox.stream().map(chckbx -> invoiceData.path(chckbx.getKey()).asText("")).toArray());
+                charges += invoiceData.path("total").asInt(0);
+            }
+
+            for (int column = 0; column < tableReport.getColumnCount(); column++) {
+                int width = 100;
+                for (int row = 0; row < tableReport.getRowCount(); row++) {
+                    TableCellRenderer renderer = tableReport.getCellRenderer(row, column);
+                    Component comp = tableReport.prepareRenderer(renderer, row, column);
+                    width = Math.max(comp.getPreferredSize().width + 50, width);
+                }
+                if (width > 250) {
+                    width = 250;
+                }
+                tableReport.getColumnModel().getColumn(column).setPreferredWidth(width);
+            }
+        } catch (SQLException | JsonProcessingException ignored) {
+            JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2174", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+
+        textFieldTotalCharges.setText("Rs. " + charges);
+        textFieldtotalNetWt.setText("0 Kg");
+        reportOpened = true;
+    }
+
+    private void getWeighingReport() {
         String date1,
                 date2,
                 textField,
@@ -6093,325 +6175,324 @@ class WeighBridge {
         int charges = 0,
                 netWt = 0,
                 serialNo;
-        Date dateTemp12;
-        if (rdbtnWeighing.isSelected()) {
-            String temp = "SELECT * FROM WEIGHING";
-            switch (Objects.toString(comboBoxReportType.getSelectedItem(), "")) {
-                case "Full Report":
-                    temp = "SELECT * FROM WEIGHING";
-                    break;
-                case "Daily Report":
-                    dateTemp12 = datePicker1.getDate();
-                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    temp = "SELECT * FROM WEIGHING WHERE NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                    break;
-                case "Datewise Report":
-                    dateTemp12 = datePicker1.getDate();
-                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    dateTemp12 = datePicker2.getDate();
-                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    temp = "SELECT * FROM WEIGHING WHERE NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                    break;
-                case "Serialwise Report":
-                    serialNo = Integer.parseInt(0 + textFieldReportTextBox.getText().replaceAll("\\D", ""));
-                    temp = "SELECT * FROM WEIGHING WHERE SLNO >= " + serialNo;
-                    break;
-                case "Vehiclewise Report":
-                    textField = textFieldReportTextBox.getText();
-                    dateTemp12 = datePicker1.getDate();
-                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    dateTemp12 = datePicker2.getDate();
-                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    temp = "SELECT * FROM WEIGHING WHERE UPPER(VEHICLENO) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                    break;
-                case "Materialwise Report":
-                    dateTemp12 = datePicker1.getDate();
-                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    dateTemp12 = datePicker2.getDate();
-                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    material = (String) comboBoxMaterialName.getSelectedItem();
-                    if (material == null) {
-                        material = "";
-                    }
-                    temp = "SELECT * FROM WEIGHING WHERE UPPER(MATERIAL) LIKE UPPER('%" + material + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                    break;
-                case "Customer - Materialwise Report":
-                    dateTemp12 = datePicker1.getDate();
-                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    dateTemp12 = datePicker2.getDate();
-                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    textField = textFieldReportTextBox.getText();
-                    material = (String) comboBoxMaterialName.getSelectedItem();
-                    if (material == null) {
-                        material = "";
-                    }
-                    temp = "SELECT * FROM WEIGHING WHERE UPPER(CUSTOMERNAME) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "' AND UPPER(MATERIAL) LIKE UPPER('%" + material + "%')";
-                    break;
-                case "Customerwise Report":
-                    dateTemp12 = datePicker1.getDate();
-                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    dateTemp12 = datePicker2.getDate();
-                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    textField = textFieldReportTextBox.getText();
-                    temp = "SELECT * FROM WEIGHING WHERE UPPER(CUSTOMERNAME) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                    break;
-                case "Transporterwise Report":
-                    dateTemp12 = datePicker1.getDate();
-                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    dateTemp12 = datePicker2.getDate();
-                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    textField = textFieldReportTextBox.getText();
-                    temp = "SELECT * FROM WEIGHING WHERE UPPER(DRIVERNAME) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                    break;
-                case "Operatorwise Report":
-                    dateTemp12 = datePicker1.getDate();
-                    date1 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    dateTemp12 = datePicker2.getDate();
-                    date2 = (new java.sql.Date(dateTemp12.getTime())).toString();
-                    textField = textFieldReportTextBox.getText();
-                    temp = "SELECT * FROM WEIGHING WHERE UPPER(OPERATOR) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
-                    break;
-            }
-            try {
-                tableReport.setModel(new TableReport(
-                        new Object[][]{},
-                        new String[]{
-                                "Edit/Save",
-                                "Sl.No",
-                                "Dc. No",
-                                "Dc. Date",
-                                chckbxIceWater.isSelected() ? "Party's Name" : "Customer's Name",
-                                chckbxIceWater.isSelected() ? "Party's City" : "Transporter's Name",
-                                "Vehicle No",
-                                "Vehicle Type",
-                                "Operator",
-                                "Place",
-                                "Phone No",
-                                "Material",
-                                chckbxIceWater.isSelected() ? "Freight Charges" : "No Of Bags",
-                                chckbxIceWater.isSelected() ? "Rate" : "Charges",
-                                "Credit",
-                                "Gross Wt",
-                                "Gross Date & Time",
-                                "Tare Wt",
-                                "Tare Date & Time",
-                                chckbxIceWater.isSelected() ? "Ice/Water Less" : chckbxRoundOff.isSelected() ? "Price (per kg)" : "Bag Deduction",
-                                "Round off",
-                                "Nett Wt",
-                                "Nett Date & Time",
-                                "Final Wt",
-                                "Final Amount",
-                                "Remarks",
-                                "Manual"
-                        }));
-                DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery(temp + " ORDER BY SLNO LIMIT 1000");
-                while (rs.next()) {
-                    String date,
-                            time,
-                            gross,
-                            tare,
-                            net;
-                    date = String.valueOf(rs.getDate("GROSSDATE"));
-                    if (date.equals("null")) {
-                        date = "";
-                    } else {
-                        date = dateAndTimeFormatdate.format(rs.getDate("GROSSDATE"));
-                    }
-                    time = String.valueOf(rs.getTime("GROSSTIME"));
-                    if (time.equals("null")) {
-                        time = "";
-                    } else {
-                        time = dateAndTimeFormattime.format(rs.getTime("GROSSTIME"));
-                    }
-                    gross = date + " " + time;
-                    date = String.valueOf(rs.getDate("TAREDATE"));
-                    if (date.equals("null")) {
-                        date = "";
-                    } else {
-                        date = dateAndTimeFormatdate.format(rs.getDate("TAREDATE"));
-                    }
-                    time = String.valueOf(rs.getTime("TARETIME"));
-                    if (time.equals("null")) {
-                        time = "";
-                    } else {
-                        time = dateAndTimeFormattime.format(rs.getTime("TARETIME"));
-                    }
-                    tare = date + " " + time;
-                    date = String.valueOf(rs.getDate("NETDATE"));
-                    if (date.equals("null")) {
-                        date = "";
-                    } else {
-                        date = dateAndTimeFormatdate.format(rs.getDate("NETDATE"));
-                    }
-                    time = String.valueOf(rs.getTime("NETTIME"));
-                    if (time.equals("null")) {
-                        time = "";
-                    } else {
-                        time = dateAndTimeFormattime.format(rs.getTime("NETTIME"));
-                    }
-                    net = date + " " + time;
-
-                    model.addRow(new Object[]{
-                            /*00*/
-                            "Edit",
-                            /*01*/
-                            rs.getInt("SLNO"),
-                            /*02*/
-                            rs.getString("DCNO"),
-                            /*03*/
-                            (String.valueOf(rs.getDate("DCNODATE"))).equals("null") ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")),
-                            /*04*/
-                            rs.getString("CUSTOMERNAME"),
-                            /*05*/
-                            rs.getString("DRIVERNAME"),
-                            /*06*/
-                            rs.getString("VEHICLENO"),
-                            /*07*/
-                            rs.getString("VEHICLE_TYPE"),
-                            /*08*/
-                            rs.getString("OPERATOR"),
-                            /*09*/
-                            rs.getString("PLACE"),
-                            /*10*/
-                            rs.getString("PHONE_NUMBER"),
-                            /*11*/
-                            rs.getString("MATERIAL"),
-                            /*12*/
-                            rs.getInt("NOOFBAGS"),
-                            /*13*/
-                            decimalFormat.format(rs.getDouble("CHARGES")),
-                            /*14*/
-                            rs.getBoolean("CREDIT"),
-                            /*15*/
-                            rs.getInt("GROSSWT"),
-                            /*16*/
-                            gross,
-                            /*17*/
-                            rs.getInt("TAREWT"),
-                            /*18*/
-                            tare,
-                            /*19*/
-                            decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")),
-                            /*20*/
-                            decimalFormat.format(rs.getDouble("ROUND_OFF")),
-                            /*21*/
-                            rs.getInt("NETWT"),
-                            /*22*/
-                            net,
-                            /*23*/
-                            rs.getInt("FINALWT"),
-                            /*24*/
-                            rs.getInt("FINALAMOUNT"),
-                            /*25*/
-                            rs.getString("REMARKS"),
-                            /*26*/
-                            rs.getBoolean("MANUAL")
-                    });
-                    charges += (int) rs.getDouble("CHARGES");
-                    netWt += rs.getInt("NETWT");
+        Date dateTemp;
+        String temp = "SELECT * FROM WEIGHING";
+        switch (Objects.toString(comboBoxReportType.getSelectedItem(), "")) {
+            case "Full Report":
+                temp = "SELECT * FROM WEIGHING";
+                break;
+            case "Daily Report":
+                dateTemp = datePicker1.getDate();
+                date1 = (new java.sql.Date(dateTemp.getTime())).toString();
+                date2 = (new java.sql.Date(dateTemp.getTime())).toString();
+                temp = "SELECT * FROM WEIGHING WHERE NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                break;
+            case "Datewise Report":
+                dateTemp = datePicker1.getDate();
+                date1 = (new java.sql.Date(dateTemp.getTime())).toString();
+                dateTemp = datePicker2.getDate();
+                date2 = (new java.sql.Date(dateTemp.getTime())).toString();
+                temp = "SELECT * FROM WEIGHING WHERE NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                break;
+            case "Serialwise Report":
+                serialNo = Integer.parseInt(0 + textFieldReportTextBox.getText().replaceAll("\\D", ""));
+                temp = "SELECT * FROM WEIGHING WHERE SLNO >= " + serialNo;
+                break;
+            case "Vehiclewise Report":
+                textField = textFieldReportTextBox.getText();
+                dateTemp = datePicker1.getDate();
+                date1 = (new java.sql.Date(dateTemp.getTime())).toString();
+                dateTemp = datePicker2.getDate();
+                date2 = (new java.sql.Date(dateTemp.getTime())).toString();
+                temp = "SELECT * FROM WEIGHING WHERE UPPER(VEHICLENO) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                break;
+            case "Materialwise Report":
+                dateTemp = datePicker1.getDate();
+                date1 = (new java.sql.Date(dateTemp.getTime())).toString();
+                dateTemp = datePicker2.getDate();
+                date2 = (new java.sql.Date(dateTemp.getTime())).toString();
+                material = (String) comboBoxMaterialName.getSelectedItem();
+                if (material == null) {
+                    material = "";
                 }
-                tableReport.getColumnModel().getColumn(0).setCellRenderer(new TableButtonRenderer());
-                tableReport.getColumnModel().getColumn(0).setCellEditor(new TableRenderer(new JCheckBox()));
-                if (!chckbxEditEnable.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Edit/Save"));
+                temp = "SELECT * FROM WEIGHING WHERE UPPER(MATERIAL) LIKE UPPER('%" + material + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                break;
+            case "Customer - Materialwise Report":
+                dateTemp = datePicker1.getDate();
+                date1 = (new java.sql.Date(dateTemp.getTime())).toString();
+                dateTemp = datePicker2.getDate();
+                date2 = (new java.sql.Date(dateTemp.getTime())).toString();
+                textField = textFieldReportTextBox.getText();
+                material = (String) comboBoxMaterialName.getSelectedItem();
+                if (material == null) {
+                    material = "";
                 }
-                if (!chckbxSlNo.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Sl.No"));
-                }
-                if (!chckbxDCNo.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Dc. No"));
-                }
-                if (!chckbxDCDate.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Dc. Date"));
-                }
-                if (!chckbxCustomerName.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn(chckbxIceWater.isSelected() ? "Party's Name" : "Customer's Name"));
-                }
-                if (!chckbxTransporterName.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn(chckbxIceWater.isSelected() ? "Party's City" : "Transporter's Name"));
-                }
-                if (!chckbxVehicleNo.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Vehicle No"));
-                }
-                if (!chckbxVehicleType.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Vehicle Type"));
-                }
-                if (!chckbxOperator.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Operator"));
-                }
-                if (!chckbxPlace.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Place"));
-                }
-                if (!chckbxPhoneNo.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Phone No"));
-                }
-                if (!chckbxMaterial.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Material"));
-                }
-                if (!chckbxNoOfBags.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn(chckbxIceWater.isSelected() ? "Freight Charges" : "No Of Bags"));
-                }
-                if (!chckbxCharges.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn(chckbxIceWater.isSelected() ? "Rate" : "Charges"));
-                }
-                if (!chckbxCredit.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Credit"));
-                }
-                if (!chckbxGrossWeight.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Gross Wt"));
-                }
-                if (!chckbxGrossDateAndTime.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Gross Date & Time"));
-                }
-                if (!chckbxTareWeight.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Tare Wt"));
-                }
-                if (!chckbxTareDateAndTime.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Tare Date & Time"));
-                }
-                if (!chckbxBagDeduction.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn(chckbxIceWater.isSelected() ? "Ice/Water Less" : chckbxRoundOff.isSelected() ? "Price (per kg)" : "Bag Deduction"));
-                }
-                if (!chckbxRoundOffColumn.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Round off"));
-                }
-                if (!chckbxNettWeight.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Nett Wt"));
-                }
-                if (!chckbxNettDateAndTime.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Nett Date & Time"));
-                }
-                if (!chckbxFinalWt.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Final Wt"));
-                }
-                if (!chckbxFinalAmount.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Final Amount"));
-                }
-                if (!chckbxRemarks.isSelected()) {
-                    tableReport.removeColumn(tableReport.getColumn("Remarks"));
-                }
-                if (!(chckbxManual.isSelected() && chckbxManualStatus.isSelected())) {
-                    tableReport.removeColumn(tableReport.getColumn("Manual"));
-                }
-                for (int column = 0; column < tableReport.getColumnCount(); column++) {
-                    int width = 100;
-                    for (int row = 0; row < tableReport.getRowCount(); row++) {
-                        TableCellRenderer renderer = tableReport.getCellRenderer(row, column);
-                        Component comp = tableReport.prepareRenderer(renderer, row, column);
-                        width = Math.max(comp.getPreferredSize().width + 50, width);
-                    }
-                    if (width > 250) {
-                        width = 250;
-                    }
-                    tableReport.getColumnModel().getColumn(column).setPreferredWidth(width);
-                }
-            } catch (SQLException ignored) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2174", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-            }
+                temp = "SELECT * FROM WEIGHING WHERE UPPER(CUSTOMERNAME) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "' AND UPPER(MATERIAL) LIKE UPPER('%" + material + "%')";
+                break;
+            case "Customerwise Report":
+                dateTemp = datePicker1.getDate();
+                date1 = (new java.sql.Date(dateTemp.getTime())).toString();
+                dateTemp = datePicker2.getDate();
+                date2 = (new java.sql.Date(dateTemp.getTime())).toString();
+                textField = textFieldReportTextBox.getText();
+                temp = "SELECT * FROM WEIGHING WHERE UPPER(CUSTOMERNAME) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                break;
+            case "Transporterwise Report":
+                dateTemp = datePicker1.getDate();
+                date1 = (new java.sql.Date(dateTemp.getTime())).toString();
+                dateTemp = datePicker2.getDate();
+                date2 = (new java.sql.Date(dateTemp.getTime())).toString();
+                textField = textFieldReportTextBox.getText();
+                temp = "SELECT * FROM WEIGHING WHERE UPPER(DRIVERNAME) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                break;
+            case "Operatorwise Report":
+                dateTemp = datePicker1.getDate();
+                date1 = (new java.sql.Date(dateTemp.getTime())).toString();
+                dateTemp = datePicker2.getDate();
+                date2 = (new java.sql.Date(dateTemp.getTime())).toString();
+                textField = textFieldReportTextBox.getText();
+                temp = "SELECT * FROM WEIGHING WHERE UPPER(OPERATOR) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                break;
         }
+        try {
+            tableReport.setModel(new TableReport(
+                    new Object[][]{},
+                    new String[]{
+                            "Edit/Save",
+                            "Sl.No",
+                            "Dc. No",
+                            "Dc. Date",
+                            chckbxIceWater.isSelected() ? "Party's Name" : "Customer's Name",
+                            chckbxIceWater.isSelected() ? "Party's City" : "Transporter's Name",
+                            "Vehicle No",
+                            "Vehicle Type",
+                            "Operator",
+                            "Place",
+                            "Phone No",
+                            "Material",
+                            chckbxIceWater.isSelected() ? "Freight Charges" : "No Of Bags",
+                            chckbxIceWater.isSelected() ? "Rate" : "Charges",
+                            "Credit",
+                            "Gross Wt",
+                            "Gross Date & Time",
+                            "Tare Wt",
+                            "Tare Date & Time",
+                            chckbxIceWater.isSelected() ? "Ice/Water Less" : chckbxRoundOff.isSelected() ? "Price (per kg)" : "Bag Deduction",
+                            "Round off",
+                            "Nett Wt",
+                            "Nett Date & Time",
+                            "Final Wt",
+                            "Final Amount",
+                            "Remarks",
+                            "Manual"
+                    }));
+            DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
+            Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            ResultSet rs = stmt.executeQuery(temp + " ORDER BY SLNO LIMIT 1000");
+            while (rs.next()) {
+                String date,
+                        time,
+                        gross,
+                        tare,
+                        net;
+                date = String.valueOf(rs.getDate("GROSSDATE"));
+                if (date.equals("null")) {
+                    date = "";
+                } else {
+                    date = dateAndTimeFormatdate.format(rs.getDate("GROSSDATE"));
+                }
+                time = String.valueOf(rs.getTime("GROSSTIME"));
+                if (time.equals("null")) {
+                    time = "";
+                } else {
+                    time = dateAndTimeFormattime.format(rs.getTime("GROSSTIME"));
+                }
+                gross = date + " " + time;
+                date = String.valueOf(rs.getDate("TAREDATE"));
+                if (date.equals("null")) {
+                    date = "";
+                } else {
+                    date = dateAndTimeFormatdate.format(rs.getDate("TAREDATE"));
+                }
+                time = String.valueOf(rs.getTime("TARETIME"));
+                if (time.equals("null")) {
+                    time = "";
+                } else {
+                    time = dateAndTimeFormattime.format(rs.getTime("TARETIME"));
+                }
+                tare = date + " " + time;
+                date = String.valueOf(rs.getDate("NETDATE"));
+                if (date.equals("null")) {
+                    date = "";
+                } else {
+                    date = dateAndTimeFormatdate.format(rs.getDate("NETDATE"));
+                }
+                time = String.valueOf(rs.getTime("NETTIME"));
+                if (time.equals("null")) {
+                    time = "";
+                } else {
+                    time = dateAndTimeFormattime.format(rs.getTime("NETTIME"));
+                }
+                net = date + " " + time;
+
+                model.addRow(new Object[]{
+                        /*00*/
+                        "Edit",
+                        /*01*/
+                        rs.getInt("SLNO"),
+                        /*02*/
+                        rs.getString("DCNO"),
+                        /*03*/
+                        (String.valueOf(rs.getDate("DCNODATE"))).equals("null") ? "" : dateAndTimeFormatdate.format(rs.getDate("DCNODATE")),
+                        /*04*/
+                        rs.getString("CUSTOMERNAME"),
+                        /*05*/
+                        rs.getString("DRIVERNAME"),
+                        /*06*/
+                        rs.getString("VEHICLENO"),
+                        /*07*/
+                        rs.getString("VEHICLE_TYPE"),
+                        /*08*/
+                        rs.getString("OPERATOR"),
+                        /*09*/
+                        rs.getString("PLACE"),
+                        /*10*/
+                        rs.getString("PHONE_NUMBER"),
+                        /*11*/
+                        rs.getString("MATERIAL"),
+                        /*12*/
+                        rs.getInt("NOOFBAGS"),
+                        /*13*/
+                        decimalFormat.format(rs.getDouble("CHARGES")),
+                        /*14*/
+                        rs.getBoolean("CREDIT"),
+                        /*15*/
+                        rs.getInt("GROSSWT"),
+                        /*16*/
+                        gross,
+                        /*17*/
+                        rs.getInt("TAREWT"),
+                        /*18*/
+                        tare,
+                        /*19*/
+                        decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")),
+                        /*20*/
+                        decimalFormat.format(rs.getDouble("ROUND_OFF")),
+                        /*21*/
+                        rs.getInt("NETWT"),
+                        /*22*/
+                        net,
+                        /*23*/
+                        rs.getInt("FINALWT"),
+                        /*24*/
+                        rs.getInt("FINALAMOUNT"),
+                        /*25*/
+                        rs.getString("REMARKS"),
+                        /*26*/
+                        rs.getBoolean("MANUAL")
+                });
+                charges += (int) rs.getDouble("CHARGES");
+                netWt += rs.getInt("NETWT");
+            }
+            tableReport.getColumnModel().getColumn(0).setCellRenderer(new TableButtonRenderer());
+            tableReport.getColumnModel().getColumn(0).setCellEditor(new TableRenderer(new JCheckBox()));
+            if (!chckbxEditEnable.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Edit/Save"));
+            }
+            if (!chckbxSlNo.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Sl.No"));
+            }
+            if (!chckbxDCNo.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Dc. No"));
+            }
+            if (!chckbxDCDate.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Dc. Date"));
+            }
+            if (!chckbxCustomerName.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn(chckbxIceWater.isSelected() ? "Party's Name" : "Customer's Name"));
+            }
+            if (!chckbxTransporterName.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn(chckbxIceWater.isSelected() ? "Party's City" : "Transporter's Name"));
+            }
+            if (!chckbxVehicleNo.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Vehicle No"));
+            }
+            if (!chckbxVehicleType.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Vehicle Type"));
+            }
+            if (!chckbxOperator.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Operator"));
+            }
+            if (!chckbxPlace.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Place"));
+            }
+            if (!chckbxPhoneNo.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Phone No"));
+            }
+            if (!chckbxMaterial.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Material"));
+            }
+            if (!chckbxNoOfBags.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn(chckbxIceWater.isSelected() ? "Freight Charges" : "No Of Bags"));
+            }
+            if (!chckbxCharges.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn(chckbxIceWater.isSelected() ? "Rate" : "Charges"));
+            }
+            if (!chckbxCredit.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Credit"));
+            }
+            if (!chckbxGrossWeight.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Gross Wt"));
+            }
+            if (!chckbxGrossDateAndTime.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Gross Date & Time"));
+            }
+            if (!chckbxTareWeight.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Tare Wt"));
+            }
+            if (!chckbxTareDateAndTime.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Tare Date & Time"));
+            }
+            if (!chckbxBagDeduction.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn(chckbxIceWater.isSelected() ? "Ice/Water Less" : chckbxRoundOff.isSelected() ? "Price (per kg)" : "Bag Deduction"));
+            }
+            if (!chckbxRoundOffColumn.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Round off"));
+            }
+            if (!chckbxNettWeight.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Nett Wt"));
+            }
+            if (!chckbxNettDateAndTime.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Nett Date & Time"));
+            }
+            if (!chckbxFinalWt.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Final Wt"));
+            }
+            if (!chckbxFinalAmount.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Final Amount"));
+            }
+            if (!chckbxRemarks.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Remarks"));
+            }
+            if (!(chckbxManual.isSelected() && chckbxManualStatus.isSelected())) {
+                tableReport.removeColumn(tableReport.getColumn("Manual"));
+            }
+            for (int column = 0; column < tableReport.getColumnCount(); column++) {
+                int width = 100;
+                for (int row = 0; row < tableReport.getRowCount(); row++) {
+                    TableCellRenderer renderer = tableReport.getCellRenderer(row, column);
+                    Component comp = tableReport.prepareRenderer(renderer, row, column);
+                    width = Math.max(comp.getPreferredSize().width + 50, width);
+                }
+                if (width > 250) {
+                    width = 250;
+                }
+                tableReport.getColumnModel().getColumn(column).setPreferredWidth(width);
+            }
+        } catch (SQLException ignored) {
+            JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2174", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+
         textFieldTotalCharges.setText("Rs. " + charges);
         textFieldtotalNetWt.setText(netWt + " Kg");
         reportOpened = true;
@@ -8613,7 +8694,6 @@ class WeighBridge {
             pj.print();
         } catch (PrinterException ignored) {
         }
-
     }
 
     private JTextPane createReportWeight() {
@@ -8827,7 +8907,75 @@ class WeighBridge {
         return "Report";
     }
 
-    private void toExcel(String excelFilePath) throws IOException {
+    private void toInvoiceExcel(String excelFilePath) throws IOException {
+        Workbook workbook;
+        if (excelFilePath.endsWith("xls")) {
+            workbook = new HSSFWorkbook();
+        } else {
+            workbook = new XSSFWorkbook();
+        }
+        String safeName = WorkbookUtil.createSafeSheetName("Invoice - " + Objects.requireNonNull(comboBoxReportType.getSelectedItem()));
+        Sheet sheet = workbook.createSheet(safeName);
+        int rowNum = 0;
+        Row row = sheet.createRow(rowNum++);
+        CellStyle cellStyleStringCenter = sheet.getWorkbook().createCellStyle();
+        cellStyleStringCenter.setAlignment(HorizontalAlignment.CENTER);
+        Cell cell;
+        cell = row.createCell(0);
+        cell.setCellValue(title1.getText());
+        cell.setCellStyle(cellStyleStringCenter);
+        row = sheet.createRow(rowNum++);
+        cell = row.createCell(0);
+        cell.setCellValue(title2.getText());
+        cell.setCellStyle(cellStyleStringCenter);
+        row = sheet.createRow(rowNum++);
+        cell = row.createCell(0);
+        cell.setCellValue(getTitle());
+        cell.setCellStyle(cellStyleStringCenter);
+        row = sheet.createRow(rowNum++);
+
+        List<MyCheckBox> filteredReportCheckBox = reportCheckBox.stream().filter(JCheckBox::isSelected).toList();
+        int c = 0;
+        for (MyCheckBox field : filteredReportCheckBox) {
+            cell = row.createCell(c++);
+            cell.setCellValue(field.getText());
+            cell.setCellStyle(cellStyleStringCenter);
+        }
+
+        TableModel model = tableReport.getModel();
+
+        for (int r = 0; r < model.getRowCount(); r++) {
+            row = sheet.createRow(rowNum++);
+
+            for (c = 0; r < model.getColumnCount(); r++) {
+                cell = row.createCell(c);
+                cell.setCellValue(model.getValueAt(r, c++).toString());
+            }
+        }
+
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, sheet.getRow(3).getLastCellNum() - 1));
+        sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, sheet.getRow(3).getLastCellNum() - 1));
+        sheet.addMergedRegion(new CellRangeAddress(2, 2, 0, sheet.getRow(3).getLastCellNum() - 1));
+
+        for (short i = sheet.getRow(3).getFirstCellNum(), end = sheet.getRow(3).getLastCellNum(); i < end; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        FileOutputStream fileOut;
+        if (excelFilePath.endsWith("xls")) {
+            fileOut = new FileOutputStream(excelFilePath);
+        } else if (excelFilePath.endsWith("xlsx")) {
+            fileOut = new FileOutputStream(excelFilePath);
+        } else {
+            fileOut = new FileOutputStream(excelFilePath + ".xlsx");
+        }
+
+        workbook.write(fileOut);
+        fileOut.close();
+        workbook.close();
+    }
+
+    private void toWeighingExcel(String excelFilePath) throws IOException {
         Workbook workbook;
         if (excelFilePath.endsWith("xls")) {
             workbook = new HSSFWorkbook();
@@ -10059,7 +10207,6 @@ class WeighBridge {
 
     private void findReport(ActionEvent... ae) {
         String message = "Plz Choose The Column To Show In Report ?";
-        int n = -1;
         if (rdbtnWeighing.isSelected()) {
             Object[] params;
             chckbxTransporterName.setText(chckbxIceWater.isSelected() ? "Party's City" : "Transporter's Name");
@@ -10127,10 +10274,26 @@ class WeighBridge {
                         chckbxRemarks
                 };
             }
-            n = JOptionPane.showConfirmDialog(null, params, "Choose The Columns", JOptionPane.OK_CANCEL_OPTION);
-        }
-        if (n == 0) {
-            getReport();
+            if (JOptionPane.showConfirmDialog(null, params, "Choose The Columns", JOptionPane.OK_CANCEL_OPTION) == 0) {
+                getWeighingReport();
+            }
+        } else if (chckbxInvoice.isSelected()) {
+            try {
+                if (null == reportCheckBox) {
+                    reportCheckBox = new ArrayList<>();
+                    JsonNode invoiceProperty = new ObjectMapper().readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
+
+                    for (JsonNode field : invoiceProperty.get("reportFields")) {
+                        reportCheckBox.add(new MyCheckBox(field));
+                    }
+                }
+
+                if (JOptionPane.showConfirmDialog(null, Stream.concat(Stream.of(message), Arrays.stream(reportCheckBox.toArray())).toArray(), "Choose The Columns", JOptionPane.OK_CANCEL_OPTION) == 0) {
+                    getInvoiceReport();
+                }
+
+            } catch (IOException | NullPointerException ignored) {
+            }
         }
     }
 
@@ -10602,18 +10765,29 @@ class WeighBridge {
         private static final long serialVersionUID = 1L;
 
         private final Set<Integer> editableRow = new HashSet<>();
+        private final boolean editable;
 
         public TableReport(Object[][] objects, String[] strings) {
             super(objects, strings);
+            this.editable = true;
+        }
+
+        public TableReport(Object[][] objects, String[] strings, boolean isEditable) {
+            super(objects, strings);
+            this.editable = isEditable;
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            return switch (column) {
-                case 0 -> true;
-                case 1, 24 -> false;
-                default -> this.editableRow.contains(row);
-            };
+            if (editable) {
+                return switch (column) {
+                    case 0 -> true;
+                    case 1, 24 -> false;
+                    default -> this.editableRow.contains(row);
+                };
+            }
+
+            return false;
         }
 
         public void removeEditableRow(int row) {
@@ -10671,6 +10845,24 @@ class WeighBridge {
     }
 
     record VehicleType(int tareCost, int grossCost) {
+    }
+
+    private static class MyCheckBox extends JCheckBox {
+        String key;
+        String type;
+        String format;
+
+        public MyCheckBox(JsonNode field) {
+            super(field.path("name").asText(""));
+            super.setSelected(field.path("checked").asBoolean(false));
+            this.key = field.path("key").asText("");
+            this.type = field.path("type").asText("");
+            this.format = field.path("format").asText("");
+        }
+
+        public String getKey() {
+            return key;
+        }
     }
 
     private class TableRenderer extends DefaultCellEditor {

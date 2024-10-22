@@ -1,5 +1,52 @@
 {
 	"html": "K.K.M Blue Metal",
+	"reportFields": [
+		{
+			"key": "invoiceNo",
+			"name": "Invoice No",
+			"checked": true
+		},
+		{
+			"key": "invoiceDate",
+			"name": "Invoice Date",
+			"checked": true
+		},
+		{
+			"key": "buyer",
+			"name": "Buyer",
+			"checked": true
+		},
+		{
+			"key": "buyerAddress",
+			"name": "Address",
+			"checked": true
+		},
+		{
+			"key": "vehicleNo",
+			"name": "Vehicle No",
+			"checked": true
+		},
+		{
+			"key": "destination",
+			"name": "Destination",
+			"checked": true
+		},
+		{
+			"key": "material",
+			"name": "Material",
+			"checked": true
+		},
+		{
+			"key": "quantity",
+			"name": "Quantity (ton)",
+			"checked": true
+		},
+		{
+			"key": "rate",
+			"name": "Rate",
+			"checked": true
+		}
+	],
 	"hiddenFields": [
 		{
 			"key": "taxAmount"
@@ -22,9 +69,9 @@
 			"key": "igstPercent",
 			"value": ".05"
 		},
-        {
-            "key": "isLocal"
-        }
+		{
+			"key": "isLocal"
+		}
 	],
 	"leftFields": [
 		{
@@ -43,7 +90,7 @@
 		{
 			"key": "buyer",
 			"name": "Buyer",
-            "type": "buyer"
+			"type": "buyer"
 		},
 		{
 			"key": "buyerAddress",
@@ -52,7 +99,7 @@
 		{
 			"key": "vehicleNo",
 			"name": "Vehicle No",
-            "type": "vehicleNo"
+			"type": "vehicleNo"
 		},
 		{
 			"key": "destination",

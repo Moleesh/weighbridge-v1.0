@@ -22,9 +22,9 @@
 			"key": "igstPercent",
 			"value": ".05"
 		},
-        {
-            "key": "isLocal"
-        }
+		{
+			"key": "isLocal"
+		}
 	],
 	"leftFields": [
 		{
@@ -43,7 +43,7 @@
 		{
 			"key": "buyer",
 			"name": "Buyer",
-            "type": "buyer"
+			"type": "buyer"
 		},
 		{
 			"key": "buyerAddress",
@@ -52,7 +52,7 @@
 		{
 			"key": "vehicleNo",
 			"name": "Vehicle No",
-            "type": "vehicleNo"
+			"type": "vehicleNo"
 		},
 		{
 			"key": "destination",
