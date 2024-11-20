@@ -9420,7 +9420,7 @@ class WeighBridge {
 
             cell = row.createCell(0);
             try {
-                cell.setCellValue(model.getValueAt(i, 20) != null ? dateFormat.format(new Date(dateAndTimeFormat.parse(model.getValueAt(i, 20).toString()).getTime())) : "");
+                cell.setCellValue(model.getValueAt(i, 22) != null ? dateFormat.format(new Date(dateAndTimeFormat.parse(model.getValueAt(i, 22).toString()).getTime())) : "");
             } catch (ParseException ignored) {
             }
 
@@ -9428,31 +9428,31 @@ class WeighBridge {
             cell.setCellValue(Integer.parseInt(0 + model.getValueAt(i, 1).toString()));
 
             cell = row.createCell(2);
-            cell.setCellValue(model.getValueAt(i, 9) != null ? model.getValueAt(i, 9).toString() : "");
+            cell.setCellValue(model.getValueAt(i, 11) != null ? model.getValueAt(i, 9).toString() : "");
 
             cell = row.createCell(3);
             cell.setCellValue(model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "");
 
             cell = row.createCell(4);
             try {
-                cell.setCellValue(model.getValueAt(i, 14) != null ? timeFormat.format(new Date(dateAndTimeFormat.parse(model.getValueAt(i, 14).toString()).getTime())) : "");
-            } catch (ParseException ignored) {
-            }
-
-            cell = row.createCell(5);
-            cell.setCellValue(Integer.parseInt(model.getValueAt(i, 13).toString()));
-
-            cell = row.createCell(6);
-            try {
                 cell.setCellValue(model.getValueAt(i, 16) != null ? timeFormat.format(new Date(dateAndTimeFormat.parse(model.getValueAt(i, 16).toString()).getTime())) : "");
             } catch (ParseException ignored) {
             }
 
-            cell = row.createCell(7);
+            cell = row.createCell(5);
             cell.setCellValue(Integer.parseInt(model.getValueAt(i, 15).toString()));
 
+            cell = row.createCell(6);
+            try {
+                cell.setCellValue(model.getValueAt(i, 18) != null ? timeFormat.format(new Date(dateAndTimeFormat.parse(model.getValueAt(i, 18).toString()).getTime())) : "");
+            } catch (ParseException ignored) {
+            }
+
+            cell = row.createCell(7);
+            cell.setCellValue(Integer.parseInt(model.getValueAt(i, 17).toString()));
+
             cell = row.createCell(8);
-            cell.setCellValue(Integer.parseInt(0 + model.getValueAt(i, 19).toString()));
+            cell.setCellValue(Integer.parseInt(0 + model.getValueAt(i, 21).toString()));
 
         }
         String getColumn = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
