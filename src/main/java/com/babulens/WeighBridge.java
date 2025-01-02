@@ -1054,7 +1054,7 @@ class WeighBridge {
             job.print();
             document.close();
         } catch (Exception ignored) {
-            JOptionPane.showMessageDialog(null, "Print Error Contact System Admin", "DB ERROR", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Print Error Contact System Admin", "Print ERROR", JOptionPane.ERROR_MESSAGE);
             return;
         }
         clearInvoice();

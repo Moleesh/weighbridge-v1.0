@@ -78,8 +78,8 @@
 			"key": "invoiceNo",
 			"name": "Invoice No",
 			"type": "invoiceNo",
-			"localPrefix": "TN",
-			"invoicePrefix": "KL"
+			"localPrefix": "TA",
+			"invoicePrefix": "KA"
 		},
 		{
 			"key": "invoiceDate",
