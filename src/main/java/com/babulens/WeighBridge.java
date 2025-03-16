@@ -432,6 +432,7 @@ class WeighBridge {
     private JRadioButton radioButtonLocal;
     private JRadioButton radioButtonOtherStates;
     private List<MyCheckBox> reportCheckBox;
+    private JCheckBox checkboxKottaSetting;
 
     /**
      * Create the application.
@@ -845,6 +846,7 @@ class WeighBridge {
             checkboxMaterialSl.setSelected(rs.getBoolean("MATERIALSL"));
             checkboxIceWater.setSelected(rs.getBoolean("ICEWATER"));
             checkboxRoundOff.setSelected(rs.getBoolean("ROUND_OFF"));
+            checkboxKottaSetting.setSelected(rs.getBoolean("KOTTA_SETTING"));
             checkboxTareToken.setSelected(rs.getBoolean("TARE_TOKEN"));
             checkboxExitPass.setSelected(rs.getBoolean("EXIT_PASS"));
             checkboxNeedLogin.setSelected(rs.getBoolean("NEED_LOGIN"));
@@ -1276,6 +1278,7 @@ class WeighBridge {
             rs.updateBoolean("MATERIALSL", checkboxMaterialSl.isSelected());
             rs.updateBoolean("ICEWATER", checkboxIceWater.isSelected());
             rs.updateBoolean("ROUND_OFF", checkboxRoundOff.isSelected());
+            rs.updateBoolean("KOTTA_SETTING", checkboxKottaSetting.isSelected());
             rs.updateBoolean("TARE_TOKEN", checkboxTareToken.isSelected());
             rs.updateBoolean("EXIT_PASS", checkboxExitPass.isSelected());
             rs.updateBoolean("NEED_LOGIN", checkboxNeedLogin.isSelected());
@@ -1524,7 +1527,7 @@ class WeighBridge {
 
         JLabel lblCharges = new JLabel("Charges");
         lblCharges.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblCharges.setBounds(50, 390, 90, 25);
+        lblCharges.setBounds(50, 390, 132, 25);
         panelWeighing.add(lblCharges);
 
         JLabel lblGrossWt = new JLabel("Gross Wt");
@@ -1607,6 +1610,18 @@ class WeighBridge {
                     } catch (SQLException ignored) {
                     }
                 }
+                if (checkboxKottaSetting.isSelected()) {
+                    try {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
+                        if (rs.next()) {
+                            textFieldCharges.setText(decimalFormat.format(rs.getDouble("COST")));
+                        } else {
+                            textFieldCharges.setText("0");
+                        }
+                    } catch (SQLException ignored) {
+                    }
+                }
                 comboBoxMaterial.setSelectedItem(Objects.toString(comboBoxMaterial.getSelectedItem(), "").toUpperCase());
             }
         });
@@ -1640,6 +1655,18 @@ class WeighBridge {
                             textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
                         } else {
                             textFieldDeductionOrPerCost.setText("0");
+                        }
+                    } catch (SQLException ignored) {
+                    }
+                }
+                if (checkboxKottaSetting.isSelected()) {
+                    try {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
+                        if (rs.next()) {
+                            textFieldCharges.setText(decimalFormat.format(rs.getDouble("COST")));
+                        } else {
+                            textFieldCharges.setText("0");
                         }
                     } catch (SQLException ignored) {
                     }
@@ -1898,6 +1925,11 @@ class WeighBridge {
             if (checkboxRoundOff.isSelected()) {
                 textFieldRoundOff.setText(decimalFormat.format(-1 * Double.parseDouble(0 + textFieldCharges.getText()) % Math.pow(10, Double.parseDouble(textFieldRoundOffDecimals.getText().replaceAll("\\D", "")))).replaceAll("-0", "0"));
                 textFieldCharges.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCharges.getText()) + Double.parseDouble(textFieldRoundOff.getText())));
+            }
+            if (checkboxKottaSetting.isSelected()) {
+                decimalFormat.setMaximumFractionDigits(2);
+                textFieldDeductionOrPerCost.setText(decimalFormat.format(Double.parseDouble(0 + textFieldNetWt.getText()) / 87));
+                textFieldRoundOff.setText(decimalFormat.format(Double.parseDouble(0 + textFieldDeductionOrPerCost.getText()) * Double.parseDouble(0 + textFieldCharges.getText())));
             }
 
             textFieldNoOfBags.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
@@ -2244,6 +2276,11 @@ class WeighBridge {
             if (checkboxRoundOff.isSelected()) {
                 textFieldRoundOff.setText(decimalFormat.format(-1 * Double.parseDouble(0 + textFieldCharges.getText()) % Math.pow(10, Double.parseDouble(textFieldRoundOffDecimals.getText().replaceAll("\\D", "")))).replaceAll("-0", "0"));
                 textFieldCharges.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCharges.getText()) + Double.parseDouble(textFieldRoundOff.getText())));
+            }
+            if (checkboxKottaSetting.isSelected()) {
+                decimalFormat.setMaximumFractionDigits(2);
+                textFieldDeductionOrPerCost.setText(decimalFormat.format(Double.parseDouble(0 + textFieldNetWt.getText()) / 87));
+                textFieldRoundOff.setText(decimalFormat.format(Double.parseDouble(0 + textFieldDeductionOrPerCost.getText()) * Double.parseDouble(0 + textFieldCharges.getText())));
             }
 
             textFieldNoOfBags.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
@@ -5022,13 +5059,9 @@ class WeighBridge {
                     checkboxEnableSettings2.setEnabled(true);
                     checkboxExcludeDcNo.setEnabled(true);
                     checkboxPrinterCopyDialog.setEnabled(true);
-                    checkboxIceWater.setEnabled(true);
-                    checkboxRoundOff.setEnabled(true);
                 }
             } else {
                 btnUnlock.setText("Unlock");
-                checkboxIceWater.setEnabled(false);
-                checkboxRoundOff.setEnabled(false);
                 checkboxManualEntry.setEnabled(false);
                 checkboxEditEnable.setEnabled(false);
                 checkboxCamera.setEnabled(false);
@@ -5260,10 +5293,8 @@ class WeighBridge {
             }
             clear();
         });
-
         checkboxAutoCharges.setFont(new Font("Times New Roman", Font.ITALIC, 15));
         checkboxAutoCharges.setFocusable(false);
-        checkboxAutoCharges.setEnabled(false);
         checkboxAutoCharges.setBackground(new Color(0, 255, 127));
         checkboxAutoCharges.setBounds(195, 270, 115, 25);
         panelSettings1.add(checkboxAutoCharges);
@@ -5739,38 +5770,26 @@ class WeighBridge {
         panelSettings2.add(lblOptions);
 
         checkboxIceWater = new JCheckBox("Ice water/Freight");
-        checkboxIceWater.setEnabled(false);
         checkboxIceWater.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         checkboxIceWater.addChangeListener(_ -> {
-            checkboxRoundOff.setEnabled(!checkboxIceWater.isSelected());
+            checkboxKottaSetting.setEnabled(!checkboxIceWater.isSelected());
             if (checkboxIceWater.isSelected()) {
                 checkboxRoundOff.setSelected(false);
+                checkboxKottaSetting.setSelected(false);
                 lblDriversName.setText("Party's City");
                 lblCustomerName.setText("Party's Name");
                 lblBagDeductionOrReductionCost.setText("Ice/Water Less");
                 lblCharges.setText("Rate");
                 lblNoOfBags.setText("Freight Charges");
                 checkboxExcludeCustomer.setEnabled(false);
-                checkboxExcludeCustomer.setSelected(false);
                 checkboxExcludeCharges.setEnabled(false);
-                checkboxExcludeCharges.setSelected(false);
-                checkboxAutoCharges.setEnabled(false);
                 checkboxAutoCharges.setSelected(false);
                 checkboxExcludeNoOfBags.setEnabled(false);
-                checkboxExcludeNoOfBags.setSelected(false);
                 checkboxExcludeDrivers.setEnabled(false);
-                checkboxExcludeDrivers.setSelected(false);
             } else {
-                lblDriversName.setText("Transporter's Name");
-                lblCustomerName.setText("Customer's Name");
-                lblBagDeductionOrReductionCost.setText(checkboxRoundOff.isSelected() ? "Price (per kg)" : "Bag Deduction");
-                lblCharges.setText("Charges");
-                lblNoOfBags.setText("No Of Bags");
                 if (Objects.equals(btnUnlock.getText(), "Lock")) {
                     checkboxExcludeCustomer.setEnabled(true);
                     checkboxExcludeCharges.setEnabled(true);
-                    checkboxAutoCharges.setEnabled(true);
-                    checkboxExcludeNoOfBags.setEnabled(!checkboxRoundOff.isSelected());
                     checkboxExcludeDrivers.setEnabled(true);
                 }
             }
@@ -5815,11 +5834,10 @@ class WeighBridge {
         panelSettings2.add(lblOperations);
 
         checkboxRoundOff = new JCheckBox("Round Off");
-        checkboxRoundOff.setEnabled(false);
         checkboxRoundOff.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         checkboxRoundOff.setFocusable(false);
         checkboxRoundOff.addChangeListener(_ -> {
-            checkboxIceWater.setEnabled(!checkboxRoundOff.isSelected());
+            checkboxKottaSetting.setEnabled(!checkboxRoundOff.isSelected());
             checkboxExcludeNoOfBags.setEnabled(!checkboxRoundOff.isSelected());
             checkboxTareToken.setEnabled(!checkboxRoundOff.isSelected());
             checkboxExitPass.setEnabled(!checkboxRoundOff.isSelected());
@@ -5831,6 +5849,7 @@ class WeighBridge {
                 checkboxExcludePlaceAndPhoneNumber.setSelected(false);
                 checkboxExcludePlaceAndPhoneNumber.setEnabled(false);
                 checkboxIceWater.setSelected(false);
+                checkboxKottaSetting.setSelected(false);
                 checkboxExcludeNoOfBags.setSelected(true);
                 checkboxAutoCharges.setSelected(true);
                 checkboxTareToken.setSelected(true);
@@ -5843,6 +5862,31 @@ class WeighBridge {
         checkboxRoundOff.setBackground(new Color(0, 255, 127));
         checkboxRoundOff.setBounds(1051, 100, 200, 25);
         panelSettings2.add(checkboxRoundOff);
+
+        checkboxKottaSetting = new JCheckBox("Kotta Setting");
+        checkboxKottaSetting.setSelected(false);
+        checkboxKottaSetting.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        checkboxKottaSetting.setFocusable(false);
+        checkboxKottaSetting.addChangeListener(_ -> {
+            checkboxExcludeNoOfBags.setEnabled(!checkboxKottaSetting.isSelected());
+            textFieldRoundOff.setVisible(checkboxKottaSetting.isSelected());
+            checkboxAutoCharges.setEnabled(!checkboxKottaSetting.isSelected());
+            if (checkboxKottaSetting.isSelected()) {
+                lblBagDeductionOrReductionCost.setText("Kotta");
+                lblCharges.setText("Price (per kotta)");
+                checkboxIceWater.setSelected(false);
+                checkboxRoundOff.setSelected(false);
+                checkboxExcludeNoOfBags.setSelected(true);
+                checkboxAutoCharges.setSelected(true);
+                lblBagDeductionOrReductionCost.setVisible(true);
+                textFieldDeductionOrPerCost.setVisible(true);
+            }
+            clear();
+        });
+        checkboxKottaSetting.setEnabled(false);
+        checkboxKottaSetting.setBackground(new Color(0, 255, 127));
+        checkboxKottaSetting.setBounds(1051, 175, 200, 25);
+        panelSettings2.add(checkboxKottaSetting);
 
         JLabel lblRoundOffDecimals = new JLabel("Round Off decimals");
         lblRoundOffDecimals.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -6268,13 +6312,13 @@ class WeighBridge {
                             "Phone No",
                             "Material",
                             checkboxIceWater.isSelected() ? "Freight Charges" : "No Of Bags",
-                            checkboxIceWater.isSelected() ? "Rate" : "Charges",
+                            getChargeText(),
                             "Credit",
                             "Gross Wt",
                             "Gross Date & Time",
                             "Tare Wt",
                             "Tare Date & Time",
-                            checkboxIceWater.isSelected() ? "Ice/Water Less" : checkboxRoundOff.isSelected() ? "Price (per kg)" : "Bag Deduction",
+                            getBagDeductionText(),
                             "Round off",
                             "Nett Wt",
                             "Nett Date & Time",
@@ -6433,7 +6477,7 @@ class WeighBridge {
                 tableReport.removeColumn(tableReport.getColumn(checkboxIceWater.isSelected() ? "Freight Charges" : "No Of Bags"));
             }
             if (!checkboxCharges.isSelected()) {
-                tableReport.removeColumn(tableReport.getColumn(checkboxIceWater.isSelected() ? "Rate" : "Charges"));
+                tableReport.removeColumn(tableReport.getColumn(getChargeText()));
             }
             if (!checkboxCredit.isSelected()) {
                 tableReport.removeColumn(tableReport.getColumn("Credit"));
@@ -6451,7 +6495,7 @@ class WeighBridge {
                 tableReport.removeColumn(tableReport.getColumn("Tare Date & Time"));
             }
             if (!checkboxBagDeduction.isSelected()) {
-                tableReport.removeColumn(tableReport.getColumn(checkboxIceWater.isSelected() ? "Ice/Water Less" : checkboxRoundOff.isSelected() ? "Price (per kg)" : "Bag Deduction"));
+                tableReport.removeColumn(tableReport.getColumn(getBagDeductionText()));
             }
             if (!checkboxRoundOffColumn.isSelected()) {
                 tableReport.removeColumn(tableReport.getColumn("Round off"));
@@ -9063,7 +9107,7 @@ class WeighBridge {
         }
         if (checkboxCharges.isSelected()) {
             cell = row.createCell(j++);
-            cell.setCellValue(checkboxIceWater.isSelected() ? "Rate" : "Charges");
+            cell.setCellValue(getChargeText());
             cell.setCellStyle(cellStyleStringCenter);
         }
         if (checkboxCredit.isSelected()) {
@@ -9093,7 +9137,7 @@ class WeighBridge {
         }
         if (checkboxBagDeduction.isSelected()) {
             cell = row.createCell(j++);
-            cell.setCellValue(checkboxIceWater.isSelected() ? "Ice/Water Less" : checkboxRoundOff.isSelected() ? "Price (per kg)" : "Bag Deduction");
+            cell.setCellValue(getBagDeductionText());
             cell.setCellStyle(cellStyleStringCenter);
         }
         if (checkboxRoundOffColumn.isSelected()) {
@@ -10209,8 +10253,8 @@ class WeighBridge {
             Object[] params;
             checkboxTransporterName.setText(checkboxIceWater.isSelected() ? "Party's City" : "Transporter's Name");
             checkboxCustomerName.setText(checkboxIceWater.isSelected() ? "Party's Name" : "Customer's Name");
-            checkboxBagDeduction.setText(checkboxIceWater.isSelected() ? "Ice/Water Less" : checkboxRoundOff.isSelected() ? "Price (per kg)" : "Bag Deduction");
-            checkboxCharges.setText(checkboxIceWater.isSelected() ? "Rate" : "Charges");
+            checkboxBagDeduction.setText(getBagDeductionText());
+            checkboxCharges.setText(getChargeText());
             checkboxNoOfBags.setText(checkboxIceWater.isSelected() ? "Freight Charges" : "No Of Bags");
             if (checkboxManualStatus.isSelected()) {
                 params = new Object[]{
@@ -10292,6 +10336,28 @@ class WeighBridge {
 
             } catch (IOException | NullPointerException ignored) {
             }
+        }
+    }
+
+    private String getChargeText() {
+        if (checkboxIceWater.isSelected()) {
+            return "Rate";
+        } else if (checkboxKottaSetting.isSelected()) {
+            return "Price (per kotta)";
+        } else {
+            return "Charges";
+        }
+    }
+
+    private String getBagDeductionText() {
+        if (checkboxIceWater.isSelected()) {
+            return "Ice/Water Less";
+        } else if (checkboxRoundOff.isSelected()) {
+            return "Price (per kg)";
+        } else if (checkboxKottaSetting.isSelected()) {
+            return "Kotta";
+        } else {
+            return "Bag Deduction";
         }
     }
 
