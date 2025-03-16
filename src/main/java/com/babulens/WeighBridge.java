@@ -5137,6 +5137,7 @@ class WeighBridge {
                 "EMJAY",
                 "EMJAY 1",
                 "Ice Water",
+                "Kotta",
                 "Mani & Co",
                 "Mani & Co 1",
                 "Mani & Co 2",
@@ -5873,7 +5874,7 @@ class WeighBridge {
             checkboxAutoCharges.setEnabled(!checkboxKottaSetting.isSelected());
             if (checkboxKottaSetting.isSelected()) {
                 lblBagDeductionOrReductionCost.setText("Kotta");
-                lblCharges.setText("Price (per kotta)");
+                lblCharges.setText("Market Rate");
                 checkboxIceWater.setSelected(false);
                 checkboxRoundOff.setSelected(false);
                 checkboxExcludeNoOfBags.setSelected(true);
@@ -6090,6 +6091,9 @@ class WeighBridge {
                     continue;
                 case "Standard":
                     printStandard();
+                    continue;
+                case "Kotta":
+                    printKotta();
                     continue;
                 case "Ice Water":
                     printIceWater();
@@ -8544,6 +8548,99 @@ class WeighBridge {
         }
     }
 
+    private void printKotta() {
+        PrinterJob pj = PrinterJob.getPrinterJob();
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 8d * 72d;
+        double height = 6.5d * 72d;
+        double widthMargin = 0d * 72d;
+        double heightMargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthMargin, heightMargin, width - (2 * widthMargin), height - (2 * heightMargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+        pBook.append(new Printable() {
+                         private void drawString(Graphics graphics, String text, int y, int x, int size) {
+                             for (String line : text.split("\n")) {
+                                 y += graphics.getFontMetrics().getHeight() - 1;
+                                 String temp = line;
+                                 if (size > 0) {
+                                     temp = StringUtils.center(temp, size);
+                                 }
+                                 graphics.drawString(temp, 23 + x, y);
+                                 graphics.drawString(temp, 209 + x, y);
+                                 graphics.drawString(temp, 395 + x, y);
+                             }
+                         }
+
+                         public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
+                             String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                             drawString(graphics, StringUtils.center(title1.getText().toUpperCase().split(" WEIGH")[0], 22), 20, 0, 0);
+                             drawString(graphics, StringUtils.center("WEIGH BRIDGE", 22), 33, 0, 0);
+                             graphics.setFont(new Font("Courier New", Font.ITALIC, 10));
+                             drawString(graphics, WordUtils.wrap(title2.getText(), 27), 48, 0, 27);
+                             graphics.drawLine(17, 75, 193, 75);
+                             graphics.drawLine(203, 75, 379, 75);
+                             graphics.drawLine(389, 75, 565, 75);
+                             graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
+                             graphics.drawString(StringUtils.center("ORIGINAL", 26), 23, 84);
+                             graphics.drawString(StringUtils.center("DUPLICATE", 26), 209, 84);
+                             graphics.drawString(StringUtils.center("TRIPLICATE", 26), 395, 84);
+                             graphics.drawLine(17, 88, 193, 88);
+                             graphics.drawLine(203, 88, 379, 88);
+                             graphics.drawLine(389, 88, 565, 88);
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 8));
+                             drawString(graphics, "Slip No       : " + textFieldSlNo.getText(), 90, 0, 0);
+                             drawString(graphics, "Date          : " + temp[0], 110, 0, 0);
+                             drawString(graphics, "Time          : " + temp[1], 130, 0, 0);
+                             drawString(graphics, "Vehicle No    : " + comboBoxVehicleNo.getEditor().getItem(), 150, 0, 0);
+                             drawString(graphics, "Material      : " + comboBoxMaterial.getEditor().getItem(), 170, 0, 0);
+                             drawString(graphics, "Customer Name : ", 190, 0, 0);
+                             drawString(graphics, "Market Rate   : " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), 230, 0, 0);
+                             drawString(graphics, "Gross Wt      : ", 250, 0, 0);
+                             drawString(graphics, "Tare Wt       : ", 270, 0, 0);
+                             drawString(graphics, "Net Wt        : ", 290, 0, 0);
+                             drawString(graphics, "Kotta         : ", 310, 0, 0);
+                             drawString(graphics, "Total Amount  : ", 330, 0, 0);
+                             drawString(graphics, WordUtils.wrap(comboBoxCustomerName.getEditor().getItem().toString(), 17), 190, 77, 0);
+                             graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                             drawString(graphics, StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", 248, 77, 0);
+                             drawString(graphics, StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", 268, 77, 0);
+                             drawString(graphics, StringUtils.leftPad(textFieldNetWt.getText(), 7) + " Kg", 288, 77, 0);
+                             drawString(graphics, StringUtils.leftPad(textFieldDeductionOrPerCost.getText(), 7) + "   ", 308, 77, 0);
+                             drawString(graphics, StringUtils.leftPad(textFieldRoundOff.getText(), 7) + " /-", 328, 77, 0);
+                             graphics.drawLine(17, 345, 193, 345);
+                             graphics.drawLine(203, 345, 379, 345);
+                             graphics.drawLine(389, 345, 565, 345);
+                             graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
+                             drawString(graphics, StringUtils.center("Thanks you visit again...", 26), 350, 0, 0);
+
+                             graphics.drawLine(17, 15, 17, 370);
+                             graphics.drawLine(193, 15, 193, 370);
+                             graphics.drawLine(203, 15, 203, 370);
+                             graphics.drawLine(379, 15, 379, 370);
+                             graphics.drawLine(389, 15, 389, 370);
+                             graphics.drawLine(565, 15, 565, 370);
+                             graphics.drawLine(17, 15, 193, 15);
+                             graphics.drawLine(203, 15, 379, 15);
+                             graphics.drawLine(389, 15, 565, 15);
+                             graphics.drawLine(17, 370, 193, 370);
+                             graphics.drawLine(203, 370, 379, 370);
+                             graphics.drawLine(389, 370, 565, 370);
+                             return PAGE_EXISTS;
+                         }
+                     },
+                pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
     private void printPlainSriPathyWeight() {
         PrinterJob pj = PrinterJob.getPrinterJob();
         PageFormat pf = new PageFormat();
@@ -10343,7 +10440,7 @@ class WeighBridge {
         if (checkboxIceWater.isSelected()) {
             return "Rate";
         } else if (checkboxKottaSetting.isSelected()) {
-            return "Price (per kotta)";
+            return "Market Rate";
         } else {
             return "Charges";
         }
