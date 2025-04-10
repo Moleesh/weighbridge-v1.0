@@ -433,6 +433,7 @@ class WeighBridge {
     private JRadioButton radioButtonOtherStates;
     private List<MyCheckBox> reportCheckBox;
     private JCheckBox checkboxKottaSetting;
+    private JLabel labelBagDeductionOrReductionCost;
 
     /**
      * Create the application.
@@ -2852,10 +2853,10 @@ class WeighBridge {
         textFieldDeductionOrPerCost.setBounds(619, 390, 100, 25);
         panelWeighing.add(textFieldDeductionOrPerCost);
 
-        JLabel label_5 = new JLabel("Kg");
-        label_5.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        label_5.setBounds(729, 390, 25, 25);
-        panelWeighing.add(label_5);
+        labelBagDeductionOrReductionCost = new JLabel("Kg");
+        labelBagDeductionOrReductionCost.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        labelBagDeductionOrReductionCost.setBounds(729, 390, 25, 25);
+        panelWeighing.add(labelBagDeductionOrReductionCost);
 
         JLabel lblFinalWt = new JLabel("Final Wt");
         lblFinalWt.setVisible(false);
@@ -5333,7 +5334,7 @@ class WeighBridge {
             textFieldNoOfBags.setVisible(!checkboxExcludeNoOfBags.isSelected());
             lblBagDeductionOrReductionCost.setVisible(!checkboxExcludeNoOfBags.isSelected());
             textFieldDeductionOrPerCost.setVisible(!checkboxExcludeNoOfBags.isSelected());
-            label_5.setVisible(!checkboxExcludeNoOfBags.isSelected());
+            labelBagDeductionOrReductionCost.setVisible(!checkboxExcludeNoOfBags.isSelected());
             clear();
         });
         checkboxExcludeNoOfBags.setFont(new Font("Times New Roman", Font.ITALIC, 15));
@@ -5869,6 +5870,7 @@ class WeighBridge {
             if (checkboxKottaSetting.isSelected()) {
                 lblBagDeductionOrReductionCost.setText("Kotta");
                 lblCharges.setText("Market Rate");
+                labelBagDeductionOrReductionCost.setText("");
                 checkboxIceWater.setSelected(false);
                 checkboxRoundOff.setSelected(false);
                 checkboxExcludeNoOfBags.setEnabled(false);
