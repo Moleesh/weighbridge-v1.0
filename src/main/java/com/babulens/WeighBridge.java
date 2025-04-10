@@ -5878,7 +5878,7 @@ class WeighBridge {
                 checkboxIceWater.setSelected(false);
                 checkboxRoundOff.setSelected(false);
                 checkboxExcludeNoOfBags.setSelected(true);
-                checkboxAutoCharges.setSelected(true);
+                checkboxAutoCharges.setSelected(false);
                 lblBagDeductionOrReductionCost.setVisible(true);
                 textFieldDeductionOrPerCost.setVisible(true);
             }
