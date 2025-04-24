@@ -816,6 +816,7 @@ class WeighBridge {
 
     private void settings(ActionEvent... ae) {
         try {
+            checkboxKottaSetting.setEnabled(true);
             Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
             rs.absolute(1);
@@ -5326,12 +5327,14 @@ class WeighBridge {
 
         checkboxExcludeNoOfBags = new JCheckBox("Exclude Bags");
         checkboxExcludeNoOfBags.addChangeListener(_ -> {
-            textFieldNoOfBags.setEnabled(!checkboxExcludeNoOfBags.isSelected());
-            lblNoOfBags.setVisible(!checkboxExcludeNoOfBags.isSelected());
-            textFieldNoOfBags.setVisible(!checkboxExcludeNoOfBags.isSelected());
-            lblBagDeductionOrReductionCost.setVisible(!checkboxExcludeNoOfBags.isSelected());
-            textFieldDeductionOrPerCost.setVisible(!checkboxExcludeNoOfBags.isSelected());
-            label_5.setVisible(!checkboxExcludeNoOfBags.isSelected());
+            if(checkboxExcludeNoOfBags.isSelected()) {
+                textFieldNoOfBags.setEnabled(false);
+                lblNoOfBags.setVisible(false);
+                textFieldNoOfBags.setVisible(false);
+                lblBagDeductionOrReductionCost.setVisible(false);
+                textFieldDeductionOrPerCost.setVisible(false);
+                label_5.setVisible(false);
+            }
             clear();
         });
         checkboxExcludeNoOfBags.setFont(new Font("Times New Roman", Font.ITALIC, 15));
@@ -5773,7 +5776,6 @@ class WeighBridge {
         checkboxIceWater = new JCheckBox("Ice water/Freight");
         checkboxIceWater.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         checkboxIceWater.addChangeListener(_ -> {
-            checkboxKottaSetting.setEnabled(!checkboxIceWater.isSelected());
             if (checkboxIceWater.isSelected()) {
                 checkboxRoundOff.setSelected(false);
                 checkboxKottaSetting.setSelected(false);
@@ -5787,18 +5789,13 @@ class WeighBridge {
                 checkboxAutoCharges.setSelected(false);
                 checkboxExcludeNoOfBags.setEnabled(false);
                 checkboxExcludeDrivers.setEnabled(false);
-            } else {
-                if (Objects.equals(btnUnlock.getText(), "Lock")) {
-                    checkboxExcludeCustomer.setEnabled(true);
-                    checkboxExcludeCharges.setEnabled(true);
-                    checkboxExcludeDrivers.setEnabled(true);
-                }
+                lblFinalWt.setVisible(true);
+                textFieldFinalWt.setVisible(true);
+                label_6.setVisible(true);
+                textFieldFinalAmount.setVisible(true);
+                textFieldDeductionOrPerCost.setEnabled(true);
+                checkboxKottaSetting.setEnabled(false);
             }
-            lblFinalWt.setVisible(checkboxIceWater.isSelected());
-            textFieldFinalWt.setVisible(checkboxIceWater.isSelected());
-            label_6.setVisible(checkboxIceWater.isSelected());
-            textFieldFinalAmount.setVisible(checkboxIceWater.isSelected());
-            textFieldDeductionOrPerCost.setEnabled(checkboxIceWater.isSelected());
             clear();
         });
         checkboxIceWater.setFocusable(false);
@@ -5838,13 +5835,6 @@ class WeighBridge {
         checkboxRoundOff.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         checkboxRoundOff.setFocusable(false);
         checkboxRoundOff.addChangeListener(_ -> {
-            checkboxKottaSetting.setEnabled(!checkboxRoundOff.isSelected());
-            checkboxExcludeNoOfBags.setEnabled(!checkboxRoundOff.isSelected());
-            checkboxTareToken.setEnabled(!checkboxRoundOff.isSelected());
-            checkboxExitPass.setEnabled(!checkboxRoundOff.isSelected());
-            textFieldRoundOff.setVisible(checkboxRoundOff.isSelected());
-            checkboxAutoCharges.setEnabled(!checkboxRoundOff.isSelected());
-            checkboxExcludePlaceAndPhoneNumber.setEnabled(!checkboxRoundOff.isSelected());
             if (checkboxRoundOff.isSelected()) {
                 lblBagDeductionOrReductionCost.setText("Price (per kg)");
                 checkboxExcludePlaceAndPhoneNumber.setSelected(false);
@@ -5857,6 +5847,13 @@ class WeighBridge {
                 checkboxExitPass.setSelected(true);
                 lblBagDeductionOrReductionCost.setVisible(true);
                 textFieldDeductionOrPerCost.setVisible(true);
+                checkboxKottaSetting.setEnabled(false);
+                checkboxExcludeNoOfBags.setEnabled(false);
+                checkboxTareToken.setEnabled(false);
+                checkboxExitPass.setEnabled(false);
+                textFieldRoundOff.setVisible(true);
+                checkboxAutoCharges.setEnabled(false);
+                checkboxExcludePlaceAndPhoneNumber.setEnabled(false);
             }
             clear();
         });
@@ -5869,9 +5866,6 @@ class WeighBridge {
         checkboxKottaSetting.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         checkboxKottaSetting.setFocusable(false);
         checkboxKottaSetting.addChangeListener(_ -> {
-            checkboxExcludeNoOfBags.setEnabled(!checkboxKottaSetting.isSelected());
-            textFieldRoundOff.setVisible(checkboxKottaSetting.isSelected());
-            checkboxAutoCharges.setEnabled(!checkboxKottaSetting.isSelected());
             if (checkboxKottaSetting.isSelected()) {
                 lblBagDeductionOrReductionCost.setText("Kotta");
                 lblCharges.setText("Market Rate");
@@ -5881,10 +5875,12 @@ class WeighBridge {
                 checkboxAutoCharges.setSelected(false);
                 lblBagDeductionOrReductionCost.setVisible(true);
                 textFieldDeductionOrPerCost.setVisible(true);
+                checkboxExcludeNoOfBags.setEnabled(false);
+                textFieldRoundOff.setVisible(true);
+                checkboxAutoCharges.setEnabled(false);
             }
             clear();
         });
-        checkboxKottaSetting.setEnabled(false);
         checkboxKottaSetting.setBackground(new Color(0, 255, 127));
         checkboxKottaSetting.setBounds(1051, 175, 200, 25);
         panelSettings2.add(checkboxKottaSetting);
@@ -8598,37 +8594,37 @@ class WeighBridge {
                              drawString(graphics, "Vehicle No    : " + comboBoxVehicleNo.getEditor().getItem(), 150, 0, 0);
                              drawString(graphics, "Material      : " + comboBoxMaterial.getEditor().getItem(), 170, 0, 0);
                              drawString(graphics, "Customer Name : ", 190, 0, 0);
-                             drawString(graphics, "Market Rate   : " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), 230, 0, 0);
-                             drawString(graphics, "Gross Wt      : ", 250, 0, 0);
-                             drawString(graphics, "Tare Wt       : ", 270, 0, 0);
-                             drawString(graphics, "Net Wt        : ", 290, 0, 0);
-                             drawString(graphics, "Kotta         : ", 310, 0, 0);
-                             drawString(graphics, "Total Amount  : ", 330, 0, 0);
+                             drawString(graphics, "Market Rate   : " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()), 210, 0, 0);
+                             drawString(graphics, "Gross Wt      : ", 230, 0, 0);
+                             drawString(graphics, "Tare Wt       : ", 250, 0, 0);
+                             drawString(graphics, "Net Wt        : ", 270, 0, 0);
+                             drawString(graphics, "Kotta         : ", 290, 0, 0);
+                             drawString(graphics, "Total Amount  : ", 310, 0, 0);
                              drawString(graphics, WordUtils.wrap(comboBoxCustomerName.getEditor().getItem().toString(), 17), 190, 77, 0);
                              graphics.setFont(new Font("Courier New", Font.BOLD, 12));
-                             drawString(graphics, StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", 248, 77, 0);
-                             drawString(graphics, StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", 268, 77, 0);
-                             drawString(graphics, StringUtils.leftPad(textFieldNetWt.getText(), 7) + " Kg", 288, 77, 0);
-                             drawString(graphics, StringUtils.leftPad(textFieldDeductionOrPerCost.getText(), 7) + "   ", 308, 77, 0);
-                             drawString(graphics, StringUtils.leftPad(textFieldRoundOff.getText(), 7) + " /-", 328, 77, 0);
-                             graphics.drawLine(17, 345, 193, 345);
-                             graphics.drawLine(203, 345, 379, 345);
-                             graphics.drawLine(389, 345, 565, 345);
+                             drawString(graphics, StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", 228, 77, 0);
+                             drawString(graphics, StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", 248, 77, 0);
+                             drawString(graphics, StringUtils.leftPad(textFieldNetWt.getText(), 7) + " Kg", 268, 77, 0);
+                             drawString(graphics, StringUtils.leftPad(textFieldDeductionOrPerCost.getText(), 7) + "   ", 288, 77, 0);
+                             drawString(graphics, StringUtils.leftPad(textFieldRoundOff.getText(), 7) + " /-", 308, 77, 0);
+                             graphics.drawLine(17, 325, 193, 325);
+                             graphics.drawLine(203, 325, 379, 325);
+                             graphics.drawLine(389, 325, 565, 325);
                              graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
-                             drawString(graphics, StringUtils.center("Thanks you visit again...", 26), 350, 0, 0);
+                             drawString(graphics, StringUtils.center("Thanks you visit again...", 26), 330, 0, 0);
 
-                             graphics.drawLine(17, 15, 17, 370);
-                             graphics.drawLine(193, 15, 193, 370);
-                             graphics.drawLine(203, 15, 203, 370);
-                             graphics.drawLine(379, 15, 379, 370);
-                             graphics.drawLine(389, 15, 389, 370);
-                             graphics.drawLine(565, 15, 565, 370);
+                             graphics.drawLine(17, 15, 17, 350);
+                             graphics.drawLine(193, 15, 193, 350);
+                             graphics.drawLine(203, 15, 203, 350);
+                             graphics.drawLine(379, 15, 379, 350);
+                             graphics.drawLine(389, 15, 389, 350);
+                             graphics.drawLine(565, 15, 565, 350);
                              graphics.drawLine(17, 15, 193, 15);
                              graphics.drawLine(203, 15, 379, 15);
                              graphics.drawLine(389, 15, 565, 15);
-                             graphics.drawLine(17, 370, 193, 370);
-                             graphics.drawLine(203, 370, 379, 370);
-                             graphics.drawLine(389, 370, 565, 370);
+                             graphics.drawLine(17, 350, 193, 350);
+                             graphics.drawLine(203, 350, 379, 350);
+                             graphics.drawLine(389, 350, 565, 350);
                              return PAGE_EXISTS;
                          }
                      },
