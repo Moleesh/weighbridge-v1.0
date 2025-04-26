@@ -5331,8 +5331,6 @@ class WeighBridge {
                 textFieldNoOfBags.setEnabled(false);
                 lblNoOfBags.setVisible(false);
                 textFieldNoOfBags.setVisible(false);
-                lblBagDeductionOrReductionCost.setVisible(false);
-                textFieldDeductionOrPerCost.setVisible(false);
                 label_5.setVisible(false);
             }
             clear();
@@ -5871,7 +5869,7 @@ class WeighBridge {
                 lblCharges.setText("Market Rate");
                 checkboxIceWater.setSelected(false);
                 checkboxRoundOff.setSelected(false);
-                checkboxExcludeNoOfBags.setSelected(false);
+                checkboxExcludeNoOfBags.setSelected(true);
                 checkboxAutoCharges.setSelected(false);
                 lblBagDeductionOrReductionCost.setVisible(true);
                 textFieldDeductionOrPerCost.setVisible(true);
