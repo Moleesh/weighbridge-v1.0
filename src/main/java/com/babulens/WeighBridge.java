@@ -816,7 +816,6 @@ class WeighBridge {
 
     private void settings(ActionEvent... ae) {
         try {
-            checkboxKottaSetting.setEnabled(true);
             Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
             rs.absolute(1);
@@ -5060,6 +5059,7 @@ class WeighBridge {
                     checkboxEnableSettings2.setEnabled(true);
                     checkboxExcludeDcNo.setEnabled(true);
                     checkboxPrinterCopyDialog.setEnabled(true);
+                    checkboxKottaSetting.setEnabled(true);
                 }
             } else {
                 btnUnlock.setText("Unlock");
@@ -5086,6 +5086,7 @@ class WeighBridge {
                 checkboxExcludePlaceAndPhoneNumber.setEnabled(false);
                 checkboxExcludeCredit.setEnabled(false);
                 checkboxExcludeVehicleType.setEnabled(false);
+                checkboxKottaSetting.setEnabled(false);
             }
         });
         btnUnlock.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -5327,12 +5328,12 @@ class WeighBridge {
 
         checkboxExcludeNoOfBags = new JCheckBox("Exclude Bags");
         checkboxExcludeNoOfBags.addChangeListener(_ -> {
-            if(checkboxExcludeNoOfBags.isSelected()) {
-                textFieldNoOfBags.setEnabled(false);
-                lblNoOfBags.setVisible(false);
-                textFieldNoOfBags.setVisible(false);
-                label_5.setVisible(false);
-            }
+            textFieldNoOfBags.setEnabled(!checkboxExcludeNoOfBags.isSelected());
+            lblNoOfBags.setVisible(!checkboxExcludeNoOfBags.isSelected());
+            textFieldNoOfBags.setVisible(!checkboxExcludeNoOfBags.isSelected());
+            lblBagDeductionOrReductionCost.setVisible(!checkboxExcludeNoOfBags.isSelected());
+            textFieldDeductionOrPerCost.setVisible(!checkboxExcludeNoOfBags.isSelected());
+            label_5.setVisible(!checkboxExcludeNoOfBags.isSelected());
             clear();
         });
         checkboxExcludeNoOfBags.setFont(new Font("Times New Roman", Font.ITALIC, 15));
@@ -5863,6 +5864,7 @@ class WeighBridge {
         checkboxKottaSetting.setSelected(false);
         checkboxKottaSetting.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         checkboxKottaSetting.setFocusable(false);
+        checkboxKottaSetting.setEnabled(false);
         checkboxKottaSetting.addChangeListener(_ -> {
             if (checkboxKottaSetting.isSelected()) {
                 lblBagDeductionOrReductionCost.setText("Kotta");
