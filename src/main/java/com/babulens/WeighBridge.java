@@ -1930,7 +1930,7 @@ class WeighBridge {
             if (checkboxKottaSetting.isSelected()) {
                 decimalFormat.setMaximumFractionDigits(2);
                 textFieldDeductionOrPerCost.setText(decimalFormat.format(Double.parseDouble(0 + textFieldNetWt.getText()) / 87));
-                textFieldRoundOff.setText(decimalFormat.format(Double.parseDouble(0 + textFieldDeductionOrPerCost.getText()) * Double.parseDouble(0 + textFieldCharges.getText())));
+                textFieldRoundOff.setText(Integer.toString((int) (Double.parseDouble(0 + textFieldDeductionOrPerCost.getText()) * Double.parseDouble(0 + textFieldCharges.getText()))));
             }
 
             textFieldNoOfBags.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
@@ -2281,7 +2281,7 @@ class WeighBridge {
             if (checkboxKottaSetting.isSelected()) {
                 decimalFormat.setMaximumFractionDigits(2);
                 textFieldDeductionOrPerCost.setText(decimalFormat.format(Double.parseDouble(0 + textFieldNetWt.getText()) / 87));
-                textFieldRoundOff.setText(decimalFormat.format(Double.parseDouble(0 + textFieldDeductionOrPerCost.getText()) * Double.parseDouble(0 + textFieldCharges.getText())));
+                textFieldRoundOff.setText(Integer.toString((int) (Double.parseDouble(0 + textFieldDeductionOrPerCost.getText()) * Double.parseDouble(0 + textFieldCharges.getText()))));
             }
 
             textFieldNoOfBags.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
@@ -5871,7 +5871,7 @@ class WeighBridge {
                 lblCharges.setText("Market Rate");
                 checkboxIceWater.setSelected(false);
                 checkboxRoundOff.setSelected(false);
-                checkboxExcludeNoOfBags.setSelected(true);
+                checkboxExcludeNoOfBags.setSelected(false);
                 checkboxAutoCharges.setSelected(false);
                 lblBagDeductionOrReductionCost.setVisible(true);
                 textFieldDeductionOrPerCost.setVisible(true);
