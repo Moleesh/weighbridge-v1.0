@@ -5871,11 +5871,11 @@ class WeighBridge {
                 lblCharges.setText("Market Rate");
                 checkboxIceWater.setSelected(false);
                 checkboxRoundOff.setSelected(false);
+                checkboxExcludeNoOfBags.setEnabled(false);
                 checkboxExcludeNoOfBags.setSelected(true);
                 checkboxAutoCharges.setSelected(false);
                 lblBagDeductionOrReductionCost.setVisible(true);
                 textFieldDeductionOrPerCost.setVisible(true);
-                checkboxExcludeNoOfBags.setEnabled(false);
                 textFieldRoundOff.setVisible(true);
                 checkboxAutoCharges.setEnabled(false);
             }
