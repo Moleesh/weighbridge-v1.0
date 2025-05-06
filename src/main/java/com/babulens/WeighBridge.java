@@ -7972,6 +7972,7 @@ class WeighBridge {
         double heightMargin = .25d * 72d;
         paper.setSize(width, height);
         paper.setImageableArea(widthMargin, heightMargin, width - (2 * widthMargin), height - (2 * heightMargin));
+        pf.setOrientation(PageFormat.PORTRAIT);
         pf.setPaper(paper);
         Book pBook = new Book();
         pBook.append(new Printable() {
