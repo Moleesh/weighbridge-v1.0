@@ -7943,7 +7943,7 @@ class WeighBridge {
                              drawString(graphics, StringUtils.rightPad(textFieldNetWt.getText(), 7) + "Kg", xCoordinate, coordinates.y - 4);
 
                              try {
-                                 BufferedImage printImage = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
+                                 BufferedImage printImage = getAvailableImage(1);
                                  BufferedImage cropImage = printImage.getSubimage(
                                          Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                                  graphics.drawImage(cropImage, 250, 115, 300, (int) (300.00 / cropImage.getWidth() * cropImage.getHeight()), null);
@@ -8006,14 +8006,14 @@ class WeighBridge {
                                  BufferedImage cropImage1 = null, cropImage2 = null;
 
                                  try {
-                                     BufferedImage printImage1 = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
+                                     BufferedImage printImage1 = getAvailableImage(1);
                                      cropImage1 = printImage1.getSubimage(
                                              Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                                  } catch (IOException ignored) {
                                  }
 
                                  try {
-                                     BufferedImage printImage2 = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_2.jpg"));
+                                     BufferedImage printImage2 = getAvailableImage(2);
                                      cropImage2 = printImage2.getSubimage(
                                              Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
                                  } catch (IOException ignored) {
@@ -8115,7 +8115,7 @@ class WeighBridge {
                              drawString(graphics, initString, 0, coordinates.y);
 
                              try {
-                                 BufferedImage printImage = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
+                                 BufferedImage printImage = getAvailableImage(1);
                                  BufferedImage cropImage = printImage.getSubimage(
                                          Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                                  graphics.drawImage(cropImage, 250, 125, 300, (int) (300.00 / cropImage.getWidth() * cropImage.getHeight()), null);
@@ -8162,66 +8162,66 @@ class WeighBridge {
 
                              String[] temp = (textFieldNetDateTime.getText() + " . . ").split(" ");
                              String initString = "\n\n" + StringUtils.center(title1.getText(), 62);
-                             graphics.setFont(new Font("Courier New", Font.BOLD, 15));
+                             graphics.setFont(new Font("Roboto Mono", Font.BOLD, 15));
 
                              Coordinates coordinates = drawString(graphics, initString, 0, 0);
                              initString = StringUtils.center(title2.getText(), 73);
-                             graphics.setFont(new Font("Courier New", Font.BOLD + Font.ITALIC, 13));
+                             graphics.setFont(new Font("Roboto Mono", Font.BOLD + Font.ITALIC, 13));
                              coordinates = drawString(graphics, initString, 0, coordinates.y);
 
                              initString = StringUtils.center("WEIGHMENT RECEIPT", 79) + "\n";
-                             graphics.setFont(new Font("Courier New", Font.BOLD + Font.ITALIC, 12));
+                             graphics.setFont(new Font("Roboto Mono", Font.BOLD + Font.ITALIC, 12));
                              coordinates = drawString(graphics, initString, 0, coordinates.y);
 
                              initString = String.format(format, "", "Sl.No") + textFieldSlNo.getText() + "\n\n" + String.format(format, "", "Date") + temp[0] + "\n\n" + String.format(format, "", "Time") + temp[1] + " " + temp[2] + "\n\n" + String.format(format, "", "Vehicle No") + comboBoxVehicleNo.getEditor().getItem() + "\n\n" + String.format(format, "", "Material") + comboBoxMaterial.getEditor().getItem() + "\n\n" + String.format(format, "", "Customer/Supplier") + comboBoxCustomerName.getEditor().getItem() + "\n\n" + (checkboxExcludeCharges.isSelected() && textFieldCharges.getText().equals("0") ? "" : String.format(format, "", "Charges") + "Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText()) + "\n\n");
-                             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+                             graphics.setFont(new Font("Roboto Mono", Font.BOLD, 10));
                              coordinates = drawString(graphics, initString, 0, coordinates.y);
 
                              initString = String.format(format, "", "Gross Wt");
-                             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+                             graphics.setFont(new Font("Roboto Mono", Font.BOLD, 10));
                              int yTemp = coordinates.y;
                              coordinates = drawString(graphics, initString, 0, coordinates.y);
                              int y = coordinates.y;
 
                              initString = StringUtils.rightPad(textFieldGrossWt.getText(), 7) + "Kg";
-                             graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                             graphics.setFont(new Font("Roboto Mono", Font.BOLD, 12));
                              drawString(graphics, initString, coordinates.x, yTemp);
 
                              initString = String.format(format, "", "Tare Wt");
-                             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+                             graphics.setFont(new Font("Roboto Mono", Font.BOLD, 10));
                              yTemp = y;
                              coordinates = drawString(graphics, initString, 0, y);
                              y = coordinates.y;
 
                              initString = StringUtils.rightPad(textFieldTareWt.getText(), 7) + "Kg";
-                             graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                             graphics.setFont(new Font("Roboto Mono", Font.BOLD, 12));
                              drawString(graphics, initString, coordinates.x, yTemp);
 
                              initString = String.format(format, "", "Net Wt");
-                             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+                             graphics.setFont(new Font("Roboto Mono", Font.BOLD, 10));
                              yTemp = y;
                              coordinates = drawString(graphics, initString, 0, y);
 
                              initString = StringUtils.rightPad(textFieldNetWt.getText(), 7) + "Kg";
-                             graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                             graphics.setFont(new Font("Roboto Mono", Font.BOLD, 12));
                              coordinates = drawString(graphics, initString, coordinates.x, yTemp);
 
                              initString = "\n\n\n" + "     " + StringUtils.rightPad(textFieldFooter.getText(), 60, " ") + "Authorised Signature";
-                             graphics.setFont(new Font("Courier New", Font.BOLD + Font.ITALIC, 10));
+                             graphics.setFont(new Font("Roboto Mono", Font.BOLD + Font.ITALIC, 10));
                              drawString(graphics, initString, 0, coordinates.y);
 
                              try {
                                  BufferedImage cropImage1 = null, cropImage2 = null;
 
                                  try {
-                                     BufferedImage printImage1 = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg"));
+                                     BufferedImage printImage1 = getAvailableImage(1);
                                      cropImage1 = printImage1.getSubimage(
                                              Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                                  } catch (IOException ignored) {
                                  }
 
                                  try {
-                                     BufferedImage printImage2 = ImageIO.read(new File("CameraOutput/" + textFieldSlNo.getText() + "_2.jpg"));
+                                     BufferedImage printImage2 = getAvailableImage(2);
                                      cropImage2 = printImage2.getSubimage(
                                              Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
                                  } catch (IOException ignored) {
@@ -9748,6 +9748,21 @@ class WeighBridge {
         return failedSlNo;
     }
 
+    private BufferedImage getAvailableImage(int no) throws IOException {
+        String basePath = "CameraOutput/" + textFieldSlNo.getText();
+        String[] affixes = {"_G", "_T", ""};
+
+        for (String affix : affixes) {
+            File file = new File(basePath + affix + "_" + no + ".jpg");
+
+            if (file.exists()) {
+                return ImageIO.read(file);
+            }
+        }
+
+        throw new IOException();
+    }
+
     private synchronized void initializeWeights() {
         for (SerialPort serialPort : SerialPort.getCommPorts()) {
             if (serialPort.getSystemPortName().equals(textFieldPortName.getText().split(";")[0].toUpperCase())) {
@@ -10069,9 +10084,10 @@ class WeighBridge {
     }
 
     private void onSave(ActionEvent... ae) {
+        String affix = radioButtonTare.isSelected() ? "_T" : "_G";
         if (checkboxCamera.isSelected()) {
             if (checkBoxCamera1.isSelected()) {
-                File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_1.jpg");
+                File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + affix + "_1.jpg");
                 try {
                     ImageIO.write(webcam[1].getImage(), "jpg", outputfile);
                 } catch (IOException | IllegalArgumentException ignored) {
@@ -10079,7 +10095,7 @@ class WeighBridge {
                 }
             }
             if (checkBoxCamera2.isSelected()) {
-                File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_2.jpg");
+                File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + affix + "_2.jpg");
                 try {
                     ImageIO.write(webcam[2].getImage(), "jpg", outputfile);
                 } catch (IOException | IllegalArgumentException ignored) {
@@ -10087,7 +10103,7 @@ class WeighBridge {
                 }
             }
             if (checkBoxCamera3.isSelected()) {
-                File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_3.jpg");
+                File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + affix + "_3.jpg");
                 try {
                     ImageIO.write(webcam[3].getImage(), "jpg", outputfile);
                 } catch (IOException | IllegalArgumentException ignored) {
@@ -10095,7 +10111,7 @@ class WeighBridge {
                 }
             }
             if (checkBoxCamera4.isSelected()) {
-                File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + "_4.jpg");
+                File outputfile = new File("CameraOutput/" + textFieldSlNo.getText() + affix + "_4.jpg");
                 try {
                     ImageIO.write(webcam[4].getImage(), "jpg", outputfile);
                 } catch (IOException | IllegalArgumentException ignored) {
