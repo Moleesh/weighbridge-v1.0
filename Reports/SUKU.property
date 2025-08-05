@@ -1,0 +1,87 @@
+{
+	"html": "SUKU",
+	"reportFields": [
+		{
+			"key": "invoiceNo",
+			"name": "Invoice No",
+			"checked": true
+		}
+	],
+	"hiddenFields": [
+	],
+	"leftFields": [
+		{
+			"key": "invoiceNo",
+			"name": "Invoice No",
+			"type": "invoiceNo"
+		},
+        {
+            "key": "material",
+            "name": "Name of Mineral",
+            "type": "material"
+        },
+        {
+            "key": "quantity",
+            "name": "Quantity(in MT)"
+        },
+        {
+            "key": "bulkTransitPassNo",
+            "name": "Bulk Transit Pass No"
+        },
+        {
+            "key": "vehicleNo",
+            "name": "Vehicle No",
+            "type": "vehicleNo"
+        },
+        {
+              "key": "distance",
+              "name": "Approximate Distance"
+        },
+		{
+			"key": "timeStart",
+			"name": "Time Start",
+			"type": "date",
+			"dateFormat": "dd-MM-yyyy",
+			"timeFormat": "HH:mm"
+		},
+		{
+            "key": "timeEnd",
+            "name": "Time End",
+            "type": "date",
+			"dateFormat": "dd-MM-yyyy",
+			"timeFormat": "HH:mm"
+        }
+	],
+	"rightFields": [
+		{
+			"type": "blank"
+		},
+        {
+            "key": "securityPaperSerialNo",
+            "name": "Security Paper Serial No"
+        },
+        {
+            "key": "transitPassSerialNo",
+            "name": "Transit Pass Serial No"
+        },
+        {
+            "key": "driver",
+            "name": "Name of Vehicle Driver",
+            "type": "transporter"
+        },
+        {
+            "key": "destination",
+            "name": "Destination and State",
+            "type": "destination"
+        },
+		{
+            "key": "buyer",
+            "name": "Purchaser",
+            "type": "buyer"
+        },
+        {
+            "key": "Address of the Purchaser",
+            "name": "Address"
+        }
+	]
+}

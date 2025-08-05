@@ -155,10 +155,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Vector;
@@ -997,6 +997,18 @@ class WeighBridge {
         invoiceFields.forEach((key, component) -> {
             if (component instanceof JTextField) {
                 invoiceData.put(key, ((JTextField) component).getText());
+            } else if (component instanceof DateTimePicker dateTimePicker) {
+                String datePattern = dateTimePicker.getDatePicker().getSettings().getFormatForDatesCommonEra().toString();
+                String timePattern = dateTimePicker.getTimePicker().getSettings().getFormatForDisplayTime().toString();
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern + " " + timePattern);
+                LocalDateTime dateTime = dateTimePicker.getDateTimeStrict();
+
+                invoiceData.put(key, Optional.ofNullable(dateTime)
+                        .map(dt -> dt.format(formatter))
+                        .orElse(""));
+
+                invoiceData.put(key + "_data", String.valueOf(dateTime));
             }
         });
 
@@ -1032,11 +1044,16 @@ class WeighBridge {
         ObjectNode invoiceData = getInvoiceData();
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             JsonNode invoiceProperty = new ObjectMapper().readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
-            String htmlContent = new String(Files.readAllBytes(Paths.get("Reports/html/" + invoiceProperty.path("html").asText("") + (radioButtonLocal.isSelected() ? "-local" : "-otherState") + ".html")));
 
-            Iterator<Map.Entry<String, JsonNode>> fieldsIterator = invoiceData.fields();
-            while (fieldsIterator.hasNext()) {
-                Map.Entry<String, JsonNode> entry = fieldsIterator.next();
+            Path path = Paths.get("Reports/html/" + invoiceProperty.path("html").asText("") + (radioButtonLocal.isSelected() ? "-local" : "-otherState") + ".html");
+            if (!Files.exists(path)) {
+                path = Paths.get("Reports/html/" + invoiceProperty.path("html").asText("") + ".html");
+            }
+
+            String htmlContent = new String(Files.readAllBytes(path));
+
+            Set<Map.Entry<String, JsonNode>> fieldsIterator = invoiceData.properties();
+            for (Map.Entry<String, JsonNode> entry : fieldsIterator) {
                 String key = entry.getKey();
                 String value = StringEscapeUtils.escapeHtml4(entry.getValue().asText());
                 htmlContent = htmlContent.replaceAll("\\$\\{" + key + "}", value);
@@ -1067,6 +1084,8 @@ class WeighBridge {
         invoiceFields.forEach((_, component) -> {
             if (component instanceof JTextField) {
                 ((JTextField) component).setText("");
+            } else if (component instanceof DateTimePicker) {
+                ((DateTimePicker) component).setDateTimeStrict(LocalDateTime.now());
             }
             component.setEnabled(true);
         });
@@ -1110,12 +1129,12 @@ class WeighBridge {
             for (JsonNode field : fields) {
                 panelToAdd.add(Box.createRigidArea(new Dimension(0, 20)));
                 JPanel panel = new JPanel();
-                panel.setMaximumSize(new Dimension(400, 25));
+                panel.setMaximumSize(new Dimension(500, 25));
                 panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
                 panel.setBackground(new Color(0, 255, 127));
 
                 JLabel label = new JLabel(field.path("name").asText(""));
-                label.setPreferredSize(new Dimension(150, 25));
+                label.setPreferredSize(new Dimension(250, 25));
                 label.setFont(new Font("Times New Roman", Font.ITALIC, 20));
                 panel.add(label);
                 panel.add(getInvoiceField(field));
@@ -1146,7 +1165,7 @@ class WeighBridge {
                 materialSet.forEach(comboBox::addItem);
                 jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
                 jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
-                invoiceFields.put("material", jTextField);
+                invoiceFields.put(field.path("key").asText("material"), jTextField);
                 return comboBox;
             }
             case "vehicleNo": {
@@ -1157,7 +1176,7 @@ class WeighBridge {
                 vehicleTypeSet.forEach(comboBox::addItem);
                 jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
                 jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
-                invoiceFields.put("vehicleNo", jTextField);
+                invoiceFields.put(field.path("key").asText("vehicleNo"), jTextField);
                 return comboBox;
             }
             case "buyer": {
@@ -1168,8 +1187,41 @@ class WeighBridge {
                 customerSet.forEach(comboBox::addItem);
                 jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
                 jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
-                invoiceFields.put("buyer", jTextField);
+                invoiceFields.put(field.path("key").asText("buyer"), jTextField);
                 return comboBox;
+            }
+            case "transporter": {
+                JComboBox<String> comboBox = new JComboBox<>();
+                comboBox.setEditable(true);
+                AutoCompleteDecorator.decorate(comboBox);
+                comboBox.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+                transportSet.forEach(comboBox::addItem);
+                jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
+                jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
+                invoiceFields.put(field.path("key").asText("transporter"), jTextField);
+                return comboBox;
+            }
+            case "date": {
+                DatePickerSettings datePickerSettings = new DatePickerSettings();
+                datePickerSettings.setFormatForDatesCommonEra(field.path("dateFormat").asText("dd-MM-yyyy"));
+                datePickerSettings.setFormatForDatesBeforeCommonEra(field.path("dateFormat").asText("dd-MM-yyyy"));
+                TimePickerSettings timePickerSettings = new TimePickerSettings();
+                timePickerSettings.setFormatForDisplayTime(field.path("timeFormat").asText("hh:mm a"));
+                DateTimePicker dateTimePicker = new DateTimePicker(datePickerSettings, timePickerSettings);
+                dateTimePicker.setDateTimeStrict(LocalDateTime.now());
+                dateTimePicker.datePicker.getComponentDateTextField().setEditable(false);
+                dateTimePicker.datePicker.getComponentDateTextField().addActionListener(_ -> {
+                    dateTimePicker.timePicker.getComponentTimeTextField().selectAll();
+                    dateTimePicker.timePicker.getComponentTimeTextField().requestFocus();
+                });
+                dateTimePicker.timePicker.getComponentTimeTextField().addActionListener(_ -> {
+                    valueEntered = true;
+                    JOptionPane.getRootFrame().dispose();
+                });
+
+                invoiceFields.put(field.path("key").asText(""), dateTimePicker);
+
+                return dateTimePicker;
             }
             case "invoiceNo": {
                 jTextField = new JTextField(getInvoicePrefix(field) + invoiceNo + field.path("invoiceSuffix").asText(""));
@@ -3849,13 +3901,13 @@ class WeighBridge {
         panelInvoice.setLayout(null);
 
         panelInvoiceLeft = new JPanel();
-        panelInvoiceLeft.setBounds(45, 39, 400, 480);
+        panelInvoiceLeft.setBounds(45, 39, 550, 480);
         panelInvoiceLeft.setBackground(new Color(0, 255, 127));
         panelInvoiceLeft.setLayout(new BoxLayout(panelInvoiceLeft, BoxLayout.Y_AXIS));
         panelInvoice.add(panelInvoiceLeft);
 
         panelInvoiceRight = new JPanel();
-        panelInvoiceRight.setBounds(460, 40, 400, 480);
+        panelInvoiceRight.setBounds(660, 40, 550, 480);
         panelInvoiceRight.setBackground(new Color(0, 255, 127));
         panelInvoiceRight.setLayout(new BoxLayout(panelInvoiceRight, BoxLayout.Y_AXIS));
         panelInvoice.add(panelInvoiceRight);
@@ -4002,6 +4054,11 @@ class WeighBridge {
                         invoiceFields.forEach((key, component) -> {
                             if (component instanceof JTextField) {
                                 ((JTextField) component).setText(invoiceData.path(key).asText(""));
+                            } else if (component instanceof DateTimePicker) {
+                                try {
+                                    ((DateTimePicker) component).setDateTimeStrict(LocalDateTime.parse(invoiceData.path(key + "_data").asText("")));
+                                } catch (Exception ignored) {
+                                }
                             }
                         });
                         return;
