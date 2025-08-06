@@ -10601,12 +10601,15 @@ class WeighBridge {
 
         CompositeDriver() {
             try {
-                add(new IpCamDriver(new IpCamStorage("cameras.xml")));
+                try {
+                    add(new IpCamDriver(new IpCamStorage("cameras.xml")));
 
-            } catch (NullPointerException | WebcamException ignored) {
-                add(new IpCam());
+                } catch (NullPointerException | WebcamException ignored) {
+                    add(new IpCam());
+                }
+                add(new WebcamDefaultDriver());
+            } catch (Exception ignored) {
             }
-            add(new WebcamDefaultDriver());
         }
     }
 
