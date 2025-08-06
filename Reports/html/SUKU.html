@@ -16,31 +16,65 @@
         body {
             width: 204mm;
             height: 297mm;
-            margin: 12px;
-            padding: 0;
+            margin: 80px;
             font-family: Roboto;
             font-size: 7pt;
         }
 
 		table {
-            width: 100%;
+			width: 83%;
             border-collapse: collapse;
         }
 
         td {
-            border: 1px solid #000;
-            padding: 4px;
+            border: 1.5px solid #000;
+            padding: 3px 5px;
             vertical-align: top;
         }
-
-		.qr {
-			width: 50px;
-			height: 50px;
+		
+		.first {
+			width: 28%;
 		}
 
-        .signature {
-			height: 30px;
+		.second {
+			width: 22%;
+		}
+		
+		.third {
+			width: 25%;
+		}
+		
+		.qr {
+			width: 70px;
+			margin-left: 580px;
+		}
+
+        .signatureicon {
+			height: 28px;
+			margin: 1px 2px;
         }
+		
+		.header {
+			margin-top: -4px;
+			margin-left: 284px;
+			padding-bottom: 2px;
+		}
+		
+		.duplicate {
+			margin-left: 277px;
+		}
+		
+		.date {
+			margin-left: 128px;
+		}
+		
+		.signature {
+			height: 44px;
+		}
+		
+		.break {
+			height: 106px;
+		}
     </style>
     <title></title>
 </head>
@@ -48,14 +82,14 @@
 <body>
 <div class="container">
     <img class="qr" alt="" src="data:image/png;base64,${QR}" />
-    <div class="note-header">Original Date &amp; Time of Dispatch : ${dispatchTime}</div>
+	<div class="header">Original<span class="date">Date &amp; Time of Dispatch : ${dispatchTime}</span></div>
     <table class="header-table">
         <tbody>
 			<tr>
-				<td>Registration Number :</td>
-				<td>TN-TNV/M2/12678/2020</td>
-				<td>Location of the Stockyard :</td>
-				<td>TNVSY0003</td>
+				<td class="first">Registration Number :</td>
+				<td class="second">TN-TNV/M2/12678/2020</td>
+				<td class="third">Location of the Stockyard :</td>
+				<td class="third">TNVSY0003</td>
 			</tr>
 			<tr>
 				<td colspan="2" rowspan="3">
@@ -64,74 +98,163 @@
 					<div>182/1B,THIRUVAMBALAPURAM ,THIRUVAMBALAPURAM</div>
 					<div>POST,RADHAPURAM TALUK,TIRUNELVELI -627130</div>
 				</td>
-				<td>SF.No / Extent :</td>
-				<td>182/1B,etc. / 001.78.98</td>
+				<td class="third">SF.No / Extent :</td>
+				<td class="third">182/1B,etc. / 001.78.98</td>
 			</tr>
 			<tr>
-				<td>Village :</td>
-				<td>Thiruvambala Puram</td>
+				<td class="third">Village :</td>
+				<td class="third">Thiruvambala Puram</td>
 			</tr>
 			<tr>
-				<td>Taluk :</td>
-				<td>Radhapuram</td>
+				<td class="third">Taluk :</td>
+				<td class="third">Radhapuram</td>
 			</tr>
 			<tr>
-				<td>Name of Mineral / Mineral Products :</td>
-				<td>${material}</td>
-				<td>District :</td>
-				<td>Tirunelveli</td>
+				<td class="first">Name of Mineral / Mineral Products :</td>
+				<td class="second">${material}</td>
+				<td class="third">District :</td>
+				<td class="third">Tirunelveli</td>
 			</tr>
 			<tr>
-				<td>Quantity(in MT) :</td>
-				<td>${quantity}</td>
-				<td>Validity of Stockyard :</td>
-				<td>11-03-2024 - 10-03-2027</td>
+				<td class="first">Quantity(in MT) :</td>
+				<td class="second">${quantityMT}</td>
+				<td class="third">Validity of Stockyard :</td>
+				<td class="third">11-03-2024 - 10-03-2027</td>
 			</tr>
 			<tr>
-				<td>Bulk Transit Pass No :</td>
-				<td>${bulkTransitPassNo}</td>
-				<td>Security Paper Serial No :</td>
-				<td>${securityPaperSerialNo}</td>
+				<td class="first">Bulk Transit Pass No :</td>
+				<td class="second">${bulkTransitPassNo}</td>
+				<td class="third">Security Paper Serial No :</td>
+				<td class="third">${securityPaperSerialNo}</td>
 			</tr>
 			<tr>
-				<td>Vehicle No :</td>
-				<td>${vehicleNo}</td>
-				<td>Transit Pass Serial No :</td>
-				<td>${transitPassSerialNo}</td>
+				<td class="first">Vehicle No :</td>
+				<td class="second">${vehicleNo}</td>
+				<td class="third">Transit Pass Serial No :</td>
+				<td class="third">${transitPassSerialNo}</td>
 			</tr>
 			<tr>
-				<td>Approximate Distance :</td>
-				<td>${distance}kms</td>
-				<td>Name of the Purchaser :</td>
-				<td>${buyer}</td>
+				<td class="first">Approximate Distance :</td>
+				<td class="second">${distance}kms</td>
+				<td class="third">Name of the Purchaser :</td>
+				<td class="third">${buyer}</td>
 			</tr>
 			<tr>
-				<td>Time Start :</td>
-				<td>${timeStart}</td>
+				<td class="first">Time Start :</td>
+				<td class="second">${timeStart}</td>
 				<td colspan="2" rowspan="3">
 					<div>Address of the Purchaser :</div>
 					<div>${address}</div>
 				</td>
 			</tr>
 			<tr>
-				<td>Time End :</td>
-				<td>${timeEnd}</td>
+				<td class="first">Time End :</td>
+				<td class="second">${timeEnd}</td>
 			</tr>
 			<tr>
-				<td>Name of Vehicle Driver :</td>
-				<td>${transporter}</td>
+				<td class="first">Name of Vehicle Driver :</td>
+				<td class="second">${driver}</td>
 			</tr>
 			<tr>
-				<td>Destination and State :</td>
-				<td>${destination}</td>
-				<td>Signature of AD / DD :</td>
-				<td><img class="signature" src="./Reports/html/images/signature.png" alt="" /></td>
+				<td class="first">Destination and State :</td>
+				<td class="second">${destination}</td>
+				<td class="third">Signature of AD / DD :</td>
+				<td class="third"><img class="signatureicon" src="./Reports/html/images/signature.png" alt="" /></td>
 			</tr>
 			<tr>
-				<td>Driver Signature :</td>
-				<td></td>
-				<td>Registree Signature :</td>
-				<td></td>
+				<td class="first signature">Driver Signature :</td>
+				<td class="second signature"/>
+				<td class="third signature">Registree Signature :</td>
+				<td class="third signature"/>
+			</tr>
+        </tbody>
+    </table>
+	<div class="break"/>
+	<img class="qr" alt="" src="data:image/png;base64,${QR}" />
+	<div class="header duplicate">Duplicate<span class="date">Date &amp; Time of Dispatch : ${dispatchTime}</span></div>
+    <table class="header-table">
+        <tbody>
+			<tr>
+				<td class="first">Registration Number :</td>
+				<td class="second">TN-TNV/M2/12678/2020</td>
+				<td class="third">Location of the Stockyard :</td>
+				<td class="third">TNVSY0003</td>
+			</tr>
+			<tr>
+				<td colspan="2" rowspan="3">
+					<div>Name and Address of the Register Holder :</div>
+					<div>C.SUKU</div>
+					<div>182/1B,THIRUVAMBALAPURAM ,THIRUVAMBALAPURAM</div>
+					<div>POST,RADHAPURAM TALUK,TIRUNELVELI -627130</div>
+				</td>
+				<td class="third">SF.No / Extent :</td>
+				<td class="third">182/1B,etc. / 001.78.98</td>
+			</tr>
+			<tr>
+				<td class="third">Village :</td>
+				<td class="third">Thiruvambala Puram</td>
+			</tr>
+			<tr>
+				<td class="third">Taluk :</td>
+				<td class="third">Radhapuram</td>
+			</tr>
+			<tr>
+				<td class="first">Name of Mineral / Mineral Products :</td>
+				<td class="second">${material}</td>
+				<td class="third">District :</td>
+				<td class="third">Tirunelveli</td>
+			</tr>
+			<tr>
+				<td class="first">Quantity(in MT) :</td>
+				<td class="second">${quantityMT}</td>
+				<td class="third">Validity of Stockyard :</td>
+				<td class="third">11-03-2024 - 10-03-2027</td>
+			</tr>
+			<tr>
+				<td class="first">Bulk Transit Pass No :</td>
+				<td class="second">${bulkTransitPassNo}</td>
+				<td class="third">Security Paper Serial No :</td>
+				<td class="third">${securityPaperSerialNo}</td>
+			</tr>
+			<tr>
+				<td class="first">Vehicle No :</td>
+				<td class="second">${vehicleNo}</td>
+				<td class="third">Transit Pass Serial No :</td>
+				<td class="third">${transitPassSerialNo}</td>
+			</tr>
+			<tr>
+				<td class="first">Approximate Distance :</td>
+				<td class="second">${distance}kms</td>
+				<td class="third">Name of the Purchaser :</td>
+				<td class="third">${buyer}</td>
+			</tr>
+			<tr>
+				<td class="first">Time Start :</td>
+				<td class="second">${timeStart}</td>
+				<td colspan="2" rowspan="3">
+					<div>Address of the Purchaser :</div>
+					<div>${address}</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="first">Time End :</td>
+				<td class="second">${timeEnd}</td>
+			</tr>
+			<tr>
+				<td class="first">Name of Vehicle Driver :</td>
+				<td class="second">${driver}</td>
+			</tr>
+			<tr>
+				<td class="first">Destination and State :</td>
+				<td class="second">${destination}</td>
+				<td class="third">Signature of AD / DD :</td>
+				<td class="third"><img class="signatureicon" src="./Reports/html/images/signature.png" alt="" /></td>
+			</tr>
+			<tr>
+				<td class="first signature">Driver Signature :</td>
+				<td class="second signature"/>
+				<td class="third signature">Registree Signature :</td>
+				<td class="third signature"/>
 			</tr>
         </tbody>
     </table>

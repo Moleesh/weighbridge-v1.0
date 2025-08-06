@@ -10,7 +10,7 @@
 	"hiddenFields": [
         {
             "key": "QRFormat",
-            "value": "${bulkTransitPassNo},${material}(${quantity}MT),${timeStart},${transitPassSerialNo},${securityPaperSerialNo},${address}"
+            "value": "${bulkTransitPassNo},${material}(${quantityMT}MT),${timeStart},${transitPassSerialNo},${vehicleNo},${address}"
         },
         {
             "key": "QR"
@@ -28,7 +28,7 @@
             "type": "material"
         },
         {
-            "key": "quantity",
+            "key": "quantityMT",
             "name": "Quantity(in MT)"
         },
         {

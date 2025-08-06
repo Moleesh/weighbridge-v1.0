@@ -23,7 +23,9 @@ import com.github.sarxos.webcam.ds.ipcam.IpCamMode;
 import com.github.sarxos.webcam.ds.ipcam.IpCamStorage;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 import com.ibatis.common.jdbc.ScriptRunner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -1061,7 +1063,9 @@ class WeighBridge {
             }
             matcher.appendTail(result);
 
-            BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(new MultiFormatWriter().encode(result.toString(), BarcodeFormat.QR_CODE, 250, 250));
+            BitMatrix matrix = new MultiFormatWriter().encode(result.toString(), BarcodeFormat.QR_CODE, 250, 250);
+            MatrixToImageConfig config = new MatrixToImageConfig(0xFF000000, 0xFFFFFFFF);
+            BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(matrix, config);
 
             try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                 ImageIO.write(qrImage, "png", byteArrayOutputStream);
