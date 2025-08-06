@@ -28,6 +28,11 @@
             "type": "material"
         },
         {
+            "key": "mineral",
+            "name": "Mineral Products",
+            "type": "material"
+        },
+        {
             "key": "quantityMT",
             "name": "Quantity(in MT)"
         },
