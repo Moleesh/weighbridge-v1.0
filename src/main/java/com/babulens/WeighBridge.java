@@ -22,8 +22,8 @@ import com.github.sarxos.webcam.ds.ipcam.IpCamDriver;
 import com.github.sarxos.webcam.ds.ipcam.IpCamMode;
 import com.github.sarxos.webcam.ds.ipcam.IpCamStorage;
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.ibatis.common.jdbc.ScriptRunner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -155,6 +155,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1060,27 +1061,13 @@ class WeighBridge {
             }
             matcher.appendTail(result);
 
-            BitMatrix bitMatrix = new QRCodeWriter().encode(result.toString(), BarcodeFormat.QR_CODE, 250, 250);
+            BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(new MultiFormatWriter().encode(result.toString(), BarcodeFormat.QR_CODE, 250, 250));
 
-            int matrixWidth = bitMatrix.getWidth();
-            int matrixHeight = bitMatrix.getHeight();
-
-            StringBuilder svg = new StringBuilder();
-            svg.append(String.format(
-                    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 %d %d' shape-rendering='crispEdges'>\n", matrixWidth, matrixHeight));
-            svg.append("<rect width='100%' height='100%' fill='white'/>\n");
-
-            for (int y = 0; y < matrixHeight; y++) {
-                for (int x = 0; x < matrixWidth; x++) {
-                    if (bitMatrix.get(x, y)) {
-                        svg.append(String.format("<rect x='%d' y='%d' width='1' height='1' fill='black'/>\n", x, y));
-                    }
-                }
+            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                ImageIO.write(qrImage, "png", byteArrayOutputStream);
+                invoiceData.put("QR", Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray()));
             }
 
-            svg.append("</svg>");
-
-            invoiceData.put("QR", svg.toString());
         } catch (Exception ignored) {
         }
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
@@ -1099,6 +1086,7 @@ class WeighBridge {
                 String value = StringEscapeUtils.escapeHtml4(entry.getValue().asText());
                 htmlContent = htmlContent.replaceAll("\\$\\{" + key + "}", value);
             }
+
             ITextRenderer iTextRenderer = new ITextRenderer();
             iTextRenderer.setDocumentFromString(htmlContent);
             iTextRenderer.layout();
