@@ -11,9 +11,6 @@
         {
             "key": "QRFormat",
             "value": "${bulkTransitPassNo},${material}(${quantityMT}MT),${timeStart},${transitPassSerialNo},${vehicleNo},${address}"
-        },
-        {
-            "key": "QR"
         }
 	],
 	"leftFields": [
