@@ -84,6 +84,11 @@
             <artifactId>pdfbox</artifactId>
             <version>3.0.5</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.3</version>
+        </dependency>
 
         <!--for SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder" -->
         <dependency>

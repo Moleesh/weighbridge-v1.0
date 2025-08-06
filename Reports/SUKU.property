@@ -8,6 +8,13 @@
 		}
 	],
 	"hiddenFields": [
+        {
+            "key": "QRFormat",
+            "value": "${bulkTransitPassNo},${material}(${quantity}MT),${timeStart},${transitPassSerialNo},${securityPaperSerialNo},${address}"
+        },
+        {
+            "key": "QR"
+        }
 	],
 	"leftFields": [
 		{
@@ -57,6 +64,13 @@
 			"type": "blank"
 		},
         {
+            "key": "dispatchTime",
+            "name": "Date & Time of Dispatch",
+            "type": "date",
+            "dateFormat": "dd-MM-yyyy",
+            "timeFormat": "HH:mm:00"
+        },
+        {
             "key": "securityPaperSerialNo",
             "name": "Security Paper Serial No"
         },
@@ -80,8 +94,8 @@
             "type": "buyer"
         },
         {
-            "key": "Address of the Purchaser",
-            "name": "Address"
+            "key": "address",
+            "name": "Address of the Purchaser"
         }
 	]
 }

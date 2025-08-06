@@ -21,6 +21,9 @@ import com.github.sarxos.webcam.ds.ipcam.IpCamDevice;
 import com.github.sarxos.webcam.ds.ipcam.IpCamDriver;
 import com.github.sarxos.webcam.ds.ipcam.IpCamMode;
 import com.github.sarxos.webcam.ds.ipcam.IpCamStorage;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.ibatis.common.jdbc.ScriptRunner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -168,6 +171,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -998,14 +1003,12 @@ class WeighBridge {
             if (component instanceof JTextField) {
                 invoiceData.put(key, ((JTextField) component).getText());
             } else if (component instanceof DateTimePicker dateTimePicker) {
-                String datePattern = dateTimePicker.getDatePicker().getSettings().getFormatForDatesCommonEra().toString();
-                String timePattern = dateTimePicker.getTimePicker().getSettings().getFormatForDisplayTime().toString();
-
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern + " " + timePattern);
+                DateTimeFormatter dateFormatter = dateTimePicker.getDatePicker().getSettings().getFormatForDatesCommonEra();
+                DateTimeFormatter timeFormatter = dateTimePicker.getTimePicker().getSettings().getFormatForDisplayTime();
                 LocalDateTime dateTime = dateTimePicker.getDateTimeStrict();
 
                 invoiceData.put(key, Optional.ofNullable(dateTime)
-                        .map(dt -> dt.format(formatter))
+                        .map(date -> dateFormatter.format(date.toLocalDate()) + " " + timeFormatter.format(date.toLocalTime()))
                         .orElse(""));
 
                 invoiceData.put(key + "_data", String.valueOf(dateTime));
@@ -1042,6 +1045,44 @@ class WeighBridge {
 
     private void printInvoice(ActionEvent... ae) {
         ObjectNode invoiceData = getInvoiceData();
+
+        try {
+            String format = Optional.ofNullable(invoiceData.path("QRFormat").asText(null))
+                    .orElseThrow(IllegalStateException::new);
+
+            Matcher matcher = Pattern.compile("\\$\\{(.*?)}").matcher(format);
+
+            StringBuilder result = new StringBuilder();
+            while (matcher.find()) {
+                String key = matcher.group(1);
+                String replacement = invoiceData.path(key).asText("");
+                matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+            }
+            matcher.appendTail(result);
+
+            BitMatrix bitMatrix = new QRCodeWriter().encode(result.toString(), BarcodeFormat.QR_CODE, 250, 250);
+
+            int matrixWidth = bitMatrix.getWidth();
+            int matrixHeight = bitMatrix.getHeight();
+
+            StringBuilder svg = new StringBuilder();
+            svg.append(String.format(
+                    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 %d %d' shape-rendering='crispEdges'>\n", matrixWidth, matrixHeight));
+            svg.append("<rect width='100%' height='100%' fill='white'/>\n");
+
+            for (int y = 0; y < matrixHeight; y++) {
+                for (int x = 0; x < matrixWidth; x++) {
+                    if (bitMatrix.get(x, y)) {
+                        svg.append(String.format("<rect x='%d' y='%d' width='1' height='1' fill='black'/>\n", x, y));
+                    }
+                }
+            }
+
+            svg.append("</svg>");
+
+            invoiceData.put("QR", svg.toString());
+        } catch (Exception ignored) {
+        }
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             JsonNode invoiceProperty = new ObjectMapper().readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
 
