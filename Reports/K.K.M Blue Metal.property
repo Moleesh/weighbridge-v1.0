@@ -2,10 +2,15 @@
 	"html": "K.K.M Blue Metal",
 	"reportFields": [
 		{
-			"key": "invoiceNo",
-			"name": "Invoice No",
+			"key": "serialNo",
+			"name": "Serial No",
 			"checked": true
 		},
+        {
+            "key": "invoiceNo",
+            "name": "Invoice No",
+            "checked": true
+        },
 		{
 			"key": "invoiceDate",
 			"name": "Invoice Date",
@@ -75,12 +80,16 @@
 	],
 	"leftFields": [
 		{
-			"key": "invoiceNo",
-			"name": "Invoice No",
+			"key": "serialNo",
+			"name": "Serial No",
 			"type": "invoiceNo",
 			"localPrefix": "TA",
 			"invoicePrefix": "KA"
 		},
+        {
+            "key": "invoiceNo",
+            "name": "Invoice No"
+        },
 		{
 			"key": "invoiceDate",
 			"name": "Invoice Date",
