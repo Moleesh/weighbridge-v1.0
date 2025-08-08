@@ -1,0 +1,166 @@
+{
+	"html": "KKM RAJENDRAN BLUE METALS",
+	"reportFields": [
+		{
+			"key": "serialNo",
+			"name": "Serial No",
+			"checked": true
+		},
+        {
+            "key": "invoiceNo",
+            "name": "Invoice No",
+            "checked": true
+        },
+		{
+			"key": "invoiceDate",
+			"name": "Invoice Date",
+			"checked": true
+		},
+		{
+			"key": "buyer",
+			"name": "Buyer",
+			"checked": true
+		},
+		{
+			"key": "buyerAddress",
+			"name": "Address",
+			"checked": true
+		},
+		{
+			"key": "vehicleNo",
+			"name": "Vehicle No",
+			"checked": true
+		},
+		{
+			"key": "destination",
+			"name": "Destination",
+			"checked": true
+		},
+		{
+			"key": "material",
+			"name": "Material",
+			"checked": true
+		},
+		{
+			"key": "quantity",
+			"name": "Quantity (ton)",
+			"checked": true
+		},
+		{
+			"key": "rate",
+			"name": "Rate",
+			"checked": true
+		}
+	],
+	"hiddenFields": [
+		{
+			"key": "taxAmount"
+		},
+		{
+			"key": "taxInWords"
+		},
+		{
+			"key": "totalInWords"
+		},
+		{
+			"key": "cgstPercent",
+			"value": ".025"
+		},
+		{
+			"key": "sgstPercent",
+			"value": ".025"
+		},
+		{
+			"key": "igstPercent",
+			"value": ".05"
+		},
+		{
+			"key": "isLocal"
+		}
+	],
+	"leftFields": [
+		{
+			"key": "serialNo",
+			"name": "Serial No",
+			"type": "invoiceNo",
+			"localPrefix": "TA",
+			"invoicePrefix": "KA"
+		},
+        {
+            "key": "invoiceNo",
+            "name": "Invoice No"
+        },
+		{
+			"key": "invoiceDate",
+			"name": "Invoice Date",
+			"type": "invoiceDate",
+			"dateFormat": "d-MMM-yy"
+		},
+		{
+			"key": "buyer",
+			"name": "Buyer",
+			"type": "buyer"
+		},
+		{
+			"key": "buyerAddress",
+			"name": "Address"
+		},
+		{
+			"key": "vehicleNo",
+			"name": "Vehicle No",
+			"type": "vehicleNo"
+		},
+		{
+			"key": "destination",
+			"name": "Destination"
+		},
+		{
+			"key": "material",
+			"name": "Material",
+			"type": "material"
+		},
+		{
+			"key": "quantity",
+			"name": "Quantity (ton)"
+		},
+		{
+			"key": "rate",
+			"name": "Rate"
+		}
+	],
+	"rightFields": [
+		{
+			"type": "blank"
+		},
+		{
+			"key": "amount",
+			"name": "Amount",
+			"type": "disabled"
+		},
+		{
+			"key": "cgst",
+			"name": "cgst",
+			"type": "disabled"
+		},
+		{
+			"key": "sgst",
+			"name": "sgst",
+			"type": "disabled"
+		},
+		{
+			"key": "igst",
+			"name": "igst",
+			"type": "disabled"
+		},
+		{
+			"key": "roundOff",
+			"name": "RoundOff (-)",
+			"type": "disabled"
+		},
+		{
+			"key": "total",
+			"name": "Total",
+			"type": "disabled"
+		}
+	]
+}

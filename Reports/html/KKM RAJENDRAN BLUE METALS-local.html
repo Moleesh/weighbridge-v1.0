@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            width: 204mm;
+            height: 297mm;
+            margin: 12px;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+        }
+
+        .container {
+            position: relative;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .title {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 12pt;
+        }
+
+        .header {
+            font-size: 9pt;
+        }
+
+        .note-header {
+            text-align: right;
+            position: absolute;
+            top: 22px;
+            right: 20px;
+            font-style: italic;
+            font-size: 10pt;
+        }
+
+        td {
+            border: 1px solid #000;
+            padding: 4px;
+            vertical-align: top;
+        }
+
+        .address strong {
+            font-size: 9pt;
+        }
+
+        .header-table td {
+            width: 188px;
+        }
+
+        .term-of-delivery {
+            height: 70px;
+        }
+
+        strong {
+            min-height: 18px;
+            display: block;
+            font-size: 10pt;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            border: 1px solid #000;
+            padding: 4px;
+            font-weight: 400;
+            text-align: center;
+        }
+
+        .body-font {
+            font-size: 9pt;
+        }
+
+        .billing-row {
+            height: 350px;
+        }
+
+        .billing-row td {
+            padding-top: 16px;
+        }
+
+        .float-right {
+            margin-left: 88px;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .left {
+            margin-left: 70px;
+        }
+
+        .inline {
+            display: inline-block;
+        }
+
+        .italic {
+            font-style: italic;
+        }
+
+        .spacing {
+            height: 60px;
+        }
+
+        .amount-chargeable {
+            position: relative;
+        }
+
+        .amount-chargeable td {
+            padding: 4px;
+            font-size: 9pt;
+        }
+
+        .chargeable-note {
+            text-align: right;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-style: italic;
+            font-size: 10pt;
+        }
+
+        .total-amount {
+            padding: 8px;
+            border-bottom: none;
+        }
+
+        .declaration {
+            padding: 8px;
+            border-top: none;
+        }
+
+        .signature {
+            padding: 8px 16px 8px 8px;
+        }
+
+        .underline {
+            text-decoration: underline;
+        }
+
+        .footer {
+            text-align: center;
+            padding-top: 8px;
+            font-size: 9pt;
+        }
+
+        .total {
+            display: inline;
+            font-size: 12pt;
+        }
+
+        img {
+            width: 12px;
+            height: 12px;
+        }
+
+        .tax, .tax strong {
+            font-size: 9pt;
+        }
+    </style>
+    <title></title>
+</head>
+
+<body>
+<div class="container">
+    <div class="title">Tax Invoice</div>
+    <div class="note-header">(ORIGINAL FOR RECIPIENT)</div>
+    <table class="header-table">
+        <tbody>
+        <tr>
+            <td colspan="2" rowspan="5" class="address"><strong>KKM RAJENDRAN BLUE METALS (OPC) PRIVATE LIMITED</strong>
+                <div>NO- 32/1/A, K K M MAHAL,</div>
+                <div>Keez Pammam, Marthandam, K.K. Disit, Pin-629165</div>
+                <div>Branch :</div>
+                <div>13/6, 13/7, Vadakkuriyanayagipuram,</div>
+                <div>Veeranarayanankulam,Vadakkuariyanayagipuram,</div>
+                <div>Part II,Cheranmadevi, Thirunelveli.</div>
+                <div>Pincode-627414</div>
+                <div>GSTIN/UIN: 33AAKCK7393R1ZK</div>
+                <div>State Name : Tamil Nadu, Code : 33</div>
+                <div>E-Mail : kkmpvt966@gmail.com</div>
+            </td>
+            <td class="header">Invoice No.<strong>${invoiceNo}</strong></td>
+            <td>Dated<strong>${invoiceDate}</strong></td>
+        </tr>
+        <tr>
+            <td class="header">Delivery Note<strong></strong></td>
+            <td>Mode/Terms of Payment<strong></strong></td>
+        </tr>
+        <tr>
+            <td class="header">Reference No. &amp; Date.<strong></strong></td>
+            <td>Other References<strong></strong></td>
+        </tr>
+        <tr>
+            <td class="header">Buyer's Order No.<strong></strong></td>
+            <td>Dated<strong></strong></td>
+        </tr>
+        <tr>
+            <td class="header">Dispatch Doc No.<strong></strong></td>
+            <td>Delivery Note Date<strong></strong></td>
+        </tr>
+        <tr>
+            <td colspan="2" rowspan="3">
+                Buyer (Bill to)
+                <strong>${buyer}</strong>
+                ${buyerAddress}
+                <div>State Name : Tamil Nadu, Code : 33</div>
+            </td>
+            <td class="header">Dispatched through<strong></strong></td>
+            <td>Destination<strong>${destination}</strong></td>
+        </tr>
+        <tr>
+            <td class="header">Bill of Lading/LR-RR No.<strong></strong></td>
+            <td>Motor Vehicle No.<strong>${vehicleNo}</strong></td>
+        </tr>
+        <tr>
+            <td class="term-of-delivery header" colspan="2">Terms of Delivery<strong></strong></td>
+        </tr>
+        </tbody>
+    </table>
+    <table>
+        <thead>
+        <tr>
+            <th style="width:18px">Sl No.</th>
+            <th style="width:200px">Description of Goods</th>
+            <th style="width:100px">HSN/SAC</th>
+            <th style="width:50px">GST Rate</th>
+            <th style="width:100px">Quantity</th>
+            <th style="width:50px">Rate</th>
+            <th style="width:50px">per</th>
+            <th style="width:50px">Disc. %</th>
+            <th style="width:125px">Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="billing-row body-font">
+            <td><strong>1</strong></td>
+            <td><strong class="spacing">${material}</strong><strong class="italic float-right">Output
+                Cgst</strong><strong class="italic float-right">Output Sgst</strong>
+                <div class="italic">Less :<strong class="inline left">Roundoff</strong></div>
+            </td>
+            <td>25171010</td>
+            <td class="right">5 %</td>
+            <td class="right"><strong>${quantity} ton</strong></td>
+            <td class="right">${rate}</td>
+            <td class="right">ton</td>
+            <td class="right"></td>
+            <td class="right"><strong
+                    class="spacing">${amount}</strong><strong>${cgst}</strong><strong>${sgst}</strong><strong
+                    class="inline">(-) ${roundOff}</strong></td>
+        </tr>
+        <tr class="right">
+            <td></td>
+            <td>Total</td>
+            <td></td>
+            <td></td>
+            <td><strong>${quantity} ton</strong></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+                <img src="./Reports/html/images/rupee.png" alt="Rs." />
+                <strong class="total">${total}</strong>
+            </td>
+        </tr>
+        <tr class="amount-chargeable">
+            <td colspan="9">
+                Tax Amount (in words)
+                <span class="chargeable-note">E.&amp; O.E</span>
+                <strong>INR ${totalInWords} Only</strong>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <table class="tax">
+        <thead>
+        <tr>
+            <th rowspan="2" style="width:280px">HSN/SAC</th>
+            <th rowspan="2" style="width:80px">Taxable Value</th>
+            <th colspan="2">Central Tax</th>
+            <th colspan="2">State Tax</th>
+            <th rowspan="2" style="width:80px">Total Tax Amount</th>
+        </tr>
+        <tr>
+            <th style="width:80px">Rate</th>
+            <th style="width:80px">Amount</th>
+            <th style="width:80px">Rate</th>
+            <th style="width:80px">Amount</th>
+        </tr>
+        </thead>
+        <tbody class="body-font">
+        <tr>
+            <td>25171010</td>
+            <td class="right">${amount}</td>
+            <td class="right">2.50%</td>
+            <td class="right">${cgst}</td>
+            <td class="right">2.50%</td>
+            <td class="right">${sgst}</td>
+            <td class="right">${taxAmount}</td>
+        </tr>
+        <tr>
+            <td><strong>Total</strong></td>
+            <td class="right"><strong>${amount}</strong></td>
+            <td></td>
+            <td class="right"><strong>${cgst}</strong></td>
+            <td></td>
+            <td class="right"><strong>${sgst}</strong></td>
+            <td class="right"><strong>${taxAmount}</strong></td>
+        </tr>
+        <tr>
+            <td class="total-amount" colspan="7">Tax Amount (in words) : <strong class="inline">INR ${taxInWords}
+                Only</strong></td>
+        </tr>
+        <tr>
+            <td class="declaration" colspan="2">
+                <div class="underline">Declaration</div>
+                <div>We declare that this invoice shows the actual price of the</div>
+                <div>goods described and that all particulars are true and correct.</div>
+            </td>
+            <td class="signature right" colspan="5">
+                <strong>for KKM RAJENDRAN BLUE METALS (OPC) PRIVATE LIMITED</strong>
+                <strong></strong>
+                Authorised Signatory
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="footer">This is a Computer Generated Invoice</div>
+</div>
+</body>
+
+</html>
