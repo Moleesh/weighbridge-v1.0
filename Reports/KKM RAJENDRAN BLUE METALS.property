@@ -2,12 +2,12 @@
 	"html": "KKM RAJENDRAN BLUE METALS",
 	"reportFields": [
 		{
-			"key": "serialNo",
+			"key": "invoiceNo",
 			"name": "Serial No",
 			"checked": true
 		},
         {
-            "key": "invoiceNo",
+            "key": "serialNo",
             "name": "Invoice No",
             "checked": true
         },
@@ -80,16 +80,12 @@
 	],
 	"leftFields": [
 		{
-			"key": "serialNo",
+			"key": "invoiceNo",
 			"name": "Serial No",
 			"type": "invoiceNo",
 			"localPrefix": "TA",
 			"invoicePrefix": "KA"
 		},
-        {
-            "key": "invoiceNo",
-            "name": "Invoice No"
-        },
 		{
 			"key": "invoiceDate",
 			"name": "Invoice Date",
@@ -132,6 +128,10 @@
 		{
 			"type": "blank"
 		},
+        {
+            "key": "serialNo",
+            "name": "Invoice No"
+        },
 		{
 			"key": "amount",
 			"name": "Amount",
