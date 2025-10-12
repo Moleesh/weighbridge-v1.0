@@ -107,6 +107,7 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -206,6 +207,7 @@ class WeighBridge {
     private final DateFormat dateFormatHyphen = new SimpleDateFormat("dd-MM-yyyy");
     private final DateFormat dateFormatSlash = new SimpleDateFormat("dd/MM/yyyy");
     private final DateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+    private final DateFormat timeFormatWithSecond = new SimpleDateFormat("hh:mm:ss a");
     private final JCheckBox checkboxSlNo = new JCheckBox("Sl.No");
     private final JCheckBox checkboxDCNo = new JCheckBox("Dc. No");
     private final JCheckBox checkboxDCDate = new JCheckBox("Dc. Date");
@@ -5248,7 +5250,8 @@ class WeighBridge {
                 "Quotation",
                 "Quotation KJJ",
                 "Sri Pathy",
-                "Standard"
+                "Standard",
+                "Vaighai"
         }));
         comboBoxPrintOptionForWeight.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         comboBoxPrintOptionForWeight.setFocusable(false);
@@ -6212,6 +6215,9 @@ class WeighBridge {
                     continue;
                 case "Quotation KJJ":
                     printQuotationKJJ();
+                    continue;
+                case "Vaighai":
+                    printVaighai();
                     continue;
                 default:
                     printPlainWeight();
@@ -8109,7 +8115,7 @@ class WeighBridge {
                                  } catch (IOException ignored) {
                                  }
 
-                                 BufferedImage printImage = joinBufferedImage(cropImage1, cropImage2);
+                                 BufferedImage printImage = joinBufferedImageByHeight(cropImage1, cropImage2);
                                  if (printImage != null) {
                                      graphics.drawImage(printImage, 250, 115, 300, (int) (300.00 / printImage.getWidth() * printImage.getHeight()), null);
                                  }
@@ -8307,17 +8313,17 @@ class WeighBridge {
                                      BufferedImage printImage1 = getAvailableImage(1);
                                      cropImage1 = printImage1.getSubimage(
                                              Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
-                                 } catch (IOException ignored) {
+                                 } catch (IOException | RasterFormatException ignored) {
                                  }
 
                                  try {
                                      BufferedImage printImage2 = getAvailableImage(2);
                                      cropImage2 = printImage2.getSubimage(
                                              Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
-                                 } catch (IOException ignored) {
+                                 } catch (IOException | RasterFormatException ignored) {
                                  }
 
-                                 BufferedImage printImage = joinBufferedImage(cropImage1, cropImage2);
+                                 BufferedImage printImage = joinBufferedImageByHeight(cropImage1, cropImage2);
                                  if (printImage != null) {
                                      graphics.drawImage(printImage, 250, 125, 300, (int) (300.00 / printImage.getWidth() * printImage.getHeight()), null);
                                  }
@@ -8633,6 +8639,157 @@ class WeighBridge {
         try {
             pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
             pj.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
+    private void printVaighai() {
+        PrinterJob printerJob = PrinterJob.getPrinterJob();
+        PageFormat pf = printerJob.defaultPage();
+        Paper paper = pf.getPaper();
+
+        double width = 8d * 72d;
+        double height = 6d * 72d;
+        double widthMargin = 0d * 72d;
+        double heightMargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthMargin, heightMargin, width - (2 * widthMargin), height - (2 * heightMargin));
+        pf.setOrientation(PageFormat.PORTRAIT);
+        pf.setPaper(paper);
+        Book book = new Book();
+
+        book.append((graphics, pageFormat, pageIndex) -> {
+            if (pageIndex > 0) return Printable.NO_SUCH_PAGE;
+
+            Graphics2D graphics2D = (Graphics2D) graphics;
+            graphics2D.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+            graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int startX = 28;
+            int startY = 27;
+            int endX = 574;
+            int x = startX + 6;
+            int y = startY;
+
+            String date, time;
+            try {
+                date = dateFormatSlash.format(dateAndTimeFormat.parse(textFieldNetDateTime.getText()));
+                time = timeFormatWithSecond.format(dateAndTimeFormat.parse(textFieldNetDateTime.getText()));
+            } catch (ParseException pe) {
+                date = "";
+                time = "";
+            }
+
+            graphics2D.setColor(Color.BLACK);
+            graphics2D.fillRect(startX, y, 546, 50);
+
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.setColor(Color.WHITE);
+            graphics2D.drawString(StringUtils.center(title1.getText(), 89), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(StringUtils.center(title2.getText(), 89), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 8));
+            graphics2D.drawString(textFieldLine3.getText(), 460, y += 14);
+            graphics2D.drawString(textFieldLine2.getText(), x, y );
+            graphics.setFont(new Font("Courier New", Font.BOLD, 9));
+            graphics2D.drawString(StringUtils.center(textFieldLine1.getText(), 99), x, y);
+
+            graphics2D.setColor(Color.BLACK);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(StringUtils.center("WEIGHMENT SLIP", 89), x, y += 18);
+
+            y += 4;
+            graphics.drawLine(startX, y, endX, y);
+
+            String format1 = "%-11.11s:                  %-11.11s:                  %-11.11s:";
+            String format2 = "            %-30.30s%-30.30s%-30.30s";
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format1, "Bill No", "Date", "Time"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2, textFieldSlNo.getText(), date, time), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format1, "Vehicle No", "Material", "No of Bags"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2,  comboBoxVehicleNo.getEditor().getItem(),  comboBoxMaterial.getEditor().getItem(), "-"), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format1, "Supplier", "Batch No", "Driver"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), "-", comboBoxOperator.getEditor().getItem()), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            try {
+                BufferedImage cropImage1 = null, cropImage2 = null;
+
+                try {
+                    BufferedImage printImage1 = getAvailableImage(1);
+                    cropImage1 = printImage1.getSubimage(
+                            Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
+                } catch (IOException | RasterFormatException ignored) {
+                }
+
+                try {
+                    BufferedImage printImage2 = getAvailableImage(2);
+                    cropImage2 = printImage2.getSubimage(
+                            Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
+                } catch (IOException | RasterFormatException ignored) {
+                }
+
+                BufferedImage printImage = joinBufferedImageByWidth(cropImage1, cropImage2);
+                if (printImage != null) {
+                    graphics.drawImage(printImage, x, y + 6, 538, 148, null);
+                }
+            } catch (NullPointerException ignored) {
+            }
+
+            y += 160;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.drawLine(210, y, 210, y + 74);
+            graphics.drawLine(392, y, 392, y + 74);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
+            graphics2D.drawString(StringUtils.center("Gross Weight (Kg)", 25), x, y += 20);
+            graphics2D.drawString(StringUtils.center("Tare Weight (Kg)", 25), 210, y);
+            graphics2D.drawString(StringUtils.center("Net Weight (Kg)", 25), 392, y);
+            y += 10;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 18));
+            graphics2D.drawString(StringUtils.center(textFieldGrossWt.getText(), 16), x, y += 20);
+            graphics2D.drawString(StringUtils.center(textFieldTareWt.getText(), 16), 210, y);
+            graphics2D.drawString(StringUtils.center(textFieldNetWt.getText(), 16), 392, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(StringUtils.center(textFieldGrossDateTime.getText(), 30), x, y += 14);
+            graphics2D.drawString(StringUtils.center(textFieldTareDateTime.getText(), 30), 210, y);
+            graphics2D.drawString(StringUtils.center(textFieldNetDateTime.getText(), 30), 392, y);
+
+            y += 10;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString("Authorised Sign :", x, y += 20);
+            graphics2D.drawString("Estimated Weight  :", 301, y);
+            graphics2D.drawString("Difference Weight :", 301, y + 16);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString("                   -", 301, y);
+            graphics2D.drawString("                   -", 301, y + 16);
+
+            y += 26;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.drawLine(startX, startY, startX, y);
+            graphics.drawLine(endX, startY, endX, y);
+
+            return Printable.PAGE_EXISTS;
+        }, pf);
+
+        printerJob.setPageable(book);
+        try {
+            printerJob.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            printerJob.print();
         } catch (PrinterException ignored) {
         }
     }
@@ -10563,7 +10720,32 @@ class WeighBridge {
         }
     }
 
-    private BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2) {
+    private BufferedImage joinBufferedImageByWidth(BufferedImage img1, BufferedImage img2) {
+        if (img1 == null) {
+            return img2;
+        }
+
+        if (img2 == null) {
+            return img1;
+        }
+
+        int offset = 2;
+        int width = img1.getWidth() + img2.getWidth() + offset;
+        int height = Math.max(img1.getHeight(), img2.getHeight());
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = newImage.createGraphics();
+        Color oldColor = g2.getColor();
+        g2.setPaint(Color.WHITE);
+        g2.fillRect(0, 0, width, height);
+        g2.setColor(oldColor);
+        g2.drawImage(img1, null, 0, 0);
+        g2.drawImage(img2, null, img1.getWidth() + offset, 0);
+        g2.dispose();
+
+        return newImage;
+    }
+
+    private BufferedImage joinBufferedImageByHeight(BufferedImage img1, BufferedImage img2) {
         if (img1 == null) {
             return img2;
         }

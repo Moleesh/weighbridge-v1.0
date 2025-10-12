@@ -75,12 +75,28 @@
 		.break {
 			height: 106px;
 		}
+		
+		.title1 {
+			position: absolute;
+			top: 80px;
+			left: 460px;
+			font-size: 11pt;
+		}
+		
+		.title2 {
+			position: absolute;
+			top: 612px;
+			left: 460px;
+			font-size: 11pt;
+		}
     </style>
     <title></title>
 </head>
 
 <body>
 <div class="container">
+	<div class='title1'>${securityPaperSerialNo}</div>
+	<div class='title2'>${securityPaperSerialNo}</div>
     <img class="qr" alt="" src="data:image/png;base64,${QR}" />
 	<div class="header">Original<span class="date">Date &amp; Time of Dispatch : ${dispatchTime}</span></div>
     <table class="header-table">
