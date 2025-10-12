@@ -219,15 +219,16 @@ class WeighBridge {
     private final JCheckBox checkboxPlace = new JCheckBox("Place");
     private final JCheckBox checkboxPhoneNo = new JCheckBox("Phone No");
     private final JCheckBox checkboxMaterial = new JCheckBox("Material");
-    private final JCheckBox checkboxNoOfBags = new JCheckBox("No OF Bags");
     private final JCheckBox checkboxCharges = new JCheckBox("Charges");
     private final JCheckBox checkboxCredit = new JCheckBox("Credit");
     private final JCheckBox checkboxGrossWeight = new JCheckBox("Gross Wt");
     private final JCheckBox checkboxGrossDateAndTime = new JCheckBox("Gross Date & Time");
     private final JCheckBox checkboxTareWeight = new JCheckBox("Tare Wt");
     private final JCheckBox checkboxTareDateAndTime = new JCheckBox("Tare Date & Time");
-    private final JCheckBox checkboxBagDeduction = new JCheckBox("Bag Deduction");
-    private final JCheckBox checkboxRoundOffColumn = new JCheckBox("Round off");
+    private final JCheckBox checkboxCustom1 = new JCheckBox("Custom 1");
+    private final JCheckBox checkboxCustom2 = new JCheckBox("Custom 2");
+    private final JCheckBox checkboxCustom3 = new JCheckBox("Custom 3");
+    private final JCheckBox checkboxCustom4 = new JCheckBox("Custom 4");
     private final JCheckBox checkboxNettWeight = new JCheckBox("Nett Wt");
     private final JCheckBox checkboxNettDateAndTime = new JCheckBox("Nett Date & Time");
     private final JCheckBox checkboxFinalWt = new JCheckBox("Final Wt");
@@ -369,8 +370,6 @@ class WeighBridge {
     private JTextField textFieldCropWidth11;
     private JTextField textFieldCropHeight11;
     private JButton btnClick;
-    private JButton btnMinusGross;
-    private JButton btnPlusTare;
     private JCheckBox checkboxExcludeRemarks;
     private JTextPane textPaneRemarks;
     private JCheckBox checkboxAutoCharges;
@@ -385,10 +384,7 @@ class WeighBridge {
     private JTextField textFieldLine4;
     private JCheckBox checkboxEnableSettings2;
     private JCheckBox checkboxTareNoSlNo;
-    private JTextField textFieldNoOfBags;
-    private JTextField textFieldDeductionOrPerCost;
     private JTextField textFieldBagWeight;
-    private JCheckBox checkboxExcludeNoOfBags;
     private JCheckBox checkboxManualStatus;
     private boolean reportOpened = false;
     private JCheckBox checkboxExcludeDcNo;
@@ -409,7 +405,6 @@ class WeighBridge {
     private JCheckBox checkboxExitPass;
     private JTextField textFieldPlace;
     private JTextField textFieldPhoneNo;
-    private JTextField textFieldRoundOff;
     private JCheckBox checkboxExcludePlaceAndPhoneNumber;
     private JCheckBox checkboxRoundOff;
     private JComboBox<String> comboBoxVehicleNo;
@@ -445,7 +440,12 @@ class WeighBridge {
     private JCheckBox checkboxKottaSetting;
     private JLabel labelBagDeductionOrReductionCost;
     private JCheckBox checkboxEstimatedWeightSetting;
-    private JLabel lblEstimatedWeight;
+    private JLabel labelCustom1;
+    private JLabel labelCustom2;
+    private JTextField textFieldCustom1;
+    private JTextField textFieldCustom2;
+    private JTextField textFieldCustom3;
+    private JTextField textFieldCustom4;
 
     /**
      * Create the application.
@@ -860,6 +860,7 @@ class WeighBridge {
             checkboxIceWater.setSelected(rs.getBoolean("ICEWATER"));
             checkboxRoundOff.setSelected(rs.getBoolean("ROUND_OFF"));
             checkboxKottaSetting.setSelected(rs.getBoolean("KOTTA_SETTING"));
+            checkboxEstimatedWeightSetting.setSelected(rs.getBoolean("ESTIMATED_WEIGHT_SETTING"));
             checkboxTareToken.setSelected(rs.getBoolean("TARE_TOKEN"));
             checkboxExitPass.setSelected(rs.getBoolean("EXIT_PASS"));
             checkboxNeedLogin.setSelected(rs.getBoolean("NEED_LOGIN"));
@@ -894,7 +895,6 @@ class WeighBridge {
             textFieldNameOfDepartment.setText(rs.getString("DEPARTMENT_NAME"));
             textFieldSiteAt.setText(rs.getString("SITE_AT"));
             checkboxTareNoSlNo.setSelected(rs.getBoolean("TARENOSLNO"));
-            checkboxExcludeNoOfBags.setSelected(rs.getBoolean("EXCLUDEBAGS"));
             textFieldBagWeight.setText(decimalFormat.format(rs.getDouble("BAGWEIGHT")));
             textFieldRoundOffDecimals.setText(Integer.toString(rs.getInt("ROUND_OFF_DECIMALS")));
 
@@ -1369,6 +1369,7 @@ class WeighBridge {
             rs.updateBoolean("ICEWATER", checkboxIceWater.isSelected());
             rs.updateBoolean("ROUND_OFF", checkboxRoundOff.isSelected());
             rs.updateBoolean("KOTTA_SETTING", checkboxKottaSetting.isSelected());
+            rs.updateBoolean("ESTIMATED_WEIGHT_SETTING", checkboxEstimatedWeightSetting.isSelected());
             rs.updateBoolean("TARE_TOKEN", checkboxTareToken.isSelected());
             rs.updateBoolean("EXIT_PASS", checkboxExitPass.isSelected());
             rs.updateBoolean("NEED_LOGIN", checkboxNeedLogin.isSelected());
@@ -1392,7 +1393,6 @@ class WeighBridge {
             rs.updateString("DEPARTMENT_NAME", textFieldNameOfDepartment.getText());
             rs.updateString("SITE_AT", textFieldSiteAt.getText());
             rs.updateBoolean("TARENOSLNO", checkboxTareNoSlNo.isSelected());
-            rs.updateBoolean("EXCLUDEBAGS", checkboxExcludeNoOfBags.isSelected());
             rs.updateDouble("BAGWEIGHT", Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")));
             rs.updateInt("ROUND_OFF_DECIMALS", Integer.parseInt(0 + textFieldRoundOffDecimals.getText().replaceAll("\\D", "")));
             rs.updateRow();
@@ -1693,9 +1693,9 @@ class WeighBridge {
                         Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                         ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
                         if (rs.next()) {
-                            textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
+                            textFieldCustom2.setText(decimalFormat.format(rs.getDouble("COST")));
                         } else {
-                            textFieldDeductionOrPerCost.setText("0");
+                            textFieldCustom2.setText("0");
                         }
                     } catch (SQLException ignored) {
                     }
@@ -1742,9 +1742,9 @@ class WeighBridge {
                         Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                         ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
                         if (rs.next()) {
-                            textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
+                            textFieldCustom2.setText(decimalFormat.format(rs.getDouble("COST")));
                         } else {
-                            textFieldDeductionOrPerCost.setText("0");
+                            textFieldCustom2.setText("0");
                         }
                     } catch (SQLException ignored) {
                     }
@@ -1971,7 +1971,7 @@ class WeighBridge {
                 textFieldNetDateTime.setText(textFieldTareDateTime.getText());
             }
             if (checkboxIceWater.isSelected()) {
-                textFieldDeductionOrPerCost.setText(Integer.toString(Integer.parseInt(0 + textFieldDeductionOrPerCost.getText().replaceAll("\\D", ""))));
+                textFieldCustom2.setText(Integer.toString(Integer.parseInt(0 + textFieldCustom2.getText().replaceAll("\\D", ""))));
 
                 if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
                     textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText())));
@@ -1981,9 +1981,9 @@ class WeighBridge {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
                     if (rs.next()) {
-                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
+                        textFieldCustom2.setText(decimalFormat.format(rs.getDouble("COST")));
                     } else {
-                        textFieldDeductionOrPerCost.setText("0");
+                        textFieldCustom2.setText("0");
                     }
                     if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
                         textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText())));
@@ -1991,10 +1991,10 @@ class WeighBridge {
                 } catch (SQLException ignored) {
                 }
             } else {
-                textFieldDeductionOrPerCost.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")))));
+                textFieldCustom2.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldCustom1.getText().replaceAll("\\D", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")))));
 
-                if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldDeductionOrPerCost.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
-                    textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldDeductionOrPerCost.getText())));
+                if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldCustom2.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
+                    textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldCustom2.getText())));
                 }
             }
             if (checkboxAutoChargeCheck.isSelected()) {
@@ -2013,20 +2013,20 @@ class WeighBridge {
                 textFieldCharges.setText(decimalFormat.format(Double.parseDouble(temp[0] + "." + temp[1])));
             }
             if (checkboxRoundOff.isSelected()) {
-                textFieldRoundOff.setText(decimalFormat.format(-1 * Double.parseDouble(0 + textFieldCharges.getText()) % Math.pow(10, Double.parseDouble(textFieldRoundOffDecimals.getText().replaceAll("\\D", "")))).replaceAll("-0", "0"));
-                textFieldCharges.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCharges.getText()) + Double.parseDouble(textFieldRoundOff.getText())));
+                textFieldCustom3.setText(decimalFormat.format(-1 * Double.parseDouble(0 + textFieldCharges.getText()) % Math.pow(10, Double.parseDouble(textFieldRoundOffDecimals.getText().replaceAll("\\D", "")))).replaceAll("-0", "0"));
+                textFieldCharges.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCharges.getText()) + Double.parseDouble(textFieldCustom3.getText())));
             }
             if (checkboxKottaSetting.isSelected()) {
                 decimalFormat.setMaximumFractionDigits(2);
-                textFieldDeductionOrPerCost.setText(decimalFormat.format(Double.parseDouble(0 + textFieldNetWt.getText()) / 87));
-                textFieldRoundOff.setText(Integer.toString((int) (Double.parseDouble(0 + textFieldDeductionOrPerCost.getText()) * Double.parseDouble(0 + textFieldCharges.getText()))));
+                textFieldCustom2.setText(decimalFormat.format(Double.parseDouble(0 + textFieldNetWt.getText()) / 87));
+                textFieldCustom3.setText(Integer.toString((int) (Double.parseDouble(0 + textFieldCustom2.getText()) * Double.parseDouble(0 + textFieldCharges.getText()))));
             }
 
-            textFieldNoOfBags.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
+            textFieldCustom1.setText(Integer.toString(Integer.parseInt(0 + textFieldCustom1.getText().replaceAll("\\D", ""))));
 
             if (checkboxIceWater.isSelected() && Integer.parseInt(textFieldNetWt.getText()) > 0) {
-                textFieldFinalWt.setText(Integer.toString(Integer.parseInt(textFieldNetWt.getText()) - Integer.parseInt(0 + textFieldDeductionOrPerCost.getText().replaceAll("\\D", ""))));
-                textFieldFinalAmount.setText(Integer.toString((int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", ""))) - Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
+                textFieldFinalWt.setText(Integer.toString(Integer.parseInt(textFieldNetWt.getText()) - Integer.parseInt(0 + textFieldCustom2.getText().replaceAll("\\D", ""))));
+                textFieldFinalAmount.setText(Integer.toString((int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", ""))) - Integer.parseInt(0 + textFieldCustom1.getText().replaceAll("\\D", ""))));
             }
             comboBoxCustomerName.setEnabled(false);
             comboBoxTransporterName.setEnabled(false);
@@ -2037,9 +2037,9 @@ class WeighBridge {
             comboBoxVehicleNo.setEnabled(false);
             comboBoxVehicleType.setEnabled(false);
             comboBoxMaterial.setEnabled(false);
-            textFieldNoOfBags.setEnabled(false);
+            textFieldCustom1.setEnabled(false);
             textFieldCharges.setEnabled(false);
-            textFieldDeductionOrPerCost.setEnabled(false);
+            textFieldCustom2.setEnabled(false);
             btnSave.setEnabled(true);
             textFieldPlace.setEnabled(false);
             textFieldPhoneNo.setEnabled(false);
@@ -2049,8 +2049,6 @@ class WeighBridge {
             btnGetTare.setEnabled(false);
             checkboxAutoChargeCheck.setEnabled(false);
             btnTotal.setEnabled(false);
-            btnMinusGross.setEnabled(false);
-            btnPlusTare.setEnabled(false);
             textPaneRemarks.setEnabled(false);
             checkboxIsCredit.setEnabled(false);
             btnSave.requestFocus();
@@ -2099,15 +2097,11 @@ class WeighBridge {
                         }
                         textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
                     }
-                    textFieldDcNo.setText(rs.getString("DCNO"));
-                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateFormatHyphen.format(rs.getDate("DCNODATE")));
                     comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                     comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                     comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
-                    textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                     textFieldTareWt.setText(Integer.toString(rs.getInt(Objects.toString(jComboBox.getSelectedItem(), "").replace("Sl.no", "").trim() + "WT")));
                     textFieldTareDateTime.setText(rs.getDate(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") + " " + rs.getTime(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "TIME"));
                     if (checkboxTareNoSlNo.isSelected()) {
@@ -2127,8 +2121,6 @@ class WeighBridge {
                 radioButtonTare.setEnabled(false);
                 btnGetGrossSl.setEnabled(false);
                 comboBoxVehicleNo.setEnabled(false);
-                btnMinusGross.setEnabled(false);
-                btnPlusTare.setEnabled(false);
                 comboBoxMaterial.setEnabled(true);
                 comboBoxMaterial.setSelectedItem("");
                 requestFocus("");
@@ -2178,15 +2170,11 @@ class WeighBridge {
                         }
                         textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
                     }
-                    textFieldDcNo.setText(rs.getString("DCNO"));
-                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateFormatHyphen.format(rs.getDate("DCNODATE")));
                     comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
                     comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                     comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
                     textFieldPlace.setText(rs.getString("PLACE"));
                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
-                    textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
                     textFieldGrossWt.setText(Integer.toString(rs.getInt(Objects.toString(jComboBox.getSelectedItem(), "").replace("Sl.no", "").trim() + "WT")));
                     textFieldGrossDateTime.setText(rs.getDate(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "DATE") + " " + rs.getTime(jComboBox.getSelectedItem().toString().replace("Sl.no", "").trim() + "TIME"));
                     if (checkboxTareNoSlNo.isSelected()) {
@@ -2206,8 +2194,6 @@ class WeighBridge {
                 radioButtonTare.setEnabled(false);
                 btnGetGrossSl.setEnabled(false);
                 comboBoxVehicleNo.setEnabled(false);
-                btnMinusGross.setEnabled(false);
-                btnPlusTare.setEnabled(false);
                 comboBoxMaterial.setEnabled(true);
                 comboBoxMaterial.setSelectedItem("");
                 requestFocus("");
@@ -2322,7 +2308,7 @@ class WeighBridge {
                 textFieldTareDateTime.setText(textFieldDateTime.getText());
             }
             if (checkboxIceWater.isSelected()) {
-                textFieldDeductionOrPerCost.setText(Integer.toString(Integer.parseInt(0 + textFieldDeductionOrPerCost.getText().replaceAll("\\D", ""))));
+                textFieldCustom2.setText(Integer.toString(Integer.parseInt(0 + textFieldCustom2.getText().replaceAll("\\D", ""))));
 
                 if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
                     textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText())));
@@ -2332,9 +2318,9 @@ class WeighBridge {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
                     if (rs.next()) {
-                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("COST")));
+                        textFieldCustom2.setText(decimalFormat.format(rs.getDouble("COST")));
                     } else {
-                        textFieldDeductionOrPerCost.setText("0");
+                        textFieldCustom2.setText("0");
                     }
                     if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
                         textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText())));
@@ -2342,10 +2328,10 @@ class WeighBridge {
                 } catch (SQLException ignored) {
                 }
             } else {
-                textFieldDeductionOrPerCost.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")))));
+                textFieldCustom2.setText(Integer.toString((int) (Integer.parseInt(0 + textFieldCustom1.getText().replaceAll("\\D", "")) * Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")))));
 
-                if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldDeductionOrPerCost.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
-                    textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldDeductionOrPerCost.getText())));
+                if (Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldCustom2.getText()) > 0 && !textFieldTareWt.getText().equals("0")) {
+                    textFieldNetWt.setText(Integer.toString(Integer.parseInt(textFieldGrossWt.getText()) - Integer.parseInt(textFieldTareWt.getText()) - Integer.parseInt(textFieldCustom2.getText())));
                 }
             }
             if (checkboxAutoChargeCheck.isSelected()) {
@@ -2364,20 +2350,20 @@ class WeighBridge {
                 textFieldCharges.setText(decimalFormat.format(Double.parseDouble(temp[0] + "." + temp[1])));
             }
             if (checkboxRoundOff.isSelected()) {
-                textFieldRoundOff.setText(decimalFormat.format(-1 * Double.parseDouble(0 + textFieldCharges.getText()) % Math.pow(10, Double.parseDouble(textFieldRoundOffDecimals.getText().replaceAll("\\D", "")))).replaceAll("-0", "0"));
-                textFieldCharges.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCharges.getText()) + Double.parseDouble(textFieldRoundOff.getText())));
+                textFieldCustom3.setText(decimalFormat.format(-1 * Double.parseDouble(0 + textFieldCharges.getText()) % Math.pow(10, Double.parseDouble(textFieldRoundOffDecimals.getText().replaceAll("\\D", "")))).replaceAll("-0", "0"));
+                textFieldCharges.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCharges.getText()) + Double.parseDouble(textFieldCustom3.getText())));
             }
             if (checkboxKottaSetting.isSelected()) {
                 decimalFormat.setMaximumFractionDigits(2);
-                textFieldDeductionOrPerCost.setText(decimalFormat.format(Double.parseDouble(0 + textFieldNetWt.getText()) / 87));
-                textFieldRoundOff.setText(Integer.toString((int) (Double.parseDouble(0 + textFieldDeductionOrPerCost.getText()) * Double.parseDouble(0 + textFieldCharges.getText()))));
+                textFieldCustom2.setText(decimalFormat.format(Double.parseDouble(0 + textFieldNetWt.getText()) / 87));
+                textFieldCustom3.setText(Integer.toString((int) (Double.parseDouble(0 + textFieldCustom2.getText()) * Double.parseDouble(0 + textFieldCharges.getText()))));
             }
 
-            textFieldNoOfBags.setText(Integer.toString(Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
+            textFieldCustom1.setText(Integer.toString(Integer.parseInt(0 + textFieldCustom1.getText().replaceAll("\\D", ""))));
 
             if (checkboxIceWater.isSelected() && Integer.parseInt(textFieldNetWt.getText()) > 0) {
-                textFieldFinalWt.setText(Integer.toString(Integer.parseInt(textFieldNetWt.getText()) - Integer.parseInt(0 + textFieldDeductionOrPerCost.getText().replaceAll("\\D", ""))));
-                textFieldFinalAmount.setText(Integer.toString((int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", ""))) - Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", ""))));
+                textFieldFinalWt.setText(Integer.toString(Integer.parseInt(textFieldNetWt.getText()) - Integer.parseInt(0 + textFieldCustom2.getText().replaceAll("\\D", ""))));
+                textFieldFinalAmount.setText(Integer.toString((int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", ""))) - Integer.parseInt(0 + textFieldCustom1.getText().replaceAll("\\D", ""))));
             }
             textFieldNetDateTime.setText(textFieldDateTime.getText());
             comboBoxCustomerName.setEnabled(false);
@@ -2389,9 +2375,9 @@ class WeighBridge {
             comboBoxVehicleNo.setEnabled(false);
             comboBoxVehicleType.setEnabled(false);
             comboBoxMaterial.setEnabled(false);
-            textFieldNoOfBags.setEnabled(false);
+            textFieldCustom1.setEnabled(false);
             textFieldCharges.setEnabled(false);
-            textFieldDeductionOrPerCost.setEnabled(false);
+            textFieldCustom2.setEnabled(false);
             btnSave.setEnabled(true);
             textFieldPlace.setEnabled(false);
             textFieldPhoneNo.setEnabled(false);
@@ -2401,8 +2387,6 @@ class WeighBridge {
             btnGetTare.setEnabled(false);
             checkboxAutoChargeCheck.setEnabled(false);
             btnTotal.setEnabled(false);
-            btnMinusGross.setEnabled(false);
-            btnPlusTare.setEnabled(false);
             textPaneRemarks.setEnabled(false);
             checkboxIsCredit.setEnabled(false);
             btnSave.requestFocus();
@@ -2718,157 +2702,6 @@ class WeighBridge {
         btnCalc.setBounds(33, 565, 75, 25);
         panelWeighing.add(btnCalc);
 
-        btnMinusGross = new JButton("-");
-        btnMinusGross.addActionListener(_ -> {
-            radioButtonTare.setSelected(true);
-            Object[] options = {
-                    "New",
-                    "Ok",
-                    "Cancel"
-            };
-            JPanel panel = new JPanel();
-            panel.add(new JLabel("Please Enter the Sl.no To Get Tare Wt ?"));
-            JTextField text = new JTextField(10);
-            panel.add(text);
-            int response = JOptionPane.showOptionDialog(null, panel, "Get Gross Sl No", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
-
-            String result = text.getText();
-            int serialNo = 0;
-            try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
-                rs.absolute(1);
-                serialNo = rs.getInt("SLNO");
-            } catch (SQLException ignored) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :806", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-            }
-            if (response == JOptionPane.YES_OPTION) {
-                radioButtonGross.setSelected(true);
-            } else if (!(result == null || (result.isEmpty()) || Integer.parseInt(result) >= serialNo || Integer.parseInt(result) <= 0 || response != JOptionPane.NO_OPTION)) {
-                try {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + result);
-                    rs.next();
-                    textFieldDcNo.setText(rs.getString("DCNO"));
-                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateFormatHyphen.format(rs.getDate("DCNODATE")));
-                    comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                    comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
-                    comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
-                    textFieldPlace.setText(rs.getString("PLACE"));
-                    textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
-                    checkboxIsCredit.setSelected(rs.getBoolean("CREDIT"));
-                    textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
-                    textFieldGrossWt.setText(Integer.toString(rs.getInt("TAREWT")));
-                    if (textFieldGrossWt.getText().equals("0")) {
-                        textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
-                        textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
-
-                    } else {
-                        textFieldGrossDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
-                    }
-                    if (textFieldGrossDateTime.getText().equals("null null")) {
-                        textFieldGrossDateTime.setText("");
-                    } else {
-                        textFieldGrossDateTime.setText(dateAndTimeFormat.format(
-                                new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
-                    }
-                } catch (SQLException | ParseException ignored) {
-                    JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :820", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-                radioButtonGross.setEnabled(false);
-                btnGetTareSl.setEnabled(false);
-                radioButtonTare.setEnabled(false);
-                btnGetGrossSl.setEnabled(false);
-                comboBoxVehicleNo.setEnabled(false);
-                btnMinusGross.setEnabled(false);
-                btnPlusTare.setEnabled(false);
-                comboBoxMaterial.setEnabled(true);
-                comboBoxMaterial.setSelectedItem("");
-                requestFocus("");
-            }
-        });
-        btnMinusGross.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        btnMinusGross.setFocusable(false);
-        btnMinusGross.setBounds(369, 54, 62, 25);
-        panelWeighing.add(btnMinusGross);
-
-        btnPlusTare = new JButton("+");
-        btnPlusTare.addActionListener(_ -> {
-            radioButtonGross.setSelected(true);
-            Object[] options = {
-                    "New",
-                    "Ok",
-                    "Cancel"
-            };
-            JPanel panel = new JPanel();
-            panel.add(new JLabel("Please Enter the Sl.no To Get Tare Wt ?"));
-            JTextField text = new JTextField(10);
-
-            panel.add(text);
-
-            int response = JOptionPane.showOptionDialog(null, panel, "Get Gross Sl No", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
-
-            String result = text.getText();
-            int serialNo = 0;
-            try {
-                Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
-                rs.absolute(1);
-                serialNo = rs.getInt("SLNO");
-            } catch (SQLException ignored) {
-                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :847", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-            }
-            if (response == JOptionPane.YES_OPTION) {
-                radioButtonTare.setSelected(true);
-            } else if (!(result == null || (result.isEmpty()) || Integer.parseInt(result) >= serialNo || Integer.parseInt(result) <= 0 || response != JOptionPane.NO_OPTION)) {
-                try {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE SLNO = " + result);
-                    rs.next();
-                    textFieldDcNo.setText(rs.getString("DCNO"));
-                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateFormatHyphen.format(rs.getDate("DCNODATE")));
-                    comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                    comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
-                    comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
-                    textFieldPlace.setText(rs.getString("PLACE"));
-                    textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
-                    checkboxIsCredit.setSelected(rs.getBoolean("CREDIT"));
-                    textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                    textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
-                    textFieldTareWt.setText(Integer.toString(rs.getInt("GROSSWT")));
-                    if (textFieldTareWt.getText().equals("0")) {
-                        textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
-                        textFieldTareDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
-                    } else {
-                        textFieldTareDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
-                    }
-                    if (textFieldTareDateTime.getText().equals("null null")) {
-                        textFieldTareDateTime.setText("");
-                    } else {
-                        textFieldTareDateTime.setText(dateAndTimeFormat.format(
-                                new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
-                    }
-                } catch (SQLException | ParseException ignored) {
-                    JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :861", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-                radioButtonGross.setEnabled(false);
-                btnGetTareSl.setEnabled(false);
-                radioButtonTare.setEnabled(false);
-                btnGetGrossSl.setEnabled(false);
-                comboBoxVehicleNo.setEnabled(false);
-                btnMinusGross.setEnabled(false);
-                btnPlusTare.setEnabled(false);
-                comboBoxMaterial.setEnabled(true);
-                comboBoxMaterial.setSelectedItem("");
-                requestFocus("");
-            }
-        });
-        btnPlusTare.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        btnPlusTare.setFocusable(false);
-        btnPlusTare.setBounds(369, 25, 62, 25);
-        panelWeighing.add(btnPlusTare);
-
         JLabel lblRemarks = new JLabel("Remarks");
         lblRemarks.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         lblRemarks.setBounds(50, 430, 100, 25);
@@ -2887,19 +2720,19 @@ class WeighBridge {
         });
         panelWeighing.add(checkboxAutoChargeCheck);
 
-        JLabel lblNoOfBags = new JLabel("No Of Bags");
-        lblNoOfBags.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblNoOfBags.setBounds(50, 350, 175, 25);
-        panelWeighing.add(lblNoOfBags);
+        labelCustom1 = new JLabel("No Of Bags");
+        labelCustom1.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        labelCustom1.setBounds(50, 350, 175, 25);
+        panelWeighing.add(labelCustom1);
 
-        textFieldNoOfBags = new JTextField();
-        textFieldNoOfBags.addActionListener(_ -> requestFocus("NoOfBags"));
-        textFieldNoOfBags.setHorizontalAlignment(SwingConstants.CENTER);
-        textFieldNoOfBags.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldNoOfBags.setDisabledTextColor(Color.BLACK);
-        textFieldNoOfBags.setColumns(10);
-        textFieldNoOfBags.setBounds(240, 350, 175, 25);
-        panelWeighing.add(textFieldNoOfBags);
+        textFieldCustom1 = new JTextField();
+        textFieldCustom1.addActionListener(_ -> requestFocus("NoOfBags"));
+        textFieldCustom1.setHorizontalAlignment(SwingConstants.CENTER);
+        textFieldCustom1.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldCustom1.setDisabledTextColor(Color.BLACK);
+        textFieldCustom1.setColumns(10);
+        textFieldCustom1.setBounds(240, 350, 175, 25);
+        panelWeighing.add(textFieldCustom1);
 
         textPaneRemarks = new JTextPane(new DefaultStyledDocument() {
             @Serial
@@ -2927,21 +2760,21 @@ class WeighBridge {
         textPaneRemarks.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         textPaneRemarks.setDisabledTextColor(Color.BLACK);
 
-        JLabel lblBagDeductionOrReductionCost = new JLabel("Bag Deduction");
-        lblBagDeductionOrReductionCost.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblBagDeductionOrReductionCost.setBounds(475, 390, 141, 25);
-        panelWeighing.add(lblBagDeductionOrReductionCost);
+        labelCustom2 = new JLabel("Bag Deduction");
+        labelCustom2.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        labelCustom2.setBounds(475, 390, 141, 25);
+        panelWeighing.add(labelCustom2);
 
-        textFieldDeductionOrPerCost = new JTextField();
-        textFieldDeductionOrPerCost.addActionListener(_ -> requestFocus("DeductionOrPerCost"));
-        textFieldDeductionOrPerCost.setText("0");
-        textFieldDeductionOrPerCost.setHorizontalAlignment(SwingConstants.RIGHT);
-        textFieldDeductionOrPerCost.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldDeductionOrPerCost.setEnabled(false);
-        textFieldDeductionOrPerCost.setDisabledTextColor(Color.BLACK);
-        textFieldDeductionOrPerCost.setColumns(10);
-        textFieldDeductionOrPerCost.setBounds(619, 390, 100, 25);
-        panelWeighing.add(textFieldDeductionOrPerCost);
+        textFieldCustom2 = new JTextField();
+        textFieldCustom2.addActionListener(_ -> requestFocus("Custom1"));
+        textFieldCustom2.setText("0");
+        textFieldCustom2.setHorizontalAlignment(SwingConstants.RIGHT);
+        textFieldCustom2.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldCustom2.setEnabled(false);
+        textFieldCustom2.setDisabledTextColor(Color.BLACK);
+        textFieldCustom2.setColumns(10);
+        textFieldCustom2.setBounds(619, 390, 100, 25);
+        panelWeighing.add(textFieldCustom2);
 
         labelBagDeductionOrReductionCost = new JLabel("Kg");
         labelBagDeductionOrReductionCost.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -3005,16 +2838,27 @@ class WeighBridge {
         textFieldPhoneNo.setBounds(775, 270, 175, 25);
         panelWeighing.add(textFieldPhoneNo);
 
-        textFieldRoundOff = new JTextField();
-        textFieldRoundOff.setText("0");
-        textFieldRoundOff.setEnabled(false);
-        textFieldRoundOff.setVisible(false);
-        textFieldRoundOff.setHorizontalAlignment(SwingConstants.CENTER);
-        textFieldRoundOff.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-        textFieldRoundOff.setDisabledTextColor(Color.BLACK);
-        textFieldRoundOff.setColumns(10);
-        textFieldRoundOff.setBounds(775, 390, 175, 25);
-        panelWeighing.add(textFieldRoundOff);
+        textFieldCustom3 = new JTextField();
+        textFieldCustom3.setText("0");
+        textFieldCustom3.setEnabled(false);
+        textFieldCustom3.setVisible(false);
+        textFieldCustom3.setHorizontalAlignment(SwingConstants.CENTER);
+        textFieldCustom3.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldCustom3.setDisabledTextColor(Color.BLACK);
+        textFieldCustom3.setColumns(10);
+        textFieldCustom3.setBounds(775, 390, 175, 25);
+        panelWeighing.add(textFieldCustom3);
+
+        textFieldCustom4 = new JTextField();
+        textFieldCustom4.setText("0");
+        textFieldCustom4.setEnabled(false);
+        textFieldCustom4.setVisible(false);
+        textFieldCustom4.setHorizontalAlignment(SwingConstants.CENTER);
+        textFieldCustom4.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldCustom4.setDisabledTextColor(Color.BLACK);
+        textFieldCustom4.setColumns(10);
+        textFieldCustom4.setBounds(990, 390, 175, 25);
+        panelWeighing.add(textFieldCustom4);
 
         comboBoxVehicleNo = new JComboBox<>();
         comboBoxVehicleNo.setEditable(true);
@@ -3072,8 +2916,10 @@ class WeighBridge {
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                                         checkboxIsCredit.setSelected(rs.getBoolean("CREDIT"));
-                                        textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
+                                        textFieldCustom1.setText(rs.getString("CUSTOM_1"));
+                                        textFieldCustom2.setText(rs.getString("CUSTOM_2"));
+                                        textFieldCustom3.setText(rs.getString("CUSTOM_3"));
+                                        textFieldCustom4.setText(rs.getString("CUSTOM_4"));
                                         textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
                                         if (textFieldGrossDateTime.getText().equals("null null")) {
                                             textFieldGrossDateTime.setText("");
@@ -3104,8 +2950,10 @@ class WeighBridge {
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                                         checkboxIsCredit.setSelected(rs.getBoolean("CREDIT"));
-                                        textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
+                                        textFieldCustom1.setText(rs.getString("CUSTOM_1"));
+                                        textFieldCustom2.setText(rs.getString("CUSTOM_2"));
+                                        textFieldCustom3.setText(rs.getString("CUSTOM_3"));
+                                        textFieldCustom4.setText(rs.getString("CUSTOM_4"));
                                         textFieldSlNo.setText(Integer.toString(rs.getInt("SLNO")));
                                         textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
                                         if (textFieldGrossDateTime.getText().equals("null null")) {
@@ -3137,8 +2985,10 @@ class WeighBridge {
                                         textFieldPlace.setText(rs.getString("PLACE"));
                                         textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                                         checkboxIsCredit.setSelected(rs.getBoolean("CREDIT"));
-                                        textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
-                                        textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
+                                        textFieldCustom1.setText(rs.getString("CUSTOM_1"));
+                                        textFieldCustom2.setText(rs.getString("CUSTOM_2"));
+                                        textFieldCustom3.setText(rs.getString("CUSTOM_3"));
+                                        textFieldCustom4.setText(rs.getString("CUSTOM_4"));
                                         textFieldTareDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
                                         if (textFieldTareDateTime.getText().equals("null null")) {
                                             textFieldTareDateTime.setText("");
@@ -4902,7 +4752,6 @@ class WeighBridge {
         panelSettings1.add(textFieldFooter);
 
         checkboxExcludeCharges = new JCheckBox("Exclude Charges");
-        checkboxExcludeCharges.setEnabled(false);
         checkboxExcludeCharges.setFocusable(false);
         checkboxExcludeCharges.setBackground(new Color(0, 255, 127));
         checkboxExcludeCharges.addChangeListener(_ -> {
@@ -5139,7 +4988,7 @@ class WeighBridge {
                     checkboxSms.setEnabled(true);
                     checkboxInvoice.setEnabled(true);
                     checkboxExcludeCustomer.setEnabled(true);
-                    checkboxExcludeCharges.setEnabled(true);
+                    checkboxExcludeCharges.setEnabled(false);
                     checkboxExcludeDrivers.setEnabled(true);
                     checkboxExcludeRemarks.setEnabled(true);
                     checkboxExcludeCredit.setEnabled(true);
@@ -5150,7 +4999,6 @@ class WeighBridge {
                     textFieldPortName.setEnabled(true);
                     textFieldSMSBaudRate.setEnabled(true);
                     textFieldSMSPortName.setEnabled(true);
-                    checkboxExcludeNoOfBags.setEnabled(true);
                     checkboxExcludePlaceAndPhoneNumber.setEnabled(true);
                     checkboxEnableSettings2.setEnabled(true);
                     checkboxExcludeDcNo.setEnabled(true);
@@ -5174,7 +5022,6 @@ class WeighBridge {
                 textFieldPortName.setEnabled(false);
                 textFieldSMSBaudRate.setEnabled(false);
                 textFieldSMSPortName.setEnabled(false);
-                checkboxExcludeNoOfBags.setEnabled(false);
                 checkboxEnableSettings2.setSelected(false);
                 checkboxEnableSettings2.setEnabled(false);
                 checkboxExcludeDcNo.setEnabled(false);
@@ -5413,33 +5260,16 @@ class WeighBridge {
         checkboxEnableSettings2.setEnabled(false);
         checkboxEnableSettings2.addChangeListener(_ -> {
             if (checkboxEnableSettings2.isSelected()) {
-                tabbedPane.setEnabledAt(9, true);
-                tabbedPane.setTitleAt(9, "          Settings 2          ");
+                tabbedPane.setEnabledAt(5, true);
+                tabbedPane.setTitleAt(5, "          Settings 2          ");
             } else {
-                tabbedPane.setEnabledAt(9, false);
-                tabbedPane.setTitleAt(9, "");
+                tabbedPane.setEnabledAt(5, false);
+                tabbedPane.setTitleAt(5, "");
             }
         });
         checkboxEnableSettings2.setBackground(new Color(0, 255, 127));
         checkboxEnableSettings2.setBounds(1029, 190, 180, 25);
         panelSettings1.add(checkboxEnableSettings2);
-
-        checkboxExcludeNoOfBags = new JCheckBox("Exclude Bags");
-        checkboxExcludeNoOfBags.addChangeListener(_ -> {
-            textFieldNoOfBags.setEnabled(!checkboxExcludeNoOfBags.isSelected());
-            lblNoOfBags.setVisible(!checkboxExcludeNoOfBags.isSelected());
-            textFieldNoOfBags.setVisible(!checkboxExcludeNoOfBags.isSelected());
-            lblBagDeductionOrReductionCost.setVisible(!checkboxExcludeNoOfBags.isSelected());
-            textFieldDeductionOrPerCost.setVisible(!checkboxExcludeNoOfBags.isSelected());
-            labelBagDeductionOrReductionCost.setVisible(!checkboxExcludeNoOfBags.isSelected());
-            clear();
-        });
-        checkboxExcludeNoOfBags.setFont(new Font("Times New Roman", Font.ITALIC, 15));
-        checkboxExcludeNoOfBags.setFocusable(false);
-        checkboxExcludeNoOfBags.setEnabled(false);
-        checkboxExcludeNoOfBags.setBackground(new Color(0, 255, 127));
-        checkboxExcludeNoOfBags.setBounds(10, 290, 145, 25);
-        panelSettings1.add(checkboxExcludeNoOfBags);
 
         checkboxExcludeDcNo = new JCheckBox("Exclude DC No");
         checkboxExcludeDcNo.addChangeListener(_ -> {
@@ -5878,15 +5708,13 @@ class WeighBridge {
                 checkboxKottaSetting.setSelected(false);
                 lblDriversName.setText("Party's City");
                 lblCustomerName.setText("Party's Name");
-                lblBagDeductionOrReductionCost.setText("Ice/Water Less");
                 lblCharges.setText("Rate");
-                lblNoOfBags.setText("Freight Charges");
                 checkboxAutoCharges.setSelected(false);
                 lblFinalWt.setVisible(true);
                 textFieldFinalWt.setVisible(true);
                 label_6.setVisible(true);
                 textFieldFinalAmount.setVisible(true);
-                textFieldDeductionOrPerCost.setEnabled(true);
+                textFieldCustom2.setEnabled(true);
             }
             clear();
         });
@@ -5928,17 +5756,15 @@ class WeighBridge {
         checkboxRoundOff.setFocusable(false);
         checkboxRoundOff.addChangeListener(_ -> {
             if (checkboxRoundOff.isSelected()) {
-                lblBagDeductionOrReductionCost.setText("Price (per kg)");
                 checkboxExcludePlaceAndPhoneNumber.setSelected(false);
                 checkboxIceWater.setSelected(false);
                 checkboxKottaSetting.setSelected(false);
-                checkboxExcludeNoOfBags.setSelected(true);
                 checkboxAutoCharges.setSelected(true);
                 checkboxTareToken.setSelected(true);
                 checkboxExitPass.setSelected(true);
-                lblBagDeductionOrReductionCost.setVisible(true);
-                textFieldDeductionOrPerCost.setVisible(true);
-                textFieldRoundOff.setVisible(true);
+                labelCustom2.setVisible(true);
+                textFieldCustom2.setVisible(true);
+                textFieldCustom3.setVisible(true);
             }
             clear();
         });
@@ -5952,13 +5778,11 @@ class WeighBridge {
         checkboxKottaSetting.setFocusable(false);
         checkboxKottaSetting.addChangeListener(_ -> {
             if (checkboxKottaSetting.isSelected()) {
-                lblBagDeductionOrReductionCost.setVisible(true);
-                lblBagDeductionOrReductionCost.setText("Kotta");
+                labelCustom2.setVisible(true);
                 lblCharges.setText("Market Rate");
                 labelBagDeductionOrReductionCost.setText("");
-                checkboxExcludeNoOfBags.setSelected(true);
-                textFieldDeductionOrPerCost.setVisible(true);
-                textFieldRoundOff.setVisible(true);
+                textFieldCustom2.setVisible(true);
+                textFieldCustom3.setVisible(true);
 
                 checkboxIceWater.setSelected(false);
                 checkboxRoundOff.setSelected(false);
@@ -6136,21 +5960,15 @@ class WeighBridge {
         checkboxEstimatedWeightSetting.setBounds(988, 200, 261, 25);
         checkboxEstimatedWeightSetting.addChangeListener(_ -> {
             if (checkboxEstimatedWeightSetting.isSelected()) {
-                lblBagDeductionOrReductionCost.setText("No of Bags");
                 labelBagDeductionOrReductionCost.setText("");
-                
-                lblEstimatedWeight = new JLabel("");
-                lblEstimatedWeight.setEnabled(false);
-                lblEstimatedWeight.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-                lblEstimatedWeight.setBounds(775, 538, 175, 25);
-                panelWeighing.add(lblEstimatedWeight);
+
                 checkboxIceWater.setSelected(false);
                 checkboxRoundOff.setSelected(false);
-                checkboxExcludeNoOfBags.setSelected(true);
                 checkboxAutoCharges.setSelected(false);
-                lblBagDeductionOrReductionCost.setVisible(true);
-                textFieldDeductionOrPerCost.setVisible(true);
-                textFieldRoundOff.setVisible(true);
+                labelCustom2.setVisible(true);
+                textFieldCustom2.setVisible(true);
+                textFieldCustom3.setVisible(true);
+                textFieldCustom4.setVisible(true);
             }
             clear();
         });
@@ -6429,14 +6247,14 @@ class WeighBridge {
                             "Place",
                             "Phone No",
                             "Material",
-                            checkboxIceWater.isSelected() ? "Freight Charges" : "No Of Bags",
+                            getCustom1(),
                             getChargeText(),
                             "Credit",
                             "Gross Wt",
                             "Gross Date & Time",
                             "Tare Wt",
                             "Tare Date & Time",
-                            getBagDeductionText(),
+                            getCustom2(),
                             "Round off",
                             "Nett Wt",
                             "Nett Date & Time",
@@ -6519,8 +6337,6 @@ class WeighBridge {
                         rs.getString("PHONE_NUMBER"),
                         /*11*/
                         rs.getString("MATERIAL"),
-                        /*12*/
-                        rs.getInt("NOOFBAGS"),
                         /*13*/
                         decimalFormat.format(rs.getDouble("CHARGES")),
                         /*14*/
@@ -6534,9 +6350,10 @@ class WeighBridge {
                         /*18*/
                         tare,
                         /*19*/
-                        decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")),
-                        /*20*/
-                        decimalFormat.format(rs.getDouble("ROUND_OFF")),
+                        rs.getString("CUSTOM_1"),
+                        rs.getString("CUSTOM_2"),
+                        rs.getString("CUSTOM_3"),
+                        rs.getString("CUSTOM_4"),
                         /*21*/
                         rs.getInt("NETWT"),
                         /*22*/
@@ -6591,9 +6408,6 @@ class WeighBridge {
             if (!checkboxMaterial.isSelected()) {
                 tableReport.removeColumn(tableReport.getColumn("Material"));
             }
-            if (!checkboxNoOfBags.isSelected()) {
-                tableReport.removeColumn(tableReport.getColumn(checkboxIceWater.isSelected() ? "Freight Charges" : "No Of Bags"));
-            }
             if (!checkboxCharges.isSelected()) {
                 tableReport.removeColumn(tableReport.getColumn(getChargeText()));
             }
@@ -6612,11 +6426,17 @@ class WeighBridge {
             if (!checkboxTareDateAndTime.isSelected()) {
                 tableReport.removeColumn(tableReport.getColumn("Tare Date & Time"));
             }
-            if (!checkboxBagDeduction.isSelected()) {
-                tableReport.removeColumn(tableReport.getColumn(getBagDeductionText()));
+            if (!checkboxCustom1.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn(getCustom1()));
             }
-            if (!checkboxRoundOffColumn.isSelected()) {
-                tableReport.removeColumn(tableReport.getColumn("Round off"));
+            if (!checkboxCustom2.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn(getCustom2()));
+            }
+            if (!checkboxCustom3.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn(getCustom3()));
+            }
+            if (!checkboxCustom4.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn(getCustom4()));
             }
             if (!checkboxNettWeight.isSelected()) {
                 tableReport.removeColumn(tableReport.getColumn("Nett Wt"));
@@ -6673,7 +6493,6 @@ class WeighBridge {
                 textFieldPlace.setText(rs.getString("PLACE"));
                 textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                 comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
-                textFieldNoOfBags.setText(Integer.toString(rs.getInt("NOOFBAGS")));
                 textFieldCharges.setText(decimalFormat.format(rs.getDouble("CHARGES")));
                 checkboxIsCredit.setSelected(rs.getBoolean("CREDIT"));
                 textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
@@ -6690,8 +6509,10 @@ class WeighBridge {
                 } else {
                     textFieldTareDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
                 }
-                textFieldDeductionOrPerCost.setText(decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")));
-                textFieldRoundOff.setText(decimalFormat.format(rs.getDouble("ROUND_OFF")));
+                textFieldCustom1.setText(rs.getString("CUSTOM_1"));
+                textFieldCustom2.setText(rs.getString("CUSTOM_2"));
+                textFieldCustom3.setText(rs.getString("CUSTOM_3"));
+                textFieldCustom4.setText(rs.getString("CUSTOM_4"));
                 textFieldNetWt.setText(Integer.toString(rs.getInt("NETWT")));
                 textFieldNetDateTime.setText(rs.getDate("NETDATE") + " " + rs.getTime("NETTIME"));
                 textFieldFinalWt.setText(Integer.toString(rs.getInt("FINALWT")));
@@ -6703,7 +6524,7 @@ class WeighBridge {
                 }
                 textPaneRemarks.setText(rs.getString("REMARKS"));
                 lblOperatorName.setText(rs.getString("OPERATOR"));
-                lblEstimatedWeight.setText(decimalFormat.format(rs.getDouble("ESTIMATED_WEIGHT")));
+//                lblEstimatedWeight.setText(decimalFormat.format(rs.getDouble("ESTIMATED_WEIGHT")));
 
                 radioButtonGross.setEnabled(false);
                 btnGetTareSl.setEnabled(false);
@@ -6722,13 +6543,11 @@ class WeighBridge {
                 btnGetGross.setEnabled(false);
                 btnGetTare.setEnabled(false);
                 btnTotal.setEnabled(false);
-                btnMinusGross.setEnabled(false);
-                btnPlusTare.setEnabled(false);
                 textPaneRemarks.setEnabled(false);
                 comboBoxCustomerName.setEnabled(false);
                 comboBoxTransporterName.setEnabled(false);
-                textFieldNoOfBags.setEnabled(false);
-                textFieldDeductionOrPerCost.setEnabled(false);
+                textFieldCustom1.setEnabled(false);
+                textFieldCustom2.setEnabled(false);
                 textFieldPlace.setEnabled(false);
                 textFieldPhoneNo.setEnabled(false);
                 checkboxIsCredit.setEnabled(false);
@@ -6782,8 +6601,8 @@ class WeighBridge {
                     break;
                 }
             case "Material":
-                if (textFieldNoOfBags.isEnabled() && textFieldNoOfBags.isVisible()) {
-                    textFieldNoOfBags.requestFocus();
+                if (textFieldCustom1.isEnabled() && textFieldCustom1.isVisible()) {
+                    textFieldCustom1.requestFocus();
                     break;
                 }
             case "NoOfBags":
@@ -6792,11 +6611,11 @@ class WeighBridge {
                     break;
                 }
             case "Charges":
-                if (textFieldDeductionOrPerCost.isEnabled() && textFieldDeductionOrPerCost.isVisible()) {
-                    textFieldDeductionOrPerCost.requestFocus();
+                if (textFieldCustom2.isEnabled() && textFieldCustom2.isVisible()) {
+                    textFieldCustom2.requestFocus();
                     break;
                 }
-            case "DeductionOrPerCost":
+            case "Custom1":
                 if (textPaneRemarks.isEnabled() && textPaneRemarks.isVisible()) {
                     textPaneRemarks.requestFocus();
                     break;
@@ -6821,21 +6640,20 @@ class WeighBridge {
             btnGetTareSl.setEnabled(true);
             radioButtonTare.setEnabled(true);
             btnGetGrossSl.setEnabled(true);
-            btnMinusGross.setEnabled(true);
-            btnPlusTare.setEnabled(true);
             comboBoxVehicleNo.setEnabled(true);
             comboBoxVehicleType.setEnabled(true);
             comboBoxMaterial.setEnabled(true);
-            textFieldNoOfBags.setEnabled(!checkboxExcludeNoOfBags.isSelected());
-            textFieldNoOfBags.setText("");
+            textFieldCustom1.setText("");
+            textFieldCustom2.setText("");
+            textFieldCustom3.setText("");
+            textFieldCustom4.setText("");
             textFieldCharges.setText("");
-            textFieldDeductionOrPerCost.setText("0");
+            textFieldCustom2.setText("0");
             textFieldGrossWt.setText("0");
             textFieldTareWt.setText("0");
             textFieldNetWt.setText("0");
             textFieldFinalWt.setText("0");
             textFieldFinalAmount.setText("0");
-            textFieldRoundOff.setText("0");
             textFieldGrossDateTime.setText("");
             textFieldTareDateTime.setText("");
             textFieldNetDateTime.setText("");
@@ -6865,7 +6683,7 @@ class WeighBridge {
                 btnGetTare.setEnabled(true);
             }
             if (checkboxIceWater.isSelected()) {
-                textFieldDeductionOrPerCost.setEnabled(true);
+                textFieldCustom2.setEnabled(true);
             }
             comboBoxCustomerName.setSelectedItem("");
             comboBoxTransporterName.setSelectedItem("");
@@ -6874,7 +6692,8 @@ class WeighBridge {
             comboBoxMaterial.setSelectedItem("");
             requestFocus("");
             lblOperatorName.setText(comboBoxOperator.getEditor().getItem().toString());
-            lblEstimatedWeight.setText("" + Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")));
+            labelCustom1.setText(getCustom1());
+            labelCustom2.setText(getCustom2());
         }
     }
 
@@ -7153,11 +6972,11 @@ class WeighBridge {
                 String.format(format1, "Gross Wt", StringUtils.leftPad(textFieldGrossWt.getText(), 7, " "), textFieldGrossDateTime.getText()),
                 String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, " "), textFieldTareDateTime.getText()),
                 String.format(format1, "Nett Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "), ""),
-                String.format(format1, "Ice/Water Less", StringUtils.leftPad(textFieldDeductionOrPerCost.getText(), 7, " "), textFieldNetDateTime.getText()),
+                String.format(format1, "Ice/Water Less", StringUtils.leftPad(textFieldCustom2.getText(), 7, " "), textFieldNetDateTime.getText()),
                 String.format(format1, "Final Wt", StringUtils.leftPad(textFieldFinalWt.getText(), 7, " "), ""),
                 String.format(format3, "Rate", textFieldCharges.getText()),
                 String.format(format3, "Total Amount", (int) (Integer.parseInt(textFieldFinalWt.getText()) * Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", "")))),
-                String.format(format3, "Freight Charges", textFieldNoOfBags.getText()),
+                String.format(format3, "Freight Charges", textFieldCustom1.getText()),
                 String.format(format3, "Final Amount", textFieldFinalAmount.getText()),
                 String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n\n",
                 "----------------------------------------------------------------------\n",
@@ -8394,8 +8213,8 @@ class WeighBridge {
                     graphics.drawString(StringUtils.leftPad(textFieldTareWt.getText(), 27), 0, y += 30);
                     graphics.drawString(StringUtils.leftPad(textFieldGrossWt.getText(), 27), 0, y += space);
                     graphics.drawString(StringUtils.leftPad(textFieldNetWt.getText(), 27), 0, y += 30);
-                    graphics.drawString(StringUtils.leftPad(textFieldDeductionOrPerCost.getText(), 27), 0, y += space);
-                    graphics.drawString(StringUtils.leftPad(textFieldRoundOff.getText(), 27), 0, y += space);
+                    graphics.drawString(StringUtils.leftPad(textFieldCustom2.getText(), 27), 0, y += space);
+                    graphics.drawString(StringUtils.leftPad(textFieldCustom3.getText(), 27), 0, y += space);
                     graphics.drawString(StringUtils.leftPad(textFieldCharges.getText(), 27), 0, y + space);
 
                     graphics.setFont(new Font("Courier New", Font.BOLD, 10));
@@ -8738,14 +8557,14 @@ class WeighBridge {
             graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
             graphics2D.drawString(String.format(format1, "Vehicle No", "Material", "No of Bags"), x, y += 14);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString(String.format(format2,  comboBoxVehicleNo.getEditor().getItem(),  comboBoxMaterial.getEditor().getItem(), "-"), x, y);
+            graphics2D.drawString(String.format(format2,  comboBoxVehicleNo.getEditor().getItem(),  comboBoxMaterial.getEditor().getItem(), textFieldCustom2.getText()), x, y);
             y += 6;
             graphics.drawLine(startX, y, endX, y);
 
             graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
             graphics2D.drawString(String.format(format1, "Supplier", "Batch No", "Driver"), x, y += 14);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), "-", comboBoxTransporterName.getEditor().getItem()), x, y);
+            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), textFieldDcNo.getText(), comboBoxTransporterName.getEditor().getItem()), x, y);
             y += 6;
             graphics.drawLine(startX, y, endX, y);
 
@@ -8799,8 +8618,8 @@ class WeighBridge {
             graphics2D.drawString("Estimated Weight  :", 301, y);
             graphics2D.drawString("Difference Weight :", 301, y + 16);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString("                   -", 301, y);
-            graphics2D.drawString("                   -", 301, y + 16);
+            graphics2D.drawString("                   " + textFieldCustom3.getText(), 301, y);
+            graphics2D.drawString("                   " + textFieldCustom4.getText(), 301, y + 16);
 
             y += 26;
             graphics.drawLine(startX, y, endX, y);
@@ -8879,8 +8698,8 @@ class WeighBridge {
                              drawString(graphics, StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", 228, 77, 0);
                              drawString(graphics, StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", 248, 77, 0);
                              drawString(graphics, StringUtils.leftPad(textFieldNetWt.getText(), 7) + " Kg", 268, 77, 0);
-                             drawString(graphics, StringUtils.leftPad(textFieldDeductionOrPerCost.getText(), 7) + "   ", 288, 77, 0);
-                             drawString(graphics, StringUtils.leftPad(textFieldRoundOff.getText(), 7) + " /-", 308, 77, 0);
+                             drawString(graphics, StringUtils.leftPad(textFieldCustom2.getText(), 7) + "   ", 288, 77, 0);
+                             drawString(graphics, StringUtils.leftPad(textFieldCustom3.getText(), 7) + " /-", 308, 77, 0);
                              graphics.drawLine(17, 325, 193, 325);
                              graphics.drawLine(203, 325, 379, 325);
                              graphics.drawLine(389, 325, 565, 325);
@@ -9040,11 +8859,11 @@ class WeighBridge {
                 String.format(format2, "Customer's Name", comboBoxCustomerName.getEditor().getItem()),
                 driver,
                 String.format(format, "Vehicle No", ": " + comboBoxVehicleNo.getEditor().getItem(), "Material", comboBoxMaterial.getEditor().getItem()),
-                String.format(format, "", "", "No Of Bags", textFieldNoOfBags.getText()),
+                String.format(format, "", "", "No Of Bags", textFieldCustom1.getText()),
                 "-----------------------------------------------------------------\n",
                 String.format(format1, "Gross Wt", StringUtils.leftPad(textFieldGrossWt.getText(), 7, " "), textFieldGrossDateTime.getText()),
                 String.format(format1, "Tare Wt", StringUtils.leftPad(textFieldTareWt.getText(), 7, ""), textFieldTareDateTime.getText()),
-                String.format(format1, "Bag Deduction", StringUtils.leftPad(textFieldDeductionOrPerCost.getText(), 7, " "), ""),
+                String.format(format1, "Bag Deduction", StringUtils.leftPad(textFieldCustom2.getText(), 7, " "), ""),
                 String.format(format1, "Net Wt", StringUtils.leftPad(textFieldNetWt.getText(), 7, " "), "Charges : Rs. " + (textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText())),
                 checkboxExcludeRemarks.isEnabled() && !Objects.equals(textPaneRemarks.getText(), "") ? "" : String.format(format3, "Remarks", textPaneRemarks.getText()) + "\n",
                 "-----------------------------------------------------------------\n",
@@ -9467,9 +9286,9 @@ class WeighBridge {
             cell.setCellValue("Material");
             cell.setCellStyle(cellStyleStringCenter);
         }
-        if (checkboxNoOfBags.isSelected()) {
+        if (checkboxCustom1.isSelected()) {
             cell = row.createCell(j++);
-            cell.setCellValue(checkboxIceWater.isSelected() ? "Freight Charges" : "No Of Bags");
+            cell.setCellValue(getCustom1());
             cell.setCellStyle(cellStyleStringCenter);
         }
         if (checkboxCharges.isSelected()) {
@@ -9502,14 +9321,24 @@ class WeighBridge {
             cell.setCellValue("Tare Date & Time");
             cell.setCellStyle(cellStyleStringCenter);
         }
-        if (checkboxBagDeduction.isSelected()) {
+        if (checkboxCustom1.isSelected()) {
             cell = row.createCell(j++);
-            cell.setCellValue(getBagDeductionText());
+            cell.setCellValue(getCustom1());
             cell.setCellStyle(cellStyleStringCenter);
         }
-        if (checkboxRoundOffColumn.isSelected()) {
+        if (checkboxCustom2.isSelected()) {
             cell = row.createCell(j++);
-            cell.setCellValue("Round off");
+            cell.setCellValue(getCustom2());
+            cell.setCellStyle(cellStyleStringCenter);
+        }
+        if (checkboxCustom3.isSelected()) {
+            cell = row.createCell(j++);
+            cell.setCellValue(getCustom3());
+            cell.setCellStyle(cellStyleStringCenter);
+        }
+        if (checkboxCustom4.isSelected()) {
+            cell = row.createCell(j++);
+            cell.setCellValue(getCustom4());
             cell.setCellStyle(cellStyleStringCenter);
         }
         if (checkboxNettWeight.isSelected()) {
@@ -9617,11 +9446,6 @@ class WeighBridge {
                 cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
             }
             j++;
-            if (checkboxNoOfBags.isSelected()) {
-                cell = row.createCell(c++);
-                cell.setCellValue(Integer.parseInt(0 + model.getValueAt(i, j).toString()));
-            }
-            j++;
             if (checkboxCharges.isSelected()) {
                 cell = row.createCell(c++);
                 cell.setCellValue(Double.parseDouble(0 + model.getValueAt(i, j).toString()));
@@ -9657,15 +9481,24 @@ class WeighBridge {
                 cell.setCellStyle(cellStyleDateTime);
             }
             j++;
-            if (checkboxBagDeduction.isSelected()) {
+            if (checkboxCustom1.isSelected()) {
                 cell = row.createCell(c++);
-                cell.setCellValue(Double.parseDouble(0 + model.getValueAt(i, j).toString()));
+                cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
             }
             j++;
-            if (checkboxRoundOffColumn.isSelected()) {
+            if (checkboxCustom2.isSelected()) {
                 cell = row.createCell(c++);
-                cell.setCellValue(Double.parseDouble(0 + model.getValueAt(i, j).toString()));
-                roundOff = c - 1;
+                cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
+            }
+            j++;
+            if (checkboxCustom3.isSelected()) {
+                cell = row.createCell(c++);
+                cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
+            }
+            j++;
+            if (checkboxCustom4.isSelected()) {
+                cell = row.createCell(c++);
+                cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
             }
             j++;
             if (checkboxNettWeight.isSelected()) {
@@ -9956,7 +9789,6 @@ class WeighBridge {
                 rs.updateString("PLACE", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
                 rs.updateString("PHONE_NUMBER", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
                 rs.updateString("MATERIAL", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
-                rs.updateInt("NOOFBAGS", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
                 rs.updateDouble("CHARGES", row.getCell(++colNum) != null ? row.getCell(colNum).getNumericCellValue() : 0);
                 rs.updateBoolean("CREDIT", row.getCell(++colNum) != null && row.getCell(colNum).toString().equalsIgnoreCase("true"));
                 rs.updateInt("GROSSWT", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
@@ -9985,8 +9817,10 @@ class WeighBridge {
                     rs.updateDate("TAREDATE", null);
                     rs.updateTime("TARETIME", null);
                 }
-                rs.updateDouble("DEDUCTION_OR_PER_COST", row.getCell(++colNum) != null ? row.getCell(colNum).getNumericCellValue() : 0);
-                rs.updateDouble("ROUND_OFF", row.getCell(++colNum) != null ? row.getCell(colNum).getNumericCellValue() : 0);
+                rs.updateString("CUSTOM_1", row.getCell(++colNum) != null ? row.getCell(colNum).getStringCellValue() : "0");
+                rs.updateString("CUSTOM_2", row.getCell(++colNum) != null ? row.getCell(colNum).getStringCellValue() : "0");
+                rs.updateString("CUSTOM_3", row.getCell(++colNum) != null ? row.getCell(colNum).getStringCellValue() : "0");
+                rs.updateString("CUSTOM_4", row.getCell(++colNum) != null ? row.getCell(colNum).getStringCellValue() : "0");
                 rs.updateInt("NETWT", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
                 if (row.getCell(++colNum) != null && !row.getCell(colNum).toString().trim().isEmpty()) {
                     if (row.getCell(colNum).getCellType() == CellType.STRING) {
@@ -10431,8 +10265,6 @@ class WeighBridge {
             rs.updateString("PLACE", textFieldPlace.getText());
             rs.updateString("PHONE_NUMBER", textFieldPhoneNo.getText());
             rs.updateString("MATERIAL", (String) comboBoxMaterial.getSelectedItem());
-            rs.updateInt("NOOFBAGS", Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", "")));
-            rs.updateDouble("ESTIMATED_WEIGHT", Double.parseDouble(0 + lblEstimatedWeight.getText().replaceAll("[^.\\d]", "")));
             rs.updateDouble("CHARGES", Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", "")));
             rs.updateBoolean("CREDIT", checkboxIsCredit.isSelected());
             rs.updateInt("GROSSWT", Integer.parseInt(textFieldGrossWt.getText()));
@@ -10449,8 +10281,10 @@ class WeighBridge {
                 rs.updateDate("TAREDATE", new java.sql.Date(date.getTime()));
                 rs.updateTime("TARETIME", new Time(date.getTime()));
             }
-            rs.updateDouble("DEDUCTION_OR_PER_COST", Double.parseDouble(0 + textFieldDeductionOrPerCost.getText().replaceAll("[^.\\d]", "")));
-            rs.updateDouble("ROUND_OFF", Double.parseDouble(0 + textFieldRoundOff.getText().replaceAll("[^-.\\d]", "")));
+            rs.updateString("CUSTOM_1", textFieldCustom1.getText());
+            rs.updateString("CUSTOM_2", textFieldCustom2.getText());
+            rs.updateString("CUSTOM_3", textFieldCustom3.getText());
+            rs.updateString("CUSTOM_4", textFieldCustom4.getText());
             rs.updateInt("NETWT", Integer.parseInt(0 + textFieldNetWt.getText()));
             if (!textFieldNetDateTime.getText().isEmpty()) {
                 Date date = dateAndTimeFormat.parse(textFieldNetDateTime.getText());
@@ -10637,9 +10471,12 @@ class WeighBridge {
             Object[] params;
             checkboxTransporterName.setText(checkboxIceWater.isSelected() ? "Party's City" : "Transporter's Name");
             checkboxCustomerName.setText(checkboxIceWater.isSelected() ? "Party's Name" : "Customer's Name");
-            checkboxBagDeduction.setText(getBagDeductionText());
+            checkboxCustom1.setText(getCustom2());
+            checkboxCustom2.setText(getCustom2());
+            checkboxCustom3.setText(getCustom2());
+            checkboxCustom4.setText(getCustom2());
             checkboxCharges.setText(getChargeText());
-            checkboxNoOfBags.setText(checkboxIceWater.isSelected() ? "Freight Charges" : "No Of Bags");
+            checkboxCustom1.setText(getCustom1());
             if (checkboxManualStatus.isSelected()) {
                 params = new Object[]{
                         message,
@@ -10654,15 +10491,16 @@ class WeighBridge {
                         checkboxPlace,
                         checkboxPhoneNo,
                         checkboxMaterial,
-                        checkboxNoOfBags,
                         checkboxCharges,
                         checkboxCredit,
                         checkboxGrossWeight,
                         checkboxGrossDateAndTime,
                         checkboxTareWeight,
                         checkboxTareDateAndTime,
-                        checkboxBagDeduction,
-                        checkboxRoundOffColumn,
+                        checkboxCustom1,
+                        checkboxCustom2,
+                        checkboxCustom3,
+                        checkboxCustom4,
                         checkboxNettWeight,
                         checkboxNettDateAndTime,
                         checkboxFinalWt,
@@ -10684,15 +10522,16 @@ class WeighBridge {
                         checkboxPlace,
                         checkboxPhoneNo,
                         checkboxMaterial,
-                        checkboxNoOfBags,
                         checkboxCharges,
                         checkboxCredit,
                         checkboxGrossWeight,
                         checkboxGrossDateAndTime,
                         checkboxTareWeight,
                         checkboxTareDateAndTime,
-                        checkboxBagDeduction,
-                        checkboxRoundOffColumn,
+                        checkboxCustom1,
+                        checkboxCustom2,
+                        checkboxCustom3,
+                        checkboxCustom4,
                         checkboxNettWeight,
                         checkboxNettDateAndTime,
                         checkboxFinalWt,
@@ -10733,15 +10572,43 @@ class WeighBridge {
         }
     }
 
-    private String getBagDeductionText() {
+    private String getCustom1() {
+        if (checkboxIceWater.isSelected()) {
+            return "Freight Charges";
+        } else if (checkboxEstimatedWeightSetting.isSelected()) {
+            return "Batch No";
+        } else {
+            return "CUSTOM_1";
+        }
+    }
+
+    private String getCustom2() {
         if (checkboxIceWater.isSelected()) {
             return "Ice/Water Less";
         } else if (checkboxRoundOff.isSelected()) {
             return "Price (per kg)";
         } else if (checkboxKottaSetting.isSelected()) {
             return "Kotta";
+        } else if (checkboxEstimatedWeightSetting.isSelected()) {
+            return "No of Bags";
         } else {
-            return "Bag Deduction";
+            return "CUSTOM_2";
+        }
+    }
+
+    private String getCustom3() {
+        if (checkboxEstimatedWeightSetting.isSelected()) {
+            return "Estimated Weight";
+        } else {
+            return "CUSTOM_3";
+        }
+    }
+
+    private String getCustom4() {
+        if (checkboxEstimatedWeightSetting.isSelected()) {
+            return "Difference Weight";
+        } else {
+            return "CUSTOM_4";
         }
     }
 
@@ -11398,7 +11265,6 @@ class WeighBridge {
                             rs.updateString("PLACE", (String) model.getValueAt(row, ++col));
                             rs.updateString("PHONE_NUMBER", (String) model.getValueAt(row, ++col));
                             rs.updateString("MATERIAL", (String) model.getValueAt(row, ++col));
-                            rs.updateInt("NOOFBAGS", Integer.parseInt("0" + model.getValueAt(row, ++col)));
                             rs.updateDouble("CHARGES", Double.parseDouble("0" + model.getValueAt(row, ++col)));
                             rs.updateBoolean("CREDIT", model.getValueAt(row, ++col).toString().equalsIgnoreCase("true"));
                             rs.updateInt("GROSSWT", Integer.parseInt(String.valueOf(model.getValueAt(row, ++col))));
@@ -11422,8 +11288,10 @@ class WeighBridge {
                                 rs.updateDate("TAREDATE", null);
                                 rs.updateTime("TARETIME", null);
                             }
-                            rs.updateDouble("DEDUCTION_OR_PER_COST", Double.parseDouble("0" + model.getValueAt(row, ++col)));
-                            rs.updateDouble("ROUND_OFF", Double.parseDouble("0" + model.getValueAt(row, ++col)));
+                            rs.updateString("CUSTOM_1",  (String) model.getValueAt(row, ++col));
+                            rs.updateString("CUSTOM_2",  (String) model.getValueAt(row, ++col));
+                            rs.updateString("CUSTOM_3",  (String) model.getValueAt(row, ++col));
+                            rs.updateString("CUSTOM_4",  (String) model.getValueAt(row, ++col));
                             rs.updateInt("NETWT", Integer.parseInt("0" + model.getValueAt(row, ++col)));
                             if (!(String.valueOf(model.getValueAt(row, ++col))).trim().isEmpty()) {
                                 Date date = dateAndTimeFormat.parse(String.valueOf(model.getValueAt(row, col)));
@@ -11497,15 +11365,16 @@ class WeighBridge {
                                     rs.getString("PLACE"),
                                     rs.getString("PHONE_NUMBER"),
                                     rs.getString("MATERIAL"),
-                                    rs.getInt("NOOFBAGS"),
                                     decimalFormat.format(rs.getDouble("CHARGES")),
                                     rs.getBoolean("CREDIT"),
                                     rs.getInt("GROSSWT"),
                                     gross,
                                     rs.getInt("TAREWT"),
                                     tare,
-                                    decimalFormat.format(rs.getDouble("DEDUCTION_OR_PER_COST")),
-                                    decimalFormat.format(rs.getDouble("ROUND_OFF")),
+                                    rs.getString("CUSTOM_1"),
+                                    rs.getString("CUSTOM_2"),
+                                    rs.getString("CUSTOM_3"),
+                                    rs.getString("CUSTOM_4"),
                                     rs.getInt("NETWT"),
                                     net,
                                     rs.getInt("FINALWT"),
