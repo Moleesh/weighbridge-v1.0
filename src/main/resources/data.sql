@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS WEIGHING
     PHONE_NUMBER             VARCHAR(100),
     MATERIAL                 VARCHAR(100),
     NOOFBAGS                 INTEGER,
+    ESTIMATED_WEIGHT         DOUBLE,
     CHARGES                  DOUBLE,
     CREDIT                   BOOLEAN,
     GROSSWT                  INTEGER,

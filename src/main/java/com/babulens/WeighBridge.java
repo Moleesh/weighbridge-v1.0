@@ -444,6 +444,8 @@ class WeighBridge {
     private List<MyCheckBox> reportCheckBox;
     private JCheckBox checkboxKottaSetting;
     private JLabel labelBagDeductionOrReductionCost;
+    private JCheckBox checkboxEstimatedWeightSetting;
+    private JLabel lblEstimatedWeight;
 
     /**
      * Create the application.
@@ -2877,6 +2879,7 @@ class WeighBridge {
         checkboxAutoChargeCheck.setFocusable(false);
         checkboxAutoChargeCheck.setBackground(new Color(0, 255, 127));
         checkboxAutoChargeCheck.setBounds(415, 390, 57, 25);
+        checkboxAutoChargeCheck.setVisible(false);
         checkboxAutoChargeCheck.addChangeListener(_ -> {
             if (btnGetWeight.isEnabled()) {
                 textFieldCharges.setEnabled(!checkboxAutoChargeCheck.isSelected());
@@ -5392,6 +5395,7 @@ class WeighBridge {
         });
         checkboxAutoCharges.setFont(new Font("Times New Roman", Font.ITALIC, 15));
         checkboxAutoCharges.setFocusable(false);
+        checkboxAutoCharges.setEnabled(false);
         checkboxAutoCharges.setBackground(new Color(0, 255, 127));
         checkboxAutoCharges.setBounds(195, 270, 115, 25);
         panelSettings1.add(checkboxAutoCharges);
@@ -5409,11 +5413,11 @@ class WeighBridge {
         checkboxEnableSettings2.setEnabled(false);
         checkboxEnableSettings2.addChangeListener(_ -> {
             if (checkboxEnableSettings2.isSelected()) {
-                tabbedPane.setEnabledAt(5, true);
-                tabbedPane.setTitleAt(5, "          Settings 2          ");
+                tabbedPane.setEnabledAt(9, true);
+                tabbedPane.setTitleAt(9, "          Settings 2          ");
             } else {
-                tabbedPane.setEnabledAt(5, false);
-                tabbedPane.setTitleAt(5, "");
+                tabbedPane.setEnabledAt(9, false);
+                tabbedPane.setTitleAt(9, "");
             }
         });
         checkboxEnableSettings2.setBackground(new Color(0, 255, 127));
@@ -5792,7 +5796,7 @@ class WeighBridge {
         checkboxTareNoSlNo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         checkboxTareNoSlNo.setFocusable(false);
         checkboxTareNoSlNo.setBackground(new Color(0, 255, 127));
-        checkboxTareNoSlNo.setBounds(1051, 50, 200, 25);
+        checkboxTareNoSlNo.setBounds(988, 50, 261, 25);
         panelSettings2.add(checkboxTareNoSlNo);
 
         JLabel lblBagsSetting = new JLabel("Settings");
@@ -5863,7 +5867,7 @@ class WeighBridge {
 
         JLabel lblOptions = new JLabel("Options");
         lblOptions.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 22));
-        lblOptions.setBounds(1051, 10, 150, 25);
+        lblOptions.setBounds(988, 10, 261, 25);
         panelSettings2.add(lblOptions);
 
         checkboxIceWater = new JCheckBox("Ice water/Freight");
@@ -5877,23 +5881,18 @@ class WeighBridge {
                 lblBagDeductionOrReductionCost.setText("Ice/Water Less");
                 lblCharges.setText("Rate");
                 lblNoOfBags.setText("Freight Charges");
-                checkboxExcludeCustomer.setEnabled(false);
-                checkboxExcludeCharges.setEnabled(false);
                 checkboxAutoCharges.setSelected(false);
-                checkboxExcludeNoOfBags.setEnabled(false);
-                checkboxExcludeDrivers.setEnabled(false);
                 lblFinalWt.setVisible(true);
                 textFieldFinalWt.setVisible(true);
                 label_6.setVisible(true);
                 textFieldFinalAmount.setVisible(true);
                 textFieldDeductionOrPerCost.setEnabled(true);
-                checkboxKottaSetting.setEnabled(false);
             }
             clear();
         });
         checkboxIceWater.setFocusable(false);
         checkboxIceWater.setBackground(new Color(0, 255, 127));
-        checkboxIceWater.setBounds(1051, 75, 200, 25);
+        checkboxIceWater.setBounds(988, 75, 261, 25);
         panelSettings2.add(checkboxIceWater);
 
         checkboxTareToken = new JCheckBox("Tare Token");
@@ -5908,7 +5907,7 @@ class WeighBridge {
         checkboxTareToken.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         checkboxTareToken.setFocusable(false);
         checkboxTareToken.setBackground(new Color(0, 255, 127));
-        checkboxTareToken.setBounds(1051, 125, 200, 25);
+        checkboxTareToken.setBounds(988, 125, 261, 25);
         panelSettings2.add(checkboxTareToken);
 
         checkboxExitPass = new JCheckBox("Exit Pass");
@@ -5916,7 +5915,7 @@ class WeighBridge {
         checkboxExitPass.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         checkboxExitPass.setFocusable(false);
         checkboxExitPass.setBackground(new Color(0, 255, 127));
-        checkboxExitPass.setBounds(1051, 150, 200, 25);
+        checkboxExitPass.setBounds(988, 150, 261, 25);
         panelSettings2.add(checkboxExitPass);
 
         JLabel lblOperations = new JLabel("Operations");
@@ -5931,7 +5930,6 @@ class WeighBridge {
             if (checkboxRoundOff.isSelected()) {
                 lblBagDeductionOrReductionCost.setText("Price (per kg)");
                 checkboxExcludePlaceAndPhoneNumber.setSelected(false);
-                checkboxExcludePlaceAndPhoneNumber.setEnabled(false);
                 checkboxIceWater.setSelected(false);
                 checkboxKottaSetting.setSelected(false);
                 checkboxExcludeNoOfBags.setSelected(true);
@@ -5940,44 +5938,38 @@ class WeighBridge {
                 checkboxExitPass.setSelected(true);
                 lblBagDeductionOrReductionCost.setVisible(true);
                 textFieldDeductionOrPerCost.setVisible(true);
-                checkboxKottaSetting.setEnabled(false);
-                checkboxExcludeNoOfBags.setEnabled(false);
-                checkboxTareToken.setEnabled(false);
-                checkboxExitPass.setEnabled(false);
                 textFieldRoundOff.setVisible(true);
-                checkboxAutoCharges.setEnabled(false);
-                checkboxExcludePlaceAndPhoneNumber.setEnabled(false);
             }
             clear();
         });
         checkboxRoundOff.setBackground(new Color(0, 255, 127));
-        checkboxRoundOff.setBounds(1051, 100, 200, 25);
+        checkboxRoundOff.setBounds(988, 100, 261, 25);
         panelSettings2.add(checkboxRoundOff);
 
         checkboxKottaSetting = new JCheckBox("Kotta Setting");
         checkboxKottaSetting.setSelected(false);
         checkboxKottaSetting.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         checkboxKottaSetting.setFocusable(false);
-        checkboxKottaSetting.setEnabled(false);
         checkboxKottaSetting.addChangeListener(_ -> {
             if (checkboxKottaSetting.isSelected()) {
+                lblBagDeductionOrReductionCost.setVisible(true);
                 lblBagDeductionOrReductionCost.setText("Kotta");
                 lblCharges.setText("Market Rate");
                 labelBagDeductionOrReductionCost.setText("");
-                checkboxIceWater.setSelected(false);
-                checkboxRoundOff.setSelected(false);
-                checkboxExcludeNoOfBags.setEnabled(false);
                 checkboxExcludeNoOfBags.setSelected(true);
-                checkboxAutoCharges.setSelected(false);
-                lblBagDeductionOrReductionCost.setVisible(true);
                 textFieldDeductionOrPerCost.setVisible(true);
                 textFieldRoundOff.setVisible(true);
-                checkboxAutoCharges.setEnabled(false);
+
+                checkboxIceWater.setSelected(false);
+                checkboxRoundOff.setSelected(false);
+                checkboxAutoCharges.setSelected(false);
+                checkboxKottaSetting.setSelected(false);
+
             }
             clear();
         });
         checkboxKottaSetting.setBackground(new Color(0, 255, 127));
-        checkboxKottaSetting.setBounds(1051, 175, 200, 25);
+        checkboxKottaSetting.setBounds(988, 175, 261, 25);
         panelSettings2.add(checkboxKottaSetting);
 
         JLabel lblRoundOffDecimals = new JLabel("Round Off decimals");
@@ -6135,6 +6127,34 @@ class WeighBridge {
         comboBoxInvoiceProperty.setFocusable(false);
         comboBoxInvoiceProperty.setBounds(215, 391, 168, 30);
         panelSettings2.add(comboBoxInvoiceProperty);
+        
+        checkboxEstimatedWeightSetting = new JCheckBox("Estimated Weight Setting");
+        checkboxEstimatedWeightSetting.setSelected(false);
+        checkboxEstimatedWeightSetting.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        checkboxEstimatedWeightSetting.setFocusable(false);
+        checkboxEstimatedWeightSetting.setBackground(new Color(0, 255, 127));
+        checkboxEstimatedWeightSetting.setBounds(988, 200, 261, 25);
+        checkboxEstimatedWeightSetting.addChangeListener(_ -> {
+            if (checkboxEstimatedWeightSetting.isSelected()) {
+                lblBagDeductionOrReductionCost.setText("No of Bags");
+                labelBagDeductionOrReductionCost.setText("");
+                
+                lblEstimatedWeight = new JLabel("");
+                lblEstimatedWeight.setEnabled(false);
+                lblEstimatedWeight.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+                lblEstimatedWeight.setBounds(775, 538, 175, 25);
+                panelWeighing.add(lblEstimatedWeight);
+                checkboxIceWater.setSelected(false);
+                checkboxRoundOff.setSelected(false);
+                checkboxExcludeNoOfBags.setSelected(true);
+                checkboxAutoCharges.setSelected(false);
+                lblBagDeductionOrReductionCost.setVisible(true);
+                textFieldDeductionOrPerCost.setVisible(true);
+                textFieldRoundOff.setVisible(true);
+            }
+            clear();
+        });
+        panelSettings2.add(checkboxEstimatedWeightSetting);
 
         JButton button = new JButton("Minimize");
         button.addActionListener(_ -> babulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
@@ -6682,6 +6702,9 @@ class WeighBridge {
                     textFieldNetDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldNetDateTime.getText()).getTime())));
                 }
                 textPaneRemarks.setText(rs.getString("REMARKS"));
+                lblOperatorName.setText(rs.getString("OPERATOR"));
+                lblEstimatedWeight.setText(decimalFormat.format(rs.getDouble("ESTIMATED_WEIGHT")));
+
                 radioButtonGross.setEnabled(false);
                 btnGetTareSl.setEnabled(false);
                 radioButtonTare.setEnabled(false);
@@ -6851,6 +6874,7 @@ class WeighBridge {
             comboBoxMaterial.setSelectedItem("");
             requestFocus("");
             lblOperatorName.setText(comboBoxOperator.getEditor().getItem().toString());
+            lblEstimatedWeight.setText("" + Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")));
         }
     }
 
@@ -8721,7 +8745,7 @@ class WeighBridge {
             graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
             graphics2D.drawString(String.format(format1, "Supplier", "Batch No", "Driver"), x, y += 14);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), "-", comboBoxOperator.getEditor().getItem()), x, y);
+            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), "-", comboBoxTransporterName.getEditor().getItem()), x, y);
             y += 6;
             graphics.drawLine(startX, y, endX, y);
 
@@ -8744,7 +8768,7 @@ class WeighBridge {
 
                 BufferedImage printImage = joinBufferedImageByWidth(cropImage1, cropImage2);
                 if (printImage != null) {
-                    graphics.drawImage(printImage, x, y + 6, 538, 148, null);
+                    graphics.drawImage(printImage, x, y + 6, 534, 148, null);
                 }
             } catch (NullPointerException ignored) {
             }
@@ -10408,6 +10432,7 @@ class WeighBridge {
             rs.updateString("PHONE_NUMBER", textFieldPhoneNo.getText());
             rs.updateString("MATERIAL", (String) comboBoxMaterial.getSelectedItem());
             rs.updateInt("NOOFBAGS", Integer.parseInt(0 + textFieldNoOfBags.getText().replaceAll("\\D", "")));
+            rs.updateDouble("ESTIMATED_WEIGHT", Double.parseDouble(0 + lblEstimatedWeight.getText().replaceAll("[^.\\d]", "")));
             rs.updateDouble("CHARGES", Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", "")));
             rs.updateBoolean("CREDIT", checkboxIsCredit.isSelected());
             rs.updateInt("GROSSWT", Integer.parseInt(textFieldGrossWt.getText()));
@@ -10729,7 +10754,7 @@ class WeighBridge {
             return img1;
         }
 
-        int offset = 2;
+        int offset = 10;
         int width = img1.getWidth() + img2.getWidth() + offset;
         int height = Math.max(img1.getHeight(), img2.getHeight());
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
