@@ -438,7 +438,6 @@ class WeighBridge {
     private JRadioButton radioButtonOtherStates;
     private List<MyCheckBox> reportCheckBox;
     private JCheckBox checkboxKottaSetting;
-    private JLabel labelBagDeductionOrReductionCost;
     private JCheckBox checkboxEstimatedWeightSetting;
     private JLabel labelCustom1;
     private JLabel labelCustom2;
@@ -2720,12 +2719,14 @@ class WeighBridge {
         });
         panelWeighing.add(checkboxAutoChargeCheck);
 
-        labelCustom1 = new JLabel("No Of Bags");
+        labelCustom1 = new JLabel("CUSTOM_1");
+        labelCustom1.setVisible(false);
         labelCustom1.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         labelCustom1.setBounds(50, 350, 175, 25);
         panelWeighing.add(labelCustom1);
 
         textFieldCustom1 = new JTextField();
+        textFieldCustom1.setVisible(false);
         textFieldCustom1.addActionListener(_ -> requestFocus("NoOfBags"));
         textFieldCustom1.setHorizontalAlignment(SwingConstants.CENTER);
         textFieldCustom1.setFont(new Font("Times New Roman", Font.PLAIN, 20));
@@ -2760,12 +2761,14 @@ class WeighBridge {
         textPaneRemarks.setFont(new Font("Times New Roman", Font.PLAIN, 15));
         textPaneRemarks.setDisabledTextColor(Color.BLACK);
 
-        labelCustom2 = new JLabel("Bag Deduction");
+        labelCustom2 = new JLabel("CUSTOM_2");
+        labelCustom2.setVisible(false);
         labelCustom2.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         labelCustom2.setBounds(475, 390, 141, 25);
         panelWeighing.add(labelCustom2);
 
         textFieldCustom2 = new JTextField();
+        textFieldCustom2.setVisible(false);
         textFieldCustom2.addActionListener(_ -> requestFocus("Custom1"));
         textFieldCustom2.setText("0");
         textFieldCustom2.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -2775,11 +2778,6 @@ class WeighBridge {
         textFieldCustom2.setColumns(10);
         textFieldCustom2.setBounds(619, 390, 100, 25);
         panelWeighing.add(textFieldCustom2);
-
-        labelBagDeductionOrReductionCost = new JLabel("Kg");
-        labelBagDeductionOrReductionCost.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        labelBagDeductionOrReductionCost.setBounds(729, 390, 25, 25);
-        panelWeighing.add(labelBagDeductionOrReductionCost);
 
         JLabel lblFinalWt = new JLabel("Final Wt");
         lblFinalWt.setVisible(false);
@@ -4752,6 +4750,7 @@ class WeighBridge {
         panelSettings1.add(textFieldFooter);
 
         checkboxExcludeCharges = new JCheckBox("Exclude Charges");
+        checkboxExcludeCharges.setEnabled(false);
         checkboxExcludeCharges.setFocusable(false);
         checkboxExcludeCharges.setBackground(new Color(0, 255, 127));
         checkboxExcludeCharges.addChangeListener(_ -> {
@@ -5780,15 +5779,11 @@ class WeighBridge {
             if (checkboxKottaSetting.isSelected()) {
                 labelCustom2.setVisible(true);
                 lblCharges.setText("Market Rate");
-                labelBagDeductionOrReductionCost.setText("");
                 textFieldCustom2.setVisible(true);
                 textFieldCustom3.setVisible(true);
-
                 checkboxIceWater.setSelected(false);
                 checkboxRoundOff.setSelected(false);
                 checkboxAutoCharges.setSelected(false);
-                checkboxKottaSetting.setSelected(false);
-
             }
             clear();
         });
@@ -5960,12 +5955,12 @@ class WeighBridge {
         checkboxEstimatedWeightSetting.setBounds(988, 200, 261, 25);
         checkboxEstimatedWeightSetting.addChangeListener(_ -> {
             if (checkboxEstimatedWeightSetting.isSelected()) {
-                labelBagDeductionOrReductionCost.setText("");
-
                 checkboxIceWater.setSelected(false);
                 checkboxRoundOff.setSelected(false);
                 checkboxAutoCharges.setSelected(false);
+                labelCustom1.setVisible(true);
                 labelCustom2.setVisible(true);
+                textFieldCustom1.setVisible(true);
                 textFieldCustom2.setVisible(true);
                 textFieldCustom3.setVisible(true);
                 textFieldCustom4.setVisible(true);
