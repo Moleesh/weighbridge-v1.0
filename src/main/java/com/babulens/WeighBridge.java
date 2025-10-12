@@ -450,7 +450,7 @@ class WeighBridge {
      * Create the application.
      */
     private WeighBridge() {
-        decimalFormat.setMaximumFractionDigits(340);
+        decimalFormat.setMaximumFractionDigits(2);
         try {
             printServices = PrinterJob.lookupPrintServices();
             printers = new Vector<>();
@@ -2224,6 +2224,7 @@ class WeighBridge {
                 textFieldTareWt.setText(lblWeight.getText());
                 textFieldTareDateTime.setText(textFieldDateTime.getText());
             }
+            textFieldNetDateTime.setText(textFieldDateTime.getText());
 
             getWeight();
         });
@@ -5861,7 +5862,6 @@ class WeighBridge {
             textFieldCharges.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCharges.getText()) + Double.parseDouble(textFieldCustom3.getText())));
         }
         if (checkboxKottaSetting.isSelected()) {
-            decimalFormat.setMaximumFractionDigits(2);
             textFieldCustom2.setText(decimalFormat.format(Double.parseDouble(0 + textFieldNetWt.getText()) / 87));
             textFieldCustom3.setText(Integer.toString((int) (Double.parseDouble(0 + textFieldCustom2.getText()) * Double.parseDouble(0 + textFieldCharges.getText()))));
         }
