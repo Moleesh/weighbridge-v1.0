@@ -182,7 +182,7 @@ VALUES ('2', NULL, NULL, NULL);
 INSERT INTO SETTINGS
 VALUES (1, 1, 1, 1200, 'COM0;8;0;10;~~~;f', 'BABULENS', 'NAGERCOIL', '', 'FOOTER', '',
         TRUE, FALSE, 1, 'Standard', 'Standard', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-         9600, 'COM0', '', '', '', '', '', '', '', '', '', '', '', '', FALSE, 0.0, 0, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE,
+         9600, 'COM0', '', '', '', '', '', '', '', '', '', '', '', '', FALSE, 0.0, 0, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE,
         '147085', '147085aA', '147085', '147085',  '147085', '147085', '147085', '147085', '147085', '123');
 INSERT INTO CAMERA
 VALUES (1, 'TRUE', 'WEBCAM TEMP', '770 * 433', 0, 0, 770, 433);
