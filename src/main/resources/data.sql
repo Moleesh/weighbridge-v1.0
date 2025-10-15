@@ -65,8 +65,8 @@ CREATE TABLE IF NOT EXISTS SETUP
 (
     ID                       VARCHAR(1) NOT NULL,
     UID                      VARCHAR(100),
-    ENDDATE                  DATETIME,
-    LASTLOGIN                DATETIME,
+    ENDDATE                  TIMESTAMP,
+    LASTLOGIN                TIMESTAMP,
     PRIMARY KEY (ID)
 );
 DROP TABLE IF EXISTS SETTINGS;
@@ -181,7 +181,7 @@ INSERT INTO SETUP
 VALUES ('2', NULL, NULL, NULL);
 INSERT INTO SETTINGS
 VALUES (1, 1, 1, 1200, 'COM0;8;0;10;~~~;f', 'BABULENS', 'NAGERCOIL', '', 'FOOTER', '',
-        TRUE, FALSE, 1, 'Standard', 'Standard', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+        TRUE, FALSE, 1, 'Standard', 'Standard', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
          9600, 'COM0', '', '', '', '', '', '', '', '', '', '', '', '', FALSE, 0.0, 0, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE,
         '147085', '147085aA', '147085', '147085',  '147085', '147085', '147085', '147085', '147085', '123');
 INSERT INTO CAMERA
