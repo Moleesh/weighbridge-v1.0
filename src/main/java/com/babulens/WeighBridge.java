@@ -215,7 +215,8 @@ class WeighBridge {
     private final JCheckBox checkboxTransporterName = new JCheckBox("Transporter's Name");
     private final JCheckBox checkboxVehicleNo = new JCheckBox("Vehicle No");
     private final JCheckBox checkboxVehicleType = new JCheckBox("Vehicle Type");
-    private final JCheckBox checkboxOperator = new JCheckBox("Operator");
+    private final JCheckBox checkboxOperatorTare = new JCheckBox("Operator Tare");
+    private final JCheckBox checkboxOperatorGross = new JCheckBox("Operator Gross");
     private final JCheckBox checkboxPlace = new JCheckBox("Place");
     private final JCheckBox checkboxPhoneNo = new JCheckBox("Phone No");
     private final JCheckBox checkboxMaterial = new JCheckBox("Material");
@@ -445,6 +446,8 @@ class WeighBridge {
     private JTextField textFieldCustom2;
     private JTextField textFieldCustom3;
     private JTextField textFieldCustom4;
+    private String operatorTare = "";
+    private String operatorGross = "";
 
     /**
      * Create the application.
@@ -5817,6 +5820,14 @@ class WeighBridge {
     private void getWeight() {
         comboBoxVehicleNo.setSelectedItem(((String) comboBoxVehicleNo.getEditor().getItem()).toUpperCase().replaceAll(" ", ""));
 
+        if (radioButtonGross.isSelected()) {
+            operatorGross = lblOperatorName.getText();
+            operatorTare = "";
+        } else {
+            operatorTare = lblOperatorName.getText();
+            operatorGross = "";
+        }
+
         if (checkboxIceWater.isSelected()) {
             textFieldCustom2.setText(Integer.toString(Integer.parseInt(0 + textFieldCustom2.getText().replaceAll("\\D", ""))));
 
@@ -6149,7 +6160,7 @@ class WeighBridge {
                 dateTemp = datePicker2.getDate();
                 date2 = (new java.sql.Date(dateTemp.getTime())).toString();
                 textField = textFieldReportTextBox.getText();
-                temp = "SELECT * FROM WEIGHING WHERE UPPER(OPERATOR) LIKE UPPER('%" + textField + "%') AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
+                temp = "SELECT * FROM WEIGHING WHERE (UPPER(OPERATOR_GROSS) LIKE UPPER('%" + textField + "%') OR UPPER(OPERATOR_TARE) LIKE UPPER('%" + textField + "%')) AND NETDATE BETWEEN '" + date1 + "' AND '" + date2 + "'";
                 break;
         }
         try {
@@ -6164,7 +6175,8 @@ class WeighBridge {
                             checkboxIceWater.isSelected() ? "Party's City" : "Transporter's Name",
                             "Vehicle No",
                             "Vehicle Type",
-                            "Operator",
+                            "Operator Tare",
+                            "Operator Gross",
                             "Place",
                             "Phone No",
                             "Material",
@@ -6252,7 +6264,8 @@ class WeighBridge {
                         /*07*/
                         rs.getString("VEHICLE_TYPE"),
                         /*08*/
-                        rs.getString("OPERATOR"),
+                        rs.getString("OPERATOR_TARE"),
+                        rs.getString("OPERATOR_GROSS"),
                         /*09*/
                         rs.getString("PLACE"),
                         /*10*/
@@ -6318,8 +6331,11 @@ class WeighBridge {
             if (!checkboxVehicleType.isSelected()) {
                 tableReport.removeColumn(tableReport.getColumn("Vehicle Type"));
             }
-            if (!checkboxOperator.isSelected()) {
-                tableReport.removeColumn(tableReport.getColumn("Operator"));
+            if (!checkboxOperatorTare.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Operator Tare"));
+            }
+            if (!checkboxOperatorGross.isSelected()) {
+                tableReport.removeColumn(tableReport.getColumn("Operator Gross"));
             }
             if (!checkboxPlace.isSelected()) {
                 tableReport.removeColumn(tableReport.getColumn("Place"));
@@ -6411,7 +6427,6 @@ class WeighBridge {
                 comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                 comboBoxVehicleNo.setSelectedItem(rs.getString("VEHICLENO"));
                 comboBoxVehicleType.setSelectedItem(rs.getString("VEHICLE_TYPE"));
-                lblOperatorName.setText(rs.getString("OPERATOR"));
                 textFieldPlace.setText(rs.getString("PLACE"));
                 textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
                 comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
@@ -6445,8 +6460,8 @@ class WeighBridge {
                     textFieldNetDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldNetDateTime.getText()).getTime())));
                 }
                 textPaneRemarks.setText(rs.getString("REMARKS"));
-                lblOperatorName.setText(rs.getString("OPERATOR"));
-//                lblEstimatedWeight.setText(decimalFormat.format(rs.getDouble("ESTIMATED_WEIGHT")));
+                operatorTare = rs.getString("OPERATOR_TARE");
+                operatorGross = rs.getString("OPERATOR_GROSS");
 
                 radioButtonGross.setEnabled(false);
                 btnGetTareSl.setEnabled(false);
@@ -6479,8 +6494,12 @@ class WeighBridge {
                 btnReprint.requestFocus();
             }
         } catch (SQLException | ParseException ignored) {
-            JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-            btnReprint.requestFocus();
+            if (runUpdateSQL()) {
+                rePrint(response);
+            } else {
+                JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                btnReprint.requestFocus();
+            }
         }
     }
 
@@ -8441,15 +8460,6 @@ class WeighBridge {
             int x = startX + 6;
             int y = startY;
 
-            String date, time;
-            try {
-                date = dateFormatSlash.format(dateAndTimeFormat.parse(textFieldNetDateTime.getText()));
-                time = timeFormatWithSecond.format(dateAndTimeFormat.parse(textFieldNetDateTime.getText()));
-            } catch (ParseException pe) {
-                date = "";
-                time = "";
-            }
-
             graphics2D.setColor(Color.BLACK);
             graphics2D.fillRect(startX, y, 546, 50);
 
@@ -8471,13 +8481,14 @@ class WeighBridge {
             y += 4;
             graphics.drawLine(startX, y, endX, y);
 
+            String format = "%-11.11s:                  %-11.11s:";
             String format1 = "%-11.11s:                  %-11.11s:                  %-11.11s:";
             String format2 = "            %-30.30s%-30.30s%-30.30s";
 
             graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
-            graphics2D.drawString(String.format(format1, "Bill No", "Date", "Time"), x, y += 14);
+            graphics2D.drawString(String.format(format, "Bill No", "Transporter"), x, y += 14);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString(String.format(format2, textFieldSlNo.getText(), date, time), x, y);
+            graphics2D.drawString(String.format(format2, textFieldSlNo.getText(), comboBoxTransporterName.getEditor().getItem(), ""), x, y);
             y += 6;
             graphics.drawLine(startX, y, endX, y);
 
@@ -8489,9 +8500,9 @@ class WeighBridge {
             graphics.drawLine(startX, y, endX, y);
 
             graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
-            graphics2D.drawString(String.format(format1, "Supplier", "Batch No", "Driver"), x, y += 14);
+            graphics2D.drawString(String.format(format1, "Sup/Cust", "Batch/DC No", "Driver, Mob"), x, y += 14);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), textFieldCustom1.getText(), comboBoxTransporterName.getEditor().getItem()), x, y);
+            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), textFieldDcNo.getText(), textFieldCustom1.getText()), x, y);
             y += 6;
             graphics.drawLine(startX, y, endX, y);
 
@@ -8541,10 +8552,13 @@ class WeighBridge {
             y += 10;
             graphics.drawLine(startX, y, endX, y);
             graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
-            graphics2D.drawString("Authorised Sign :", x, y += 20);
+            graphics2D.drawString("G/W Opr Name :", x, y += 20);
+            graphics2D.drawString("T/W Opr Name :", x, y + 16);
             graphics2D.drawString("Estimated Weight  :", 301, y);
             graphics2D.drawString("Difference Weight :", 301, y + 16);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString("              " + operatorGross, x, y);
+            graphics2D.drawString("              " + operatorTare, x, y + 16);
             graphics2D.drawString("                   " + textFieldCustom3.getText(), 301, y);
             graphics2D.drawString("                   " + textFieldCustom4.getText(), 301, y + 16);
 
@@ -9193,9 +9207,14 @@ class WeighBridge {
             cell.setCellValue("Vehicle Type");
             cell.setCellStyle(cellStyleStringCenter);
         }
-        if (checkboxOperator.isSelected()) {
+        if (checkboxOperatorTare.isSelected()) {
             cell = row.createCell(j++);
-            cell.setCellValue("Operator");
+            cell.setCellValue("Operator Tare");
+            cell.setCellStyle(cellStyleStringCenter);
+        }
+        if (checkboxOperatorGross.isSelected()) {
+            cell = row.createCell(j++);
+            cell.setCellValue("Operator Gross");
             cell.setCellStyle(cellStyleStringCenter);
         }
         if (checkboxPlace.isSelected()) {
@@ -9348,7 +9367,12 @@ class WeighBridge {
                 cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
             }
             j++;
-            if (checkboxOperator.isSelected()) {
+            if (checkboxOperatorTare.isSelected()) {
+                cell = row.createCell(c++);
+                cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
+            }
+            j++;
+            if (checkboxOperatorGross.isSelected()) {
                 cell = row.createCell(c++);
                 cell.setCellValue(model.getValueAt(i, j) != null ? model.getValueAt(i, j).toString() : "");
             }
@@ -9707,7 +9731,8 @@ class WeighBridge {
                 rs.updateString("DRIVERNAME", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
                 rs.updateString("VEHICLENO", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
                 rs.updateString("VEHICLE_TYPE", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
-                rs.updateString("OPERATOR", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                rs.updateString("OPERATOR_TARE", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
+                rs.updateString("OPERATOR_GROSS", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
                 rs.updateString("PLACE", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
                 rs.updateString("PHONE_NUMBER", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
                 rs.updateString("MATERIAL", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim() : "");
@@ -10183,7 +10208,8 @@ class WeighBridge {
             rs.updateString("DRIVERNAME", temp);
             rs.updateString("VEHICLENO", vehicleNo);
             rs.updateString("VEHICLE_TYPE", (String) comboBoxVehicleType.getSelectedItem());
-            rs.updateString("OPERATOR", lblOperatorName.getText());
+            rs.updateString("OPERATOR_TARE", operatorTare);
+            rs.updateString("OPERATOR_GROSS", operatorGross);
             rs.updateString("PLACE", textFieldPlace.getText());
             rs.updateString("PHONE_NUMBER", textFieldPhoneNo.getText());
             rs.updateString("MATERIAL", (String) comboBoxMaterial.getSelectedItem());
@@ -10409,7 +10435,8 @@ class WeighBridge {
                         checkboxTransporterName,
                         checkboxVehicleNo,
                         checkboxVehicleType,
-                        checkboxOperator,
+                        checkboxOperatorTare,
+                        checkboxOperatorGross,
                         checkboxPlace,
                         checkboxPhoneNo,
                         checkboxMaterial,
@@ -10440,7 +10467,8 @@ class WeighBridge {
                         checkboxTransporterName,
                         checkboxVehicleNo,
                         checkboxVehicleType,
-                        checkboxOperator,
+                        checkboxOperatorTare,
+                        checkboxOperatorGross,
                         checkboxPlace,
                         checkboxPhoneNo,
                         checkboxMaterial,
@@ -10498,7 +10526,7 @@ class WeighBridge {
         if (checkboxIceWater.isSelected()) {
             return "Freight Charges";
         } else if (checkboxEstimatedWeightSetting.isSelected()) {
-            return "Batch No";
+            return "Driver, Mobile";
         } else {
             return "CUSTOM_1";
         }
@@ -11183,7 +11211,8 @@ class WeighBridge {
                             rs.updateString("DRIVERNAME", (String) model.getValueAt(row, ++col));
                             rs.updateString("VEHICLENO", (String) model.getValueAt(row, ++col));
                             rs.updateString("VEHICLE_TYPE", (String) model.getValueAt(row, ++col));
-                            rs.updateString("OPERATOR", (String) model.getValueAt(row, ++col));
+                            rs.updateString("OPERATOR_TARE", (String) model.getValueAt(row, ++col));
+                            rs.updateString("OPERATOR_GROSS", (String) model.getValueAt(row, ++col));
                             rs.updateString("PLACE", (String) model.getValueAt(row, ++col));
                             rs.updateString("PHONE_NUMBER", (String) model.getValueAt(row, ++col));
                             rs.updateString("MATERIAL", (String) model.getValueAt(row, ++col));
@@ -11283,7 +11312,8 @@ class WeighBridge {
                                     rs.getString("DRIVERNAME"),
                                     rs.getString("VEHICLENO"),
                                     rs.getString("VEHICLE_TYPE"),
-                                    rs.getString("OPERATOR"),
+                                    rs.getString("OPERATOR_TARE"),
+                                    rs.getString("OPERATOR_GROSS"),
                                     rs.getString("PLACE"),
                                     rs.getString("PHONE_NUMBER"),
                                     rs.getString("MATERIAL"),
