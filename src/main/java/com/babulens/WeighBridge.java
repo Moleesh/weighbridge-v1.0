@@ -5911,6 +5911,7 @@ class WeighBridge {
         btnTotal.setEnabled(false);
         textPaneRemarks.setEnabled(false);
         checkboxIsCredit.setEnabled(false);
+        textFieldCustom3.setEnabled(false);
         btnSave.requestFocus();
     }
 
@@ -8453,7 +8454,7 @@ class WeighBridge {
 
             Graphics2D graphics2D = (Graphics2D) graphics;
             graphics2D.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-            graphics2D.scale(.96, .96);
+            graphics2D.scale(.94, .94);
             graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             int startX = 30;
