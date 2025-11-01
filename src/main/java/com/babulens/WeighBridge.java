@@ -4940,7 +4940,7 @@ class WeighBridge {
                 "Quotation KJJ",
                 "Sri Pathy",
                 "Standard",
-                "Vaighai"
+                "Electra"
         }));
         comboBoxPrintOptionForWeight.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         comboBoxPrintOptionForWeight.setFocusable(false);
@@ -5884,7 +5884,7 @@ class WeighBridge {
 
         if (checkboxEstimatedWeightSetting.isSelected()) {
             textFieldCustom2.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCustom2.getText().replaceAll("[^.\\d]", ""))));
-            textFieldCustom3.setText(decimalFormat.format(Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")) * Integer.parseInt(0 + textFieldCustom2.getText().replaceAll("\\D", ""))));
+            textFieldCustom3.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCustom3.getText().replaceAll("[^.\\d]", ""))));
             textFieldCustom4.setText(decimalFormat.format(Double.parseDouble(textFieldNetWt.getText()) - Double.parseDouble(textFieldCustom3.getText())));
         }
 
@@ -5986,8 +5986,8 @@ class WeighBridge {
                 case "Quotation KJJ":
                     printQuotationKJJ();
                     continue;
-                case "Vaighai":
-                    printVaighai();
+                case "Electra":
+                    printElectra();
                     continue;
                 default:
                     printPlainWeight();
@@ -6619,6 +6619,7 @@ class WeighBridge {
             checkboxAutoChargeCheck.setEnabled(true);
             checkboxAutoChargeCheck.setSelected(checkboxAutoCharges.isSelected());
             textFieldCharges.setEnabled(!(checkboxExcludeCharges.isSelected() || checkboxAutoChargeCheck.isSelected()));
+            textFieldCustom3.setEnabled(checkboxEstimatedWeightSetting.isSelected());
             textPaneRemarks.setText("");
             textFieldDcNo.setText("");
             textFieldDcDate.setText("");
@@ -8432,13 +8433,13 @@ class WeighBridge {
         }
     }
 
-    private void printVaighai() {
+    private void printElectra() {
         PrinterJob printerJob = PrinterJob.getPrinterJob();
         PageFormat pf = printerJob.defaultPage();
         Paper paper = pf.getPaper();
 
-        double width = 8d * 72d;
-        double height = 6d * 72d;
+        double width = 7.8d * 72d;
+        double height = 5.8d * 72d;
         double widthMargin = 0d * 72d;
         double heightMargin = 0d * 72d;
         paper.setSize(width, height);
@@ -8452,16 +8453,17 @@ class WeighBridge {
 
             Graphics2D graphics2D = (Graphics2D) graphics;
             graphics2D.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+            graphics2D.scale(.96, .96);
             graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            int startX = 28;
+            int startX = 30;
             int startY = 27;
             int endX = 574;
             int x = startX + 6;
             int y = startY;
 
             graphics2D.setColor(Color.BLACK);
-            graphics2D.fillRect(startX, y, 546, 50);
+            graphics2D.fillRect(startX, y, 544, 50);
 
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
             graphics2D.setColor(Color.WHITE);
@@ -8486,9 +8488,9 @@ class WeighBridge {
             String format2 = "            %-30.30s%-30.30s%-30.30s";
 
             graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
-            graphics2D.drawString(String.format(format, "Bill No", "Transporter"), x, y += 14);
+            graphics2D.drawString(String.format(format1, "Bill No", "Transporter", "Batch/DC No"), x, y += 14);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString(String.format(format2, textFieldSlNo.getText(), comboBoxTransporterName.getEditor().getItem(), ""), x, y);
+            graphics2D.drawString(String.format(format2, textFieldSlNo.getText(), textFieldDcNo.getText(), comboBoxTransporterName.getEditor().getItem()), x, y);
             y += 6;
             graphics.drawLine(startX, y, endX, y);
 
@@ -8500,9 +8502,9 @@ class WeighBridge {
             graphics.drawLine(startX, y, endX, y);
 
             graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
-            graphics2D.drawString(String.format(format1, "Sup/Cust", "Batch/DC No", "Driver, Mob"), x, y += 14);
+            graphics2D.drawString(String.format(format, "Sup/Cust", "Driver, Mob"), x, y += 14);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), textFieldDcNo.getText(), textFieldCustom1.getText()), x, y);
+            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), textFieldCustom1.getText(), ""), x, y);
             y += 6;
             graphics.drawLine(startX, y, endX, y);
 
@@ -8525,7 +8527,7 @@ class WeighBridge {
 
                 BufferedImage printImage = joinBufferedImageByWidth(cropImage1, cropImage2);
                 if (printImage != null) {
-                    graphics.drawImage(printImage, x, y + 6, 534, 148, null);
+                    graphics.drawImage(printImage, x, y + 6, 532, 148, null);
                 }
             } catch (NullPointerException ignored) {
             }
