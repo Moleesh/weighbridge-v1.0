@@ -2720,58 +2720,69 @@ class WeighBridge {
             if (l.getActionCommand().equals("comboBoxEdited")) {
                 comboBoxVehicleNo.setSelectedItem(((String) comboBoxVehicleNo.getEditor().getItem()).toUpperCase().replaceAll(" ", ""));
                 if (!checkboxTareNoSlNo.isSelected()) {
-                    if (radioButtonGross.isSelected()) {
-                        try {
-                            Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                            ResultSet rs = stmt.executeQuery("SELECT * FROM VEHICLETARES WHERE VEHICLENO LIKE '" + comboBoxVehicleNo.getEditor().getItem() + "'");
-                            if (rs.next()) {
-                                if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the Stored tare Weight ?", "Tare Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                                    textFieldTareDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
-                                    if (textFieldTareDateTime.getText().equals("null null")) {
-                                        textFieldTareDateTime.setText("");
-                                    } else {
-                                        textFieldTareDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
-                                    }
-                                    textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
+                    try {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        ResultSet rs = stmt.executeQuery("SELECT * FROM VEHICLETARES WHERE VEHICLENO LIKE '" + comboBoxVehicleNo.getEditor().getItem() + "'");
+                        if (rs.next()) {
+                            if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the Stored tare Weight ?", "Tare Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                                textFieldDcNo.setText(rs.getString("DCNO"));
+                                textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateFormatHyphen.format(rs.getDate("DCNODATE")));
+                                comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
+                                comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
+                                textFieldPlace.setText(rs.getString("PLACE"));
+                                textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
+                                checkboxIsCredit.setSelected(rs.getBoolean("CREDIT"));
+                                textFieldCustom1.setText(rs.getString("CUSTOM_1"));
+                                textFieldCustom2.setText(rs.getString("CUSTOM_2"));
+                                textFieldCustom3.setText(rs.getString("CUSTOM_3"));
+                                textFieldCustom4.setText(rs.getString("CUSTOM_4"));
+                                textFieldTareDateTime.setText(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME"));
+                                if (textFieldTareDateTime.getText().equals("null null")) {
+                                    textFieldTareDateTime.setText("");
+                                } else {
+                                    textFieldTareDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldTareDateTime.getText()).getTime())));
+                                }
+                                textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
+                                radioButtonGross.setSelected(true);
+                                return;
+                            }
+                        }
+                    } catch (SQLException | ParseException ignored) {
+                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+
+                    try {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE VEHICLENO LIKE '" + comboBoxVehicleNo.getEditor().getItem() + "'");
+                        if (rs.last()) {
+                            if (rs.getInt("TAREWT") == 0) {
+                                if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the last gross Weight ?", "Gross Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                                    textFieldDcNo.setText(rs.getString("DCNO"));
+                                    textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateFormatHyphen.format(rs.getDate("DCNODATE")));
+                                    comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
+                                    comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
                                     textFieldPlace.setText(rs.getString("PLACE"));
                                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
-                                }
-                            }
-                        } catch (SQLException | ParseException ignored) {
-                            JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                        }
-                    } else {
-                        try {
-                            Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                            ResultSet rs = stmt.executeQuery("SELECT * FROM WEIGHING WHERE VEHICLENO LIKE '" + comboBoxVehicleNo.getEditor().getItem() + "'");
-                            if (rs.last()) {
-                                if (rs.getInt("TAREWT") == 0) {
-                                    if (JOptionPane.showConfirmDialog(null, "Please Select Yes to Enter the last gross Weight ?", "Gross Weight Available", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                                        textFieldDcNo.setText(rs.getString("DCNO"));
-                                        textFieldDcDate.setText(rs.getDate("DCNODATE") == null ? "" : dateFormatHyphen.format(rs.getDate("DCNODATE")));
-                                        comboBoxCustomerName.setSelectedItem(rs.getString("CUSTOMERNAME"));
-                                        comboBoxTransporterName.setSelectedItem(rs.getString("DRIVERNAME"));
-                                        textFieldPlace.setText(rs.getString("PLACE"));
-                                        textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
-                                        checkboxIsCredit.setSelected(rs.getBoolean("CREDIT"));
-                                        textFieldCustom1.setText(rs.getString("CUSTOM_1"));
-                                        textFieldCustom2.setText(rs.getString("CUSTOM_2"));
-                                        textFieldCustom3.setText(rs.getString("CUSTOM_3"));
-                                        textFieldCustom4.setText(rs.getString("CUSTOM_4"));
-                                        textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
-                                        if (textFieldGrossDateTime.getText().equals("null null")) {
-                                            textFieldGrossDateTime.setText("");
-                                        } else {
-                                            textFieldGrossDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
-                                        }
-                                        textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
-                                        comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
+                                    checkboxIsCredit.setSelected(rs.getBoolean("CREDIT"));
+                                    textFieldCustom1.setText(rs.getString("CUSTOM_1"));
+                                    textFieldCustom2.setText(rs.getString("CUSTOM_2"));
+                                    textFieldCustom3.setText(rs.getString("CUSTOM_3"));
+                                    textFieldCustom4.setText(rs.getString("CUSTOM_4"));
+                                    textFieldGrossDateTime.setText(rs.getDate("GROSSDATE") + " " + rs.getTime("GROSSTIME"));
+                                    if (textFieldGrossDateTime.getText().equals("null null")) {
+                                        textFieldGrossDateTime.setText("");
+                                    } else {
+                                        textFieldGrossDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldGrossDateTime.getText()).getTime())));
                                     }
+                                    textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
+                                    comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
+                                    radioButtonTare.setSelected(true);
+                                    return;
                                 }
                             }
-                        } catch (SQLException | ParseException ignored) {
-                            JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                         }
+                    } catch (SQLException | ParseException ignored) {
+                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
                     if (radioButtonTare.isSelected()) {
