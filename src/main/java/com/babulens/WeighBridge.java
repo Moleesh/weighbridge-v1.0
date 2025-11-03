@@ -159,6 +159,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2832,7 +2833,6 @@ class WeighBridge {
                     } catch (SQLException | ParseException ignored) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
                     }
-
                 }
                 requestFocus("VehicleNo");
             }
@@ -8444,7 +8444,7 @@ class WeighBridge {
 
             Graphics2D graphics2D = (Graphics2D) graphics;
             graphics2D.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-            graphics2D.scale(.94, .94);
+            graphics2D.scale(.93, .93);
             graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             int startX = 30;
@@ -8481,7 +8481,7 @@ class WeighBridge {
             graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
             graphics2D.drawString(String.format(format1, "Bill No", "Transporter", "Batch/DC No"), x, y += 14);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString(String.format(format2, textFieldSlNo.getText(), textFieldDcNo.getText(), comboBoxTransporterName.getEditor().getItem()), x, y);
+            graphics2D.drawString(String.format(format2, textFieldSlNo.getText(), comboBoxTransporterName.getEditor().getItem(), textFieldDcNo.getText()), x, y);
             y += 6;
             graphics.drawLine(startX, y, endX, y);
 
@@ -8503,14 +8503,14 @@ class WeighBridge {
                 BufferedImage cropImage1 = null, cropImage2 = null;
 
                 try {
-                    BufferedImage printImage1 = getAvailableImage(1);
+                    BufferedImage printImage1 = getAvailableImage(1, radioButtonGross.isSelected() ? "_G" : "_T");
                     cropImage1 = printImage1.getSubimage(
                             Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
                 }
 
                 try {
-                    BufferedImage printImage2 = getAvailableImage(2);
+                    BufferedImage printImage2 = getAvailableImage(2, radioButtonGross.isSelected() ? "_G" : "_T");
                     cropImage2 = printImage2.getSubimage(
                             Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
@@ -9793,19 +9793,20 @@ class WeighBridge {
         return failedSlNo;
     }
 
-    private BufferedImage getAvailableImage(int no) throws IOException {
+    private BufferedImage getAvailableImage(int no, String... affix) throws IOException {
+        List<String> affixes = new ArrayList<>();
+        if (affix != null) Collections.addAll(affixes, affix);
+        affixes.addAll(List.of("_G", "_T", ""));
         String basePath = "CameraOutput/" + textFieldSlNo.getText();
-        String[] affixes = {"_G", "_T", ""};
 
-        for (String affix : affixes) {
-            File file = new File(basePath + affix + "_" + no + ".jpg");
+        File match = affixes.stream()
+                .map(_affix -> new File(basePath + _affix + "_" + no + ".jpg"))
+                .filter(File::exists)
+                .findFirst()
+                .orElseThrow(() -> new IOException("No matching image found"));
 
-            if (file.exists()) {
-                return ImageIO.read(file);
-            }
-        }
+        return ImageIO.read(match);
 
-        throw new IOException();
     }
 
     private synchronized void initializeWeights() {
