@@ -8190,7 +8190,7 @@ class WeighBridge {
         PageFormat pf = new PageFormat();
         Paper paper = pf.getPaper();
         double width = 2.8d * 72d;
-        double height = 4d * 72d;
+        double height = 4.3d * 72d;
         double widthMargin = 0d * 72d;
         double heightMargin = 0d * 72d;
         paper.setSize(width, height);
@@ -8202,6 +8202,7 @@ class WeighBridge {
                             space = 20;
                     graphics.setFont(new Font("Courier New", Font.BOLD, 12));
                     graphics.drawString(StringUtils.center(title1.getText(), 29), 0, y += space);
+                    graphics.drawString(StringUtils.center(title2.getText(), 29), 0, y += space);
                     graphics.drawString("    " + textFieldSlNo.getText(), 0, y += 2 * space);
                     graphics.drawString("     " + comboBoxCustomerName.getEditor().getItem(), 0, y += space);
                     graphics.drawString("       " + textFieldPlace.getText(), 0, y += space);
@@ -8213,7 +8214,7 @@ class WeighBridge {
                     graphics.drawString(StringUtils.leftPad(textFieldNetWt.getText(), 27), 0, y + 30);
 
                     graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-                    graphics.drawString("No:", 0, y = 70);
+                    graphics.drawString("No:", 0, y = 90);
                     graphics.drawString("M/s:", 0, y += space);
                     graphics.drawString("Place:", 0, y += space);
                     graphics.drawString("Phone:", 0, y += space);
@@ -8226,7 +8227,7 @@ class WeighBridge {
                     graphics.drawString(StringUtils.leftPad("Driver Sign", 27), 0, y + 30);
 
                     graphics.setFont(new Font("Courier New", Font.BOLD, 9));
-                    graphics.drawString("                          " + (textFieldNetDateTime.getText() + " . ").split(" ")[0], 0, 70);
+                    graphics.drawString("                        " + (textFieldNetDateTime.getText() + " . ").split(" ")[0], 0, 90);
 
                     return Printable.PAGE_EXISTS;
                 },
