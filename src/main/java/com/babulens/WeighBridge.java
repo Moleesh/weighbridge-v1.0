@@ -433,6 +433,7 @@ class WeighBridge {
     private JPanel panelInvoiceLeft;
     private JPanel panelInvoiceRight;
     private Map<String, JComponent> invoiceFields;
+    private Map<String, Set<JComboBox<String>>> invoiceComboBox;
     private JButton btnGetTotal;
     private JButton btnInvoiceSave;
     private JButton btnInvoicePrint;
@@ -1040,6 +1041,99 @@ class WeighBridge {
             rs.absolute(1);
             rs.updateInt("INVOICE_NO", ++invoiceNo);
             rs.updateRow();
+
+            try {
+                Set<String> temp = new HashSet<>();
+                stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                rs = stmt.executeQuery("SELECT * FROM MATERIALS");
+                Set<JComboBox<String>> material = invoiceComboBox.getOrDefault("material", Set.of());
+                rs.last();
+                int nextSqNo = rs.getRow() + 1;
+
+                material.forEach(comboBox -> {
+                    String item = (String) comboBox.getSelectedItem();
+                    if (item != null && !item.isEmpty() && materialSet.add(item)) {
+                        temp.add(item);
+                    }
+                });
+
+                for (String item : temp) {
+                    rs.moveToInsertRow();
+                    rs.updateString("MATERIAL", item);
+                    rs.updateInt("SQNO", nextSqNo++);
+                    rs.insertRow();
+                    material.forEach(comboBox -> comboBox.addItem(item));
+                }
+            } catch (SQLException ignored) {
+            }
+
+            try {
+                Set<String> temp = new HashSet<>();
+                stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                rs = stmt.executeQuery("SELECT * FROM VEHICLE_TYPE");
+                Set<JComboBox<String>> vehicleNo = invoiceComboBox.getOrDefault("vehicleNo", Set.of());
+
+                vehicleNo.forEach(comboBox -> {
+                    String item = (String) comboBox.getSelectedItem();
+                    if (item != null && !item.isEmpty() && vehicleTypeSet.add(item)) {
+                        temp.add(item);
+                    }
+                });
+
+                for (String item : temp) {
+                    rs.moveToInsertRow();
+                    rs.updateString("VEHICLE_TYPE", item);
+                    rs.insertRow();
+                    vehicleNo.forEach(comboBox -> comboBox.addItem(item));
+                }
+            } catch (SQLException ignored) {
+            }
+
+            try {
+                Set<String> temp = new HashSet<>();
+                stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                rs = stmt.executeQuery("SELECT * FROM CUSTOMER");
+                Set<JComboBox<String>> buyer = invoiceComboBox.getOrDefault("buyer", Set.of());
+
+                buyer.forEach(comboBox -> {
+                    String item = (String) comboBox.getSelectedItem();
+                    if (item != null && !item.isEmpty() && customerSet.add(item)) {
+                        temp.add(item);
+                    }
+                });
+
+                for (String item : temp) {
+                    rs.moveToInsertRow();
+                    rs.updateString("CUSTOMER", item);
+                    rs.insertRow();
+                    buyer.forEach(comboBox -> comboBox.addItem(item));
+                }
+            } catch (SQLException ignored) {
+            }
+
+            try {
+                Set<String> temp = new HashSet<>();
+                stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                rs = stmt.executeQuery("SELECT * FROM TRANSPORTER");
+                Set<JComboBox<String>> transporter = invoiceComboBox.getOrDefault("transporter", Set.of());
+
+                transporter.forEach(comboBox -> {
+                    String item = (String) comboBox.getSelectedItem();
+                    if (item != null && !item.isEmpty() && transportSet.add(item)) {
+                        temp.add(item);
+                    }
+                });
+
+                for (String item : temp) {
+                    rs.moveToInsertRow();
+                    rs.updateString("TRANSPORTER", item);
+                    rs.insertRow();
+
+                    transporter.forEach(comboBox -> comboBox.addItem(item));
+                }
+            } catch (SQLException ignored) {
+            }
+
         } catch (SQLException ignored) {
             if (runUpdateSQL()) {
                 saveInvoice();
@@ -1142,6 +1236,7 @@ class WeighBridge {
                 panelInvoiceLeft.removeAll();
                 panelInvoiceRight.removeAll();
                 invoiceFields = new HashMap<>();
+                invoiceComboBox = new HashMap<>();
 
                 JsonNode invoiceProperty = new ObjectMapper().readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
                 addInvoiceFields(invoiceProperty.get("leftFields"), panelInvoiceLeft);
@@ -1206,6 +1301,7 @@ class WeighBridge {
                 jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
                 jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
                 invoiceFields.put(field.path("key").asText("material"), jTextField);
+                invoiceComboBox.computeIfAbsent("material", _ -> new HashSet<>()).add(comboBox);
                 return comboBox;
             }
             case "vehicleNo": {
@@ -1217,6 +1313,7 @@ class WeighBridge {
                 jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
                 jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
                 invoiceFields.put(field.path("key").asText("vehicleNo"), jTextField);
+                invoiceComboBox.computeIfAbsent("vehicleNo", _ -> new HashSet<>()).add(comboBox);
                 return comboBox;
             }
             case "buyer": {
@@ -1228,6 +1325,7 @@ class WeighBridge {
                 jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
                 jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
                 invoiceFields.put(field.path("key").asText("buyer"), jTextField);
+                invoiceComboBox.computeIfAbsent("buyer", _ -> new HashSet<>()).add(comboBox);
                 return comboBox;
             }
             case "transporter": {
@@ -1239,6 +1337,7 @@ class WeighBridge {
                 jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
                 jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
                 invoiceFields.put(field.path("key").asText("transporter"), jTextField);
+                invoiceComboBox.computeIfAbsent("transporter", _ -> new HashSet<>()).add(comboBox);
                 return comboBox;
             }
             case "date": {
@@ -3611,6 +3710,14 @@ class WeighBridge {
         panelCameras.add(textFieldCropHeight11);
 
         panelInvoice = new JPanel();
+        panelInvoice.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                if (afterStart) {
+                    settings();
+                }
+            }
+        });
         panelInvoice.setBackground(new Color(0, 255, 127));
         tabbedPane.addTab("", panelInvoice);
         tabbedPane.setEnabledAt(2, true);
