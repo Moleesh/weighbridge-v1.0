@@ -99,7 +99,8 @@
 		},
 		{
 			"key": "buyerAddress",
-			"name": "Address"
+			"name": "Address",
+            "type": "address"
 		},
 		{
 			"key": "vehicleNo",

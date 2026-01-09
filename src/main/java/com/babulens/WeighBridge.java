@@ -1046,11 +1046,11 @@ class WeighBridge {
                 Set<String> temp = new HashSet<>();
                 stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 rs = stmt.executeQuery("SELECT * FROM MATERIALS");
-                Set<JComboBox<String>> material = invoiceComboBox.getOrDefault("material", Set.of());
+                Set<JComboBox<String>> materials = invoiceComboBox.getOrDefault("material", Set.of());
                 rs.last();
                 int nextSqNo = rs.getRow() + 1;
 
-                material.forEach(comboBox -> {
+                materials.forEach(comboBox -> {
                     String item = (String) comboBox.getSelectedItem();
                     if (item != null && !item.isEmpty() && materialSet.add(item)) {
                         temp.add(item);
@@ -1062,7 +1062,7 @@ class WeighBridge {
                     rs.updateString("MATERIAL", item);
                     rs.updateInt("SQNO", nextSqNo++);
                     rs.insertRow();
-                    material.forEach(comboBox -> comboBox.addItem(item));
+                    materials.forEach(comboBox -> comboBox.addItem(item));
                 }
             } catch (SQLException ignored) {
             }
@@ -1071,9 +1071,9 @@ class WeighBridge {
                 Set<String> temp = new HashSet<>();
                 stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 rs = stmt.executeQuery("SELECT * FROM VEHICLE_TYPE");
-                Set<JComboBox<String>> vehicleNo = invoiceComboBox.getOrDefault("vehicleNo", Set.of());
+                Set<JComboBox<String>> vehicleNos = invoiceComboBox.getOrDefault("vehicleNo", Set.of());
 
-                vehicleNo.forEach(comboBox -> {
+                vehicleNos.forEach(comboBox -> {
                     String item = (String) comboBox.getSelectedItem();
                     if (item != null && !item.isEmpty() && vehicleTypeSet.add(item)) {
                         temp.add(item);
@@ -1084,7 +1084,7 @@ class WeighBridge {
                     rs.moveToInsertRow();
                     rs.updateString("VEHICLE_TYPE", item);
                     rs.insertRow();
-                    vehicleNo.forEach(comboBox -> comboBox.addItem(item));
+                    vehicleNos.forEach(comboBox -> comboBox.addItem(item));
                 }
             } catch (SQLException ignored) {
             }
@@ -1093,9 +1093,9 @@ class WeighBridge {
                 Set<String> temp = new HashSet<>();
                 stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 rs = stmt.executeQuery("SELECT * FROM CUSTOMER");
-                Set<JComboBox<String>> buyer = invoiceComboBox.getOrDefault("buyer", Set.of());
+                Set<JComboBox<String>> buyers = invoiceComboBox.getOrDefault("buyer", Set.of());
 
-                buyer.forEach(comboBox -> {
+                buyers.forEach(comboBox -> {
                     String item = (String) comboBox.getSelectedItem();
                     if (item != null && !item.isEmpty() && customerSet.add(item)) {
                         temp.add(item);
@@ -1106,7 +1106,7 @@ class WeighBridge {
                     rs.moveToInsertRow();
                     rs.updateString("CUSTOMER", item);
                     rs.insertRow();
-                    buyer.forEach(comboBox -> comboBox.addItem(item));
+                    buyers.forEach(comboBox -> comboBox.addItem(item));
                 }
             } catch (SQLException ignored) {
             }
@@ -1115,9 +1115,9 @@ class WeighBridge {
                 Set<String> temp = new HashSet<>();
                 stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 rs = stmt.executeQuery("SELECT * FROM TRANSPORTER");
-                Set<JComboBox<String>> transporter = invoiceComboBox.getOrDefault("transporter", Set.of());
+                Set<JComboBox<String>> transporters = invoiceComboBox.getOrDefault("transporter", Set.of());
 
-                transporter.forEach(comboBox -> {
+                transporters.forEach(comboBox -> {
                     String item = (String) comboBox.getSelectedItem();
                     if (item != null && !item.isEmpty() && transportSet.add(item)) {
                         temp.add(item);
@@ -1129,7 +1129,30 @@ class WeighBridge {
                     rs.updateString("TRANSPORTER", item);
                     rs.insertRow();
 
-                    transporter.forEach(comboBox -> comboBox.addItem(item));
+                    transporters.forEach(comboBox -> comboBox.addItem(item));
+                }
+            } catch (SQLException ignored) {
+            }
+
+            try {
+                Set<String> temp = new HashSet<>();
+                stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                rs = stmt.executeQuery("SELECT * FROM OPERATORS");
+                Set<JComboBox<String>> operators = invoiceComboBox.getOrDefault("address", Set.of());
+
+                operators.forEach(comboBox -> {
+                    String item = (String) comboBox.getSelectedItem();
+                    if (item != null && !item.isEmpty() && operatorSet.add(item)) {
+                        temp.add(item);
+                    }
+                });
+
+                for (String item : temp) {
+                    rs.moveToInsertRow();
+                    rs.updateString("OPERATOR", item);
+                    rs.insertRow();
+
+                    operators.forEach(comboBox -> comboBox.addItem(item));
                 }
             } catch (SQLException ignored) {
             }
@@ -1338,6 +1361,18 @@ class WeighBridge {
                 jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
                 invoiceFields.put(field.path("key").asText("transporter"), jTextField);
                 invoiceComboBox.computeIfAbsent("transporter", _ -> new HashSet<>()).add(comboBox);
+                return comboBox;
+            }
+            case "address": {
+                JComboBox<String> comboBox = new JComboBox<>();
+                comboBox.setEditable(true);
+                AutoCompleteDecorator.decorate(comboBox);
+                comboBox.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+                operatorSet.forEach(comboBox::addItem);
+                jTextField = (JTextField) comboBox.getEditor().getEditorComponent();
+                jTextField.addPropertyChangeListener(_ -> comboBox.setEnabled(jTextField.isEnabled()));
+                invoiceFields.put(field.path("key").asText("address"), jTextField);
+                invoiceComboBox.computeIfAbsent("address", _ -> new HashSet<>()).add(comboBox);
                 return comboBox;
             }
             case "date": {
