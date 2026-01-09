@@ -2,12 +2,12 @@
 	"html": "K.K.M Blue Metal",
 	"reportFields": [
 		{
-			"key": "invoiceNo",
+			"key": "serialNo",
 			"name": "Serial No",
 			"checked": true
 		},
         {
-            "key": "serialNo",
+            "key": "invoiceNo",
             "name": "Invoice No",
             "checked": true
         },
@@ -81,7 +81,7 @@
 	"leftFields": [
 		{
 			"key": "invoiceNo",
-			"name": "Serial No",
+			"name": "Invoice No",
 			"type": "invoiceNo",
 			"localPrefix": "TA",
 			"invoicePrefix": "KA"
@@ -109,7 +109,8 @@
 		},
 		{
 			"key": "destination",
-			"name": "Destination"
+			"name": "Destination",
+            "type": "address"
 		},
 		{
 			"key": "material",
@@ -129,10 +130,6 @@
 		{
 			"type": "blank"
 		},
-        {
-            "key": "serialNo",
-            "name": "Invoice No"
-        },
 		{
 			"key": "amount",
 			"name": "Amount",

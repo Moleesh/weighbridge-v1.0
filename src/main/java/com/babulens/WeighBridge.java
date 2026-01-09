@@ -1070,7 +1070,7 @@ class WeighBridge {
             try {
                 Set<String> temp = new HashSet<>();
                 stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                rs = stmt.executeQuery("SELECT * FROM VEHICLE_TYPE");
+                rs = stmt.executeQuery("SELECT * FROM VEHICLE_TYPES");
                 Set<JComboBox<String>> vehicleNos = invoiceComboBox.getOrDefault("vehicleNo", Set.of());
 
                 vehicleNos.forEach(comboBox -> {
