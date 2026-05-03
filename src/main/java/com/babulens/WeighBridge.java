@@ -6114,19 +6114,19 @@ class WeighBridge {
             double excessShortage = netWeight - estimatedWeight;
 
             if (excessShortage > 0) {
-                weighingData.put("GODOWN_GROSS_WEIGHT", Double.parseDouble(textFieldGrossWt.getText()) + adjust - excessShortage);
-                weighingData.put("GODOWN_NET_WEIGHT", Double.parseDouble(textFieldNetWt.getText()) + adjust - excessShortage);
+                weighingData.put("GODOWN_GROSS_WEIGHT", (int) (Double.parseDouble(textFieldGrossWt.getText()) + adjust - excessShortage));
+                weighingData.put("GODOWN_NET_WEIGHT", (int) (Double.parseDouble(textFieldNetWt.getText()) + adjust - excessShortage));
             } else {
-                weighingData.put("GODOWN_GROSS_WEIGHT", Double.parseDouble(textFieldGrossWt.getText()) + adjust);
-                weighingData.put("GODOWN_NET_WEIGHT", Double.parseDouble(textFieldNetWt.getText()) + adjust);
+                weighingData.put("GODOWN_GROSS_WEIGHT", (int) (Double.parseDouble(textFieldGrossWt.getText()) + adjust));
+                weighingData.put("GODOWN_NET_WEIGHT", (int) (Double.parseDouble(textFieldNetWt.getText()) + adjust));
             }
 
             weighingData.put("BAG_WEIGHT", bagWeight);
-            weighingData.put("ESTIMATED_WEIGHT", estimatedWeight);
+            weighingData.put("ESTIMATED_WEIGHT", (int) estimatedWeight);
 
             textFieldCustom2.setText(decimalFormat.format(noOfBags));
-            textFieldCustom3.setText(decimalFormat.format(netWeight));
-            textFieldCustom4.setText(decimalFormat.format(excessShortage));
+            textFieldCustom3.setText(decimalFormat.format((int) netWeight));
+            textFieldCustom4.setText(decimalFormat.format((int) excessShortage));
             textFieldCharges.setText(decimalFormat.format(adjust));
         }
 
@@ -8969,11 +8969,11 @@ class WeighBridge {
             graphics2D.drawString("Estimated Weight :", x, y + 16);
             graphics2D.drawString("Excess/Shortage  :", 301, y);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString("                 " + textFieldCustom4.getText(), x, y);
-            graphics2D.drawString("                 " + weighingData.get("ESTIMATED_WEIGHT").asDouble(0), x, y + 16);
-            graphics2D.drawString("                 " + textFieldCustom3.getText(), 301, y);
+            graphics2D.drawString("                  " + textFieldCustom3.getText(), x, y);
+            graphics2D.drawString("                  " + weighingData.get("ESTIMATED_WEIGHT").asDouble(0), x, y + 16);
+            graphics2D.drawString("                  " + textFieldCustom4.getText(), 301, y);
             graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
-            graphics2D.drawString("Signature", 320, y + 20);
+            graphics2D.drawString("Signature", 450, y + 20);
 
             y += 26;
             graphics.drawLine(startX, y, endX, y);
@@ -9112,7 +9112,8 @@ class WeighBridge {
             y += 10;
             graphics.drawLine(startX, y, endX, y);
             graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
-            graphics2D.drawString("Signature", 320, y + 20);
+            y += 20;
+            graphics2D.drawString("Signature", 450, y + 20);
 
             y += 26;
             graphics.drawLine(startX, y, endX, y);
@@ -9249,7 +9250,8 @@ class WeighBridge {
             y += 10;
             graphics.drawLine(startX, y, endX, y);
             graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
-            graphics2D.drawString("Signature", 320, y + 20);
+            y += 20;
+            graphics2D.drawString("Signature", 450, y + 20);
 
             y += 26;
             graphics.drawLine(startX, y, endX, y);
