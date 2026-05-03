@@ -208,7 +208,6 @@ class WeighBridge {
     private final DateFormat dateFormatHyphen = new SimpleDateFormat("dd-MM-yyyy");
     private final DateFormat dateFormatSlash = new SimpleDateFormat("dd/MM/yyyy");
     private final DateFormat timeFormat = new SimpleDateFormat("hh:mm a");
-    private final DateFormat timeFormatWithSecond = new SimpleDateFormat("hh:mm:ss a");
     private final JCheckBox checkboxSlNo = new JCheckBox("Sl.No");
     private final JCheckBox checkboxDCNo = new JCheckBox("Dc. No");
     private final JCheckBox checkboxDCDate = new JCheckBox("Dc. Date");
@@ -454,6 +453,7 @@ class WeighBridge {
     private JTextField textFieldCustom4;
     private String operatorTare = "";
     private String operatorGross = "";
+    private JLabel lblCharges;
 
     /**
      * Create the application.
@@ -1760,7 +1760,7 @@ class WeighBridge {
         lblMaterial.setBounds(50, 310, 175, 25);
         panelWeighing.add(lblMaterial);
 
-        JLabel lblCharges = new JLabel("Charges");
+        lblCharges = new JLabel("Charges");
         lblCharges.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         lblCharges.setBounds(50, 390, 132, 25);
         panelWeighing.add(lblCharges);
@@ -1833,29 +1833,22 @@ class WeighBridge {
         comboBoxMaterial.getEditor().getEditorComponent().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                if (checkboxRoundOff.isSelected()) {
-                    try {
-                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                        ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
-                        if (rs.next()) {
-                            textFieldCustom2.setText(decimalFormat.format(rs.getDouble("COST")));
-                        } else {
-                            textFieldCustom2.setText("0");
-                        }
-                    } catch (SQLException ignored) {
+                try {
+                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    ResultSet rs = stmt.executeQuery("SELECT * FROM MATERIALS WHERE MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
+                    String cost = "0";
+                    if (rs.next()) {
+                        cost = decimalFormat.format(rs.getDouble("COST"));
+                        weighingData.put("COST", rs.getString("COST"));
+                        weighingData.put("BAG_WEIGHT", rs.getString("BAG_WEIGHT"));
                     }
-                }
-                if (checkboxKottaSetting.isSelected()) {
-                    try {
-                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                        ResultSet rs = stmt.executeQuery("SELECT COST FROM MATERIALS where MATERIAL = '" + comboBoxMaterial.getEditor().getItem().toString() + "'");
-                        if (rs.next()) {
-                            textFieldCharges.setText(decimalFormat.format(rs.getDouble("COST")));
-                        } else {
-                            textFieldCharges.setText("0");
-                        }
-                    } catch (SQLException ignored) {
+                    if (checkboxRoundOff.isSelected()) {
+                        textFieldCustom2.setText(cost);
                     }
+                    if (checkboxKottaSetting.isSelected()) {
+                        textFieldCharges.setText(cost);
+                    }
+                } catch (SQLException ignored) {
                 }
                 comboBoxMaterial.setSelectedItem(Objects.toString(comboBoxMaterial.getSelectedItem(), "").toUpperCase());
             }
@@ -2825,7 +2818,7 @@ class WeighBridge {
         comboBoxVehicleNo.getEditor().getEditorComponent().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                comboBoxVehicleNo.setSelectedItem(Objects.toString(comboBoxVehicleNo.getSelectedItem(), "").toUpperCase().replaceAll(" ", ""));
+                comboBoxVehicleNo.setSelectedItem(Objects.toString(comboBoxVehicleNo.getSelectedItem(), "").toUpperCase().replace(" ", ""));
                 try {
                     Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = stmt.executeQuery("SELECT * FROM VEHICLETARES WHERE VEHICLENO LIKE '" + comboBoxVehicleNo.getEditor().getItem() + "'");
@@ -2839,7 +2832,7 @@ class WeighBridge {
         });
         comboBoxVehicleNo.addActionListener(l -> {
             if (l.getActionCommand().equals("comboBoxEdited")) {
-                comboBoxVehicleNo.setSelectedItem(((String) comboBoxVehicleNo.getEditor().getItem()).toUpperCase().replaceAll(" ", ""));
+                comboBoxVehicleNo.setSelectedItem(((String) comboBoxVehicleNo.getEditor().getItem()).toUpperCase().replace(" ", ""));
                 if (!checkboxTareNoSlNo.isSelected()) {
                     if (radioButtonGross.isSelected()) {
                         try {
@@ -2856,6 +2849,7 @@ class WeighBridge {
                                     textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
                                     textFieldPlace.setText(rs.getString("PLACE"));
                                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
+                                    updateWeighingDataFromDB(rs);
                                 }
                             }
                         } catch (SQLException | ParseException ignored) {
@@ -2887,6 +2881,7 @@ class WeighBridge {
                                         }
                                         textFieldGrossWt.setText(Integer.toString(rs.getInt("GROSSWT")));
                                         comboBoxMaterial.setSelectedItem(rs.getString("MATERIAL"));
+                                        updateWeighingDataFromDB(rs);
                                     }
                                 }
                             }
@@ -5772,6 +5767,13 @@ class WeighBridge {
         babulensWeighbridgeDesigned.getContentPane().add(button);
     }
 
+    private void updateWeighingDataFromDB(ResultSet rs) throws SQLException {
+        try {
+            weighingData = weighingData.setAll((ObjectNode) objectMapper.readTree(rs.getString("WEIGHING_DATA")));
+        } catch (JsonProcessingException ignored) {
+        }
+    }
+
     private JPanel getSettings1Panel() {
         JPanel panelSettings1 = new JPanel();
         panelSettings1.addComponentListener(new ComponentAdapter() {
@@ -6032,7 +6034,7 @@ class WeighBridge {
     }
 
     private void getWeight() {
-        comboBoxVehicleNo.setSelectedItem(((String) comboBoxVehicleNo.getEditor().getItem()).toUpperCase().replaceAll(" ", ""));
+        comboBoxVehicleNo.setSelectedItem(((String) comboBoxVehicleNo.getEditor().getItem()).toUpperCase().replace(" ", ""));
 
         if (radioButtonGross.isSelected()) {
             operatorGross = lblOperatorName.getText();
@@ -6083,7 +6085,7 @@ class WeighBridge {
             textFieldCharges.setText(decimalFormat.format(Double.parseDouble(temp[0] + "." + temp[1])));
         }
         if (checkboxRoundOff.isSelected()) {
-            textFieldCustom3.setText(decimalFormat.format(-1 * Double.parseDouble(0 + textFieldCharges.getText()) % Math.pow(10, Double.parseDouble(textFieldRoundOffDecimals.getText().replaceAll("\\D", "")))).replaceAll("-0", "0"));
+            textFieldCustom3.setText(decimalFormat.format(-1 * Double.parseDouble(0 + textFieldCharges.getText()) % Math.pow(10, Double.parseDouble(textFieldRoundOffDecimals.getText().replaceAll("\\D", "")))).replace("-0", "0"));
             textFieldCharges.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCharges.getText()) + Double.parseDouble(textFieldCustom3.getText())));
         }
         if (checkboxKottaSetting.isSelected()) {
@@ -6688,8 +6690,7 @@ class WeighBridge {
                 textPaneRemarks.setText(rs.getString("REMARKS"));
                 try {
                     weighingData = (ObjectNode) objectMapper.readTree(rs.getString("WEIGHING_DATA"));
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
+                } catch (JsonProcessingException ignored) {
                 }
                 operatorTare = rs.getString("OPERATOR_TARE");
                 operatorGross = rs.getString("OPERATOR_GROSS");
@@ -6875,6 +6876,7 @@ class WeighBridge {
             lblOperatorName.setText(comboBoxOperator.getEditor().getItem().toString());
             labelCustom1.setText(getCustom1());
             labelCustom2.setText(getCustom2());
+            lblCharges.setText(getChargeText());
             weighingData = objectMapper.createObjectNode();
         }
     }
@@ -7233,7 +7235,7 @@ class WeighBridge {
 
                         graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
                         graphics.drawString(" CHIT No         : " + textFieldSlNo.getText(), margin, len += space + space);
-                        graphics.drawString(" Date  : " + temp[0].replaceAll("-", "/"), margin + spacing, len);
+                        graphics.drawString(" Date  : " + temp[0].replace("-", "/"), margin + spacing, len);
                         graphics.drawString(" Vehicle No      : " + comboBoxVehicleNo.getEditor().getItem(), margin, len += space);
                         graphics.drawString(" Time  : " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
                         graphics.drawString(" Material Name   : " + comboBoxMaterial.getEditor().getItem(), margin, len += space);
@@ -7246,12 +7248,12 @@ class WeighBridge {
                         graphics.drawString("First Weight  : ", margin + spacing + spacing, len);
 
                         graphics.setFont(new Font("Courier New", Font.BOLD, 12));
-                        graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len);
+                        graphics.drawString("         " + temp[0].replace("-", "/"), margin, len);
                         graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
                         graphics.drawString("                " + StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
 
                         temp = (textFieldTareDateTime.getText() + " . . ").split(" ");
-                        graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len += space);
+                        graphics.drawString("         " + temp[0].replace("-", "/"), margin, len += space);
                         graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
                         graphics.drawString("                " + StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
 
@@ -7321,7 +7323,7 @@ class WeighBridge {
 
                         graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
                         graphics.drawString(" CHIT No         : " + textFieldSlNo.getText(), margin, len += space + space);
-                        graphics.drawString(" Date  : " + temp[0].replaceAll("-", "/"), margin + spacing, len);
+                        graphics.drawString(" Date  : " + temp[0].replace("-", "/"), margin + spacing, len);
                         graphics.drawString(" Vehicle No      : " + comboBoxVehicleNo.getEditor().getItem(), margin, len += space);
                         graphics.drawString(" Time  : " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
                         graphics.drawString(" Material Name   : " + comboBoxMaterial.getEditor().getItem(), margin, len += space);
@@ -7334,12 +7336,12 @@ class WeighBridge {
                         graphics.drawString("Gross Weight  : ", margin + spacing + spacing, len);
 
                         graphics.setFont(new Font("Courier New", Font.BOLD, 12));
-                        graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len);
+                        graphics.drawString("         " + temp[0].replace("-", "/"), margin, len);
                         graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
                         graphics.drawString("                " + StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
 
                         temp = (textFieldTareDateTime.getText() + " . . ").split(" ");
-                        graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len += space);
+                        graphics.drawString("         " + temp[0].replace("-", "/"), margin, len += space);
                         graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
                         graphics.drawString("                " + StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
 
@@ -7412,7 +7414,7 @@ class WeighBridge {
 
                         graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
                         graphics.drawString(" Sl. No          : " + textFieldSlNo.getText(), margin, len += space + space);
-                        graphics.drawString(" Date  : " + temp[0].replaceAll("-", "/"), margin + spacing, len);
+                        graphics.drawString(" Date  : " + temp[0].replace("-", "/"), margin + spacing, len);
                         graphics.drawString(" Vehicle No      : " + comboBoxVehicleNo.getEditor().getItem(), margin, len += space);
                         graphics.drawString(" Time  : " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
                         graphics.drawString(" Material Name   : " + comboBoxMaterial.getEditor().getItem(), margin, len += space);
@@ -7425,12 +7427,12 @@ class WeighBridge {
                         graphics.drawString("Laden Weight  : ", margin + spacing + spacing, len);
 
                         graphics.setFont(new Font("Courier New", Font.BOLD, 12));
-                        graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len);
+                        graphics.drawString("         " + temp[0].replace("-", "/"), margin, len);
                         graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
                         graphics.drawString("                " + StringUtils.leftPad(textFieldGrossWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
 
                         temp = (textFieldTareDateTime.getText() + " . . ").split(" ");
-                        graphics.drawString("         " + temp[0].replaceAll("-", "/"), margin, len += space);
+                        graphics.drawString("         " + temp[0].replace("-", "/"), margin, len += space);
                         graphics.drawString("         " + temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), margin + spacing, len);
                         graphics.drawString("                " + StringUtils.leftPad(textFieldTareWt.getText(), 7) + " Kg", margin + spacing + spacing, len);
 
@@ -7498,7 +7500,7 @@ class WeighBridge {
                     graphics.setFont(new Font("Verdana", Font.PLAIN, 11));
                     graphics.drawString("Weighbridge Slip No", margin, len += space);
                     graphics.drawString(": " + textFieldSlNo.getText(), margin + 130, len);
-                    graphics.drawString("Date     :  " + temp[0].replaceAll("-", " - "), 400, len);
+                    graphics.drawString("Date     :  " + temp[0].replace("-", " - "), 400, len);
                     graphics.drawLine(margin - 5, len += lineSpace, 560, len);
 
                     graphics.drawString("Name of Work", margin, len += space);
@@ -7534,7 +7536,7 @@ class WeighBridge {
                     graphics.drawString("Laden Weight", 350, len);
                     graphics.drawString(":", 350 + 100, len);
                     graphics.setFont(new Font("Verdana", Font.BOLD, 11));
-                    graphics.drawString(temp[0].replaceAll("-", " - "), margin + 50, len);
+                    graphics.drawString(temp[0].replace("-", " - "), margin + 50, len);
                     graphics.drawString(temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), 200 + 50, len);
                     text = textFieldGrossWt.getText() + " Kg";
                     graphics.drawString(text, 350 + 100 + (100 - graphics.getFontMetrics().stringWidth(text)), len);
@@ -7546,7 +7548,7 @@ class WeighBridge {
                     graphics.drawString("UnLaden Weight", 350, len);
                     graphics.drawString(":", 350 + 100, len);
                     graphics.setFont(new Font("Verdana", Font.BOLD, 11));
-                    graphics.drawString(temp[0].replaceAll("-", " - "), margin + 50, len);
+                    graphics.drawString(temp[0].replace("-", " - "), margin + 50, len);
                     graphics.drawString(temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), 200 + 50, len);
                     text = textFieldTareWt.getText() + " Kg";
                     graphics.drawString(text, 350 + 100 + (100 - graphics.getFontMetrics().stringWidth(text)), len);
@@ -7606,7 +7608,7 @@ class WeighBridge {
                         graphics.setFont(new Font("Verdana", Font.PLAIN, 11));
                         graphics.drawString("Weighbridge Slip No", margin, len += space);
                         graphics.drawString(": " + textFieldSlNo.getText(), margin + 130, len);
-                        graphics.drawString("Date     :  " + temp[0].replaceAll("-", " - "), 400, len);
+                        graphics.drawString("Date     :  " + temp[0].replace("-", " - "), 400, len);
                         graphics.drawLine(margin - 5, len += lineSpace, 560, len);
 
                         graphics.drawString("Name of Work", margin, len += space);
@@ -7642,7 +7644,7 @@ class WeighBridge {
                         graphics.drawString("Laden Weight", 350, len);
                         graphics.drawString(":", 350 + 100, len);
                         graphics.setFont(new Font("Verdana", Font.BOLD, 11));
-                        graphics.drawString(temp[0].replaceAll("-", " - "), margin + 50, len);
+                        graphics.drawString(temp[0].replace("-", " - "), margin + 50, len);
                         graphics.drawString(temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), 200 + 50, len);
                         text = textFieldGrossWt.getText() + " Kg";
                         graphics.drawString(text, 350 + 100 + (100 - graphics.getFontMetrics().stringWidth(text)), len);
@@ -7654,7 +7656,7 @@ class WeighBridge {
                         graphics.drawString("UnLaden Weight", 350, len);
                         graphics.drawString(":", 350 + 100, len);
                         graphics.setFont(new Font("Verdana", Font.BOLD, 11));
-                        graphics.drawString(temp[0].replaceAll("-", " - "), margin + 50, len);
+                        graphics.drawString(temp[0].replace("-", " - "), margin + 50, len);
                         graphics.drawString(temp[1].replaceAll("\\.", "") + " " + temp[2].replaceAll("\\.", ""), 200 + 50, len);
                         text = textFieldTareWt.getText() + " Kg";
                         graphics.drawString(text, 350 + 100 + (100 - graphics.getFontMetrics().stringWidth(text)), len);
@@ -9706,7 +9708,6 @@ class WeighBridge {
         int charge = -1,
                 grossWt = -1,
                 tareWt = -1,
-                roundOff = -1,
                 netWt = -1,
                 finalWt = -1,
                 finalAmount = -1;
@@ -9879,10 +9880,6 @@ class WeighBridge {
         if (tareWt != -1) {
             cell = row.createCell(tareWt);
             cell.setCellFormula("SUM(" + getColumn.charAt(tareWt) + "4:" + getColumn.charAt(tareWt) + rowNum + ")");
-        }
-        if (roundOff != -1) {
-            cell = row.createCell(roundOff);
-            cell.setCellFormula("SUM(" + getColumn.charAt(roundOff) + "4:" + getColumn.charAt(roundOff) + rowNum + ")");
         }
         if (netWt != -1) {
             cell = row.createCell(netWt);
