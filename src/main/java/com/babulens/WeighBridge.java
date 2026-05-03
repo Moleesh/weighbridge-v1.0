@@ -1840,7 +1840,7 @@ class WeighBridge {
                     if (rs.next()) {
                         cost = decimalFormat.format(rs.getDouble("COST"));
                         weighingData.put("COST", rs.getString("COST"));
-                        weighingData.put("BAG_WEIGHT", rs.getString("BAG_WEIGHT"));
+                        weighingData.put("FULL_BAG_WEIGHT", rs.getString("BAG_WEIGHT"));
                     }
                     if (checkboxRoundOff.isSelected()) {
                         textFieldCustom2.setText(cost);
@@ -6105,9 +6105,29 @@ class WeighBridge {
         }
 
         if (checkboxGodownSetting.isSelected()) {
-            textFieldCustom2.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCustom2.getText().replaceAll("[^.\\d]", ""))));
-            textFieldCustom3.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCustom3.getText().replaceAll("[^.\\d]", ""))));
-            textFieldCustom4.setText(decimalFormat.format(Double.parseDouble(textFieldNetWt.getText()) - Double.parseDouble(textFieldCustom3.getText())));
+            double fullBagWeight = weighingData.get("FULL_BAG_WEIGHT").asDouble(0);
+            double noOfBags = Double.parseDouble(0 + textFieldCustom2.getText().replaceAll("[^.\\d]", ""));
+            double bagWeight = Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", ""));
+            double netWeight = Double.parseDouble(textFieldNetWt.getText()) - (noOfBags * bagWeight);
+            double estimatedWeight = (fullBagWeight * noOfBags);
+            int adjust = Integer.parseInt(0 + textFieldCharges.getText().replaceAll("\\D", ""));
+            double excessShortage = netWeight - estimatedWeight;
+
+            if (excessShortage > 0) {
+                weighingData.put("GODOWN_GROSS_WEIGHT", Double.parseDouble(textFieldGrossWt.getText()) + adjust - excessShortage);
+                weighingData.put("GODOWN_NET_WEIGHT", Double.parseDouble(textFieldNetWt.getText()) + adjust - excessShortage);
+            } else {
+                weighingData.put("GODOWN_GROSS_WEIGHT", Double.parseDouble(textFieldGrossWt.getText()) + adjust);
+                weighingData.put("GODOWN_NET_WEIGHT", Double.parseDouble(textFieldNetWt.getText()) + adjust);
+            }
+
+            weighingData.put("BAG_WEIGHT", bagWeight);
+            weighingData.put("ESTIMATED_WEIGHT", estimatedWeight);
+
+            textFieldCustom2.setText(decimalFormat.format(noOfBags));
+            textFieldCustom3.setText(decimalFormat.format(netWeight));
+            textFieldCustom4.setText(decimalFormat.format(excessShortage));
+            textFieldCharges.setText(decimalFormat.format(adjust));
         }
 
         comboBoxCustomerName.setEnabled(false);
@@ -6213,7 +6233,13 @@ class WeighBridge {
                     printElectra();
                     continue;
                 case "Electra V2":
-                    printElectraV2();
+                    if (Integer.parseInt(textFieldNetWt.getText()) > 0) {
+                        printElectraV2();
+                        printGodownBill();
+                        printGodownTareBill();
+                    } else {
+                        printElectraV2();
+                    }
                     continue;
                 default:
                     printPlainWeight();
@@ -8863,7 +8889,7 @@ class WeighBridge {
 
             graphics2D.setColor(Color.BLACK);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString(StringUtils.center("WEIGHMENT SLIP", 89), x, y += 18);
+            graphics2D.drawString(StringUtils.center("ORIGINAL", 89), x, y += 18);
 
             y += 4;
             graphics.drawLine(startX, y, endX, y);
@@ -8939,14 +8965,291 @@ class WeighBridge {
             y += 10;
             graphics.drawLine(startX, y, endX, y);
             graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
-            graphics2D.drawString("Bill Weight  :", x, y += 20);
-            graphics2D.drawString("Estimated Weight :", 301, y);
-            graphics2D.drawString("Excess/Shortage  :", 301, y + 16);
+            graphics2D.drawString("Bill Weight      :", x, y += 20);
+            graphics2D.drawString("Estimated Weight :", x, y + 16);
+            graphics2D.drawString("Excess/Shortage  :", 301, y);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
-            graphics2D.drawString("              " + operatorGross, x, y);
-            graphics2D.drawString("              " + operatorTare, x, y + 16);
-            graphics2D.drawString("                  " + textFieldCustom3.getText(), 301, y);
-            graphics2D.drawString("                  " + textFieldCustom4.getText(), 301, y + 16);
+            graphics2D.drawString("                 " + textFieldCustom4.getText(), x, y);
+            graphics2D.drawString("                 " + weighingData.get("ESTIMATED_WEIGHT").asDouble(0), x, y + 16);
+            graphics2D.drawString("                 " + textFieldCustom3.getText(), 301, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
+            graphics2D.drawString("Signature", 320, y + 20);
+
+            y += 26;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.drawLine(startX, startY, startX, y);
+            graphics.drawLine(endX, startY, endX, y);
+
+            return Printable.PAGE_EXISTS;
+        }, pf);
+
+        printerJob.setPageable(book);
+        try {
+            printerJob.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            printerJob.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
+    private void printGodownBill() {
+        PrinterJob printerJob = PrinterJob.getPrinterJob();
+        PageFormat pf = printerJob.defaultPage();
+        Paper paper = pf.getPaper();
+
+        double width = 7.8d * 72d;
+        double height = 5.8d * 72d;
+        double widthMargin = 0d * 72d;
+        double heightMargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthMargin, heightMargin, width - (2 * widthMargin), height - (2 * heightMargin));
+        pf.setOrientation(PageFormat.PORTRAIT);
+        pf.setPaper(paper);
+        Book book = new Book();
+
+        book.append((graphics, pageFormat, pageIndex) -> {
+            if (pageIndex > 0) return Printable.NO_SUCH_PAGE;
+
+            Graphics2D graphics2D = (Graphics2D) graphics;
+            graphics2D.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+            graphics2D.scale(.93, .93);
+            graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int startX = 30;
+            int startY = 27;
+            int endX = 574;
+            int x = startX + 6;
+            int y = startY;
+
+            graphics2D.setColor(Color.BLACK);
+            graphics2D.fillRect(startX, y, 544, 50);
+
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.setColor(Color.WHITE);
+            graphics2D.drawString(StringUtils.center(title1.getText(), 89), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(StringUtils.center(title2.getText(), 89), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 8));
+            graphics2D.drawString(textFieldLine3.getText(), 460, y += 14);
+            graphics2D.drawString(textFieldLine2.getText(), x, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 9));
+            graphics2D.drawString(StringUtils.center(textFieldLine1.getText(), 99), x, y);
+
+            graphics2D.setColor(Color.BLACK);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(StringUtils.center("FOR GODOWN", 89), x, y += 18);
+
+            y += 4;
+            graphics.drawLine(startX, y, endX, y);
+
+            String format = "%-11.11s:                  %-11.11s:";
+            String format1 = "%-11.11s:                  %-11.11s:                  %-11.11s:";
+            String format2 = "            %-30.30s%-30.30s%-30.30s";
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format1, "Bill No", "Transporter", "Batch/DC No"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2, textFieldSlNo.getText(), comboBoxTransporterName.getEditor().getItem(), textFieldDcNo.getText()), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format1, "Vehicle No", "Material", "No of Bags"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2, comboBoxVehicleNo.getEditor().getItem(), comboBoxMaterial.getEditor().getItem(), textFieldCustom2.getText()), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format, "Sup/Cust", "Driver, Mob"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), textFieldCustom1.getText(), ""), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            try {
+                BufferedImage cropImage1 = null, cropImage2 = null;
+
+                try {
+                    BufferedImage printImage1 = getAvailableImage(1, radioButtonGross.isSelected() ? "_G" : "_T");
+                    cropImage1 = printImage1.getSubimage(
+                            Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
+                } catch (IOException | RasterFormatException ignored) {
+                }
+
+                try {
+                    BufferedImage printImage2 = getAvailableImage(2, radioButtonGross.isSelected() ? "_G" : "_T");
+                    cropImage2 = printImage2.getSubimage(
+                            Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
+                } catch (IOException | RasterFormatException ignored) {
+                }
+
+                BufferedImage printImage = joinBufferedImageByWidth(cropImage1, cropImage2);
+                if (printImage != null) {
+                    graphics.drawImage(printImage, x, y + 6, 532, 148, null);
+                }
+            } catch (NullPointerException ignored) {
+            }
+
+            y += 160;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.drawLine(210, y, 210, y + 74);
+            graphics.drawLine(392, y, 392, y + 74);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
+            graphics2D.drawString(StringUtils.center("Gross Weight (Kg)", 25), x, y += 20);
+            graphics2D.drawString(StringUtils.center("Tare Weight (Kg)", 25), 210, y);
+            graphics2D.drawString(StringUtils.center("Net Weight (Kg)", 25), 392, y);
+            y += 10;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 18));
+            graphics2D.drawString(StringUtils.center(String.valueOf(weighingData.get("GODOWN_GROSS_WEIGHT").asDouble(0)), 16), x, y += 20);
+            graphics2D.drawString(StringUtils.center(textFieldTareWt.getText(), 16), 210, y);
+            graphics2D.drawString(StringUtils.center(String.valueOf(weighingData.get("GODOWN_NET_WEIGHT").asDouble(0)), 16), 392, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(StringUtils.center(textFieldGrossDateTime.getText(), 30), x, y += 14);
+            graphics2D.drawString(StringUtils.center(textFieldTareDateTime.getText(), 30), 210, y);
+            graphics2D.drawString(StringUtils.center(textFieldNetDateTime.getText(), 30), 392, y);
+
+            y += 10;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
+            graphics2D.drawString("Signature", 320, y + 20);
+
+            y += 26;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.drawLine(startX, startY, startX, y);
+            graphics.drawLine(endX, startY, endX, y);
+
+            return Printable.PAGE_EXISTS;
+        }, pf);
+
+        printerJob.setPageable(book);
+        try {
+            printerJob.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            printerJob.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
+    private void printGodownTareBill() {
+        PrinterJob printerJob = PrinterJob.getPrinterJob();
+        PageFormat pf = printerJob.defaultPage();
+        Paper paper = pf.getPaper();
+
+        double width = 7.8d * 72d;
+        double height = 5.8d * 72d;
+        double widthMargin = 0d * 72d;
+        double heightMargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthMargin, heightMargin, width - (2 * widthMargin), height - (2 * heightMargin));
+        pf.setOrientation(PageFormat.PORTRAIT);
+        pf.setPaper(paper);
+        Book book = new Book();
+
+        book.append((graphics, pageFormat, pageIndex) -> {
+            if (pageIndex > 0) return Printable.NO_SUCH_PAGE;
+
+            Graphics2D graphics2D = (Graphics2D) graphics;
+            graphics2D.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+            graphics2D.scale(.93, .93);
+            graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int startX = 30;
+            int startY = 27;
+            int endX = 574;
+            int x = startX + 6;
+            int y = startY;
+
+            graphics2D.setColor(Color.BLACK);
+            graphics2D.fillRect(startX, y, 544, 50);
+
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.setColor(Color.WHITE);
+            graphics2D.drawString(StringUtils.center(title1.getText(), 89), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(StringUtils.center(title2.getText(), 89), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 8));
+            graphics2D.drawString(textFieldLine3.getText(), 460, y += 14);
+            graphics2D.drawString(textFieldLine2.getText(), x, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 9));
+            graphics2D.drawString(StringUtils.center(textFieldLine1.getText(), 99), x, y);
+
+            graphics2D.setColor(Color.BLACK);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(StringUtils.center("EMPTY SLIP", 89), x, y += 18);
+
+            y += 4;
+            graphics.drawLine(startX, y, endX, y);
+
+            String format = "%-11.11s:                  %-11.11s:";
+            String format1 = "%-11.11s:                  %-11.11s:                  %-11.11s:";
+            String format2 = "            %-30.30s%-30.30s%-30.30s";
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format1, "Bill No", "Transporter", "Batch/DC No"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2, textFieldSlNo.getText(), comboBoxTransporterName.getEditor().getItem(), textFieldDcNo.getText()), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format1, "Vehicle No", "Material", "No of Bags"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2, comboBoxVehicleNo.getEditor().getItem(), comboBoxMaterial.getEditor().getItem(), textFieldCustom2.getText()), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format, "Sup/Cust", "Driver, Mob"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), textFieldCustom1.getText(), ""), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            try {
+                BufferedImage cropImage1 = null, cropImage2 = null;
+
+                try {
+                    BufferedImage printImage1 = getAvailableImage(1, radioButtonGross.isSelected() ? "_G" : "_T");
+                    cropImage1 = printImage1.getSubimage(
+                            Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
+                } catch (IOException | RasterFormatException ignored) {
+                }
+
+                try {
+                    BufferedImage printImage2 = getAvailableImage(2, radioButtonGross.isSelected() ? "_G" : "_T");
+                    cropImage2 = printImage2.getSubimage(
+                            Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
+                } catch (IOException | RasterFormatException ignored) {
+                }
+
+                BufferedImage printImage = joinBufferedImageByWidth(cropImage1, cropImage2);
+                if (printImage != null) {
+                    graphics.drawImage(printImage, x, y + 6, 532, 148, null);
+                }
+            } catch (NullPointerException ignored) {
+            }
+
+            y += 160;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.drawLine(210, y, 210, y + 74);
+            graphics.drawLine(392, y, 392, y + 74);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
+            graphics2D.drawString(StringUtils.center("Gross Weight (Kg)", 25), x, y += 20);
+            graphics2D.drawString(StringUtils.center("Tare Weight (Kg)", 25), 210, y);
+            graphics2D.drawString(StringUtils.center("Net Weight (Kg)", 25), 392, y);
+            y += 10;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 18));
+            graphics2D.drawString(StringUtils.center(String.valueOf(0), 16), x, y += 20);
+            graphics2D.drawString(StringUtils.center(textFieldTareWt.getText(), 16), 210, y);
+            graphics2D.drawString(StringUtils.center(String.valueOf(0), 16), 392, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(StringUtils.center(textFieldTareDateTime.getText(), 30), 210, y += 14);
+
+            y += 10;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
+            graphics2D.drawString("Signature", 320, y + 20);
 
             y += 26;
             graphics.drawLine(startX, y, endX, y);
