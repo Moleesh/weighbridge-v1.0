@@ -6106,12 +6106,12 @@ class WeighBridge {
         }
 
         if (checkboxGodownSetting.isSelected() && Integer.parseInt(textFieldNetWt.getText()) > 0) {
-            double fullBagWeight = weighingData.get("FULL_BAG_WEIGHT").asDouble(0);
-            int noOfBags = Integer.parseInt(0 + textFieldCustom2.getText().replaceAll("\\D", ""));
+            double fullBagWeight = weighingData.path("FULL_BAG_WEIGHT").asDouble(0);
+            int noOfBags = (int) Double.parseDouble(textFieldCustom2.getText().replaceAll("[^.\\d]", ""));
             double bagWeight = Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", ""));
             int netWeight = (int) (Double.parseDouble(textFieldNetWt.getText()) - (noOfBags * bagWeight));
             int estimatedWeight = (int) (fullBagWeight * noOfBags);
-            int adjust = Integer.parseInt(0 + textFieldCharges.getText().replaceAll("\\D", ""));
+            int adjust = (int) Double.parseDouble(textFieldCharges.getText().replaceAll("[^.\\d]", ""));
             int excessShortage = (netWeight - estimatedWeight);
 
             if (excessShortage > 0) {
