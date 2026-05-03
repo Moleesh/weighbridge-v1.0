@@ -442,6 +442,7 @@ class WeighBridge {
     private List<MyCheckBox> reportCheckBox;
     private JCheckBox checkboxKottaSetting;
     private JCheckBox checkboxEstimatedWeightSetting;
+    private JCheckBox checkboxGodownSetting;
     private JLabel labelCustom1;
     private JLabel labelCustom2;
     private JTextField textFieldCustom1;
@@ -992,6 +993,7 @@ class WeighBridge {
                 model.addRow(new Object[]{
                         rs.getInt("SQNO"),
                         rs.getString("MATERIAL"),
+                        rs.getDouble("BAG_WEIGHT"),
                         rs.getDouble("COST")
                 });
                 if (materialSet.add(rs.getString("MATERIAL"))) {
@@ -1507,6 +1509,7 @@ class WeighBridge {
             rs.updateBoolean("ROUND_OFF", checkboxRoundOff.isSelected());
             rs.updateBoolean("KOTTA_SETTING", checkboxKottaSetting.isSelected());
             rs.updateBoolean("ESTIMATED_WEIGHT_SETTING", checkboxEstimatedWeightSetting.isSelected());
+            rs.updateBoolean("GODOWN_SETTING", checkboxGodownSetting.isSelected());
             rs.updateBoolean("TARE_TOKEN", checkboxTareToken.isSelected());
             rs.updateBoolean("EXIT_PASS", checkboxExitPass.isSelected());
             rs.updateBoolean("NEED_LOGIN", checkboxNeedLogin.isSelected());
@@ -1632,7 +1635,8 @@ class WeighBridge {
             for (int i = 1; i <= model.getRowCount(); i++) {
                 rs.moveToInsertRow();
                 rs.updateString("MATERIAL", model.getValueAt(i - 1, 1).toString().toUpperCase());
-                rs.updateDouble("COST", Double.parseDouble(("0" + model.getValueAt(i - 1, 2)).replaceAll("[^.\\d]", "")));
+                rs.updateDouble("BAG_WEIGHT", Double.parseDouble(("0" + model.getValueAt(i - 1, 2)).replaceAll("[^.\\d]", "")));
+                rs.updateDouble("COST", Double.parseDouble(("0" + model.getValueAt(i - 1, 3)).replaceAll("[^.\\d]", "")));
                 rs.updateInt("SQNO", (int) model.getValueAt(i - 1, 0));
                 rs.insertRow();
             }
@@ -2615,11 +2619,7 @@ class WeighBridge {
             if (checkBoxCamera1.isSelected()) {
                 try {
                     Runnable stuffToDo = new Thread(() -> {
-                        BufferedImage previewImage = webcam[1].getImage();
-                        BufferedImage cropImage = previewImage.getSubimage(
-                                Integer.parseInt(0 + textFieldCropX11.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY11.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth11.getText().replaceAll("\\D", "")), Integer.parseInt("0" + textFieldCropHeight11.getText().replaceAll("\\D", "")));
-                        JLabel jLabel = new JLabel(
-                                new ImageIcon(cropImage.getScaledInstance(1280, 768, Image.SCALE_DEFAULT)));
+                        JLabel jLabel = getPreview();
                         jLabel.addMouseListener(new MouseAdapter() {
                             @Override
                             public void mouseClicked(MouseEvent e12) {
@@ -2656,25 +2656,7 @@ class WeighBridge {
         btnClick.setBounds(120, 565, 75, 25);
         panelWeighing.add(btnClick);
 
-        JButton btnCalc = new JButton("Calc");
-        btnCalc.addActionListener(_ -> {
-            if (calc == null) {
-                calc = new Calculator();
-                calc.setTitle("Calculator");
-                calc.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-                calc.pack();
-                calc.setLocation(50, 50);
-                calc.setVisible(true);
-                calc.setResizable(false);
-                calc.setAlwaysOnTop(true);
-            } else {
-                calc.setVisible(true);
-            }
-            calc.setState(Frame.NORMAL);
-        });
-        btnCalc.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnCalc.setFocusable(false);
-        btnCalc.setBounds(33, 565, 75, 25);
+        JButton btnCalc = getCalcButton();
         panelWeighing.add(btnCalc);
 
         JLabel lblRemarks = new JLabel("Remarks");
@@ -4542,12 +4524,14 @@ class WeighBridge {
                 new String[]{
                         "Sl.No",
                         "Materials",
+                        "Bag Weight",
                         "Cost"
                 }) {
             @Serial
             private static final long serialVersionUID = 1L;
             final boolean[] columnEditable = new boolean[]{
                     false,
+                    true,
                     true,
                     true
             };
@@ -4561,6 +4545,7 @@ class WeighBridge {
         tableMaterial.getColumnModel().getColumn(0).setPreferredWidth(43);
         tableMaterial.getColumnModel().getColumn(1).setResizable(false);
         tableMaterial.getColumnModel().getColumn(2).setResizable(false);
+        tableMaterial.getColumnModel().getColumn(3).setResizable(false);
         scrollPaneMaterial.setViewportView(tableMaterial);
 
         JButton btnAddMaterialRow = new JButton("+");
@@ -4569,6 +4554,7 @@ class WeighBridge {
             model.addRow(new Object[]{
                     model.getRowCount() + 1,
                     "",
+                    0.0,
                     0.0
             });
         });
@@ -5072,7 +5058,8 @@ class WeighBridge {
                 "Quotation KJJ",
                 "Sri Pathy",
                 "Standard",
-                "Electra"
+                "Electra",
+                "Electra V2"
         }));
         comboBoxPrintOptionForWeight.setFont(new Font("Times New Roman", Font.PLAIN, 18));
         comboBoxPrintOptionForWeight.setFocusable(false);
@@ -5928,6 +5915,7 @@ class WeighBridge {
         checkboxEstimatedWeightSetting.addChangeListener(_ -> {
             if (checkboxEstimatedWeightSetting.isSelected()) {
                 checkboxIceWater.setSelected(false);
+                checkboxGodownSetting.setSelected(false);
                 checkboxRoundOff.setSelected(false);
                 checkboxAutoCharges.setSelected(false);
                 labelCustom1.setVisible(true);
@@ -5941,12 +5929,67 @@ class WeighBridge {
         });
         panelSettings2.add(checkboxEstimatedWeightSetting);
 
+        checkboxGodownSetting = new JCheckBox("Godown Setting");
+        checkboxGodownSetting.setSelected(false);
+        checkboxGodownSetting.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        checkboxGodownSetting.setFocusable(false);
+        checkboxGodownSetting.setBackground(new Color(0, 255, 127));
+        checkboxGodownSetting.setBounds(988, 250, 261, 25);
+        checkboxGodownSetting.addChangeListener(_ -> {
+            if (checkboxGodownSetting.isSelected()) {
+                checkboxIceWater.setSelected(false);
+                checkboxRoundOff.setSelected(false);
+                checkboxEstimatedWeightSetting.setSelected(false);
+                checkboxAutoCharges.setSelected(false);
+                checkboxCharges.setSelected(true);
+                labelCustom1.setVisible(true);
+                labelCustom2.setVisible(true);
+                textFieldCustom1.setVisible(true);
+                textFieldCustom2.setVisible(true);
+                textFieldCustom3.setVisible(true);
+                textFieldCustom4.setVisible(true);
+            }
+            clear();
+        });
+        panelSettings2.add(checkboxGodownSetting);
+
         JButton button = new JButton("Minimize");
         button.addActionListener(_ -> babulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
         button.setFont(new Font("Times New Roman", Font.BOLD, 20));
         button.setFocusable(false);
         button.setBounds(518, 11, 117, 30);
         babulensWeighbridgeDesigned.getContentPane().add(button);
+    }
+
+    private JButton getCalcButton() {
+        JButton btnCalc = new JButton("Calc");
+        btnCalc.addActionListener(_ -> {
+            if (calc == null) {
+                calc = new Calculator();
+                calc.setTitle("Calculator");
+                calc.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+                calc.pack();
+                calc.setLocation(50, 50);
+                calc.setVisible(true);
+                calc.setResizable(false);
+                calc.setAlwaysOnTop(true);
+            } else {
+                calc.setVisible(true);
+            }
+            calc.setState(Frame.NORMAL);
+        });
+        btnCalc.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnCalc.setFocusable(false);
+        btnCalc.setBounds(33, 565, 75, 25);
+        return btnCalc;
+    }
+
+    private JLabel getPreview() {
+        BufferedImage previewImage = webcam[1].getImage();
+        BufferedImage cropImage = previewImage.getSubimage(
+                Integer.parseInt(0 + textFieldCropX11.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY11.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth11.getText().replaceAll("\\D", "")), Integer.parseInt("0" + textFieldCropHeight11.getText().replaceAll("\\D", "")));
+        return new JLabel(
+                new ImageIcon(cropImage.getScaledInstance(1280, 768, Image.SCALE_DEFAULT)));
     }
 
     private void getWeight() {
@@ -6121,6 +6164,9 @@ class WeighBridge {
                     continue;
                 case "Electra":
                     printElectra();
+                    continue;
+                case "Electra V2":
+                    printElectraV2();
                     continue;
                 default:
                     printPlainWeight();
@@ -8697,6 +8743,152 @@ class WeighBridge {
             graphics2D.drawString("              " + operatorTare, x, y + 16);
             graphics2D.drawString("                   " + textFieldCustom3.getText(), 301, y);
             graphics2D.drawString("                   " + textFieldCustom4.getText(), 301, y + 16);
+
+            y += 26;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.drawLine(startX, startY, startX, y);
+            graphics.drawLine(endX, startY, endX, y);
+
+            return Printable.PAGE_EXISTS;
+        }, pf);
+
+        printerJob.setPageable(book);
+        try {
+            printerJob.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            printerJob.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
+    private void printElectraV2() {
+        PrinterJob printerJob = PrinterJob.getPrinterJob();
+        PageFormat pf = printerJob.defaultPage();
+        Paper paper = pf.getPaper();
+
+        double width = 7.8d * 72d;
+        double height = 5.8d * 72d;
+        double widthMargin = 0d * 72d;
+        double heightMargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthMargin, heightMargin, width - (2 * widthMargin), height - (2 * heightMargin));
+        pf.setOrientation(PageFormat.PORTRAIT);
+        pf.setPaper(paper);
+        Book book = new Book();
+
+        book.append((graphics, pageFormat, pageIndex) -> {
+            if (pageIndex > 0) return Printable.NO_SUCH_PAGE;
+
+            Graphics2D graphics2D = (Graphics2D) graphics;
+            graphics2D.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+            graphics2D.scale(.93, .93);
+            graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int startX = 30;
+            int startY = 27;
+            int endX = 574;
+            int x = startX + 6;
+            int y = startY;
+
+            graphics2D.setColor(Color.BLACK);
+            graphics2D.fillRect(startX, y, 544, 50);
+
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.setColor(Color.WHITE);
+            graphics2D.drawString(StringUtils.center(title1.getText(), 89), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(StringUtils.center(title2.getText(), 89), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 8));
+            graphics2D.drawString(textFieldLine3.getText(), 460, y += 14);
+            graphics2D.drawString(textFieldLine2.getText(), x, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 9));
+            graphics2D.drawString(StringUtils.center(textFieldLine1.getText(), 99), x, y);
+
+            graphics2D.setColor(Color.BLACK);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(StringUtils.center("WEIGHMENT SLIP", 89), x, y += 18);
+
+            y += 4;
+            graphics.drawLine(startX, y, endX, y);
+
+            String format = "%-11.11s:                  %-11.11s:";
+            String format1 = "%-11.11s:                  %-11.11s:                  %-11.11s:";
+            String format2 = "            %-30.30s%-30.30s%-30.30s";
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format1, "Bill No", "Transporter", "Batch/DC No"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2, textFieldSlNo.getText(), comboBoxTransporterName.getEditor().getItem(), textFieldDcNo.getText()), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format1, "Vehicle No", "Material", "No of Bags"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2, comboBoxVehicleNo.getEditor().getItem(), comboBoxMaterial.getEditor().getItem(), textFieldCustom2.getText()), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString(String.format(format, "Sup/Cust", "Driver, Mob"), x, y += 14);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(String.format(format2, comboBoxCustomerName.getEditor().getItem(), textFieldCustom1.getText(), ""), x, y);
+            y += 6;
+            graphics.drawLine(startX, y, endX, y);
+
+            try {
+                BufferedImage cropImage1 = null, cropImage2 = null;
+
+                try {
+                    BufferedImage printImage1 = getAvailableImage(1, radioButtonGross.isSelected() ? "_G" : "_T");
+                    cropImage1 = printImage1.getSubimage(
+                            Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
+                } catch (IOException | RasterFormatException ignored) {
+                }
+
+                try {
+                    BufferedImage printImage2 = getAvailableImage(2, radioButtonGross.isSelected() ? "_G" : "_T");
+                    cropImage2 = printImage2.getSubimage(
+                            Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
+                } catch (IOException | RasterFormatException ignored) {
+                }
+
+                BufferedImage printImage = joinBufferedImageByWidth(cropImage1, cropImage2);
+                if (printImage != null) {
+                    graphics.drawImage(printImage, x, y + 6, 532, 148, null);
+                }
+            } catch (NullPointerException ignored) {
+            }
+
+            y += 160;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.drawLine(210, y, 210, y + 74);
+            graphics.drawLine(392, y, 392, y + 74);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 12));
+            graphics2D.drawString(StringUtils.center("Gross Weight (Kg)", 25), x, y += 20);
+            graphics2D.drawString(StringUtils.center("Tare Weight (Kg)", 25), 210, y);
+            graphics2D.drawString(StringUtils.center("Net Weight (Kg)", 25), 392, y);
+            y += 10;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 18));
+            graphics2D.drawString(StringUtils.center(textFieldGrossWt.getText(), 16), x, y += 20);
+            graphics2D.drawString(StringUtils.center(textFieldTareWt.getText(), 16), 210, y);
+            graphics2D.drawString(StringUtils.center(textFieldNetWt.getText(), 16), 392, y);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString(StringUtils.center(textFieldGrossDateTime.getText(), 30), x, y += 14);
+            graphics2D.drawString(StringUtils.center(textFieldTareDateTime.getText(), 30), 210, y);
+            graphics2D.drawString(StringUtils.center(textFieldNetDateTime.getText(), 30), 392, y);
+
+            y += 10;
+            graphics.drawLine(startX, y, endX, y);
+            graphics.setFont(new Font("Courier New", Font.PLAIN, 10));
+            graphics2D.drawString("Bill Weight  :", x, y += 20);
+            graphics2D.drawString("Estimated Weight :", 301, y);
+            graphics2D.drawString("Excess/Shortage  :", 301, y + 16);
+            graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+            graphics2D.drawString("              " + operatorGross, x, y);
+            graphics2D.drawString("              " + operatorTare, x, y + 16);
+            graphics2D.drawString("                  " + textFieldCustom3.getText(), 301, y);
+            graphics2D.drawString("                  " + textFieldCustom4.getText(), 301, y + 16);
 
             y += 26;
             graphics.drawLine(startX, y, endX, y);
