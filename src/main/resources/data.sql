@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS WEIGHING
     FINALWT                  INTEGER,
     FINALAMOUNT              INTEGER,
     REMARKS                  VARCHAR(100),
+    WEIGHING_DATA            VARCHAR(2000),
     MANUAL                   BOOLEAN,
     PRIMARY KEY (SLNO)
 );

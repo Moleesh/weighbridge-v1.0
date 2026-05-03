@@ -238,6 +238,7 @@ class WeighBridge {
     private final JCheckBox checkboxRemarks = new JCheckBox("Remarks");
     private final JCheckBox checkboxManual = new JCheckBox("Manual");
     private final Webcam[] webcam = new Webcam[5];
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private boolean ranModifiedScript = true;
     private String TRIAL_LICENSE_PASSWORD = "147085";
     private String LICENSE_PASSWORD = "147085aA";
@@ -249,13 +250,15 @@ class WeighBridge {
     private String EDIT_ENABLE_PASSWORD = "147085";
     private String RESET_PASSWORD = "147085";
     private String LOGIN_PASSWORD = "123";
+    private ObjectNode weighingData = objectMapper.createObjectNode();
     private int noOfCopies = 0;
     private boolean takeBackup = false;
     private boolean valueEntered = false;
     private boolean afterStart = false;
+    private boolean lock = false;
+
     private Connection dbConnection;
     private BufferedImage clickedImage;
-    private boolean lock = false;
     private PrintService[] printServices;
     private Vector<String> printers;
     private Vector<String> invoiceProperties;
@@ -866,6 +869,7 @@ class WeighBridge {
             checkboxRoundOff.setSelected(rs.getBoolean("ROUND_OFF"));
             checkboxKottaSetting.setSelected(rs.getBoolean("KOTTA_SETTING"));
             checkboxEstimatedWeightSetting.setSelected(rs.getBoolean("ESTIMATED_WEIGHT_SETTING"));
+            checkboxGodownSetting.setSelected(rs.getBoolean("GODOWN_SETTING"));
             checkboxTareToken.setSelected(rs.getBoolean("TARE_TOKEN"));
             checkboxExitPass.setSelected(rs.getBoolean("EXIT_PASS"));
             checkboxNeedLogin.setSelected(rs.getBoolean("NEED_LOGIN"));
@@ -1011,7 +1015,7 @@ class WeighBridge {
     }
 
     private ObjectNode getInvoiceData() {
-        ObjectNode invoiceData = new ObjectMapper().createObjectNode();
+        ObjectNode invoiceData = objectMapper.createObjectNode();
         invoiceFields.forEach((key, component) -> {
             if (component instanceof JTextField) {
                 invoiceData.put(key, ((JTextField) component).getText());
@@ -1201,7 +1205,7 @@ class WeighBridge {
         } catch (Exception ignored) {
         }
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            JsonNode invoiceProperty = new ObjectMapper().readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
+            JsonNode invoiceProperty = objectMapper.readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
 
             Path path = Paths.get("Reports/html/" + invoiceProperty.path("html").asText("") + (radioButtonLocal.isSelected() ? "-local" : "-otherState") + ".html");
             if (!Files.exists(path)) {
@@ -1263,7 +1267,7 @@ class WeighBridge {
                 invoiceFields = new HashMap<>();
                 invoiceComboBox = new HashMap<>();
 
-                JsonNode invoiceProperty = new ObjectMapper().readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
+                JsonNode invoiceProperty = objectMapper.readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
                 addInvoiceFields(invoiceProperty.get("leftFields"), panelInvoiceLeft);
                 addInvoiceFields(invoiceProperty.get("rightFields"), panelInvoiceRight);
                 addInvoiceFields(invoiceProperty.get("hiddenFields"));
@@ -2619,7 +2623,7 @@ class WeighBridge {
             if (checkBoxCamera1.isSelected()) {
                 try {
                     Runnable stuffToDo = new Thread(() -> {
-                        JLabel jLabel = getPreview();
+                        JLabel jLabel = getPreviewButton();
                         jLabel.addMouseListener(new MouseAdapter() {
                             @Override
                             public void mouseClicked(MouseEvent e12) {
@@ -3871,48 +3875,7 @@ class WeighBridge {
         panelFooter.add(Box.createRigidArea(new Dimension(500, 10)));
         panelFooter.add(Box.createRigidArea(new Dimension(150, 25)));
 
-        JButton btnInvoiceRePrint = new JButton("Re Print");
-        btnInvoiceRePrint.setFocusable(false);
-        btnInvoiceRePrint.addActionListener(_ -> {
-            String response = JOptionPane.showInputDialog(null, "Please Enter the Invoice No to Reprint ?", "Reprint", JOptionPane.QUESTION_MESSAGE);
-            if (response != null) {
-                try {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM INVOICES WHERE INVOICE_NO = " + response);
-                    if (rs.next()) {
-                        JsonNode invoiceData = new ObjectMapper().readTree(rs.getString("INVOICE_DATA"));
-                        boolean isLocal = invoiceData.path("isLocal").asBoolean(false);
-                        radioButtonLocal.setSelected(isLocal);
-                        radioButtonOtherStates.setSelected(!isLocal);
-                        btnGetTotal.setEnabled(false);
-                        btnInvoicePrint.setEnabled(true);
-                        btnInvoiceSave.setEnabled(false);
-                        btnInvoicePrint.requestFocus();
-                        invoiceFields.forEach((_, component) -> component.setEnabled(false));
-                        radioButtonLocal.setEnabled(false);
-                        radioButtonOtherStates.setEnabled(false);
-                        invoiceFields.forEach((key, component) -> {
-                            if (component instanceof JTextField) {
-                                ((JTextField) component).setText(invoiceData.path(key).asText(""));
-                            } else if (component instanceof DateTimePicker) {
-                                try {
-                                    ((DateTimePicker) component).setDateTimeStrict(LocalDateTime.parse(invoiceData.path(key + "_data").asText("")));
-                                } catch (Exception ignored) {
-                                }
-                            }
-                        });
-                        return;
-                    } else {
-                        JOptionPane.showMessageDialog(null, "SQL ERROR\nRECORD NOT FOUND", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (SQLException | JsonProcessingException ignored) {
-                    JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-                btnInvoiceRePrint.requestFocus();
-            }
-        });
-        btnInvoiceRePrint.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnInvoiceRePrint.setPreferredSize(new Dimension(150, 25));
+        JButton btnInvoiceRePrint = getInvoiceRePrintButton();
         panelFooter.add(btnInvoiceRePrint);
 
         JButton btnInvoiceClear = new JButton("Clear");
@@ -4191,34 +4154,7 @@ class WeighBridge {
         lblTotalNetWt.setBounds(20, 581, 120, 25);
         panelReport.add(lblTotalNetWt);
 
-        JButton btnExportToExcel = new JButton("Export to Excel");
-        btnExportToExcel.addActionListener(_ -> {
-            JFrame jFrame = new JFrame();
-            JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home") + File.separator + "Desktop");
-            fileChooser.setDialogTitle("Specify a file name to save your report");
-            fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Documents", "xls", "xlsx"));
-            fileChooser.setSelectedFile(new File("report.xlsx"));
-            if (fileChooser.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION) {
-                File fileToSave = fileChooser.getSelectedFile();
-                String name = fileToSave.getAbsolutePath();
-                try {
-                    if (radioButtonWeighing.isSelected()) {
-                        if (Objects.equals(comboBoxReport.getSelectedItem(), "Mani & Co")) {
-                            toExcelManiAndCo(name);
-                        } else {
-                            toWeighingExcel(name);
-                        }
-                    } else if (radioButtonInvoice.isSelected()) {
-                        toInvoiceExcel(name);
-                    }
-                } catch (IOException ignored) {
-                    JOptionPane.showMessageDialog(null, "Plz Close the Excel file\nLINE :3027", "FILE ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-        btnExportToExcel.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnExportToExcel.setFocusable(false);
-        btnExportToExcel.setBounds(1027, 550, 186, 25);
+        JButton btnExportToExcel = getExportToExcelButton();
         panelReport.add(btnExportToExcel);
 
         btnPrintReport = new JButton("Print");
@@ -4548,19 +4484,7 @@ class WeighBridge {
         tableMaterial.getColumnModel().getColumn(3).setResizable(false);
         scrollPaneMaterial.setViewportView(tableMaterial);
 
-        JButton btnAddMaterialRow = new JButton("+");
-        btnAddMaterialRow.addActionListener(_ -> {
-            DefaultTableModel model = (DefaultTableModel) tableMaterial.getModel();
-            model.addRow(new Object[]{
-                    model.getRowCount() + 1,
-                    "",
-                    0.0,
-                    0.0
-            });
-        });
-        btnAddMaterialRow.setFocusable(false);
-        btnAddMaterialRow.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        btnAddMaterialRow.setBounds(229, 319, 41, 38);
+        JButton btnAddMaterialRow = getAddMaterialRowButton();
         panelSettings1.add(btnAddMaterialRow);
 
         JButton btnDeleteMaterialRow = new JButton("-");
@@ -5934,14 +5858,14 @@ class WeighBridge {
         checkboxGodownSetting.setFont(new Font("Times New Roman", Font.ITALIC, 20));
         checkboxGodownSetting.setFocusable(false);
         checkboxGodownSetting.setBackground(new Color(0, 255, 127));
-        checkboxGodownSetting.setBounds(988, 250, 261, 25);
+        checkboxGodownSetting.setBounds(988, 225, 261, 25);
         checkboxGodownSetting.addChangeListener(_ -> {
             if (checkboxGodownSetting.isSelected()) {
                 checkboxIceWater.setSelected(false);
                 checkboxRoundOff.setSelected(false);
                 checkboxEstimatedWeightSetting.setSelected(false);
                 checkboxAutoCharges.setSelected(false);
-                checkboxCharges.setSelected(true);
+                checkboxExcludeCharges.setSelected(false);
                 labelCustom1.setVisible(true);
                 labelCustom2.setVisible(true);
                 textFieldCustom1.setVisible(true);
@@ -5959,6 +5883,101 @@ class WeighBridge {
         button.setFocusable(false);
         button.setBounds(518, 11, 117, 30);
         babulensWeighbridgeDesigned.getContentPane().add(button);
+    }
+
+    private JButton getAddMaterialRowButton() {
+        JButton btnAddMaterialRow = new JButton("+");
+        btnAddMaterialRow.addActionListener(_ -> {
+            DefaultTableModel model = (DefaultTableModel) tableMaterial.getModel();
+            model.addRow(new Object[]{
+                    model.getRowCount() + 1,
+                    "",
+                    0.0,
+                    0.0
+            });
+        });
+        btnAddMaterialRow.setFocusable(false);
+        btnAddMaterialRow.setFont(new Font("Times New Roman", Font.BOLD, 15));
+        btnAddMaterialRow.setBounds(229, 319, 41, 38);
+        return btnAddMaterialRow;
+    }
+
+    private JButton getExportToExcelButton() {
+        JButton btnExportToExcel = new JButton("Export to Excel");
+        btnExportToExcel.addActionListener(_ -> {
+            JFrame jFrame = new JFrame();
+            JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home") + File.separator + "Desktop");
+            fileChooser.setDialogTitle("Specify a file name to save your report");
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Documents", "xls", "xlsx"));
+            fileChooser.setSelectedFile(new File("report.xlsx"));
+            if (fileChooser.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                String name = fileToSave.getAbsolutePath();
+                try {
+                    if (radioButtonWeighing.isSelected()) {
+                        if (Objects.equals(comboBoxReport.getSelectedItem(), "Mani & Co")) {
+                            toExcelManiAndCo(name);
+                        } else {
+                            toWeighingExcel(name);
+                        }
+                    } else if (radioButtonInvoice.isSelected()) {
+                        toInvoiceExcel(name);
+                    }
+                } catch (IOException ignored) {
+                    JOptionPane.showMessageDialog(null, "Plz Close the Excel file\nLINE :3027", "FILE ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        btnExportToExcel.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnExportToExcel.setFocusable(false);
+        btnExportToExcel.setBounds(1027, 550, 186, 25);
+        return btnExportToExcel;
+    }
+
+    private JButton getInvoiceRePrintButton() {
+        JButton btnInvoiceRePrint = new JButton("Re Print");
+        btnInvoiceRePrint.setFocusable(false);
+        btnInvoiceRePrint.addActionListener(_ -> {
+            String response = JOptionPane.showInputDialog(null, "Please Enter the Invoice No to Reprint ?", "Reprint", JOptionPane.QUESTION_MESSAGE);
+            if (response != null) {
+                try {
+                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    ResultSet rs = stmt.executeQuery("SELECT * FROM INVOICES WHERE INVOICE_NO = " + response);
+                    if (rs.next()) {
+                        JsonNode invoiceData = objectMapper.readTree(rs.getString("INVOICE_DATA"));
+                        boolean isLocal = invoiceData.path("isLocal").asBoolean(false);
+                        radioButtonLocal.setSelected(isLocal);
+                        radioButtonOtherStates.setSelected(!isLocal);
+                        btnGetTotal.setEnabled(false);
+                        btnInvoicePrint.setEnabled(true);
+                        btnInvoiceSave.setEnabled(false);
+                        btnInvoicePrint.requestFocus();
+                        invoiceFields.forEach((_, component) -> component.setEnabled(false));
+                        radioButtonLocal.setEnabled(false);
+                        radioButtonOtherStates.setEnabled(false);
+                        invoiceFields.forEach((key, component) -> {
+                            if (component instanceof JTextField) {
+                                ((JTextField) component).setText(invoiceData.path(key).asText(""));
+                            } else if (component instanceof DateTimePicker) {
+                                try {
+                                    ((DateTimePicker) component).setDateTimeStrict(LocalDateTime.parse(invoiceData.path(key + "_data").asText("")));
+                                } catch (Exception ignored) {
+                                }
+                            }
+                        });
+                        return;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "SQL ERROR\nRECORD NOT FOUND", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (SQLException | JsonProcessingException ignored) {
+                    JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+                btnInvoiceRePrint.requestFocus();
+            }
+        });
+        btnInvoiceRePrint.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnInvoiceRePrint.setPreferredSize(new Dimension(150, 25));
+        return btnInvoiceRePrint;
     }
 
     private JButton getCalcButton() {
@@ -5984,7 +6003,7 @@ class WeighBridge {
         return btnCalc;
     }
 
-    private JLabel getPreview() {
+    private JLabel getPreviewButton() {
         BufferedImage previewImage = webcam[1].getImage();
         BufferedImage cropImage = previewImage.getSubimage(
                 Integer.parseInt(0 + textFieldCropX11.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY11.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth11.getText().replaceAll("\\D", "")), Integer.parseInt("0" + textFieldCropHeight11.getText().replaceAll("\\D", "")));
@@ -6058,6 +6077,12 @@ class WeighBridge {
         }
 
         if (checkboxEstimatedWeightSetting.isSelected()) {
+            textFieldCustom2.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCustom2.getText().replaceAll("[^.\\d]", ""))));
+            textFieldCustom3.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCustom3.getText().replaceAll("[^.\\d]", ""))));
+            textFieldCustom4.setText(decimalFormat.format(Double.parseDouble(textFieldNetWt.getText()) - Double.parseDouble(textFieldCustom3.getText())));
+        }
+
+        if (checkboxGodownSetting.isSelected()) {
             textFieldCustom2.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCustom2.getText().replaceAll("[^.\\d]", ""))));
             textFieldCustom3.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCustom3.getText().replaceAll("[^.\\d]", ""))));
             textFieldCustom4.setText(decimalFormat.format(Double.parseDouble(textFieldNetWt.getText()) - Double.parseDouble(textFieldCustom3.getText())));
@@ -6229,7 +6254,7 @@ class WeighBridge {
             Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             ResultSet rs = stmt.executeQuery(temp + " ORDER BY INVOICE_NO LIMIT 1000");
             while (rs.next()) {
-                JsonNode invoiceData = new ObjectMapper().readTree(rs.getString("INVOICE_DATA"));
+                JsonNode invoiceData = objectMapper.readTree(rs.getString("INVOICE_DATA"));
                 model.addRow(filteredReportCheckBox.stream().map(checkbox -> invoiceData.path(checkbox.getKey()).asText("")).toArray());
                 charges += invoiceData.path("total").asInt(0);
             }
@@ -6374,6 +6399,7 @@ class WeighBridge {
                             "Final Wt",
                             "Final Amount",
                             "Remarks",
+                            "Weighing Data",
                             "Manual"
                     }));
             DefaultTableModel model = (DefaultTableModel) tableReport.getModel();
@@ -6478,6 +6504,7 @@ class WeighBridge {
                         rs.getInt("FINALAMOUNT"),
                         /*25*/
                         rs.getString("REMARKS"),
+                        rs.getString("WEIGHING_DATA"),
                         /*26*/
                         rs.getBoolean("MANUAL")
                 });
@@ -6639,6 +6666,11 @@ class WeighBridge {
                     textFieldNetDateTime.setText(dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(textFieldNetDateTime.getText()).getTime())));
                 }
                 textPaneRemarks.setText(rs.getString("REMARKS"));
+                try {
+                    weighingData = (ObjectNode) objectMapper.readTree(rs.getString("WEIGHING_DATA"));
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
                 operatorTare = rs.getString("OPERATOR_TARE");
                 operatorGross = rs.getString("OPERATOR_GROSS");
 
@@ -6664,6 +6696,8 @@ class WeighBridge {
                 comboBoxTransporterName.setEnabled(false);
                 textFieldCustom1.setEnabled(false);
                 textFieldCustom2.setEnabled(false);
+                textFieldCustom3.setEnabled(false);
+                textFieldCustom4.setEnabled(false);
                 textFieldPlace.setEnabled(false);
                 textFieldPhoneNo.setEnabled(false);
                 checkboxIsCredit.setEnabled(false);
@@ -6799,6 +6833,7 @@ class WeighBridge {
             checkboxAutoChargeCheck.setSelected(checkboxAutoCharges.isSelected());
             textFieldCharges.setEnabled(!(checkboxExcludeCharges.isSelected() || checkboxAutoChargeCheck.isSelected()));
             textFieldCustom3.setEnabled(checkboxEstimatedWeightSetting.isSelected());
+            textFieldCustom3.setEnabled(false);
             textPaneRemarks.setText("");
             textFieldDcNo.setText("");
             textFieldDcDate.setText("");
@@ -6820,6 +6855,7 @@ class WeighBridge {
             lblOperatorName.setText(comboBoxOperator.getEditor().getItem().toString());
             labelCustom1.setText(getCustom1());
             labelCustom2.setText(getCustom2());
+            weighingData = objectMapper.createObjectNode();
         }
     }
 
@@ -10112,6 +10148,7 @@ class WeighBridge {
                 rs.updateInt("FINALWT", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
                 rs.updateInt("FINALAMOUNT", row.getCell(++colNum) != null ? (int) row.getCell(colNum).getNumericCellValue() : 0);
                 rs.updateString("REMARKS", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim().trim() : "");
+                rs.updateString("WEIGHING_DATA", row.getCell(++colNum) != null ? row.getCell(colNum).toString().trim().trim() : "");
                 rs.updateBoolean("MANUAL", true);
                 if (!update) {
                     rs.insertRow();
@@ -10546,6 +10583,7 @@ class WeighBridge {
             rs.updateBoolean("CREDIT", checkboxIsCredit.isSelected());
             rs.updateInt("GROSSWT", Integer.parseInt(textFieldGrossWt.getText()));
             rs.updateString("REMARKS", textPaneRemarks.getText());
+            rs.updateString("WEIGHING_DATA", weighingData.toString());
 
             if (!textFieldGrossDateTime.getText().isEmpty()) {
                 Date date = dateAndTimeFormat.parse(textFieldGrossDateTime.getText());
@@ -10825,7 +10863,7 @@ class WeighBridge {
             try {
                 if (null == reportCheckBox) {
                     reportCheckBox = new ArrayList<>();
-                    JsonNode invoiceProperty = new ObjectMapper().readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
+                    JsonNode invoiceProperty = objectMapper.readTree(new File("Reports/" + comboBoxInvoiceProperty.getSelectedItem()));
 
                     for (JsonNode field : invoiceProperty.get("reportFields")) {
                         reportCheckBox.add(new MyCheckBox(field));
@@ -10846,6 +10884,8 @@ class WeighBridge {
             return "Rate";
         } else if (checkboxKottaSetting.isSelected()) {
             return "Market Rate";
+        } else if (checkboxGodownSetting.isSelected()) {
+            return "Adjust";
         } else {
             return "Charges";
         }
@@ -10854,7 +10894,7 @@ class WeighBridge {
     private String getCustom1() {
         if (checkboxIceWater.isSelected()) {
             return "Freight Charges";
-        } else if (checkboxEstimatedWeightSetting.isSelected()) {
+        } else if (checkboxEstimatedWeightSetting.isSelected() || checkboxGodownSetting.isSelected()) {
             return "Driver, Mobile";
         } else {
             return "CUSTOM_1";
@@ -10868,7 +10908,7 @@ class WeighBridge {
             return "Price (per kg)";
         } else if (checkboxKottaSetting.isSelected()) {
             return "Kotta";
-        } else if (checkboxEstimatedWeightSetting.isSelected()) {
+        } else if (checkboxEstimatedWeightSetting.isSelected() || checkboxGodownSetting.isSelected()) {
             return "No of Bags";
         } else {
             return "CUSTOM_2";
@@ -10876,7 +10916,7 @@ class WeighBridge {
     }
 
     private String getCustom3() {
-        if (checkboxEstimatedWeightSetting.isSelected()) {
+        if (checkboxEstimatedWeightSetting.isSelected() || checkboxGodownSetting.isSelected()) {
             return "Estimated Weight";
         } else {
             return "CUSTOM_3";
@@ -10884,7 +10924,7 @@ class WeighBridge {
     }
 
     private String getCustom4() {
-        if (checkboxEstimatedWeightSetting.isSelected()) {
+        if (checkboxEstimatedWeightSetting.isSelected() || checkboxGodownSetting.isSelected()) {
             return "Difference Weight";
         } else {
             return "CUSTOM_4";
@@ -11586,6 +11626,7 @@ class WeighBridge {
                             rs.updateInt("FINALAMOUNT", Integer.parseInt("0" + model.getValueAt(row, ++col)));
 
                             rs.updateString("REMARKS", model.getValueAt(row, ++col) != null ? String.valueOf(model.getValueAt(row, col)) : "");
+                            rs.updateString("WEIGHING_DATA", model.getValueAt(row, ++col) != null ? String.valueOf(model.getValueAt(row, col)) : "");
                             rs.updateBoolean("MANUAL", true);
                             rs.updateRow();
 
@@ -11661,6 +11702,7 @@ class WeighBridge {
                                     rs.getInt("FINALWT"),
                                     rs.getInt("FINALAMOUNT"),
                                     rs.getString("REMARKS"),
+                                    rs.getString("WEIGHING_DATA"),
                                     rs.getBoolean("MANUAL")
                             }) {
                                 model.setValueAt(cell, row, ++col);
