@@ -6717,7 +6717,7 @@ class WeighBridge {
                 textPaneRemarks.setText(rs.getString("REMARKS"));
                 try {
                     weighingData = (ObjectNode) objectMapper.readTree(rs.getString("WEIGHING_DATA"));
-                } catch (JsonProcessingException ignored) {
+                } catch (JsonProcessingException | ClassCastException ignored) {
                 }
                 operatorTare = rs.getString("OPERATOR_TARE");
                 operatorGross = rs.getString("OPERATOR_GROSS");
