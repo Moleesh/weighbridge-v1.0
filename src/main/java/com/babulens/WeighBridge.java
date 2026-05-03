@@ -5770,7 +5770,7 @@ class WeighBridge {
 
     private void updateWeighingDataFromDB(ResultSet rs) throws SQLException {
         try {
-            weighingData = weighingData.setAll((ObjectNode) objectMapper.readTree(rs.getString("WEIGHING_DATA")));
+            weighingData.setAll((ObjectNode) objectMapper.readTree(rs.getString("WEIGHING_DATA")));
         } catch (JsonProcessingException ignored) {
         }
     }
@@ -6107,7 +6107,7 @@ class WeighBridge {
 
         if (checkboxGodownSetting.isSelected() && Integer.parseInt(textFieldNetWt.getText()) > 0) {
             double fullBagWeight = weighingData.get("FULL_BAG_WEIGHT").asDouble(0);
-            double noOfBags = Double.parseDouble(0 + textFieldCustom2.getText().replaceAll("[^.\\d]", ""));
+            int noOfBags = Integer.parseInt(0 + textFieldCustom2.getText().replaceAll("\\D", ""));
             double bagWeight = Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", ""));
             double netWeight = Double.parseDouble(textFieldNetWt.getText()) - (noOfBags * bagWeight);
             double estimatedWeight = (fullBagWeight * noOfBags);
