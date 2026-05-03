@@ -5771,7 +5771,7 @@ class WeighBridge {
     private void updateWeighingDataFromDB(ResultSet rs) throws SQLException {
         try {
             weighingData.setAll((ObjectNode) objectMapper.readTree(rs.getString("WEIGHING_DATA")));
-        } catch (JsonProcessingException ignored) {
+        } catch (JsonProcessingException | ClassCastException ignored) {
         }
     }
 
@@ -6109,10 +6109,10 @@ class WeighBridge {
             double fullBagWeight = weighingData.get("FULL_BAG_WEIGHT").asDouble(0);
             int noOfBags = Integer.parseInt(0 + textFieldCustom2.getText().replaceAll("\\D", ""));
             double bagWeight = Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", ""));
-            double netWeight = Double.parseDouble(textFieldNetWt.getText()) - (noOfBags * bagWeight);
-            double estimatedWeight = (fullBagWeight * noOfBags);
+            int netWeight = (int) (Double.parseDouble(textFieldNetWt.getText()) - (noOfBags * bagWeight));
+            int estimatedWeight = (int) (fullBagWeight * noOfBags);
             int adjust = Integer.parseInt(0 + textFieldCharges.getText().replaceAll("\\D", ""));
-            double excessShortage = netWeight - estimatedWeight;
+            int excessShortage = (netWeight - estimatedWeight);
 
             if (excessShortage > 0) {
                 weighingData.put("GODOWN_GROSS_WEIGHT", (int) (Double.parseDouble(textFieldGrossWt.getText()) + adjust - excessShortage));
@@ -6123,11 +6123,11 @@ class WeighBridge {
             }
 
             weighingData.put("BAG_WEIGHT", bagWeight);
-            weighingData.put("ESTIMATED_WEIGHT", (int) estimatedWeight);
+            weighingData.put("ESTIMATED_WEIGHT", estimatedWeight);
 
             textFieldCustom2.setText(decimalFormat.format(noOfBags));
-            textFieldCustom3.setText(decimalFormat.format((int) netWeight));
-            textFieldCustom4.setText(decimalFormat.format((int) excessShortage));
+            textFieldCustom3.setText(decimalFormat.format(netWeight));
+            textFieldCustom4.setText(decimalFormat.format(excessShortage));
             textFieldCharges.setText(decimalFormat.format(adjust));
         }
 
