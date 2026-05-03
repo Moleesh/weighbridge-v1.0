@@ -6234,7 +6234,7 @@ class WeighBridge {
                     printElectra();
                     continue;
                 case "Electra V2":
-                    if (Integer.parseInt(textFieldNetWt.getText()) > 0) {
+                    if (Integer.parseInt(textFieldNetWt.getText()) > 0 && Integer.parseInt(textFieldCustom2.getText()) > 0) {
                         printElectraV2();
                         printGodownBill();
                         printGodownTareBill();
