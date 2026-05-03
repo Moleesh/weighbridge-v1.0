@@ -2944,6 +2944,7 @@ class WeighBridge {
                                     radioButtonGross.setSelected(true);
                                 }
                             }
+                            updateWeighingDataFromDB(rs);
                         }
                     } catch (SQLException | ParseException ignored) {
                         JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :680", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
@@ -6104,7 +6105,7 @@ class WeighBridge {
             textFieldCustom4.setText(decimalFormat.format(Double.parseDouble(textFieldNetWt.getText()) - Double.parseDouble(textFieldCustom3.getText())));
         }
 
-        if (checkboxGodownSetting.isSelected()) {
+        if (checkboxGodownSetting.isSelected() && Integer.parseInt(textFieldNetWt.getText()) > 0) {
             double fullBagWeight = weighingData.get("FULL_BAG_WEIGHT").asDouble(0);
             double noOfBags = Double.parseDouble(0 + textFieldCustom2.getText().replaceAll("[^.\\d]", ""));
             double bagWeight = Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", ""));
@@ -8970,7 +8971,7 @@ class WeighBridge {
             graphics2D.drawString("Excess/Shortage  :", 301, y);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
             graphics2D.drawString("                  " + textFieldCustom3.getText(), x, y);
-            graphics2D.drawString("                  " + weighingData.get("ESTIMATED_WEIGHT").asInt(0), x, y + 16);
+            graphics2D.drawString("                  " + weighingData.path("ESTIMATED_WEIGHT").asInt(0), x, y + 16);
             graphics2D.drawString("                  " + textFieldCustom4.getText(), 301, y);
             graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
             graphics2D.drawString("Signature", 450, y + 20);
@@ -9101,9 +9102,9 @@ class WeighBridge {
             y += 10;
             graphics.drawLine(startX, y, endX, y);
             graphics.setFont(new Font("Courier New", Font.BOLD, 18));
-            graphics2D.drawString(StringUtils.center(String.valueOf(weighingData.get("GODOWN_GROSS_WEIGHT").asInt(0)), 16), x, y += 20);
+            graphics2D.drawString(StringUtils.center(String.valueOf(weighingData.path("GODOWN_GROSS_WEIGHT").asInt(0)), 16), x, y += 20);
             graphics2D.drawString(StringUtils.center(textFieldTareWt.getText(), 16), 210, y);
-            graphics2D.drawString(StringUtils.center(String.valueOf(weighingData.get("GODOWN_NET_WEIGHT").asInt(0)), 16), 392, y);
+            graphics2D.drawString(StringUtils.center(String.valueOf(weighingData.path("GODOWN_NET_WEIGHT").asInt(0)), 16), 392, y);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
             graphics2D.drawString(StringUtils.center(textFieldGrossDateTime.getText(), 30), x, y += 14);
             graphics2D.drawString(StringUtils.center(textFieldTareDateTime.getText(), 30), 210, y);
