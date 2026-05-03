@@ -4351,28 +4351,7 @@ class WeighBridge {
         radioButtonInvoice.setBounds(44, 53, 328, 25);
         panelReport.add(radioButtonInvoice);
 
-        JPanel panelSettings1 = new JPanel();
-        panelSettings1.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(ComponentEvent e) {
-                try {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
-                    DefaultTableModel model = (DefaultTableModel) tableVehicleTare.getModel();
-                    model.setRowCount(0);
-                    while (rs.next()) {
-                        model.addRow(new Object[]{
-                                rs.getString("VEHICLENO"),
-                                rs.getString("PLACE"),
-                                rs.getString("PHONE_NUMBER"),
-                                rs.getInt("TAREWT"),
-                                dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME")).getTime()))
-                        });
-                    }
-                } catch (SQLException | ParseException ignored) {
-                }
-            }
-        });
+        JPanel panelSettings1 = getSettings1Panel();
         panelSettings1.setBackground(new Color(0, 255, 127));
         tabbedPane.addTab("          Settings          ", panelSettings1);
         panelSettings1.setLayout(null);
@@ -4487,19 +4466,7 @@ class WeighBridge {
         JButton btnAddMaterialRow = getAddMaterialRowButton();
         panelSettings1.add(btnAddMaterialRow);
 
-        JButton btnDeleteMaterialRow = new JButton("-");
-        btnDeleteMaterialRow.addActionListener(_ -> {
-            DefaultTableModel model = (DefaultTableModel) tableMaterial.getModel();
-            if (tableMaterial.getSelectedRow() != -1) {
-                model.removeRow(tableMaterial.getSelectedRow());
-            }
-            for (int i = 1; i <= model.getRowCount(); i++) {
-                model.setValueAt(i, i - 1, 0);
-            }
-        });
-        btnDeleteMaterialRow.setFocusable(false);
-        btnDeleteMaterialRow.setFont(new Font("Times New Roman", Font.BOLD, 15));
-        btnDeleteMaterialRow.setBounds(269, 319, 41, 38);
+        JButton btnDeleteMaterialRow = getDeleteMaterialRowButton();
         panelSettings1.add(btnDeleteMaterialRow);
 
         JScrollPane scrollPaneVehicleTare = new JScrollPane();
@@ -5057,40 +5024,7 @@ class WeighBridge {
         label_3.setBounds(336, 195, 100, 25);
         panelSettings1.add(label_3);
 
-        JButton btnResetTares = new JButton("Reset Tares");
-        btnResetTares.addActionListener(_ -> {
-            JPasswordField password = new JPasswordField(10);
-            password.addActionListener(_ -> JOptionPane.getRootFrame().dispose());
-            JPanel panel = new JPanel();
-            String[] ConnectOptionNames = {
-                    "Enter",
-                    "Cancel"
-            };
-            panel.add(new JLabel("Please the Password ? "));
-            panel.add(password);
-            JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
-            char[] temp = password.getPassword();
-            boolean isCorrect;
-            char[] correctPassword = RESET_PASSWORD.toCharArray();
-            if (temp.length != correctPassword.length) {
-                isCorrect = false;
-            } else {
-                isCorrect = Arrays.equals(temp, correctPassword);
-            }
-            if (isCorrect) {
-                try {
-                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                    stmt.executeUpdate("truncate table TRANSPORTER");
-                    comboBoxTransporterName.removeAllItems();
-                    transportSet.clear();
-                } catch (SQLException ignored) {
-                }
-            }
-            clear();
-        });
-        btnResetTares.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnResetTares.setFocusable(false);
-        btnResetTares.setBounds(1085, 270, 150, 25);
+        JButton btnResetTares = getResetTaresButton();
         panelSettings1.add(btnResetTares);
 
         checkboxExcludeRemarks = new JCheckBox("Exclude Remarks");
@@ -5341,54 +5275,7 @@ class WeighBridge {
         checkboxInvoice.setBounds(638, 100, 200, 25);
         panelSettings1.add(checkboxInvoice);
 
-        JButton btnResetInvoiceNo = new JButton("Reset Invoice No");
-        btnResetInvoiceNo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        btnResetInvoiceNo.setFocusable(false);
-        btnResetInvoiceNo.setBounds(900, 270, 175, 25);
-        btnResetInvoiceNo.addActionListener(_ -> {
-            JPasswordField password = new JPasswordField(10);
-            password.addActionListener(_ -> JOptionPane.getRootFrame().dispose());
-            JPanel panel = new JPanel();
-            String[] ConnectOptionNames = {
-                    "Enter",
-                    "Cancel"
-            };
-            panel.add(new JLabel("Please the Password ? "));
-            panel.add(password);
-            JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
-            char[] temp = password.getPassword();
-            boolean isCorrect;
-            char[] correctPassword = RESET_PASSWORD.toCharArray();
-            if (temp.length != correctPassword.length) {
-                isCorrect = false;
-            } else {
-                isCorrect = Arrays.equals(temp, correctPassword);
-            }
-            if (isCorrect) {
-                String response = JOptionPane.showInputDialog(null, "Please Enter the Starting Invoice No ?", "Invoice No", JOptionPane.QUESTION_MESSAGE);
-                if (response == null || Integer.parseInt(0 + response.replaceAll("\\D", "")) == 0) {
-                    JOptionPane.showMessageDialog(null, "Reset Failed ", "Value Entered is not correct", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    try {
-                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                        PreparedStatement prepareStatement = dbConnection.prepareStatement("CREATE TABLE INVOICES_" + DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss").format(LocalDateTime.now()) + " AS TABLE INVOICES");
-                        prepareStatement.executeUpdate();
-                        prepareStatement = dbConnection.prepareStatement("TRUNCATE TABLE INVOICES");
-                        prepareStatement.executeUpdate();
-                        ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
-                        rs.absolute(1);
-                        rs.updateInt("INVOICE_NO", Integer.parseInt(response.replaceAll("\\D", "")));
-                        rs.updateRow();
-                    } catch (SQLException ignored) {
-                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2836", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
-                    }
-                    settings();
-                    JOptionPane.showMessageDialog(null, "Reset Successful ", "Reset Successful", JOptionPane.INFORMATION_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Wrong Password ", "Value Entered the Correct Password", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        JButton btnResetInvoiceNo = getResetInvoiceNoButton();
         panelSettings1.add(btnResetInvoiceNo);
 
         JPanel panelSettings2 = new JPanel();
@@ -5883,6 +5770,139 @@ class WeighBridge {
         button.setFocusable(false);
         button.setBounds(518, 11, 117, 30);
         babulensWeighbridgeDesigned.getContentPane().add(button);
+    }
+
+    private JPanel getSettings1Panel() {
+        JPanel panelSettings1 = new JPanel();
+        panelSettings1.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                try {
+                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    ResultSet rs = stmt.executeQuery("SELECT * FROM VEHICLETARES");
+                    DefaultTableModel model = (DefaultTableModel) tableVehicleTare.getModel();
+                    model.setRowCount(0);
+                    while (rs.next()) {
+                        model.addRow(new Object[]{
+                                rs.getString("VEHICLENO"),
+                                rs.getString("PLACE"),
+                                rs.getString("PHONE_NUMBER"),
+                                rs.getInt("TAREWT"),
+                                dateAndTimeFormat.format(new Date(dateAndTimeFormatSql.parse(rs.getDate("TAREDATE") + " " + rs.getTime("TARETIME")).getTime()))
+                        });
+                    }
+                } catch (SQLException | ParseException ignored) {
+                }
+            }
+        });
+        return panelSettings1;
+    }
+
+    private JButton getResetInvoiceNoButton() {
+        JButton btnResetInvoiceNo = new JButton("Reset Invoice No");
+        btnResetInvoiceNo.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnResetInvoiceNo.setFocusable(false);
+        btnResetInvoiceNo.setBounds(900, 270, 175, 25);
+        btnResetInvoiceNo.addActionListener(_ -> {
+            JPasswordField password = new JPasswordField(10);
+            password.addActionListener(_ -> JOptionPane.getRootFrame().dispose());
+            JPanel panel = new JPanel();
+            String[] ConnectOptionNames = {
+                    "Enter",
+                    "Cancel"
+            };
+            panel.add(new JLabel("Please the Password ? "));
+            panel.add(password);
+            JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
+            char[] temp = password.getPassword();
+            boolean isCorrect;
+            char[] correctPassword = RESET_PASSWORD.toCharArray();
+            if (temp.length != correctPassword.length) {
+                isCorrect = false;
+            } else {
+                isCorrect = Arrays.equals(temp, correctPassword);
+            }
+            if (isCorrect) {
+                String response = JOptionPane.showInputDialog(null, "Please Enter the Starting Invoice No ?", "Invoice No", JOptionPane.QUESTION_MESSAGE);
+                if (response == null || Integer.parseInt(0 + response.replaceAll("\\D", "")) == 0) {
+                    JOptionPane.showMessageDialog(null, "Reset Failed ", "Value Entered is not correct", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    try {
+                        Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                        PreparedStatement prepareStatement = dbConnection.prepareStatement("CREATE TABLE INVOICES_" + DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss").format(LocalDateTime.now()) + " AS TABLE INVOICES");
+                        prepareStatement.executeUpdate();
+                        prepareStatement = dbConnection.prepareStatement("TRUNCATE TABLE INVOICES");
+                        prepareStatement.executeUpdate();
+                        ResultSet rs = stmt.executeQuery("SELECT * FROM SETTINGS");
+                        rs.absolute(1);
+                        rs.updateInt("INVOICE_NO", Integer.parseInt(response.replaceAll("\\D", "")));
+                        rs.updateRow();
+                    } catch (SQLException ignored) {
+                        JOptionPane.showMessageDialog(null, "SQL ERROR\nCHECK THE VALUES ENTERED\nLINE :2836", "SQL ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+                    settings();
+                    JOptionPane.showMessageDialog(null, "Reset Successful ", "Reset Successful", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Wrong Password ", "Value Entered the Correct Password", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        return btnResetInvoiceNo;
+    }
+
+    private JButton getResetTaresButton() {
+        JButton btnResetTares = new JButton("Reset Tares");
+        btnResetTares.addActionListener(_ -> {
+            JPasswordField password = new JPasswordField(10);
+            password.addActionListener(_ -> JOptionPane.getRootFrame().dispose());
+            JPanel panel = new JPanel();
+            String[] ConnectOptionNames = {
+                    "Enter",
+                    "Cancel"
+            };
+            panel.add(new JLabel("Please the Password ? "));
+            panel.add(password);
+            JOptionPane.showOptionDialog(null, panel, "Password ", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, ConnectOptionNames, null);
+            char[] temp = password.getPassword();
+            boolean isCorrect;
+            char[] correctPassword = RESET_PASSWORD.toCharArray();
+            if (temp.length != correctPassword.length) {
+                isCorrect = false;
+            } else {
+                isCorrect = Arrays.equals(temp, correctPassword);
+            }
+            if (isCorrect) {
+                try {
+                    Statement stmt = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                    stmt.executeUpdate("truncate table TRANSPORTER");
+                    comboBoxTransporterName.removeAllItems();
+                    transportSet.clear();
+                } catch (SQLException ignored) {
+                }
+            }
+            clear();
+        });
+        btnResetTares.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        btnResetTares.setFocusable(false);
+        btnResetTares.setBounds(1085, 270, 150, 25);
+        return btnResetTares;
+    }
+
+    private JButton getDeleteMaterialRowButton() {
+        JButton btnDeleteMaterialRow = new JButton("-");
+        btnDeleteMaterialRow.addActionListener(_ -> {
+            DefaultTableModel model = (DefaultTableModel) tableMaterial.getModel();
+            if (tableMaterial.getSelectedRow() != -1) {
+                model.removeRow(tableMaterial.getSelectedRow());
+            }
+            for (int i = 1; i <= model.getRowCount(); i++) {
+                model.setValueAt(i, i - 1, 0);
+            }
+        });
+        btnDeleteMaterialRow.setFocusable(false);
+        btnDeleteMaterialRow.setFont(new Font("Times New Roman", Font.BOLD, 15));
+        btnDeleteMaterialRow.setBounds(269, 319, 41, 38);
+        return btnDeleteMaterialRow;
     }
 
     private JButton getAddMaterialRowButton() {
