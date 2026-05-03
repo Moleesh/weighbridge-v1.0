@@ -8923,14 +8923,14 @@ class WeighBridge {
                 BufferedImage cropImage1 = null, cropImage2 = null;
 
                 try {
-                    BufferedImage printImage1 = getAvailableImage(1, radioButtonGross.isSelected() ? "_G" : "_T");
+                    BufferedImage printImage1 = getAvailableImage(1, "_G");
                     cropImage1 = printImage1.getSubimage(
                             Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
                 }
 
                 try {
-                    BufferedImage printImage2 = getAvailableImage(2, radioButtonGross.isSelected() ? "_G" : "_T");
+                    BufferedImage printImage2 = getAvailableImage(2, "_G");
                     cropImage2 = printImage2.getSubimage(
                             Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
@@ -8970,7 +8970,7 @@ class WeighBridge {
             graphics2D.drawString("Excess/Shortage  :", 301, y);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
             graphics2D.drawString("                  " + textFieldCustom3.getText(), x, y);
-            graphics2D.drawString("                  " + weighingData.get("ESTIMATED_WEIGHT").asDouble(0), x, y + 16);
+            graphics2D.drawString("                  " + weighingData.get("ESTIMATED_WEIGHT").asInt(0), x, y + 16);
             graphics2D.drawString("                  " + textFieldCustom4.getText(), 301, y);
             graphics.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 10));
             graphics2D.drawString("Signature", 450, y + 20);
@@ -9070,14 +9070,14 @@ class WeighBridge {
                 BufferedImage cropImage1 = null, cropImage2 = null;
 
                 try {
-                    BufferedImage printImage1 = getAvailableImage(1, radioButtonGross.isSelected() ? "_G" : "_T");
+                    BufferedImage printImage1 = getAvailableImage(1, "_G");
                     cropImage1 = printImage1.getSubimage(
                             Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
                 }
 
                 try {
-                    BufferedImage printImage2 = getAvailableImage(2, radioButtonGross.isSelected() ? "_G" : "_T");
+                    BufferedImage printImage2 = getAvailableImage(2, "_G");
                     cropImage2 = printImage2.getSubimage(
                             Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
@@ -9101,9 +9101,9 @@ class WeighBridge {
             y += 10;
             graphics.drawLine(startX, y, endX, y);
             graphics.setFont(new Font("Courier New", Font.BOLD, 18));
-            graphics2D.drawString(StringUtils.center(String.valueOf(weighingData.get("GODOWN_GROSS_WEIGHT").asDouble(0)), 16), x, y += 20);
+            graphics2D.drawString(StringUtils.center(String.valueOf(weighingData.get("GODOWN_GROSS_WEIGHT").asInt(0)), 16), x, y += 20);
             graphics2D.drawString(StringUtils.center(textFieldTareWt.getText(), 16), 210, y);
-            graphics2D.drawString(StringUtils.center(String.valueOf(weighingData.get("GODOWN_NET_WEIGHT").asDouble(0)), 16), 392, y);
+            graphics2D.drawString(StringUtils.center(String.valueOf(weighingData.get("GODOWN_NET_WEIGHT").asInt(0)), 16), 392, y);
             graphics.setFont(new Font("Courier New", Font.BOLD, 10));
             graphics2D.drawString(StringUtils.center(textFieldGrossDateTime.getText(), 30), x, y += 14);
             graphics2D.drawString(StringUtils.center(textFieldTareDateTime.getText(), 30), 210, y);
@@ -9210,14 +9210,14 @@ class WeighBridge {
                 BufferedImage cropImage1 = null, cropImage2 = null;
 
                 try {
-                    BufferedImage printImage1 = getAvailableImage(1, radioButtonGross.isSelected() ? "_G" : "_T");
+                    BufferedImage printImage1 = getAvailableImage(1, "_T");
                     cropImage1 = printImage1.getSubimage(
                             Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
                 }
 
                 try {
-                    BufferedImage printImage2 = getAvailableImage(2, radioButtonGross.isSelected() ? "_G" : "_T");
+                    BufferedImage printImage2 = getAvailableImage(2, "_T");
                     cropImage2 = printImage2.getSubimage(
                             Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
