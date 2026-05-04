@@ -8935,14 +8935,14 @@ class WeighBridge {
                 BufferedImage cropImage1 = null, cropImage2 = null;
 
                 try {
-                    BufferedImage printImage1 = getAvailableImage(1, "_G");
+                    BufferedImage printImage1 = getAvailableImage(1);
                     cropImage1 = printImage1.getSubimage(
                             Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
                 }
 
                 try {
-                    BufferedImage printImage2 = getAvailableImage(2, "_G");
+                    BufferedImage printImage2 = getAvailableImage(2);
                     cropImage2 = printImage2.getSubimage(
                             Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
@@ -9082,14 +9082,14 @@ class WeighBridge {
                 BufferedImage cropImage1 = null, cropImage2 = null;
 
                 try {
-                    BufferedImage printImage1 = getAvailableImage(1, "_G");
+                    BufferedImage printImage1 = getAvailableImage(1);
                     cropImage1 = printImage1.getSubimage(
                             Integer.parseInt(0 + textFieldCropX1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth1.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight1.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
                 }
 
                 try {
-                    BufferedImage printImage2 = getAvailableImage(2, "_G");
+                    BufferedImage printImage2 = getAvailableImage(2);
                     cropImage2 = printImage2.getSubimage(
                             Integer.parseInt(0 + textFieldCropX2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropY2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropWidth2.getText().replaceAll("\\D", "")), Integer.parseInt(0 + textFieldCropHeight2.getText().replaceAll("\\D", "")));
                 } catch (IOException | RasterFormatException ignored) {
