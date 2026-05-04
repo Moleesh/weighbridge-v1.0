@@ -413,6 +413,7 @@ class WeighBridge {
     private JCheckBox checkboxRoundOff;
     private JComboBox<String> comboBoxVehicleNo;
     private JTextField textFieldRoundOffDecimals;
+    private JTextField textFieldDefaultCharge;
     private JCheckBox checkboxIsCredit;
     private JCheckBox checkboxExcludeCredit;
     private JCheckBox checkboxExcludeVehicleType;
@@ -854,6 +855,7 @@ class WeighBridge {
             noOfCopies = Integer.parseInt(textFieldNoOfCopies.getText());
             comboBoxPrintOptionForWeight.getModel().setSelectedItem(rs.getString("PRINTOPTIONFORWEIGHT"));
             comboBoxInvoiceProperty.getModel().setSelectedItem(rs.getString("INVOICE_PROPERTY"));
+            textFieldDefaultCharge.setText(rs.getString("DEFAULT_CHARGE"));
             comboBoxReport.getModel().setSelectedItem(rs.getString("REPORT"));
             checkboxExcludeCharges.setSelected(rs.getBoolean("EXCLUDECHARGES"));
             checkboxExcludeDrivers.setSelected(rs.getBoolean("EXCLUDEDRIVER"));
@@ -1495,6 +1497,7 @@ class WeighBridge {
             rs.updateBoolean("EXCLUDECUSTOMERS", checkboxExcludeCustomer.isSelected());
             rs.updateString("PRINTOPTIONFORWEIGHT", (String) comboBoxPrintOptionForWeight.getSelectedItem());
             rs.updateString("INVOICE_PROPERTY", (String) comboBoxInvoiceProperty.getSelectedItem());
+            rs.updateString("DEFAULT_CHARGE", textFieldDefaultCharge.getText());
             rs.updateString("REPORT", (String) comboBoxReport.getSelectedItem());
             rs.updateInt("BAUDRATE", Integer.parseInt(0 + textFieldBaudRate.getText().replaceAll("\\D", "")));
             rs.updateString("PORTNAME", textFieldPortName.getText());
@@ -5559,7 +5562,7 @@ class WeighBridge {
 
         JLabel lblRoundOffDecimals = new JLabel("Round Off decimals");
         lblRoundOffDecimals.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblRoundOffDecimals.setBounds(40, 355, 173, 25);
+        lblRoundOffDecimals.setBounds(40, 395, 173, 25);
         panelSettings2.add(lblRoundOffDecimals);
 
         textFieldRoundOffDecimals = new JTextField();
@@ -5568,7 +5571,7 @@ class WeighBridge {
         textFieldRoundOffDecimals.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         textFieldRoundOffDecimals.setDisabledTextColor(Color.BLACK);
         textFieldRoundOffDecimals.setColumns(10);
-        textFieldRoundOffDecimals.setBounds(215, 350, 168, 30);
+        textFieldRoundOffDecimals.setBounds(215, 390, 168, 30);
         panelSettings2.add(textFieldRoundOffDecimals);
 
         JLabel lblNameOfWork = new JLabel("Name Of Work");
@@ -5703,14 +5706,14 @@ class WeighBridge {
 
         JLabel lblInvoiceProperty = new JLabel("Invoice Property");
         lblInvoiceProperty.setFont(new Font("Times New Roman", Font.ITALIC, 20));
-        lblInvoiceProperty.setBounds(40, 391, 173, 25);
+        lblInvoiceProperty.setBounds(40, 430, 173, 25);
         panelSettings2.add(lblInvoiceProperty);
 
         comboBoxInvoiceProperty = new JComboBox<>();
         comboBoxInvoiceProperty.setModel(new DefaultComboBoxModel<>(invoiceProperties));
         comboBoxInvoiceProperty.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         comboBoxInvoiceProperty.setFocusable(false);
-        comboBoxInvoiceProperty.setBounds(215, 391, 168, 30);
+        comboBoxInvoiceProperty.setBounds(215, 430, 168, 30);
         panelSettings2.add(comboBoxInvoiceProperty);
 
         checkboxEstimatedWeightSetting = new JCheckBox("Estimated Weight Setting");
@@ -5759,6 +5762,19 @@ class WeighBridge {
             clear();
         });
         panelSettings2.add(checkboxGodownSetting);
+
+        JLabel lblDefaultCharge = new JLabel("Default Charge");
+        lblDefaultCharge.setFont(new Font("Times New Roman", Font.ITALIC, 20));
+        lblDefaultCharge.setBounds(40, 355, 150, 25);
+        panelSettings2.add(lblDefaultCharge);
+
+        textFieldDefaultCharge = new JTextField();
+        textFieldDefaultCharge.setHorizontalAlignment(SwingConstants.CENTER);
+        textFieldDefaultCharge.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textFieldDefaultCharge.setDisabledTextColor(Color.BLACK);
+        textFieldDefaultCharge.setColumns(10);
+        textFieldDefaultCharge.setBounds(215, 350, 168, 30);
+        panelSettings2.add(textFieldDefaultCharge);
 
         JButton button = new JButton("Minimize");
         button.addActionListener(_ -> babulensWeighbridgeDesigned.setState(Frame.ICONIFIED));
@@ -6109,19 +6125,14 @@ class WeighBridge {
             double fullBagWeight = weighingData.path("FULL_BAG_WEIGHT").asDouble(0);
             int noOfBags = (int) Double.parseDouble(textFieldCustom2.getText().replaceAll("[^.\\d]", ""));
             double bagWeight = Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", ""));
-            int netWeight = (int) (Double.parseDouble(textFieldNetWt.getText()) - (noOfBags * bagWeight));
-            int estimatedWeight = (int) (fullBagWeight * noOfBags);
+            int netWeight = (int) Math.round(Double.parseDouble(textFieldNetWt.getText()) - (noOfBags * bagWeight));
+            int estimatedWeight = (int) Math.round(fullBagWeight * noOfBags);
             int adjust = (int) Double.parseDouble(textFieldCharges.getText().replaceAll("[^.\\d]", ""));
-            int excessShortage = (netWeight - estimatedWeight);
+            int excessShortage = netWeight - estimatedWeight;
+            int totalAdjustment = (int) (Math.round((excessShortage > 0 ? adjust - excessShortage : adjust) / 10.0) * 10);
 
-            if (excessShortage > 0) {
-                weighingData.put("GODOWN_GROSS_WEIGHT", (int) (Double.parseDouble(textFieldGrossWt.getText()) + adjust - excessShortage));
-                weighingData.put("GODOWN_NET_WEIGHT", (int) (Double.parseDouble(textFieldNetWt.getText()) + adjust - excessShortage));
-            } else {
-                weighingData.put("GODOWN_GROSS_WEIGHT", (int) (Double.parseDouble(textFieldGrossWt.getText()) + adjust));
-                weighingData.put("GODOWN_NET_WEIGHT", (int) (Double.parseDouble(textFieldNetWt.getText()) + adjust));
-            }
-
+            weighingData.put("GODOWN_GROSS_WEIGHT", (int) (Double.parseDouble(textFieldGrossWt.getText()) + totalAdjustment));
+            weighingData.put("GODOWN_NET_WEIGHT", (int) (Double.parseDouble(textFieldNetWt.getText()) + totalAdjustment));
             weighingData.put("BAG_WEIGHT", bagWeight);
             weighingData.put("ESTIMATED_WEIGHT", estimatedWeight);
 
@@ -6855,7 +6866,7 @@ class WeighBridge {
             textFieldCustom2.setText("");
             textFieldCustom3.setText("");
             textFieldCustom4.setText("");
-            textFieldCharges.setText("");
+            textFieldCharges.setText(textFieldDefaultCharge.getText());
             textFieldGrossWt.setText("0");
             textFieldTareWt.setText("0");
             textFieldNetWt.setText("0");
