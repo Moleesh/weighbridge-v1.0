@@ -2852,7 +2852,6 @@ class WeighBridge {
                                     textFieldTareWt.setText(Integer.toString(rs.getInt("TAREWT")));
                                     textFieldPlace.setText(rs.getString("PLACE"));
                                     textFieldPhoneNo.setText(rs.getString("PHONE_NUMBER"));
-                                    updateWeighingDataFromDB(rs);
                                 }
                             }
                         } catch (SQLException | ParseException ignored) {
@@ -6123,13 +6122,13 @@ class WeighBridge {
 
         if (checkboxGodownSetting.isSelected() && Integer.parseInt(textFieldNetWt.getText()) > 0) {
             double fullBagWeight = weighingData.path("FULL_BAG_WEIGHT").asDouble(0);
-            int noOfBags = (int) Double.parseDouble(textFieldCustom2.getText().replaceAll("[^.\\d]", ""));
+            int noOfBags = (int) Double.parseDouble(0 + textFieldCustom2.getText().replaceAll("[^.\\d]", ""));
             double bagWeight = Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", ""));
             int netWeight = (int) Math.round(Double.parseDouble(textFieldNetWt.getText()) - (noOfBags * bagWeight));
             int estimatedWeight = (int) Math.round(fullBagWeight * noOfBags);
-            int adjust = (int) Double.parseDouble(textFieldCharges.getText().replaceAll("[^.\\d]", ""));
+            int adjust = (int) Double.parseDouble(0 + textFieldCharges.getText().replaceAll("[^.\\d]", ""));
             int excessShortage = netWeight - estimatedWeight;
-            int totalAdjustment = (int) (Math.round((excessShortage > 0 ? adjust - excessShortage : adjust) / 10.0) * 10);
+            int totalAdjustment = (int) (Math.round((excessShortage > 0 ? adjust - excessShortage : 0) / 10.0) * 10);
 
             weighingData.put("GODOWN_GROSS_WEIGHT", (int) (Double.parseDouble(textFieldGrossWt.getText()) + totalAdjustment));
             weighingData.put("GODOWN_NET_WEIGHT", (int) (Double.parseDouble(textFieldNetWt.getText()) + totalAdjustment));
