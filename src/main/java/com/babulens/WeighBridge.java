@@ -7181,8 +7181,8 @@ class WeighBridge {
     }
 
     private JTextPane createTextPaneIceWater() {
-        String format = " %1$-13s: %2$-15s\n";
-        String format2 = " %1$-13s: %2$-20s%3$-12s: %4$-20s\n";
+        String format = " %1$-12s: %2$-15s\n";
+        String format2 = " %1$-12s: %2$-20s%3$-12s: %4$-20s\n";
         String format1 = "     %1$-15s: %2$-7s Kg               %3$-20s\n";
         String format3 = "     %1$-15s: %2$s\n";
 
