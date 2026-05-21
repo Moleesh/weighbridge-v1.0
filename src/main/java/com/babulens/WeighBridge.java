@@ -5481,7 +5481,11 @@ class WeighBridge {
                 textFieldFinalWt.setVisible(true);
                 label_6.setVisible(true);
                 textFieldFinalAmount.setVisible(true);
-                textFieldCustom2.setEnabled(true);
+                labelCustom1.setVisible(true);
+                labelCustom2.setVisible(true);
+                textFieldCustom1.setVisible(true);
+                textFieldCustom2.setVisible(true);
+                textFieldCustom3.setVisible(true);
             }
             clear();
         });
