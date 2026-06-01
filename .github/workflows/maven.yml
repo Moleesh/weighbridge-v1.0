@@ -3,6 +3,9 @@ name: WeighBridge 1.0
 on:
   push:
     branches: [ "master" ]
+  push:
+    tags: 
+      - 'v*'  # Trigger on version tags like v1.0.0
 
 jobs:
   build:
@@ -34,3 +37,10 @@ jobs:
         with:
           name: WeighBridge 1.0
           path: WeighBridge 1.0
+
+      # Create GitHub Release (only on tag push)
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: WeighBridge 1.0/**/*
