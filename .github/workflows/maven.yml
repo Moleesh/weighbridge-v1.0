@@ -3,7 +3,6 @@ name: WeighBridge 1.0
 on:
   push:
     branches: [ "master" ]
-  push:
     tags: 
       - 'v*'  # Trigger on version tags like v1.0.0
 
