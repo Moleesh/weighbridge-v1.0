@@ -39,6 +39,12 @@ jobs:
           name: WeighBridge 1.0
           path: WeighBridge 1.0
 
+      # Zip the build artifacts
+      - name: Zip build artifacts
+        shell: bash
+        run: |
+          zip -r WeighBridge-1.0.0.zip "WeighBridge 1.0"
+
       # Remove existing tag and create a new one
       - name: Delete and recreate git tag
         shell: bash
@@ -61,6 +67,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v1.0.0
-          files: WeighBridge 1.0/**/*
+          files: WeighBridge-1.0.0.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
