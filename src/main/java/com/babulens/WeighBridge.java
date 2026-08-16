@@ -6014,7 +6014,7 @@ class WeighBridge {
 
         if (checkboxEstimatedWeightSetting.isSelected()) {
             textFieldCustom2.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCustom2.getText().replaceAll("[^.\\d]", ""))));
-            textFieldCustom3.setText(decimalFormat.format(Double.parseDouble(0 + textFieldCustom3.getText().replaceAll("[^.\\d]", "")) * Integer.parseInt(0 + textFieldCustom2.getText().replaceAll("\\D", ""))));
+            textFieldCustom3.setText(decimalFormat.format(Double.parseDouble(0 + textFieldBagWeight.getText().replaceAll("[^.\\d]", "")) * Integer.parseInt(0 + textFieldCustom2.getText().replaceAll("\\D", ""))));
             textFieldCustom4.setText(decimalFormat.format(Double.parseDouble(textFieldNetWt.getText()) - Double.parseDouble(textFieldCustom3.getText())));
         }
 
