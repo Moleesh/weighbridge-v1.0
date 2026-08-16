@@ -192,6 +192,45 @@
                     </filesets>
                 </configuration>
             </plugin>
+            <!-- Wraps the jar-with-dependencies into a native Windows launcher (Weighbridge.exe) -->
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>2.6.0</version>
+                <executions>
+                    <execution>
+                        <id>l4j-weighbridge</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <outfile>target/Weighbridge.exe</outfile>
+                            <jar>target/WeighBridge-jar-with-dependencies.jar</jar>
+                            <errTitle>WeighBridge</errTitle>
+                            <classPath>
+                                <mainClass>com.babulens.WeighBridge</mainClass>
+                            </classPath>
+                            <jre>
+                                <minVersion>22</minVersion>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>1.0.0.0</fileVersion>
+                                <txtFileVersion>1.0.0.0</txtFileVersion>
+                                <fileDescription>WeighBridge</fileDescription>
+                                <copyright>WeighBridge</copyright>
+                                <productVersion>1.0.0.0</productVersion>
+                                <txtProductVersion>1.0.0.0</txtProductVersion>
+                                <productName>WeighBridge</productName>
+                                <companyName>WeighBridge</companyName>
+                                <internalName>Weighbridge</internalName>
+                                <originalFilename>Weighbridge.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -208,6 +247,8 @@
                                 <copy file="sample.xlsx" tofile="WeighBridge 1.0/sample.xlsx"/>
                                 <copy file="target/WeighBridge-jar-with-dependencies.jar"
                                       tofile="WeighBridge 1.0/Weighbridge.jar"/>
+                                <copy file="target/Weighbridge.exe"
+                                      tofile="WeighBridge 1.0/Weighbridge.exe"/>
                                 <mkdir dir="WeighBridge 1.0/CameraOutput"/>
                                 <copy todir="WeighBridge 1.0/Reports">
                                     <fileset dir="Reports"/>
