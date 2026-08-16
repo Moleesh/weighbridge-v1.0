@@ -7840,6 +7840,9 @@ class WeighBridge {
 
         s = doc.addStyle("6", regular);
         StyleConstants.setFontSize(s, 9);
+
+        s = doc.addStyle("7", regular);
+        StyleConstants.setFontSize(s, 4);
     }
 
     private JTextPane createTextPanePreWeight2() {
@@ -8113,31 +8116,31 @@ class WeighBridge {
 
         String[] initStyles = {
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
-                "2",
+                "7",
                 "1",
         };
         JTextPane textPane = new JTextPane();
