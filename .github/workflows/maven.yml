@@ -74,8 +74,6 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: v1.0.0
-          files: |
-            WeighBridge-1.0.0.zip
-            WeighBridge 1.0/Weighbridge.exe
+          files: WeighBridge-1.0.0.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
