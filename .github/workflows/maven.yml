@@ -57,7 +57,7 @@ jobs:
           # Delete existing GitHub release, if any — action-gh-release only adds/updates
           # the files it's given, it never removes stale assets from a previous release,
           # so without this step old build artifacts pile up on the v1.0.0 release forever.
-          gh release delete v1.0.0 --yes --cleanup-tag 2>/dev/null || true
+          gh release delete v1.0.0 --yes --cleanup-tag || echo "::warning::gh release delete failed (see above) — stale assets may persist"
 
           # Delete local tag if it exists
           git tag -d v1.0.0 2>/dev/null || true
