@@ -4946,6 +4946,7 @@ class WeighBridge {
                 "Quotation",
                 "Quotation KJJ",
                 "Ranga Plain Paper",
+                "Ranga Pre Print",
                 "Sri Pathy",
                 "Standard",
                 "Electra",
@@ -6218,6 +6219,9 @@ class WeighBridge {
                 case "Ranga Plain Paper":
                     printRangaPrePrint();
                     continue;
+                case "Ranga Pre Print":
+                    printPreWeight(createTextPaneRangaPreWeight(), 1.18d);
+                    break;
                 case "Ice Water":
                     printIceWater();
                     continue;
@@ -8056,6 +8060,84 @@ class WeighBridge {
                 "3",
                 "1",
                 "3",
+                "1",
+        };
+        JTextPane textPane = new JTextPane();
+        StyledDocument doc = textPane.getStyledDocument();
+        addStylesToDocumentPreWeight(doc);
+
+        try {
+            for (int i = 0; i < initString.length; i++) {
+                doc.insertString(doc.getLength(), initString[i], doc.getStyle(initStyles[i]));
+            }
+        } catch (BadLocationException ignored) {
+        }
+        return textPane;
+    }
+
+    private JTextPane createTextPaneRangaPreWeight() {
+        String format = "%1$-9s%2$-32s%3$-31s%4$-12s";
+        String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
+        String customerName = Objects.toString(comboBoxCustomerName.getEditor().getItem(), "");
+        String charges = textFieldCharges.getText().equals("0") ? "" : textFieldCharges.getText();
+        String estimatedWt = String.valueOf(weighingData.path("ESTIMATED_WEIGHT").asInt(0));
+        String[] initString = {
+                String.format(format, "", textFieldSlNo.getText(), textFieldSlNo.getText(), textFieldSlNo.getText()),
+                "\n\n",
+                String.format(format, "", temp[0], temp[0], temp[0]),
+                "\n\n",
+                String.format(format, "", temp[1] + " " + temp[2], temp[1] + " " + temp[2], temp[1] + " " + temp[2]),
+                "\n\n",
+                String.format(format, "", comboBoxVehicleNo.getEditor().getItem(), comboBoxVehicleNo.getEditor().getItem(), comboBoxVehicleNo.getEditor().getItem()),
+                "\n\n",
+                String.format(format, "", comboBoxMaterial.getEditor().getItem(), comboBoxMaterial.getEditor().getItem(), comboBoxMaterial.getEditor().getItem()),
+                "\n\n",
+                String.format(format, "", customerName, customerName, customerName),
+                "\n\n",
+                String.format(format, "", textFieldCustom2.getText(), textFieldCustom2.getText(), textFieldCustom2.getText()),
+                "\n\n",
+                String.format(format, "", charges, charges, charges),
+                "\n\n",
+                String.format(format, "", textFieldGrossWt.getText() + " Kg", textFieldGrossWt.getText() + " Kg", textFieldGrossWt.getText() + " Kg"),
+                "\n\n",
+                String.format(format, "", textFieldTareWt.getText() + " Kg", textFieldTareWt.getText() + " Kg", textFieldTareWt.getText() + " Kg"),
+                "\n\n",
+                String.format(format, "", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg"),
+                "\n\n",
+                String.format(format, "", textFieldCustom3.getText() + " Kg", textFieldCustom3.getText() + " Kg", textFieldCustom3.getText() + " Kg"),
+                "\n\n",
+                String.format(format, "", estimatedWt + " Kg", estimatedWt + " Kg", estimatedWt + " Kg"),
+                "\n\n",
+                String.format(format, "", textFieldCustom4.getText(), textFieldCustom4.getText(), textFieldCustom4.getText())
+        };
+
+        String[] initStyles = {
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
+                "1",
+                "2",
                 "1",
         };
         JTextPane textPane = new JTextPane();

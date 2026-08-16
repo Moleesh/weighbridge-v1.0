@@ -41,9 +41,9 @@ jobs:
 
       # Zip the build artifacts
       - name: Zip build artifacts
-        shell: bash
+        shell: pwsh
         run: |
-          zip -r WeighBridge-1.0.0.zip "WeighBridge 1.0"
+          Compress-Archive -Path "WeighBridge 1.0" -DestinationPath "WeighBridge-1.0.0.zip" -Force
 
       # Remove existing tag and create a new one
       - name: Delete and recreate git tag
