@@ -6070,19 +6070,19 @@ class WeighBridge {
         for (int i = 0; i < noOfCopies; i++) {
             switch (Objects.toString(comboBoxPrintOptionForWeight.getSelectedItem(), "")) {
                 case "Pre Print":
-                    printPreWeight(createTextPanePreWeight(), 1.25d);
+                    printPreWeight(createTextPanePreWeight());
                     break;
                 case "Pre Print 2":
-                    printPreWeight(createTextPanePreWeight2(), 1.25d);
+                    printPreWeight(createTextPanePreWeight2());
                     break;
                 case "Pre Print 3":
-                    printPreWeight(createTextPanePreWeight3(), 1.25d);
+                    printPreWeight(createTextPanePreWeight3());
                     break;
                 case "Pre Print 4":
-                    printPreWeight(createTextPanePreWeight4(), 1.18d);
+                    printPreWeight(createTextPanePreWeight4());
                     break;
                 case "Pre Print 5":
-                    printPreWeight(createTextPanePreWeight5(), 1.18d);
+                    printPreWeight(createTextPanePreWeight5());
                     break;
                 case "Camera":
                     printCameraWeight();
@@ -6112,7 +6112,7 @@ class WeighBridge {
                     printRangaPrePrint();
                     continue;
                 case "Ranga Pre Print":
-                    printPreWeight(createTextPaneRangaPreWeight(), 1.18d);
+                    printPreWeight(createTextPaneRangaPreWeight());
                     break;
                 case "Ice Water":
                     printIceWater();
@@ -7626,17 +7626,19 @@ class WeighBridge {
         }
     }
 
-    private void printPreWeight(JTextPane textPane, double topMargin) {
+    private void printPreWeight(JTextPane textPane) {
         textPane.setBackground(Color.white);
         PrinterJob pj = PrinterJob.getPrinterJob();
         PageFormat pf = new PageFormat();
         Paper paper = pf.getPaper();
-        double width = 10d * 72d;
+        double width = 8.5d * 72d; // DO NOT CHANGE - calibrated paper width, verified correct
         double height = 6d * 72d;
         double widthMargin = 0;
-        double heightMargin = topMargin * 72d;
+        double heightMargin = 1.26d * 72d;
+        double topExtra = 6d / 25.4d * 72d; // +6mm added to the top margin only
+        double topMargin = heightMargin + topExtra;
         paper.setSize(width, height);
-        paper.setImageableArea(widthMargin, heightMargin, width - (2 * widthMargin), height - (2 * heightMargin));
+        paper.setImageableArea(widthMargin, topMargin, width - 2 * widthMargin, height - topMargin - heightMargin);
         pf.setPaper(paper);
         Book pBook = new Book();
         pBook.append(textPane.getPrintable(null, null), pf);
