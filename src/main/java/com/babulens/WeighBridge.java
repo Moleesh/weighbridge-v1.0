@@ -7635,7 +7635,7 @@ class WeighBridge {
         double height = 6d * 72d;
         double widthMargin = 0;
         double heightMargin = 1.26d * 72d;
-        double topExtra = 6d / 25.4d * 72d; // +6mm added to the top margin only
+        double topExtra = 0d / 25.4d * 72d; // +6mm added to the top margin only
         double topMargin = heightMargin + topExtra;
         paper.setSize(width, height);
         paper.setImageableArea(widthMargin, topMargin, width - 2 * widthMargin, height - topMargin - heightMargin);
@@ -7737,6 +7737,10 @@ class WeighBridge {
 
         s = doc.addStyle("7", regular);
         StyleConstants.setFontSize(s, 4);
+
+        s = doc.addStyle("8", regular);
+        StyleConstants.setBold(s, true);
+        StyleConstants.setFontSize(s, 14);
     }
 
     private JTextPane createTextPanePreWeight2() {
@@ -7797,6 +7801,7 @@ class WeighBridge {
 
     private JTextPane createTextPanePreWeight3() {
         String format = "%1$-7s%2$-30s%3$-30s%4$-12s";
+        String format1 = "%1$-6s%2$-26s%3$-26s%4$-12s";
         String[] temp = (textFieldNetDateTime.getText() + " . ").split(" ");
         String[] initString = {
                 String.format(format, "", textFieldSlNo.getText(), textFieldSlNo.getText(), textFieldSlNo.getText()),
@@ -7818,7 +7823,7 @@ class WeighBridge {
                 "\n\n",
                 String.format(format, "", textFieldTareWt.getText() + " Kg", textFieldTareWt.getText() + " Kg", textFieldTareWt.getText() + " Kg"),
                 "\n\n",
-                String.format(format, "", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg")
+                String.format(format1, "", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg", textFieldNetWt.getText() + " Kg")
         };
 
         String[] initStyles = {
@@ -7840,7 +7845,7 @@ class WeighBridge {
                 "3",
                 "1",
                 "3",
-                "1",
+                "8",
 
         };
         JTextPane textPane = new JTextPane();
