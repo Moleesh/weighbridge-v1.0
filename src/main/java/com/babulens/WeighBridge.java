@@ -4836,6 +4836,7 @@ class WeighBridge {
                 "Pre Print 4",
                 "Pre Print 5",
                 "Quotation",
+                "Quotation 1",
                 "Quotation KJJ",
                 "Ranga Plain Paper",
                 "Ranga Pre Print",
@@ -6140,6 +6141,9 @@ class WeighBridge {
                     continue;
                 case "Quotation":
                     printQuotation();
+                    continue;
+                case "Quotation 1":
+                    printQuotation1();
                     continue;
                 case "Quotation KJJ":
                     printQuotationKJJ();
@@ -8432,6 +8436,67 @@ class WeighBridge {
 
                     graphics.setFont(new Font("Courier New", Font.BOLD, 10));
                     graphics.drawString("No:", 0, y = 70);
+                    graphics.drawString("M/s:", 0, y += space);
+                    graphics.drawString("Place:", 0, y += space);
+                    graphics.drawString("Phone:", 0, y += space);
+                    graphics.drawString("Vehicle No:", 0, y += space);
+                    graphics.drawString("Material:", 0, y += space);
+                    graphics.drawString("Tare Wt.", 0, y += 30);
+                    graphics.drawString("Gross Wt.", 0, y += space);
+                    graphics.drawString("Net Wt.", 0, y += 30);
+                    graphics.drawString("Rate", 0, y += space);
+                    graphics.drawString("R.Off", 0, y += space);
+                    graphics.drawString("Total", 0, y += space);
+
+                    graphics.drawString(StringUtils.leftPad("Driver Sign", 27), 0, y + 30);
+
+                    graphics.setFont(new Font("Courier New", Font.BOLD, 9));
+                    graphics.drawString("                " + textFieldNetDateTime.getText(), 0, 70);
+
+                    return Printable.PAGE_EXISTS;
+                },
+                pf);
+        pj.setPageable(pBook);
+        try {
+            pj.setPrintService(printServices[comboBoxPrinter.getSelectedIndex()]);
+            pj.print();
+        } catch (PrinterException ignored) {
+        }
+    }
+
+    private void printQuotation1() {
+        PrinterJob pj = PrinterJob.getPrinterJob();
+        PageFormat pf = new PageFormat();
+        Paper paper = pf.getPaper();
+        double width = 2.8d * 72d;
+        double height = 5d * 72d;
+        double widthMargin = 0d * 72d;
+        double heightMargin = 0d * 72d;
+        paper.setSize(width, height);
+        paper.setImageableArea(widthMargin, heightMargin, width - (2 * widthMargin), height - (2 * heightMargin));
+        pf.setPaper(paper);
+        Book pBook = new Book();
+        pBook.append((graphics, _, _) -> {
+                    int y = 10,
+                            space = 20;
+                    graphics.setFont(new Font("Courier New", Font.BOLD, 12));
+                    graphics.drawString(StringUtils.center(title1.getText(), 29), 0, y);
+                    graphics.drawString(StringUtils.center(title2.getText(), 29), 0, y += space);
+                    graphics.drawString("    " + textFieldSlNo.getText(), 0, y += space);
+                    graphics.drawString("     " + comboBoxCustomerName.getEditor().getItem(), 0, y += space);
+                    graphics.drawString("       " + textFieldPlace.getText(), 0, y += space);
+                    graphics.drawString("       " + textFieldPhoneNo.getText(), 0, y += space);
+                    graphics.drawString("            " + comboBoxVehicleNo.getEditor().getItem(), 0, y += space);
+                    graphics.drawString("          " + comboBoxMaterial.getEditor().getItem(), 0, y += space);
+                    graphics.drawString(StringUtils.leftPad(textFieldTareWt.getText(), 27), 0, y += 30);
+                    graphics.drawString(StringUtils.leftPad(textFieldGrossWt.getText(), 27), 0, y += space);
+                    graphics.drawString(StringUtils.leftPad(textFieldNetWt.getText(), 27), 0, y += 30);
+                    graphics.drawString(StringUtils.leftPad(textFieldCustom2.getText(), 27), 0, y += space);
+                    graphics.drawString(StringUtils.leftPad(textFieldCustom3.getText(), 27), 0, y += space);
+                    graphics.drawString(StringUtils.leftPad(textFieldCharges.getText(), 27), 0, y + space);
+
+                    graphics.setFont(new Font("Courier New", Font.BOLD, 10));
+                    graphics.drawString("No:", 0, y = 50);
                     graphics.drawString("M/s:", 0, y += space);
                     graphics.drawString("Place:", 0, y += space);
                     graphics.drawString("Phone:", 0, y += space);
